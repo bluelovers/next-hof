@@ -1,0 +1,289 @@
+/**
+ * BattleDisplay 樣式
+ * BattleDisplay styles
+ *
+ * 源自 Hall of Rumor 戰報風格
+ * Derived from Hall of Rumor battle log styling
+ */
+
+.battle-display {
+  font-family: 'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif;
+  font-size: 12px;
+  color: #bdc8d7;
+  background: #10151b;
+  max-width: 780px;
+  min-width: 505px;
+  margin: 0 auto;
+  border-left: 1px solid #070b0e;
+  border-right: 1px solid #070b0e;
+  border-bottom: 1px solid #070b0e;
+}
+
+/* ==================== 戰鬥框架 ==================== */
+
+.battle-display .battle-frame {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.battle-display .battle-frame td {
+  padding: 3px;
+}
+
+/* ==================== 隊伍資訊 ==================== */
+
+.battle-display .teams {
+  width: 50%;
+  text-align: center;
+  padding: 10px;
+}
+
+.battle-display .teams .bold {
+  font-weight: bold;
+  text-shadow: 0 0 0.2em #8F7;
+}
+
+.battle-display .ttd1 {
+  border-left: 1px solid #070b0e;
+  padding-left: 10px;
+}
+
+.battle-display .ttd2 {
+  padding-left: 10px;
+}
+
+.battle-display .break {
+  border-bottom: 1px solid #070b0e;
+}
+
+.battle-display .break-top {
+  border-top: 1px solid #070b0e;
+}
+
+/* ==================== 戰場畫面 ==================== */
+
+.battle-display .btl-img {
+  background: #070b0e;
+  padding: 3px;
+}
+
+.battle-display .battle-scene {
+  position: relative;
+  margin: auto;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-position: 0px 0px;
+}
+
+.battle-display .battle-sprite {
+  position: absolute;
+  background-repeat: no-repeat;
+}
+
+.battle-display .battle-sprite.flip-h {
+  -moz-transform: scaleX(-1);
+  -o-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
+  filter: FlipH;
+  -ms-filter: "FlipH";
+}
+
+.battle-display .sprite-label {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #bdc8d7;
+  white-space: nowrap;
+  text-shadow: 0 0 4px #000;
+  pointer-events: none;
+}
+
+/* ==================== 導航箭頭 ==================== */
+
+.battle-display .nav-arrow {
+  position: absolute;
+  bottom: 0px;
+  right: 50px;
+  z-index: 100;
+}
+
+.battle-display .nav-arrow a {
+  text-decoration: none;
+  color: #8a9cb7;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.battle-display .nav-arrow a:hover {
+  text-decoration: underline;
+  color: #cbd3de;
+}
+
+/* ==================== HP/SP 狀態 ==================== */
+
+.battle-display .hpsp {
+  padding-left: 20px;
+}
+
+.battle-display .hp-bar-container,
+.battle-display .sp-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 2px 0;
+}
+
+.battle-display .hp-bar-bg,
+.battle-display .sp-bar-bg {
+  flex: 1;
+  height: 10px;
+  background: #1a232d;
+  border: 1px solid #334357;
+  border-radius: 2px;
+  overflow: hidden;
+  max-width: 120px;
+}
+
+.battle-display .hp-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.battle-display .sp-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.battle-display .hp-text {
+  font-size: 10px;
+  min-width: 65px;
+  text-align: right;
+}
+
+.battle-display .sp-text {
+  font-size: 10px;
+  min-width: 65px;
+  text-align: right;
+}
+
+/* ==================== 屬性顏色 ==================== */
+
+.battle-display .dmg {
+  color: #cc3300;
+  text-shadow: 0 0 0.2em #E63D3D;
+}
+
+.battle-display .recover {
+  color: #3366ff;
+  text-shadow: 0 0 0.2em #2E7398;
+}
+
+.battle-display .support {
+  color: #66cc66;
+  text-shadow: 0 0 0.2em #88FF77;
+}
+
+.battle-display .charge {
+  color: #ffcc33;
+  text-shadow: 0 0 0.2em #8F7;
+}
+
+.battle-display .result {
+  color: #66cc66;
+  font-weight: bold;
+  text-shadow: 0 0 0.2em #3C6237;
+}
+
+.battle-display .bold {
+  font-weight: bold;
+}
+
+.battle-display .u {
+  text-decoration: underline;
+  text-decoration-color: rgba(189, 200, 215, 0.38);
+}
+
+/* ==================== 行動日誌 ==================== */
+
+.battle-display .action-entry {
+  padding: 4px 8px;
+  border-bottom: 1px solid rgba(7, 11, 14, 0.3);
+}
+
+.battle-display .action-entry .skill-icon {
+  vertical-align: middle;
+  margin: 0 5px;
+  width: 18px;
+  height: 18px;
+}
+
+.battle-display .action-entry .skill-placeholder {
+  display: inline-block;
+  vertical-align: middle;
+  width: 18px;
+  height: 18px;
+  margin: 0 5px;
+  background: #304052;
+  border: 1px solid #334357;
+  border-radius: 3px;
+  text-align: center;
+  line-height: 18px;
+  font-size: 10px;
+}
+
+.battle-display .delay-indicator {
+  font-size: 80%;
+}
+
+/* ==================== 戰鬥結果 ==================== */
+
+.battle-display .result-title {
+  font-size: 200%;
+  text-align: center;
+  padding: 10px 0px;
+}
+
+.battle-display .result-title.win {
+  color: #66cc66;
+  text-shadow: 0 0 0.2em #3C6237;
+}
+
+.battle-display .result-title.lose {
+  color: #cc3300;
+  text-shadow: 0 0 0.2em #E63D3D;
+}
+
+.battle-display .result-stats {
+  width: 50%;
+  text-align: center;
+  padding: 10px;
+  vertical-align: top;
+}
+
+.battle-display .result-stats .stat-row {
+  padding: 2px 0;
+}
+
+/* ==================== 單位狀態摘要 ==================== */
+
+.battle-display .unit-summary {
+  padding: 2px 0;
+}
+
+.battle-display .unit-summary .unit-name {
+  font-weight: bold;
+}
+
+/* ==================== 入場動畫 ==================== */
+
+.battle-display .enter-animation {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

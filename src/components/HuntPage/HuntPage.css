@@ -1,0 +1,66 @@
+/**
+ * HuntPage 樣式
+ * HuntPage styles
+ *
+ * 狩獵列表頁面的樣式定義
+ * Styles for the hunting grounds list page
+ */
+
+/* ==================== 頁面容器 / Page container ==================== */
+
+.hunt-page {
+  font-family: 'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif;
+  font-size: 12px;
+  color: #bdc8d7;
+}
+
+/* ==================== 頁面標題 / Page title ==================== */
+
+.hunt-page h4 {
+  padding: 0 0 0 5px;
+  margin: 10px 0;
+  border-left: 14px solid #cad3df;
+  border-bottom: 1px solid #cad3df;
+  font-size: 13px;
+}
+
+/* ==================== 子導航 / Sub-navigation ==================== */
+
+.hunt-page .hunt-subnav {
+  margin: 5px 20px;
+}
+
+.hunt-page .hunt-subnav-link {
+  text-decoration: none;
+  color: #8a9cb7;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.hunt-page .hunt-subnav-link:hover {
+  text-decoration: underline;
+  color: #cbd3de;
+}
+
+.hunt-page .subnav-separator {
+  color: #bdc8d7;
+  font-size: 12px;
+}
+
+/* ==================== 獵區連結 / Area link ==================== */
+
+.hunt-page .hunt-area-link {
+  text-decoration: none;
+  color: #8a9cb7;
+  font-size: 12px;
+}
+
+.hunt-page .hunt-area-link:hover {
+  text-decoration: underline;
+  color: #cbd3de;
+}
+
+.hunt-page .hunt-level-range {
+  color: #bdc8d7;
+  font-size: 12px;
+}
