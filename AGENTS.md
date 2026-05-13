@@ -16,13 +16,32 @@
 
 ```typescript
 // ✅ 正確 / Correct: 直接從原始路徑載入
-import { JobTree } from 'src/components/GameDataPage/JobTree';
-import { SkillCard } from 'src/components/GameDataPage/SkillCard';
+import { JobTree } from '#/components/GameDataPage/JobTree';
+import { SkillCard } from '#/components/GameDataPage/SkillCard';
 
 // ❌ 錯誤 / Wrong: 透過 barrel index.ts
-import { JobTree } from 'src/components/GameDataPage';
-import { SkillCard } from 'src/components/GameDataPage';
+import { JobTree } from '#/components/GameDataPage';
+import { SkillCard } from '#/components/GameDataPage';
 ```
+
+### 使用 `#/` 根路徑別名取代相對路徑
+
+**禁止使用 `../` 多層相對路徑**，改使用 `#/` 作為專案根目錄別名。
+
+**Don't use `../` relative paths.** Always use `#/` as the project root alias.
+
+```typescript
+// ✅ 正確 / Correct: 使用 #/ 根路徑別名
+import { LoginForm } from '#/components/auth/LoginForm';
+import { GameLayout } from '#/components/pages/GameLayout';
+import type { IJobData } from '#/components/game-data/GameDataTypes';
+
+// ❌ 錯誤 / Wrong: 多層相對路徑（難以維護、搬家易壞）
+import { LoginForm } from '../auth/LoginForm';
+import { IJobData } from '../../game-data/GameDataTypes';
+```
+
+**設定方式 / Configuration:** 詳見 `docs/import-alias-guide.md`
 
 ### 檔案路徑對照表 / Component Path Reference
 
