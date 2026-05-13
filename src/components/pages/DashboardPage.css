@@ -1,0 +1,56 @@
+/**
+ * DashboardPage 樣式
+ * DashboardPage styles
+ *
+ * 注意：此檔案僅保留頁面級佈局樣式
+ * 子元件樣式已移至各自元件目錄下的 CSS 檔案
+ * Note: This file only contains page-level layout styles.
+ * Child component styles have been moved to their respective CSS files.
+ */
+
+/* ==================== 整體佈局 / Overall layout ==================== */
+
+.dashboard-page {
+  font-family: 'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif;
+  font-size: 12px;
+  color: #bdc8d7;
+}
+
+/* ==================== 頁尾 / Footer ==================== */
+
+.dashboard-footer {
+  width: 100%;
+  padding: 8px 0 4px 0;
+  background: #1b222c;
+  border-top: 1px solid #070b0e;
+  text-align: center;
+  color: #5a708f;
+  font-size: 12px;
+}
+
+.dashboard-footer .footer-link {
+  text-decoration: none;
+  color: #8a9cb7;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.dashboard-footer .footer-link:hover {
+  text-decoration: underline;
+  color: #cbd3de;
+}
+
+.dashboard-footer .footer-copyright {
+  color: #5a708f;
+  font-size: 11px;
+}
+
+/* ==================== 標題 / Headings ==================== */
+
+.dashboard-page h4 {
+  padding-left: 5px;
+  margin: 10px 0px;
+  border-left: 15px solid #cad3df;
+  border-bottom: 1px solid #cad3df;
+  display: block;
+}

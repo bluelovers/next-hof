@@ -1,0 +1,27 @@
+/**
+ * TownPage 樣式
+ * TownPage styles
+ *
+ * 注意：此檔案僅保留頁面級佈局樣式
+ * 子元件樣式已移至各自元件目錄下的 CSS 檔案
+ * Note: This file only contains page-level layout styles.
+ * Child component styles have been moved to their respective CSS files.
+ */
+
+/* ==================== 城鎮標題 / Town title ==================== */
+
+.town-page .town-page-title {
+  padding-left: 5px;
+  margin: 10px 0px;
+  border-left: 15px solid #cad3df;
+  border-bottom: 1px solid #cad3df;
+  display: block;
+  font-size: 13px;
+  color: #bdc8d7;
+}
+
+/* ==================== 設施區域容器 / Facilities area container ==================== */
+
+.town-page .town-facilities {
+  padding: 10px 15px;
+}

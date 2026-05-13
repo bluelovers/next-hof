@@ -1,0 +1,41 @@
+/**
+ * BattleResult 元件樣式
+ * BattleResult component styles
+ *
+ * 原始來源：BattleDisplay.css 第 243-268 行
+ * Source: BattleDisplay.css lines 243-268
+ *
+ * 注意：分隔線樣式 .break 和 .break-top 已移至 Shared.css（多元件共用）
+ * Note: Divider styles .break and .break-top moved to Shared.css (shared across components)
+ */
+
+/* ==================== 結果標題 / Result Title ==================== */
+
+.result-title {
+  font-size: 200%;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.result-title.win {
+  color: #66cc66;
+  text-shadow: 0 0 0.2em #3C6237;
+}
+
+.result-title.lose {
+  color: #cc3300;
+  text-shadow: 0 0 0.2em #E63D3D;
+}
+
+/* ==================== 統計數據 / Statistics ==================== */
+
+.result-stats {
+  width: 50%;
+  text-align: center;
+  padding: 10px;
+  vertical-align: top;
+}
+
+.result-stats .stat-row {
+  padding: 2px 0;
+}

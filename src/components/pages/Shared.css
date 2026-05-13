@@ -1,0 +1,62 @@
+/**
+ * 頁面共享工具樣式
+ * Shared utility styles for pages
+ */
+
+/* ==================== Clearfix / 清除浮動 ==================== */
+
+.clearfix {
+  clear: both;
+}
+
+/* ==================== Bold / 粗體 ==================== */
+
+.bold {
+  font-weight: bold;
+}
+
+/* ==================== Underline / 底線 ==================== */
+
+.u {
+  text-decoration: underline;
+  text-decoration-color: rgba(189, 200, 215, 0.38);
+}
+
+/* ==================== Battle 共享樣式 / Battle Shared Styles ==================== */
+
+/* 這些樣式被多個 Battle 子元件使用，因此放在 Shared.css */
+.ttd1 {
+  border-left: 1px solid #070b0e;
+  padding-left: 10px;
+}
+
+.ttd2 {
+  padding-left: 10px;
+}
+
+.break {
+  border-bottom: 1px solid #070b0e;
+}
+
+.break-top {
+  border-top: 1px solid #070b0e;
+}
+
+.result {
+  color: #66cc66;
+  font-weight: bold;
+  text-shadow: 0 0 0.2em #3C6237;
+}
+
+/* ==================== BattleUnit 共享樣式 / BattleUnit Shared Styles ==================== */
+
+/* 單位容器 / Unit container */
+.hpsp {
+  padding-left: 20px;
+}
+
+/* 蓄力/詠唱狀態 / Charge/casting status */
+.charge {
+  color: #ffcc33;
+  text-shadow: 0 0 0.2em #8F7;
+}

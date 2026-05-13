@@ -1,0 +1,29 @@
+/**
+ * RankingTable 樣式
+ * RankingTable styles
+ *
+ * Hall of Rumor 風格的排行榜表格
+ * Hall of Rumor styled ranking table
+ */
+
+/* ==================== 表格容器 / Table wrapper ==================== */
+
+.ranking-table-wrapper {
+  /* 外層 wrapper 樣式（取代 .home-page） */
+}
+
+/* ==================== 排行榜表格 / Ranking table ==================== */
+
+.ranking-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.ranking-table td {
+  padding: 3px;
+}
+
+.ranking-table .td-header {
+  background-color: #304052;
+  text-align: center;
+}

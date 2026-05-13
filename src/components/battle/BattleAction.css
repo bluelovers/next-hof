@@ -1,0 +1,56 @@
+/**
+ * BattleAction 元件樣式
+ * BattleAction component styles
+ *
+ * 原始來源：BattleDisplay.css 第 174-239 行
+ * Source: BattleDisplay.css lines 174-239
+ */
+
+/* ==================== 屬性顏色 / Attribute Colors ==================== */
+
+.dmg {
+  color: #cc3300;
+  text-shadow: 0 0 0.2em #E63D3D;
+}
+
+.recover {
+  color: #3366ff;
+  text-shadow: 0 0 0.2em #2E7398;
+}
+
+.support {
+  color: #66cc66;
+  text-shadow: 0 0 0.2em #88FF77;
+}
+
+/* ==================== 行動日誌 / Action Log ==================== */
+
+.action-entry {
+  padding: 4px 8px;
+  border-bottom: 1px solid rgba(7, 11, 14, 0.3);
+}
+
+.action-entry .skill-icon {
+  vertical-align: middle;
+  margin: 0 5px;
+  width: 18px;
+  height: 18px;
+}
+
+.action-entry .skill-placeholder {
+  display: inline-block;
+  vertical-align: middle;
+  width: 18px;
+  height: 18px;
+  margin: 0 5px;
+  background: #304052;
+  border: 1px solid #334357;
+  border-radius: 3px;
+  text-align: center;
+  line-height: 18px;
+  font-size: 10px;
+}
+
+.delay-indicator {
+  font-size: 80%;
+}

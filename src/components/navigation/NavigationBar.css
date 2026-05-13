@@ -1,0 +1,46 @@
+/**
+ * NavigationBar 導航欄樣式
+ * NavigationBar styles
+ */
+
+/* ==================== 導航列容器 / Navigation container ==================== */
+
+.dashboard-nav {
+  padding: 8px 10px 5px 10px;
+  border-top: 1px solid #070b0e;
+  background: #304052;
+}
+
+/* ==================== 導航連結 / Navigation links ==================== */
+
+.dashboard-nav-link {
+  text-decoration: none;
+  color: #8a9cb7;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.dashboard-nav-link:hover {
+  text-decoration: underline;
+  color: #cbd3de;
+}
+
+.dashboard-nav-link-active {
+  color: #c69500;
+}
+
+.dashboard-nav-link-active:hover {
+  color: #ffcc33;
+}
+
+/* ==================== 分隔線 / Divider ==================== */
+
+.nav-divide {
+  border-left: 1px solid #070b0e;
+  width: 1px;
+  background: #070b0e;
+  margin: 0px 15px;
+  display: inline-block;
+  height: 14px;
+  vertical-align: middle;
+}

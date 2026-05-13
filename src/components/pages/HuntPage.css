@@ -1,0 +1,105 @@
+/**
+ * HuntPage Styles
+ * Styles for the hunting grounds list page
+ *
+ * Includes land_frame card pedestal and terrain background classes
+ */
+.hunt-page {
+  font-family: 'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif;
+  font-size: 12px;
+  color: #bdc8d7;
+}
+.hunt-page h4 {
+  padding: 0 0 0 5px;
+  margin: 10px 0;
+  border-left: 14px solid #cad3df;
+  border-bottom: 1px solid #cad3df;
+  font-size: 13px;
+}
+
+/* Sub-navigation */
+.hunt-page .hunt-subnav {
+  margin: 5px 20px;
+}
+.hunt-page .hunt-subnav-link {
+  text-decoration: none;
+  color: #8a9cb7;
+  font-weight: bold;
+  font-size: 12px;
+}
+.hunt-page .hunt-subnav-link:hover {
+  text-decoration: underline;
+  color: #cbd3de;
+}
+.hunt-page .subnav-separator {
+  color: #bdc8d7;
+  font-size: 12px;
+}
+
+/* Area list container */
+.hunt-page .hunt-area-list {
+  text-align: center;
+  margin: 15px;
+}
+
+/* land_frame card pedestal */
+.hunt-page .land_frame {
+  display: inline-block;
+  min-width: 150px;
+  vertical-align: top;
+  margin: 8px;
+}
+.hunt-page .land_frame .land {
+  margin: 0;
+  padding: 0;
+}
+.hunt-page .land_frame .g_name {
+  display: block;
+}
+
+/* Land base styles */
+.hunt-page .land {
+  padding-bottom: 20px;
+  margin: 20px 0 3px;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  min-height: 70px;
+  min-width: 150px;
+}
+
+/* Land background variants */
+.hunt-page .land_aband       { background-image: url('/image/land/land_aband.png'); }
+.hunt-page .land_grass       { background-image: url('/image/land/land_grass.png'); }
+.hunt-page .land_grass01     { background-image: url('/image/land/land_grass01.png'); }
+.hunt-page .land_sea         { background-image: url('/image/land/land_sea.png'); }
+.hunt-page .land_cave        { background-image: url('/image/land/land_cave.png'); }
+.hunt-page .land_snow        { background-image: url('/image/land/land_snow.png'); }
+.hunt-page .land_swamp       { background-image: url('/image/land/land_swamp.png'); }
+.hunt-page .land_ocean       { background-image: url('/image/land/land_ocean.png'); }
+.hunt-page .land_ocean0      { background-image: url('/image/land/land_ocean0.png'); }
+.hunt-page .land_sand        { background-image: url('/image/land/land_sand.png'); }
+.hunt-page .land_sand1       { background-image: url('/image/land/land_sand1.png'); }
+.hunt-page .land_mount       { background-image: url('/image/land/land_mount.png'); }
+.hunt-page .land_lava        { background-image: url('/image/land/land_lava.png'); }
+.hunt-page .land_pavement01  { background-image: url('/image/land/land_pavement01.png'); }
+.hunt-page .land_build01     { background-image: url('/image/land/land_build01.png'); }
+.hunt-page .land_jungle      { background-image: url('/image/land/land_jungle.png'); }
+.hunt-page .land_nest        { background-image: url('/image/land/land_nest.png'); }
+.hunt-page .land_noimage     { background-image: url('/image/land/land_noimage.png'); }
+
+/* Area name link */
+.hunt-page .g_name a {
+  text-decoration: none;
+  color: #8a9cb7;
+  font-size: 12px;
+}
+.hunt-page .g_name a:hover {
+  text-decoration: underline;
+  color: #cbd3de;
+}
+
+/* Level range text */
+.hunt-page .hunt-level-range {
+  color: #bdc8d7;
+  font-size: 12px;
+}

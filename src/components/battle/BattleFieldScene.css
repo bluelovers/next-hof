@@ -1,0 +1,50 @@
+/**
+ * BattleFieldScene 元件樣式
+ * BattleFieldScene component styles
+ *
+ * 原始來源：BattleDisplay.css 第 65-102 行
+ * Source: BattleDisplay.css lines 65-102
+ */
+
+/* ==================== 戰鬥畫面背景 / Battle Scene Background ==================== */
+
+.btl-img {
+  background: #070b0e;
+  padding: 3px;
+}
+
+.battle-scene {
+  position: relative;
+  margin: auto;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-position: 0px 0px;
+}
+
+/* ==================== 精靈圖層 / Sprite Layers ==================== */
+
+.battle-sprite {
+  position: absolute;
+  background-repeat: no-repeat;
+}
+
+.battle-sprite.flip-h {
+  -moz-transform: scaleX(-1);
+  -o-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
+  filter: FlipH;
+  -ms-filter: "FlipH";
+}
+
+.sprite-label {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #bdc8d7;
+  white-space: nowrap;
+  text-shadow: 0 0 4px #000;
+  pointer-events: none;
+}

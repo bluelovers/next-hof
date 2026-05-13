@@ -1,0 +1,16 @@
+/**
+ * CharacterList 角色列表容器樣式
+ * CharacterList styles
+ */
+
+/* ==================== 角色列表容器 / Character list container ==================== */
+
+.dashboard-characters.margin15 {
+  margin: 15px;
+}
+
+/* ==================== 清除浮動 / Clearfix ==================== */
+
+.clearfix {
+  clear: both;
+}

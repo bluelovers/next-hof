@@ -1,0 +1,30 @@
+/**
+ * GDSubNav 樣式
+ * GDSubNav (GameData sub-navigation) styles
+ */
+
+/* ==================== 子導航容器 / Sub-navigation container ==================== */
+
+.gd-subnav {
+  margin: 15px;
+}
+
+/* ==================== 導航連結 / Navigation links ==================== */
+
+.gd-subnav a {
+  text-decoration: none;
+  color: #8a9cb7;
+  font-weight: bold;
+  margin: 0 4px;
+}
+
+.gd-subnav a:hover {
+  text-decoration: underline;
+  color: #cbd3de;
+}
+
+/* ==================== 分隔符 / Divider ==================== */
+
+.gd-subnav .subnav-divide {
+  color: #5a708f;
+}

@@ -1,0 +1,57 @@
+/**
+ * GameDescription 樣式
+ * GameDescription styles
+ *
+ * Hall of Rumor 風格的遊戲簡介區域
+ * Hall of Rumor styled game description section
+ */
+
+/* ==================== 遊戲簡介容器 / Game description wrapper ==================== */
+
+.game-description-wrapper {
+  /* 外層 wrapper 樣式（取代 .home-page） */
+}
+
+/* ==================== 裝飾圖 / Decoration ==================== */
+
+.hof-decoration {
+  width: 350px;
+  text-align: center;
+  height: 199px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  background: #1b222c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5a708f;
+  font-size: 24px;
+}
+
+/* ==================== 遊戲描述內容 / Game description content ==================== */
+
+.game-description {
+  margin-left: 20px;
+}
+
+.game-description .section-title {
+  text-decoration: underline;
+  text-decoration-color: rgba(189, 200, 215, 0.38);
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+
+.game-description ul {
+  list-style: none outside none;
+  margin-left: 0;
+  margin-bottom: 12px;
+}
+
+.game-description li {
+  margin-left: 40px;
+}
+
+.game-description .battle-link {
+  color: #c69500;
+  font-weight: bold;
+}

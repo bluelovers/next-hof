@@ -1,0 +1,28 @@
+/**
+ * FacilityGroup 設施群組樣式
+ * FacilityGroup styles
+ */
+
+/* ==================== 設施群組容器 / Facility group container ==================== */
+
+.town-facility-group {
+  margin-bottom: 12px;
+}
+
+/* ==================== 群組標題 / Group title ==================== */
+
+.town-facility-group-title {
+  font-size: 12px;
+  color: #8a9cb7;
+  margin: 6px 0 3px 0;
+  padding: 0;
+  border: none;
+  display: inline;
+}
+
+/* ==================== 群組項目列表 / Group items list ==================== */
+
+.town-facility-group-items {
+  display: inline;
+  margin-left: 8px;
+}

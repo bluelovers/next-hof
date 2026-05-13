@@ -1,0 +1,27 @@
+/**
+ * JobDetailTable 職業詳細表格樣式
+ * JobDetailTable styles
+ */
+
+/* ==================== 表格容器 / Table container ==================== */
+
+.job-detail-table {
+  border-collapse: collapse;
+  width: 740px;
+}
+
+/* ==================== 表格單元格 / Table cells ==================== */
+
+.job-detail-table td {
+  padding: 3px;
+}
+
+/* ==================== 背景顏色交替 / Background alternation ==================== */
+
+.td-base {
+  background-color: #304052;
+}
+
+.td-alt {
+  background-color: #384b5f;
+}

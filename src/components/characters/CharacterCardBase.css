@@ -1,0 +1,82 @@
+/**
+ * CharacterCard / BattleCharacterCard 共享底座樣式
+ * Shared pedestal styles for CharacterCard and BattleCharacterCard
+ */
+
+/* ==================== carpet_frame 底座容器 / Pedestal container ==================== */
+
+.carpet_frame {
+  display: inline-block;
+  margin: 8px;
+  text-align: center;
+  vertical-align: top;
+  width: 150px;
+  white-space: nowrap;
+  font-size: 12px;
+  color: #bdc8d7;
+}
+
+/* ==================== carpet0 / carpet1 交替地毯背景 / Alternating backgrounds ==================== */
+
+.carpet0,
+.carpet1 {
+  display: block;
+  text-align: center;
+  width: 150px;
+  height: 76px;
+  background-repeat: no-repeat;
+  background-position: 50% 100%;
+  padding: 0 0 20px;
+  margin: 20px 0 3px;
+}
+
+.carpet0 {
+  background-image: url('/image/carpet011.png');
+}
+
+.carpet1 {
+  background-image: url('/image/carpet010.png');
+}
+
+.carpet0 a,
+.carpet1 a {
+  display: inline;
+}
+
+.carpet0 img,
+.carpet1 img {
+  border: 0;
+  vertical-align: baseline;
+}
+
+/* ==================== 文字資訊區 / Text info area ==================== */
+
+.carpet_frame div[id^="text"] {
+  display: block;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  width: 150px;
+  line-height: 16.8px;
+  font-size: 12px;
+  color: #bdc8d7;
+}
+
+/* 未選取狀態（半透明變暗）/ Unselected state (dimmed) */
+.carpet_frame div[id^="text"].unselect {
+  color: #506685;
+}
+
+/* 星標樣式 / Star marker */
+.carpet_frame .bold.charge {
+  color: #c69500;
+  font-weight: bold;
+}
+
+/* ==================== 選取控件 / Selection controls ==================== */
+
+.carpet_frame input[type="radio"],
+.carpet_frame input[type="checkbox"] {
+  margin: 0 1px 0 0;
+  accent-color: #c69500;
+}

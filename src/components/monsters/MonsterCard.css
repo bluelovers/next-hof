@@ -1,0 +1,50 @@
+/**
+ * MonsterCard 怪物卡片樣式
+ * MonsterCard styles
+ */
+
+/* ==================== 地形容器 / Land container ==================== */
+
+.carpet_frame .land {
+  padding-bottom: 20px;
+  margin: 20px 0 3px;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  min-height: 70px;
+  min-width: 150px;
+}
+
+/* ==================== 地形背景變體 / Land background variants ==================== */
+
+/**
+ * 地形背景圖片
+ * Land background images
+ *
+ * 圖片路徑：/image/land/land_{type}.png
+ * Image path: /image/land/land_{type}.png
+ */
+
+.carpet_frame .land_aband      { background-image: url('/image/land/land_aband.png'); }
+.carpet_frame .land_grass      { background-image: url('/image/land/land_grass.png'); }
+.carpet_frame .land_grass01    { background-image: url('/image/land/land_grass01.png'); }
+.carpet_frame .land_sea        { background-image: url('/image/land/land_sea.png'); }
+.carpet_frame .land_cave       { background-image: url('/image/land/land_cave.png'); }
+.carpet_frame .land_snow       { background-image: url('/image/land/land_snow.png'); }
+.carpet_frame .land_swamp      { background-image: url('/image/land/land_swamp.png'); }
+.carpet_frame .land_ocean0     { background-image: url('/image/land/land_ocean0.png'); }
+.carpet_frame .land_sand       { background-image: url('/image/land/land_sand.png'); }
+.carpet_frame .land_sand1      { background-image: url('/image/land/land_sand1.png'); }
+.carpet_frame .land_mount      { background-image: url('/image/land/land_mount.png'); }
+.carpet_frame .land_lava       { background-image: url('/image/land/land_lava.png'); }
+.carpet_frame .land_pavement01 { background-image: url('/image/land/land_pavement01.png'); }
+.carpet_frame .land_build01    { background-image: url('/image/land/land_build01.png'); }
+.carpet_frame .land_jungle     { background-image: url('/image/land/land_jungle.png'); }
+.carpet_frame .land_nest       { background-image: url('/image/land/land_nest.png'); }
+.carpet_frame .land_noimage    { background-image: url('/image/land/land_noimage.png'); }
+
+/* ==================== 怪物圖片 / Monster image ==================== */
+
+.carpet_frame .land img {
+  border: 0;
+  vertical-align: baseline;
+}

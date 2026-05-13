@@ -1,0 +1,75 @@
+/**
+ * BattlePage 戰鬥編成頁樣式
+ * BattlePage styles
+ *
+ * 狩獵編成畫面 — 選取角色與怪物展示
+ * Battle formation screen — character selection and monster display
+ *
+ * 原始站真實樣式對照 / Original site actual style reference:
+ * .land:      { padding-bottom:20px; margin:20px 0 3px; background-position:center bottom;
+ *               background-repeat:no-repeat; min-height:70px; min-width:150px }
+ * .land_*:    { background-image:url('/image/land/land_*.png') }
+ * .btn:       { font-size:12px; color:#565656; background:#f5f5f5;
+ *               padding:4px 10px 3px 7px; margin:2px 7px 8px 2px; cursor:pointer }
+ */
+
+/* ==================== 戰鬥編成頁容器 / Battle page container ==================== */
+
+.battle-page {
+  font-family: 'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif;
+  font-size: 12px;
+  color: #bdc8d7;
+}
+
+/* ==================== 標題 / Headings ==================== */
+
+.battle-page h4 {
+  padding-left: 5px;
+  margin: 10px 0;
+  border-left: 15px solid #cad3df;
+  border-bottom: 1px solid #cad3df;
+  display: block;
+}
+
+/* ==================== 角色列容器（置中排列）/ Character row container (center-aligned) ==================== */
+
+/**
+ * 角色卡片使用 text-align:center 置中，與原始站一致
+ * Character cards center-aligned to match original site
+ */
+.battle-characters {
+  text-align: center;
+}
+
+/* ==================== 動作按鈕 / Action buttons ==================== */
+
+.battle-page .btn {
+  font-size: 12px;
+  color: #565656;
+  background: #f5f5f5;
+  border: none;
+  padding: 4px 10px 3px 7px;
+  margin: 2px 7px 8px 2px;
+  cursor: pointer;
+}
+
+/* ==================== 儲存隊伍標籤 / Save party label ==================== */
+
+.battle-page .battle-save-label {
+  font-size: 12px;
+  color: #bdc8d7;
+  cursor: default;
+}
+
+.battle-page .battle-save-label input[type="checkbox"] {
+  accent-color: #c69500;
+}
+
+/* ==================== 分隔線 / Horizontal rule ==================== */
+
+.battle-page hr {
+  /* 保留瀏覽器預設樣式，與原始站一致 */
+  margin: 8px 0;
+}
+
+

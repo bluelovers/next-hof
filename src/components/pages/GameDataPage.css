@@ -1,0 +1,16 @@
+/**
+ * GameDataPage 樣式
+ * GameDataPage styles
+ *
+ * 注意：此檔案僅保留頁面級佈局樣式
+ * 子元件樣式已移至各自元件目錄下的 CSS 檔案
+ * Note: This file only contains page-level layout styles.
+ * Child component styles have been moved to their respective CSS files.
+ */
+
+/* ==================== 頁面容器 / Page container ==================== */
+
+.gamedata-page {
+  /* 頁面級佈局樣式（如有） */
+  /* Page-level layout styles (if any) */
+}

@@ -1,0 +1,65 @@
+/**
+ * LoginForm 樣式
+ * LoginForm styles
+ *
+ * Hall of Rumor 風格的登入表單
+ * Hall of Rumor styled login form
+ */
+
+/* ==================== 登入表單容器 / Login form container ==================== */
+
+.login-form-wrapper {
+  padding-left: 20px;
+}
+
+.login-form {
+  /* 表單本身無額外 padding（由 wrapper 提供） */
+}
+
+/* ==================== 表格 / Table ==================== */
+
+.login-form table {
+  border-collapse: collapse;
+}
+
+.login-form td {
+  padding: 2px 4px;
+}
+
+/* ==================== 輸入框 / Text input ==================== */
+
+.login-form .text-input {
+  padding: 1px 5px 0px 5px;
+  color: #10151b;
+  border: 1px solid #1a232d;
+  background: #91a2bb;
+  font-size: 12px;
+  font-family: 'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif;
+}
+
+/* ==================== 文字對齊 / Text alignment ==================== */
+
+.login-form .text-right {
+  text-align: right;
+}
+
+/* ==================== 登入按鈕 / Login button ==================== */
+
+.login-form .btn-login {
+  font-size: 12px;
+  padding: 5px 8px 2px 8px;
+  margin-top: 5px;
+  margin-right: 5px;
+  font-weight: bold;
+  text-align: center;
+  color: #181818;
+  border: 1px solid #334357;
+  background: #91a2bb;
+  cursor: pointer;
+}
+
+/* ==================== 新遊戲連結 / New game link ==================== */
+
+.login-form .newgame-link {
+  margin-left: 8px;
+}

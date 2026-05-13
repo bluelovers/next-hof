@@ -1,0 +1,30 @@
+/**
+ * HomePage 樣式
+ * HomePage styles
+ *
+ * 僅包含頁面佈局相關樣式
+ * Layout styles only (component-specific styles moved to components)
+ */
+
+/* ==================== 兩欄佈局 / Two-column layout ==================== */
+
+.home-page .hp-container {
+  width: 730px;
+}
+
+.home-page .hp-right {
+  width: 350px;
+  float: right;
+}
+
+.home-page .hp-left {
+  width: 350px;
+  padding: 15px;
+  float: left;
+}
+
+/* ==================== Clearfix ==================== */
+
+.home-page .c-both {
+  clear: both;
+}

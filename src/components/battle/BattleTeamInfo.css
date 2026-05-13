@@ -1,0 +1,13 @@
+/**
+ * BattleTeamInfo 元件樣式
+ * BattleTeamInfo component styles
+ *
+ * 原始來源：BattleDisplay.css 第 35-39 行
+ * Source: BattleDisplay.css lines 35-39
+ */
+
+.teams {
+  width: 50%;
+  text-align: center;
+  padding: 10px;
+}

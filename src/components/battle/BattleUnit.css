@@ -1,0 +1,77 @@
+/**
+ * BattleUnit 元件樣式
+ * BattleUnit component styles
+ *
+ * 原始來源：BattleDisplay.css 第 131-170、272-278 行
+ * Source: BattleDisplay.css lines 131-170, 272-278
+ */
+
+/* ==================== 單位摘要 / Unit Summary ==================== */
+
+.unit-summary {
+  padding: 2px 0;
+}
+
+.unit-summary .unit-name {
+  font-weight: bold;
+}
+
+/* ==================== HP 狀態條 / HP Bar ==================== */
+
+.hp-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 2px 0;
+}
+
+.hp-bar-bg {
+  flex: 1;
+  height: 10px;
+  background: #1a232d;
+  border: 1px solid #334357;
+  border-radius: 2px;
+  overflow: hidden;
+  max-width: 120px;
+}
+
+.hp-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.hp-text {
+  font-size: 10px;
+  min-width: 65px;
+  text-align: right;
+}
+
+/* ==================== SP 狀態條 / SP Bar ==================== */
+
+.sp-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 2px 0;
+}
+
+.sp-bar-bg {
+  flex: 1;
+  height: 10px;
+  background: #1a232d;
+  border: 1px solid #334357;
+  border-radius: 2px;
+  overflow: hidden;
+  max-width: 120px;
+}
+
+.sp-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.sp-text {
+  font-size: 10px;
+  min-width: 65px;
+  text-align: right;
+}

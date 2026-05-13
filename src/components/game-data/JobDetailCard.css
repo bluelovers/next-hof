@@ -1,0 +1,51 @@
+/**
+ * JobDetailCard 職業詳細卡片樣式
+ * JobDetailCard styles
+ */
+
+/* ==================== 職業名稱單元格 / Job name cell ==================== */
+
+.job-name-cell {
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.job-name-bold {
+  font-weight: bold;
+  color: #bdc8d7;
+}
+
+/* ==================== 精靈單元格 / Sprite cell ==================== */
+
+.job-sprite-cell {
+  white-space: nowrap;
+}
+
+.job-sprite {
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  background: #1b222c;
+  border: 1px solid #070b0e;
+  margin: 0 2px;
+  vertical-align: middle;
+}
+
+/* ==================== 描述單元格 / Description cell ==================== */
+
+.job-desc-cell {
+  color: #bdc8d7;
+}
+
+/* ==================== 裝備列 / Equipment row ==================== */
+
+.equipment-row {
+  margin-left: 30px;
+  padding: 2px 0;
+}
+
+/* ==================== 技能列 / Skills row ==================== */
+
+.skills-row {
+  padding-left: 30px;
+}

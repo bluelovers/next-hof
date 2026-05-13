@@ -1,0 +1,64 @@
+/**
+ * JobTree 職業樹樣式
+ * JobTree styles
+ */
+
+/* ==================== 職業樹容器 / Job tree container ==================== */
+
+.job-tree {
+  margin: 15px;
+}
+
+/* ==================== 樹狀清單 / Tree list ==================== */
+
+.job-tree ul {
+  list-style: none;
+  padding-left: 20px;
+  margin: 0;
+}
+
+/* ==================== 樹狀節點 / Tree nodes ==================== */
+
+.job-tree li {
+  position: relative;
+  margin: 4px 0;
+}
+
+/* 連接線（可選）/ Connecting lines (optional) */
+.job-tree li::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -12px;
+  width: 12px;
+  height: 1px;
+  background-color: #5a708f;
+}
+
+.job-tree li::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -12px;
+  width: 1px;
+  height: 100%;
+  background-color: #5a708f;
+}
+
+/* 最后一个子节点移除竖线 / Remove vertical line for last child */
+.job-tree li:last-child::after {
+  height: 12px;
+}
+
+/* ==================== 職稱連結 / Job title links ==================== */
+
+.job-tree a {
+  text-decoration: none;
+  color: #8a9cb7;
+  font-weight: bold;
+}
+
+.job-tree a:hover {
+  text-decoration: underline;
+  color: #cbd3de;
+}

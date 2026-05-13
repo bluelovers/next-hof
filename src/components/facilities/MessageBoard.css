@@ -1,0 +1,84 @@
+/**
+ * MessageBoard 留言板樣式
+ * MessageBoard styles
+ */
+
+/* ==================== 留言板容器 / Message board container ==================== */
+
+.town-message-board {
+  margin: 15px;
+}
+
+/* ==================== 留言板標題 / Message board title ==================== */
+
+.town-message-board-title {
+  padding-left: 5px;
+  margin: 10px 0px;
+  border-left: 15px solid #cad3df;
+  border-bottom: 1px solid #cad3df;
+  display: block;
+  font-size: 13px;
+  color: #bdc8d7;
+}
+
+/* ==================== 留言板內容 / Message board content ==================== */
+
+.town-message-board-content {
+  padding: 8px 0;
+}
+
+/* ==================== 歷史留言 / Historical messages ==================== */
+
+.town-messages {
+  margin-bottom: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.town-message-item {
+  padding: 4px 8px;
+  color: #8a9cb7;
+  font-size: 12px;
+  border-bottom: 1px solid #1b222c;
+}
+
+/* ==================== 輸入表單 / Input form ==================== */
+
+.town-message-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.town-message-input {
+  flex: 1;
+  padding: 3px 5px;
+  color: #bdc8d7;
+  border: 1px solid #304052;
+  background: #1b222c;
+  font-size: 12px;
+  font-family: 'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif;
+}
+
+.town-message-input:focus {
+  outline: none;
+  border-color: #c69500;
+}
+
+/* ==================== 送出按鈕 / Submit button ==================== */
+
+.town-message-button {
+  padding: 3px 12px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #bdc8d7;
+  border: 1px solid #304052;
+  background: #202935;
+  cursor: pointer;
+  font-family: 'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif;
+}
+
+.town-message-button:hover {
+  background: #304052;
+  color: #fff;
+}

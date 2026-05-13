@@ -1,0 +1,35 @@
+/**
+ * TeamStatus 隊伍狀態樣式
+ * TeamStatus styles
+ */
+
+/* ==================== 隊伍狀態容器 / Team status container ==================== */
+
+.dashboard-team-status {
+  padding: 10px;
+  background: #1b222c;
+  border-bottom: 1px solid #070b0e;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* ==================== 隊伍名稱 / Team name ==================== */
+
+.team-name {
+  font-weight: bold;
+  color: #cbd3de;
+  font-size: 14px;
+}
+
+/* ==================== 資金 / Funds ==================== */
+
+.team-funds {
+  color: #8a9cb7;
+}
+
+/* ==================== 時間 / Time ==================== */
+
+.team-time {
+  color: #8a9cb7;
+}

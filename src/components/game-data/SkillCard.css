@@ -1,0 +1,104 @@
+/**
+ * SkillCard 技能卡片樣式
+ * SkillCard styles
+ */
+
+/* ==================== 技能卡片容器 / Skill card container ==================== */
+
+.g-skill {
+  display: inline-block;
+  padding: 1px 0;
+}
+
+/* ==================== 技能名稱 / Skill name ==================== */
+
+.g-skill .g-name {
+  text-shadow: 0 0 0.2em #8f7;
+  cursor: help;
+}
+
+/* ==================== 技能圖示 / Skill icon ==================== */
+
+.g-skill .skill-icon-img {
+  vertical-align: middle;
+  margin: 0 5px;
+  width: 18px;
+  height: 18px;
+}
+
+.g-skill .skill-icon-placeholder {
+  display: inline-block;
+  vertical-align: middle;
+  width: 18px;
+  height: 18px;
+  margin: 0 5px;
+  background: #1b222c;
+  border: 1px solid #334357;
+  border-radius: 3px;
+  text-align: center;
+  line-height: 18px;
+  font-size: 10px;
+  color: #5a708f;
+}
+
+/* ==================== 目標顏色 / Target colors ==================== */
+
+.tgt-enemy {
+  color: #cc3300;
+  text-shadow: 0 0 0.2em #e63d3d;
+}
+
+.tgt-friend {
+  color: #3366ff;
+  text-shadow: 0 0 0.2em #2e7398;
+}
+
+.tgt-self {
+  color: #66cc66;
+  text-shadow: 0 0 0.2em #88ff77;
+}
+
+/* ==================== 範圍顏色 / Scope colors ==================== */
+
+.scp-normal {
+  color: #3366ff;
+  text-shadow: 0 0 0.2em #2e7398;
+}
+
+.scp-multi {
+  color: #993399;
+  text-shadow: 0 0 0.2em #b02fdd;
+}
+
+/* ==================== SP / Power / Hit rate ==================== */
+
+.sp-cost {
+  color: #66cc66;
+  text-shadow: 0 0 0.2em #88ff77;
+}
+
+.power-pct {
+  color: #bdc8d7;
+}
+
+.hit-rate {
+  color: #bdc8d7;
+}
+
+.weapon-limit {
+  color: #5a708f;
+  font-size: 11px;
+}
+
+/* ==================== 其他屬性 / Extra attributes ==================== */
+
+.extra-attr {
+  color: #ffcc33;
+  text-shadow: 0 0 0.2em #8f7;
+}
+
+/* ==================== 技能效果 / Skill effect ==================== */
+
+.skill-effect {
+  color: #bdc8d7;
+}

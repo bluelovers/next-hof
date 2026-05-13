@@ -1,0 +1,29 @@
+/**
+ * InfoSection 樣式
+ * InfoSection styles
+ *
+ * Hall of Rumor 風格的系統資訊區域
+ * Hall of Rumor styled system info section
+ */
+
+/* ==================== 資訊區域容器 / Info section wrapper ==================== */
+
+.info-section-wrapper {
+  /* 外層 wrapper 樣式（取代 .home-page） */
+  margin: 15px;
+}
+
+/* ==================== 資訊標題 / Info heading ==================== */
+
+.info-section h4 {
+  padding-left: 5px;
+  margin: 10px 0px;
+  border-left: 15px solid #cad3df;
+  border-bottom: 1px solid #cad3df;
+}
+
+/* ==================== 資訊文字 / Info text ==================== */
+
+.info-section .info-text {
+  margin: 4px 0;
+}
