@@ -13,14 +13,14 @@
  * - 戰鬥結果 / Battle result
  */
 import React from 'react';
-import type { IBattleDisplayData, IBattleUnit } from './types';
-import { BattleTeamInfo } from './BattleTeamInfo';
-import { BattleFieldScene } from './BattleFieldScene';
-import { BattleUnit } from './BattleUnit';
-import { BattleLog } from './BattleLog';
-import { BattleResult } from './BattleResult';
+import type { IBattleDisplayData, IBattleUnit } from '#/components/battle/types';
+import { BattleTeamInfo } from '#/components/battle/BattleTeamInfo';
+import { BattleFieldScene } from '#/components/battle/BattleFieldScene';
+import { BattleUnit } from '#/components/battle/BattleUnit';
+import { BattleLog } from '#/components/battle/BattleLog';
+import { BattleResult } from '#/components/battle/BattleResult';
 import './BattleDisplay.css';
-import '../pages/Shared.css';
+import '#/components/pages/Shared.css';
 
 /** 戰鬥顯示屬性 / Battle display props */
 export interface IBattleDisplayProps {

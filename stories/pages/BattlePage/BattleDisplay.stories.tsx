@@ -7,11 +7,11 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { BattleDisplay } from '../../src/components/battle/BattleDisplay';
-import type { IBattleDisplayData, IBattleAction } from '../../src/components/battle/types';
+import { BattleDisplay } from '#/components/pages/BattleDisplay';
+import type { IBattleDisplayData, IBattleAction } from '#/components/battle/types';
 
 const meta: Meta<typeof BattleDisplay> = {
-  title: 'Battle/BattleDisplay',
+  title: 'Pages/BattlePage/BattleDisplay',
   component: BattleDisplay,
   parameters: {
     layout: 'fullscreen',

@@ -72,15 +72,15 @@ import { IJobData } from '../../game-data/GameDataTypes';
 | JobTree | `src/components/GameDataPage/JobTree` |
 | JobDetailTable | `src/components/GameDataPage/JobDetailTable` |
 | CharacterSpriteDisplay | `src/components/GameDataPage/CharacterSpriteDisplay` |
-| BattleDisplay | `src/components/BattleDisplay/BattleDisplay` |
-| BattleTeamInfo | `src/components/BattleDisplay/BattleTeamInfo` |
-| BattleUnit | `src/components/BattleDisplay/BattleUnit` |
-| BattleAction | `src/components/BattleDisplay/BattleAction` |
-| BattleLog | `src/components/BattleDisplay/BattleLog` |
-| BattleFieldScene | `src/components/BattleDisplay/BattleFieldScene` |
-| BattleResult | `src/components/BattleDisplay/BattleResult` |
+| BattleDisplay | `src/components/pages/BattleDisplay` |
+| BattleTeamInfo | `src/components/battle/BattleTeamInfo` |
+| BattleUnit | `src/components/battle/BattleUnit` |
+| BattleAction | `src/components/battle/BattleAction` |
+| BattleLog | `src/components/battle/BattleLog` |
+| BattleFieldScene | `src/components/battle/BattleFieldScene` |
+| BattleResult | `src/components/battle/BattleResult` |
 | GameDataTypes | `src/components/GameDataPage/GameDataTypes` |
-| BattleDisplay/types | `src/components/BattleDisplay/types` |
+| BattleDisplay/types | `src/components/battle/types` |
 
 ---
 
@@ -127,3 +127,139 @@ import { IJobData } from '../../game-data/GameDataTypes';
 ### ~JobDetailCard.tsx — spriteUrls 未實際渲染~（✅ 已修正）
 
 `src/components/GameDataPage/JobDetailCard.tsx` 的 sprite span 已補上 `backgroundImage` 樣式。
+
+---
+
+## 元件 CSS 獨立性規則 / Component CSS Independence Rules
+
+### 禁止行爲 / Prohibited Practices
+
+**以下模式一律禁止：**
+
+- ❌ **禁止導入父頁面 CSS**
+  元件中不得導入任何 `../pages/XXX.css` 檔案
+  Components must not import any `../pages/XXX.css` file
+
+  ```typescript
+  // ❌ 錯誤
+  import '../pages/GameDataPage.css';
+
+  // ✅ 正確
+  import './ComponentName.css';
+  ```
+
+- ❌ **禁止樣式依賴父 wrapper class**
+  元件樣式不得寫成 `.parent .child` 形式，必須自包含
+  Component styles must not depend on parent wrapper class
+
+  ```css
+  /* ❌ 錯誤：依賴父頁面 class */
+  .gamedata-page .job-tree { ... }
+
+  /* ✅ 正確：元件自包含 */
+  .job-tree { ... }
+  ```
+
+- ❌ **禁止在父頁面 CSS 中定義子元件樣式**
+  父頁面 CSS 僅限頁面級佈局，不得包含子元件專用規則
+  Parent page CSS must only contain page-level layout, never child-component styles
+
+  ```css
+  /* ❌ 錯誤：子元件規則寫在父頁面 */
+  .dashboard-page .carpet_frame { ... }  /* CharacterCard 的樣式 */
+
+  /* ✅ 正確：移到 CharacterCard.css */
+  .carpet_frame { ... }
+  ```
+
+### 强制要求 / Mandatory Requirements
+
+**所有元件必須遵守：**
+
+1. **自有 CSS 文件**
+   每個元件必須在相同目錄下擁有對應的 CSS 文件，並在元件中導入
+   Every component must have a same-directory CSS file and import it
+
+2. **父頁面 CSS 僅供頁面級使用**
+   父頁面 CSS 只能包含頁面容器、整體字體、區域 padding/margin 等佈局規則
+   Parent page CSS is for layout only (container, spacing, fonts)
+
+3. **共享樣式提取爲基底文件**
+   多個元件共用的一組 class 應提取爲 `XXXBase.css`，統一導入
+   Shared styles must be extracted to `XXXBase.css`
+
+4. **自包含驗證**
+   元件必須能在 Storybook 或其他孤立環境中渲染，**無需**手動添加父 wrapper 或手動導入父 CSS
+   Components must render in isolation without manual wrapper or parent CSS import
+
+---
+
+## 元件 CSS 提取檢查清單 / Component CSS Extraction Checklist
+
+當重構或新增元件時，請逐項確認：
+
+### 提取階段
+- [ ] 掃描元件 JSX，列出所有 `className`
+- [ ] 在父頁面 CSS 中搜索 scoped 版本（`.parent .child`）
+- [ ] 將所有 scoped 規則複製到新 CSS 文件，**移除父 class 前綴**
+- [ ] 為新 CSS 文件撰寫適當的註解（雙語）
+- [ ] 在元件中添加 `import './ComponentName.css'`
+- [ ] 從父頁面 CSS **删除**已提取的完整規則區塊（包括註解）
+
+### 清理階段
+- [ ] 檢查父頁面 CSS 是否仍有 `.parent .child` 模式的規則
+- [ ] 確認父頁面 CSS 只保留頁面級樣式（`.page-container`, `h4`, `padding` 等）
+- [ ] 運行 Storybook，確認所有故事**不需要** decorator wrapper 也能正常渲染
+- [ ] 執行 `npm run check:css-deps`（如有）确认無 `../pages/*.css` 導入
+
+### 共享樣式
+- [ ] 若多個元件共享樣式，是否已提取爲 `Base.css`？
+- [ ] 所有共享元件是否都導入了 `Base.css`？
+- [ ] `Base.css` 是否不包含任何頁面特定 class？
+
+---
+
+## 技術債務監控 / Technical Debt Monitoring
+
+### 檢測腳本 / Detection Script
+
+定期運行以下腳本，檢測是否有人重新引入父 CSS 依賴：
+
+```typescript
+// scripts/check-parent-css-deps.ts
+import { readdirSync } from 'fs';
+import { join } from 'path';
+
+const PARENT_PAGES = ['HomePage', 'GameDataPage', 'BattlePage', 'TownPage', 'DashboardPage'];
+
+for (const page of PARENT_PAGES) {
+  const regex = new RegExp(`import.*\\.\\.\\/pages\\/${page}\\.css`);
+  // 掃描 src/components/**/*.tsx
+  // 輸出違規文件列表
+}
+```
+
+**加入 package.json：**
+```json
+{
+  "scripts": {
+    "check:css-deps": "tsx scripts/check-parent-css-deps.ts"
+  }
+}
+```
+
+---
+
+## 相關文檔 / Related Documentation
+
+- **案例研究：** `docs/css-isolation-case-study.md` — 本次重構完整分析
+- **路徑載入規則：** 本文件上方 — 使用 `#/` 別名取代 `../`
+- **元件製作檢查清單：** 本文件第 87–118 行 — CSS/型別檢查
+
+---
+
+> **重構日期：** 2026-05-13
+> **負責：** Shadow Monarch (opencode-arise)
+> **範圍：** HomePage, GameDataPage, BattlePage, TownPage, DashboardPage 所有子元件
+> **状态：** ✅ 完成，已建立預防機制
+
