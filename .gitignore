@@ -7,3 +7,4 @@ node_modules
 !.storybook
 tsconfig.tsbuildinfo
 nul
+debug-storybook.log

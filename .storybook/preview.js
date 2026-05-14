@@ -13,8 +13,22 @@ const preview = {
       // 'error' - fail CI on a11y violations
       // 'off' - skip a11y checks entirely
       test: "todo"
-    }
+    },
+
+    docs: {
+			codePanel: true,
+		},
+
+		layout: 'centered',
   },
+
+  initialGlobals: {
+		// 👇 Set the initial background color
+		backgrounds: {
+			value: 'dark',
+			grid: true,
+		},
+	},
 };
 
 export default preview;

@@ -11,7 +11,15 @@ const config = {
     "@storybook/addon-vitest",
     "@storybook/addon-a11y",
     "@storybook/addon-docs",
-    "@storybook/addon-onboarding"
+    "@storybook/addon-onboarding",
+		{
+			name: '@storybook/addon-mcp',
+			options: {
+				toolsets: {},
+			},
+		},
+		"storybook-addon-pseudo-states",
+		'@storybook/addon-links',
   ],
   "framework": "@storybook/nextjs-vite"
 };
