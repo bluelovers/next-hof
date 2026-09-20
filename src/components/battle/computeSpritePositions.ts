@@ -11,6 +11,7 @@
  * from the battlefield size and the front/back row distribution of each team.
  */
 import type { IBattleSprite } from './types';
+import { getSpriteImageDir, computeSpriteFlipped, useFlipPositioning } from './spriteFlip';
 
 /** 角色輸入（含圖像尺寸與站位） / Character input (with image size and battle position) */
 export interface IBattlePositionChar {
@@ -46,7 +47,18 @@ export interface IComputeSpritePositionsOptions {
   height: number;
   /** 橫向分割數（對應 size_x/6 的 6，預設 6） / Column split count (default 6) */
   cellCount?: number;
-  /** 是否啟用反轉（對應 style==1 的 flip，預設 true） / Enable flip (default true) */
+  /**
+   * 是否啟用反轉（翻轉定位模式）的手動覆寫
+   * Manual override for flip (flip positioning mode)
+   *
+   * 未提供時，翻轉與定位模式會依各精靈圖檔目錄（char / char_rev）與隊伍側
+   * 自動推導（見 spriteFlip.ts 的 useFlipPositioning / computeSpriteFlipped）。
+   * 明確傳入時則沿用舊行為（右隊強制翻轉定位）。
+   * When omitted, both flip and positioning are auto-derived from each sprite's image
+   * directory (char / char_rev) and team side (see useFlipPositioning /
+   * computeSpriteFlipped in spriteFlip.ts). When explicitly passed, the legacy
+   * behavior is used (right team forced into flip positioning).
+   */
   flip?: boolean;
 }
 
@@ -66,7 +78,10 @@ function computeRowPositions(
   position: 'front' | 'back',
   side: 'left' | 'right'
 ): IBattleSprite[] {
-  const { width, height, cellCount = 6, flip = true } = options;
+  const { width, height, cellCount = 6 } = options;
+  // 手動覆寫：呼叫端明確傳入 flip 時沿用舊定位模式；否則依圖檔目錄自動推導
+  // Manual override: explicit flip keeps the legacy mode; otherwise auto-derive.
+  const explicitFlip = options.flip;
   const number = chars.length;
   if (number === 0) {
     return [];
@@ -76,18 +91,25 @@ function computeRowPositions(
   const cellHeight = height;
   const yCenter = height / 2;
 
-  // direction：flip 模式（預設）兩隊皆 0；非 flip 模式右隊為 1
-  // direction: flip mode (default) → 0 for both teams; non-flip → 1 for right team
-  const direction = flip ? 0 : side === 'right' ? 1 : 0;
+  // 依本列圖檔目錄 + 隊伍側自動推導是否採「翻轉定位模式」
+  // Auto-derive flip positioning from this row's image directory + side:
+  // char 圖配右隊、char_rev 圖配左隊 時需要翻轉定位（其餘直接定位）
+  const teamDir = chars.find((c) => c.imageUrl)?.imageUrl ?? '';
+  const autoFlipMode = useFlipPositioning(teamDir, side);
+  const flipMode = explicitFlip ?? autoFlipMode;
+
+  // direction：翻轉定位模式下兩隊皆 0；非翻轉定位模式右隊為 1
+  // direction: flip positioning → 0 for both; non-flip → 1 for right team
+  const direction = flipMode ? 0 : side === 'right' ? 1 : 0;
 
   // 列基準 x（column index）：
-  // flip 模式：前衛=2、後衛=1（兩隊相同，右隊靠 flipped 鏡像到右側）
-  // 非 flip 模式：左隊 前衛=2/後衛=1；右隊 前衛=4/後衛=5（直接置於右側）
+  // 翻轉定位模式：前衛=2、後衛=1（兩隊相同，右隊靠 flipped 鏡像到右側）
+  // 非翻轉定位模式：左隊 前衛=2/後衛=1；右隊 前衛=4/後衛=5（直接置於右側）
   // Column index:
-  // flip mode: front=2, back=1 (same for both teams; right team mirrored via flipped)
-  // non-flip mode: left front=2/back=1; right front=4/back=5 (placed directly on right)
+  // flip positioning: front=2, back=1 (same for both; right team mirrored via flipped)
+  // non-flip positioning: left front=2/back=1; right front=4/back=5 (directly on right)
   let columnIndex: number;
-  if (flip) {
+  if (flipMode) {
     columnIndex = position === 'back' ? 1 : 2;
   } else {
     columnIndex = side === 'left'
@@ -103,10 +125,8 @@ function computeRowPositions(
   const gapX = (cellWidth / (number + 1)) * (direction ? 1 : -1);
   const gapY = (cellHeight / (number + 1)) * 1;
 
-  // 右隊在 flip 模式下需標記 flipped（CSS 鏡像到右側）；非 flip 模式右隊使用已翻轉圖，flipped=false
-  // Right team in flip mode is marked flipped (CSS mirrors to right side);
-  // in non-flip mode right team uses pre-flipped images, so flipped=false.
-  const flipped = side === 'right' ? flip : false;
+  // flipped 於下方 map 內依各精靈圖檔目錄個別計算（見 computeSpriteFlipped）
+  // flipped is computed per-sprite inside the map below via computeSpriteFlipped
 
   let gap = 0;
   return chars.map((char) => {
@@ -120,6 +140,15 @@ function computeRowPositions(
     // Center the image on (x, y), then subtract half size for background-position top-left
     x -= Math.round(char.imageWidth / 2);
     y -= Math.round(char.imageHeight / 2);
+
+    // 翻轉標記：明確傳入 flip 時沿用舊公式；否則依圖檔目錄 + 隊伍自動計算
+    // Flipped flag: explicit flip keeps the legacy formula; otherwise auto-compute
+    // from the image directory + team side.
+    const flipped = (
+      explicitFlip !== undefined
+        ? side === 'right' ? explicitFlip : false
+        : computeSpriteFlipped(char.imageUrl, side)
+    );
 
     return {
       id: char.id,

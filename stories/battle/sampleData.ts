@@ -164,9 +164,13 @@ function toPositionChars(team: IRosterTeam): ITeamBattleChars {
  * Create auto-positioned demo sprites
  *
  * 依據 demoRoster 與戰場尺寸，自動計算每個角色的 background-position (x, y)
- * 與 flipped；可透過 options 覆寫 cellCount / flip 等
+ * 與 flipped；翻轉改由圖檔目錄（char / char_rev）搭配隊伍側自動推導
+ * （見 src/components/battle/spriteFlip.ts），不再寫死 flip。
+ * 可透過 options.flip 明確覆寫、或 options.cellCount 等調整。
  * Computes each sprite's background-position (x, y) and flipped from the roster
- * and battlefield size; options can override cellCount / flip etc.
+ * and battlefield size; flipping is now auto-derived from the image directory
+ * (char / char_rev) combined with the team side (see spriteFlip.ts) instead of
+ * being hardcoded. Pass options.flip to override, or options.cellCount to adjust.
  */
 export function createAutoSampleSprites(
   options?: Partial<IComputeSpritePositionsOptions>
@@ -175,7 +179,9 @@ export function createAutoSampleSprites(
     left: toPositionChars(demoRoster.left),
     right: toPositionChars(demoRoster.right),
   };
-  return computeBattleSpritePositions(input, { ...sampleFieldSize, flip: true, ...options });
+  // 不傳 flip：交由 computeBattleSpritePositions 依圖檔目錄自動推導翻轉
+  // Omit flip so computeBattleSpritePositions auto-derives flipping from the directory.
+  return computeBattleSpritePositions(input, { ...sampleFieldSize, ...options });
 }
 
 /** 共用自動定位精靈樣本（展示用） / Shared auto-positioned sprite sample (demo) */
