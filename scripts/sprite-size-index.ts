@@ -65,8 +65,14 @@ export type ISpriteSizeIndex = Record<string, ICacheEntry>;
 /** 專案根目錄下的 public（圖檔來源） / public dir under project root */
 const PUBLIC_DIR = resolve(process.cwd(), 'public');
 
-/** 預設掃描的精靈目錄（相對 public） / Default sprite dirs to scan (relative to public) */
-const DEFAULT_SCAN_DIRS = ['image/char', 'image/char_rev'];
+/** 預設掃描的精靈目錄（相對 public） / Default sprite dirs to scan (relative to public)
+ *  含 char / char_rev（角色精靈）與 other（魔法陣 mc 圖）
+ *  Includes char / char_rev (character sprites) and other (magic-circle mc images) */
+const DEFAULT_SCAN_DIRS = [
+  'image/char',
+  'image/char_rev',
+  'image/other',
+];
 
 /** 各資料夾內的快取檔名（點檔，避免與圖檔混淆） / Per-folder cache filename (dotfile) */
 const CACHE_FILE_NAME = '.sprite-sizes.json';

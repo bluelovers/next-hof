@@ -82,6 +82,16 @@ export type IBattleFieldVAlign = 'top' | 'middle' | 'bottom';
 /** 背景圖縮放模式 / Background image scale mode */
 export type IBattleFieldBgScale = 'natural' | 'cover' | 'contain' | 'stretch' | 'repeat';
 
+/** 魔方陣（魔法陣）圖層 / Magic circle layer */
+export interface IBattleMagicCircle {
+  /** 魔方陣圖片路徑 / Magic-circle image path */
+  imageUrl: string;
+  /** X 軸位置（預設 280，對應 PHP 魔方陣定位） / X position (default 280, PHP magic-circle placement) */
+  x?: number;
+  /** Y 軸位置（預設 0） / Y position (default 0) */
+  y?: number;
+}
+
 /** 戰場背景 / Battlefield background */
 export interface IBattleFieldConfig {
   /** 背景類型 / Background type */
@@ -96,6 +106,8 @@ export interface IBattleFieldConfig {
   bgSize?: IBattleFieldBgSize;
   /** 背景圖縮放模式（預設 natural） / Background image scale mode (default natural) */
   bgScale?: IBattleFieldBgScale;
+  /** 魔方陣圖層（選填，繪製於角色精靈之下） / Magic-circle layers (optional, drawn beneath sprites) */
+  magicCircles?: IBattleMagicCircle[];
 }
 
 /** 戰鬥動作類型 / Battle action type */

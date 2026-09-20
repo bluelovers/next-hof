@@ -13,7 +13,7 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { BattleFieldScene } from '../../src/components/battle/BattleFieldScene';
-import { sampleSpritesAuto, sampleSprites, createSampleConfig } from './sampleData';
+import { sampleSpritesAuto, sampleSprites, createSampleConfig, sampleMagicCircles } from './sampleData';
 
 const meta: Meta<typeof BattleFieldScene> = {
   title: 'Battle/Atoms/BattleFieldSceneAuto',
@@ -55,6 +55,21 @@ export const AutoPositioned: Story = {
   args: {
     sprites: sampleSpritesAuto,
     config: createSampleConfig('grass'),
+    showLabels: true,
+  },
+};
+
+/**
+ * 含魔方陣圖層（對應 PHP exec_css 的魔方陣渲染，繪製於角色之下）
+ * With a magic-circle layer (mirrors PHP exec_css; drawn beneath the sprites)
+ */
+export const WithMagicCircle: Story = {
+  args: {
+    sprites: sampleSpritesAuto,
+    config: {
+      ...createSampleConfig('grass'),
+      magicCircles: sampleMagicCircles,
+    },
     showLabels: true,
   },
 };

@@ -24,11 +24,13 @@ export interface ISpriteImageSize {
 
 import image_char from '../../../public/image/char/.sprite-sizes.json';
 import image_char_rev from '../../../public/image/char_rev/.sprite-sizes.json';
+import image_other from '../../../public/image/other/.sprite-sizes.json';
 
 /** 圖像尺寸索引：URL → 尺寸（由各資料夾快取彙總） / Size index: URL → size (aggregated from per-folder caches) */
 export const spriteImageSizes: Record<string, ISpriteImageSize> = {
   ...Object.fromEntries(Object.entries(image_char).map(([k, v]) => ["/image/char/" + k, v])),
   ...Object.fromEntries(Object.entries(image_char_rev).map(([k, v]) => ["/image/char_rev/" + k, v])),
+  ...Object.fromEntries(Object.entries(image_other).map(([k, v]) => ["/image/other/" + k, v])),
 };
 
 /** 缺漏時的預設尺寸（中心對齊用） / Default size when missing (for centering) */

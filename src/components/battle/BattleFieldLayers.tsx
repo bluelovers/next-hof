@@ -20,6 +20,7 @@ import type {
   IBattleFieldBgScale,
 } from './types';
 import { BattleFieldSpriteFrame } from './BattleFieldSpriteFrame';
+import { BattleFieldMagicCircle } from './BattleFieldMagicCircle';
 
 /** 戰場圖層屬性 / Battlefield layers props */
 export interface IBattleFieldLayersProps {
@@ -134,6 +135,11 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
 
   return (
     <div style={bgStyle}>
+      {/* 魔方陣圖層（繪製於角色精靈之下，對應 PHP exec_css 的魔方陣渲染） / Magic-circle layers (drawn beneath sprites; mirrors PHP exec_css) */}
+      {config.magicCircles?.map((mc, i) => (
+        <BattleFieldMagicCircle key={i} magicCircle={mc} width={width} height={height} />
+      ))}
+
       {/* 角色精靈排版框（保護角色排版尺寸） / Sprite layout frame (protects sprite layout size) */}
       <BattleFieldSpriteFrame
         sprites={sprites}

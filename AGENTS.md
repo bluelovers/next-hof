@@ -78,6 +78,7 @@ import { IJobData } from '../../game-data/GameDataTypes';
 | BattleAction | `src/components/battle/BattleAction` |
 | BattleLog | `src/components/battle/BattleLog` |
 | BattleFieldScene | `src/components/battle/BattleFieldScene` |
+| BattleFieldMagicCircle | `src/components/battle/BattleFieldMagicCircle` |
 | BattleResult | `src/components/battle/BattleResult` |
 | GameDataTypes | `src/components/GameDataPage/GameDataTypes` |
 | BattleDisplay/types | `src/components/battle/types` |

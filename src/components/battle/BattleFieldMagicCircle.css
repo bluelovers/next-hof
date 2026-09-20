@@ -1,0 +1,19 @@
+/**
+ * BattleFieldMagicCircle 元件樣式
+ * BattleFieldMagicCircle component styles
+ *
+ * 靜態樣式集中於此；動態定位（width/height/background-position）由元件內聯樣式提供
+ * Static styles live here; dynamic placement (width/height/background-position)
+ * is provided via the component's inline style.
+ */
+
+/* ==================== 魔方陣圖層 / Magic-circle layer ==================== */
+
+.battle-magic-circle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-repeat: no-repeat;
+  /* 不攔截滑鼠事件，避免擋住其上方的角色精靈互動 / don't block pointer events over sprites */
+  pointer-events: none;
+}

@@ -6,7 +6,7 @@
  * All battle-related stories import from here to avoid duplicated,
  * independently-maintained sample data across files.
  */
-import type { IBattleSprite, IBattleFieldConfig } from '../../src/components/battle/types';
+import type { IBattleSprite, IBattleFieldConfig, IBattleMagicCircle } from '../../src/components/battle/types';
 import {
   computeBattleSpritePositions,
   type IComputeSpritePositionsOptions,
@@ -47,6 +47,18 @@ export const sampleBackgroundUrls = {
   sand: '/image/land/bg_sand.png',
   egypt: '/image/land/bg_egypt_001.png', // 實際圖檔尺寸 768×320 / actual file size 768×320
 } as const;
+
+/**
+ * 共用魔方陣（魔法陣）展示資料（單一事實來源）
+ * Shared magic-circle (魔法陣) showcase data (single source of truth)
+ *
+ * 對應 PHP exec_css 中的魔方陣渲染（固定位置背景圖層，繪製於角色精靈之下）
+ * Mirrors the magic-circle rendering in PHP exec_css (fixed-position background
+ * layer drawn beneath the sprites); position defaults to (280, 0) per PHP.
+ */
+export const sampleMagicCircles: IBattleMagicCircle[] = [
+  { imageUrl: '/image/other/mc0_1.png', x: 280, y: 0 },
+];
 
 /**
  * 建立共用戰場配置
