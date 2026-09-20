@@ -85,6 +85,18 @@ import { IJobData } from '../../game-data/GameDataTypes';
 
 ---
 
+## 指令執行限制
+
+### 嚴禁使用 npx 執行指令
+
+**禁止透過 `npx` 執行任何指令**（如 `npx tsx ...`、`npx vitest ...`、`npx tsc ...` 等）。
+
+需要執行專案腳本時，請改用下列方式之一：
+- 使用既有的 npm script（例如 `npm run sprite:index`）；
+- 直接呼叫 `node_modules/.bin/` 下的本地二進位（例如 `node_modules/.bin/tsx scripts/xxx.ts`）。
+
+---
+
 ## 元件製作檢查清單 / Component Creation Checklist
 
 製作或修改元件時，必須仔細檢查以下項目：
