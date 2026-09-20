@@ -56,12 +56,10 @@ export interface IBattleFieldSpriteLayersProps {
  * never compound.
  */
 function buildSpriteLayers(
-  sprites: IBattleSprite[],
-  width: number,
-  height: number,
-  showLabels?: boolean,
-  style?: CSSProperties
+  props: IBattleFieldSpriteLayersProps
 ): React.ReactNode[] {
+  const { sprites, width, height, showLabels, style } = props;
+
   return sprites.map((sprite, index) => {
     const flipClass = sprite.flipped ? ' flip-h' : '';
 
@@ -113,12 +111,6 @@ function buildSpriteLayers(
  * 轉發 props 給輔助函式 buildSpriteLayers 產生同層（兄弟）圖層
  * Forwards props to the buildSpriteLayers helper to produce sibling layers
  */
-export const BattleFieldSpriteLayers: React.FC<IBattleFieldSpriteLayersProps> = ({
-  sprites,
-  width,
-  height,
-  showLabels,
-  style,
-}) => {
-  return <>{buildSpriteLayers(sprites, width, height, showLabels, style)}</>;
+export const BattleFieldSpriteLayers: React.FC<IBattleFieldSpriteLayersProps> = (props) => {
+  return <>{buildSpriteLayers(props)}</>;
 };
