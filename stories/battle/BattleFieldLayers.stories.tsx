@@ -141,10 +141,12 @@ export const BgScaleRepeat: Story = {
   },
 };
 
-/** 背景框小於圖檔（bgSize 較小）：自然尺寸下以置底置中裁切，不會偏左上 / Box smaller than image: natural mode crops centered-bottom, not top-left */
-export const BgSmallerThanImage: Story = {
+/** bgSize 小於角色排版尺寸（480×200）時被無視，自動回退為角色排版尺寸 / bgSize smaller than layout (480×200) is ignored, falls back to layout size */
+export const BgSizeIgnoredWhenSmaller: Story = {
   args: {
+    // 300×140 小於 480×200 → 被防禦無視，背景框維持 480×200 / 300×140 < 480×200 → ignored, box stays 480×200
     bgSize: { width: 300, height: 140 },
+    config: createSampleConfig('egypt'),
   },
 };
 

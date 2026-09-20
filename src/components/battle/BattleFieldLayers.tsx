@@ -11,6 +11,7 @@
  * when omitted, background and sprites share the same width/height.
  */
 import React from 'react';
+import type { CSSProperties } from 'react';
 import type {
   IBattleSprite,
   IBattleFieldConfig,
@@ -36,6 +37,8 @@ export interface IBattleFieldLayersProps {
   bgSize?: IBattleFieldBgSize;
   /** 角色精靈框垂直對齊方式（預設 bottom） / Sprite frame vertical alignment (default bottom) */
   valign?: IBattleFieldVAlign;
+  /** 自訂樣式（可複寫或追加至背景圖層） / Custom style (override or append to background layer) */
+  style?: CSSProperties;
 }
 
 /**
@@ -96,16 +99,20 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
   showLabels,
   bgSize,
   valign = 'bottom',
+  style,
 }) => {
   // 角色排版尺寸：選填，未提供時使用預設值（保持原有設計）
   // Sprite layout size: optional, fall back to defaults when omitted
   const width = rawWidth ?? 480;
   const height = rawHeight ?? 200;
 
-  // 背景尺寸：優先使用 bgSize，未提供則回退為角色排版尺寸
-  // Background size: prefer bgSize; fall back to sprite layout size when omitted
-  const bgWidth = bgSize?.width ?? width;
-  const bgHeight = bgSize?.height ?? height;
+  // 背景尺寸防禦：bgSize 任一維度低於角色排版尺寸時，該維度被無視並回退為角色排版尺寸
+  // Background size guard: when any bgSize dimension is smaller than the sprite layout
+  // size, that dimension is ignored and falls back to the sprite layout size.
+  const bgWidth =
+    bgSize?.width != null && bgSize.width >= width ? bgSize.width : width;
+  const bgHeight =
+    bgSize?.height != null && bgSize.height >= height ? bgSize.height : height;
 
   // 背景圖排版：預設自然尺寸 + 水平置中垂直置底，縮放模式由 config.bgScale 控制
   // Background image layout: default natural size + centered/bottom; scale mode from config.bgScale
@@ -122,6 +129,7 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
       : undefined,
     position: 'relative',
     ...bgImageLayout,
+    ...style,
   };
 
   return (

@@ -2,6 +2,7 @@
  * BattleDisplay 類型定義
  * BattleDisplay type definitions
  */
+import type { CSSProperties } from 'react';
 import type { ITSRequireAtLeastOne } from 'ts-type';
 
 /** 隊伍顏色樣式 / Team color style */
@@ -49,8 +50,8 @@ export interface IBattleTeam {
 
 /** 戰場精靈 / Battlefield sprite */
 export interface IBattleSprite {
-  /** 角色 ID / Character ID */
-  id: string;
+  /** 角色 ID（同時作為 DOM id 用於定位/選取） / Character ID (also used as DOM id for targeting) */
+  id?: string;
   /** 精靈圖片路徑 / Sprite image path */
   imageUrl: string;
   /** X 軸位置 / X position */
@@ -58,9 +59,13 @@ export interface IBattleSprite {
   /** Y 軸位置 / Y position */
   y: number;
   /** 是否翻轉 / Whether flipped horizontally */
-  flipped: boolean;
+  flipped?: boolean;
   /** 角色名稱 / Character name */
   name?: string;
+  /** 精靈圖層自訂樣式（可複寫或追加） / Custom sprite layer style (override or append) */
+  style?: CSSProperties;
+  /** 名稱標籤自訂樣式（可複寫或追加） / Custom name label style (override or append) */
+  labelStyle?: CSSProperties;
 }
 
 /** 戰場背景尺寸 / Battlefield background size */

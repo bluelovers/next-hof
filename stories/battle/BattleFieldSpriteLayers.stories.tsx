@@ -65,3 +65,34 @@ export const Default: Story = {};
 export const NoLabels: Story = {
   args: { showLabels: false },
 };
+
+/** 樣式覆寫示範：元件 style 套用至所有圖層，單體精靈 style/labelStyle 各自覆寫 / Style override demo */
+export const StyleOverride: Story = {
+  args: {
+    showLabels: true,
+    // 元件層級 style：所有精靈圖層套用藍色邊框 / Component-level style: blue outline on every layer
+    style: { outline: '1px solid rgba(90,160,255,0.6)' },
+    sprites: [
+      {
+        id: 'mon_052',
+        imageUrl: '/image/char/mon_052.png',
+        x: 164,
+        y: 16,
+        flipped: false,
+        name: 'GoblinWarrior(A)',
+        // 單體精靈樣式覆寫（最優先） / Per-sprite style override (highest priority)
+        style: { opacity: 0.7 },
+        // 單體標籤樣式覆寫 / Per-sprite label style override
+        labelStyle: { color: '#ffd166', fontSize: 13 },
+      },
+      {
+        id: 'mon_018',
+        imageUrl: '/image/char_rev/mon_018.png',
+        x: 352,
+        y: 14,
+        flipped: true,
+        name: 'Hero1',
+      },
+    ],
+  },
+};

@@ -16,7 +16,9 @@
  * buildSpriteLayers; the component itself no longer calls itself.
  */
 import React from 'react';
+import type { CSSProperties } from 'react';
 import type { IBattleSprite } from './types';
+import { BattleFieldSpriteLabel } from './BattleFieldSpriteLabel';
 import './BattleFieldSpriteLayers.css';
 
 /** 戰場精靈圖層屬性 / Battlefield sprite layers props */
@@ -31,6 +33,8 @@ export interface IBattleFieldSpriteLayersProps {
   height: number;
   /** 是否顯示名稱標籤 / Whether to show name labels */
   showLabels?: boolean;
+  /** 自訂樣式（可複寫或追加至每個精靈圖層） / Custom style (override or append to every sprite layer) */
+  style?: CSSProperties;
 }
 
 /**
@@ -47,7 +51,8 @@ function buildSpriteLayers(
   index: number,
   width: number,
   height: number,
-  showLabels?: boolean
+  showLabels: boolean,
+  style?: CSSProperties
 ): React.ReactNode {
   if (index >= spriteList.length) {
     // 最內層為空 div（結束遞迴）
@@ -58,7 +63,7 @@ function buildSpriteLayers(
   const sprite = spriteList[index];
   const flipClass = sprite.flipped ? ' flip-h' : '';
 
-  const layerStyle: React.CSSProperties = {
+  const layerStyle: CSSProperties = {
     width,
     height: height + (showLabels ? 20 : 0),
     backgroundImage: sprite.imageUrl
@@ -69,29 +74,28 @@ function buildSpriteLayers(
     position: 'relative',
   };
 
+  // 合併順序：基礎樣式 < 元件/輔助函式 style < 單體精靈 style（最優先）
+  // Merge order: base < component/helper style < per-sprite style (highest priority)
+  const mergedStyle: CSSProperties = {
+    ...layerStyle,
+    ...style,
+    ...sprite.style,
+  };
+
   return (
     <div
       className={`battle-sprite${flipClass}`}
-      style={layerStyle}
+      id={sprite.id}
+      style={mergedStyle}
     >
       {showLabels && sprite.name && (
-        <div
-          className="sprite-label"
-          style={{
-            position: 'absolute',
-            bottom: 2,
-            [sprite.x > 240 ? 'right' : 'left']: 4,
-            fontSize: 10,
-            color: '#bdc8d7',
-            whiteSpace: 'nowrap',
-            textShadow: '0 0 4px #000',
-            pointerEvents: 'none',
-          }}
-        >
-          {sprite.name}
-        </div>
+        <BattleFieldSpriteLabel
+          name={sprite.name}
+          x={sprite.x}
+          style={sprite.labelStyle}
+        />
       )}
-      {buildSpriteLayers(spriteList, index + 1, width, height, showLabels)}
+      {buildSpriteLayers(spriteList, index + 1, width, height, showLabels, style)}
     </div>
   );
 }
@@ -108,7 +112,8 @@ export const BattleFieldSpriteLayers: React.FC<IBattleFieldSpriteLayersProps> = 
   index,
   width,
   height,
-  showLabels,
+  showLabels = false,
+  style,
 }) => {
-  return buildSpriteLayers(sprites, index, width, height, showLabels);
+  return buildSpriteLayers(sprites, index, width, height, showLabels, style);
 };

@@ -1,0 +1,21 @@
+/**
+ * BattleFieldSpriteLabel 元件樣式
+ * BattleFieldSpriteLabel component styles
+ *
+ * 名稱標籤樣式，由 BattleFieldSpriteLayers.css 抽離而來
+ * Name label styles, extracted from BattleFieldSpriteLayers.css
+ */
+
+/* ==================== 名稱標籤 / Name Label ==================== */
+
+.sprite-label {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #bdc8d7;
+  white-space: nowrap;
+  text-shadow: 0 0 4px #000;
+  pointer-events: none;
+}

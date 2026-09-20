@@ -21,15 +21,3 @@
   filter: FlipH;
   -ms-filter: "FlipH";
 }
-
-.sprite-label {
-  position: absolute;
-  bottom: -14px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 10px;
-  color: #bdc8d7;
-  white-space: nowrap;
-  text-shadow: 0 0 4px #000;
-  pointer-events: none;
-}

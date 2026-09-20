@@ -11,6 +11,7 @@
  * the character sprite layout.
  */
 import React from 'react';
+import type { CSSProperties } from 'react';
 import type { IBattleSprite, IBattleFieldVAlign } from './types';
 import { BattleFieldSpriteLayers } from './BattleFieldSpriteLayers';
 import './BattleFieldSpriteFrame.css';
@@ -27,6 +28,8 @@ export interface IBattleFieldSpriteFrameProps {
   showLabels?: boolean;
   /** 垂直對齊方式（預設 bottom） / Vertical alignment (default bottom) */
   valign?: IBattleFieldVAlign;
+  /** 自訂樣式（可複寫或追加） / Custom style (override or append) */
+  style?: CSSProperties;
 }
 
 /**
@@ -47,11 +50,12 @@ export const BattleFieldSpriteFrame: React.FC<IBattleFieldSpriteFrameProps> = ({
   height,
   showLabels,
   valign = 'bottom',
+  style,
 }) => {
   return (
     <div
       className={`battle-sprite-frame battle-sprite-frame--${valign}`}
-      style={{ width, height }}
+      style={{ width, height, ...style }}
     >
       <BattleFieldSpriteLayers
         sprites={sprites}
