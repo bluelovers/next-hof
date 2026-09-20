@@ -4,15 +4,17 @@
  *
  * 名稱標籤樣式，由 BattleFieldSpriteLayers.css 抽離而來
  * Name label styles, extracted from BattleFieldSpriteLayers.css
+ *
+ * 定位（position / top / left / right）由元件內聯樣式依角色 (x, y) 錨點控制，
+ * 此處僅保留視覺預設，便於外部統一調整
+ * Positioning (position/top/left/right) is controlled by inline styles anchored
+ * to the character (x, y); only visual defaults remain here for centralized tuning.
  */
 
 /* ==================== 名稱標籤 / Name Label ==================== */
 
 .sprite-label {
-  position: absolute;
-  bottom: -14px;
-  left: 50%;
-  transform: translateX(-50%);
+  /* 視覺預設（可被元件內聯樣式覆寫） / Visual defaults (overridable by inline styles) */
   font-size: 10px;
   color: #bdc8d7;
   white-space: nowrap;

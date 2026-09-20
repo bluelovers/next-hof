@@ -37,6 +37,8 @@ const meta: Meta<typeof BattleFieldSpriteLabel> = {
   args: {
     name: 'Hero1',
     x: 352,
+    y: 40,
+    width: 480,
   },
 };
 

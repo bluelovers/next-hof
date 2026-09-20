@@ -65,7 +65,7 @@ function buildSpriteLayers(
 
   const layerStyle: CSSProperties = {
     width,
-    height: height + (showLabels ? 20 : 0),
+    height,
     backgroundImage: sprite.imageUrl
       ? `url(${sprite.imageUrl})`
       : undefined,
@@ -92,6 +92,8 @@ function buildSpriteLayers(
         <BattleFieldSpriteLabel
           name={sprite.name}
           x={sprite.x}
+          y={sprite.y}
+          width={width}
           style={sprite.labelStyle}
         />
       )}
