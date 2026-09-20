@@ -2,6 +2,16 @@
 
 /** @type { import('@storybook/nextjs-vite').StorybookConfig } */
 const config = {
+
+viteFinal: async (config) => {
+config.resolve = config.resolve || {};
+config.resolve.alias = {
+...config.resolve.alias,
+'next/image': await import('next/image.js').then(m => m.default ?? m),
+};
+return config;
+},
+
   "stories": [
     "../stories/**/*.mdx",
     "../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)"
