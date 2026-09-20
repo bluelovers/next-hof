@@ -179,15 +179,25 @@ function computeRowPositions(
  * structure that computeBattleSpritePositions expects, without manually nesting
  * front/back arrays.
  *
+ * 傳入 teams 時，會以該既有隊伍為基底「追加」本次 chars（先複製再 push，不會變動
+ * 傳入的 teams 本身），適用於分批累積同一場戰鬥的隊伍定義；
+ * 未傳入則從空的 left / right 開始。
+ * When `teams` is given, the new `chars` are appended onto that existing team
+ * definition (cloned first, so the passed `teams` is not mutated) — useful for
+ * accumulating a battle's roster across multiple batches. Omit it to start from
+ * empty left / right teams.
+ *
  * @param chars 扁平名冊（含 side / position） / Flat roster (with side / position)
+ * @param teams 既有的左右隊結構（選填，作為追加基底） / Existing left/right teams (optional, append base)
  * @returns 可直接傳入 computeBattleSpritePositions 的隊伍結構
  *          Team structure ready for computeBattleSpritePositions
  */
 export function groupBattleChars(
-  chars: IBattlePositionChar[]
+  chars: IBattlePositionChar[],
+  teams?: IBattleSidePair<ITeamBattleChars>
 ): IBattleSidePair<ITeamBattleChars> {
-  const left: ITeamBattleChars = { front: [], back: [] };
-  const right: ITeamBattleChars = { front: [], back: [] };
+  const left: ITeamBattleChars = { front: [...(teams?.left?.front ?? [])], back: [...(teams?.left?.back ?? [])] };
+  const right: ITeamBattleChars = { front: [...(teams?.right?.front ?? [])], back: [...(teams?.right?.back ?? [])] };
   for (const c of chars) {
     const team = c.side === 'right' ? right : left;
     (c.position === 'back' ? team.back : team.front).push(c);
