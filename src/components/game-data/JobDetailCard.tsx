@@ -8,6 +8,7 @@
 import React from 'react';
 import type { IJobData } from './GameDataTypes';
 import { SkillCard } from './SkillCard';
+import { buildSpriteStyle } from './gameDataUtils';
 import './JobDetailCard.css';
 
 /** 職業詳細卡片屬性 / Job detail card props */
@@ -24,7 +25,7 @@ export interface IJobDetailCardProps {
  */
 export const JobDetailCard: React.FC<IJobDetailCardProps> = ({
   job,
-  altBg = false,
+  altBg,
 }) => {
   const { id, name, spriteUrls, description, equipment, skills } = job;
   const bgClass = altBg ? 'td-alt' : 'td-base';
@@ -42,11 +43,7 @@ export const JobDetailCard: React.FC<IJobDetailCardProps> = ({
             <span
               key={i}
               className="job-sprite"
-              style={{
-                backgroundImage: `url(${url})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
+              style={buildSpriteStyle(url)}
             />
           ))}
         </td>

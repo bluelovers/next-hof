@@ -35,7 +35,8 @@ type Story = StoryObj<typeof meta>;
 export const Basic: Story = {
   args: {
     job: {
-      id: 'warrior',
+      id: 1,
+      parentId: 0,
       name: '戦士',
       spriteUrls: ['/image/char/warrior.png'],
       description: 'HPが高く、攻撃力も高い。重装備で防御力も高い。',
@@ -49,7 +50,7 @@ export const Basic: Story = {
           spCost: 5,
           powerPct: 80,
           hits: 1,
-          hitRate: 90,
+          hitRate: '90',
           weaponLimit: '剣',
           effect: '敵単体に物理ダメージ',
           extraAttrs: [],
@@ -63,7 +64,8 @@ export const Basic: Story = {
 export const MultipleSprites: Story = {
   args: {
     job: {
-      id: 'mage',
+      id: 2,
+      parentId: 0,
       name: '魔法使い',
       spriteUrls: ['/image/char/male_mage.png', '/image/char/female_mage.png'],
       description: 'MPが高く、魔法攻撃が得意。防御力は低い。',
@@ -77,7 +79,7 @@ export const MultipleSprites: Story = {
           spCost: 10,
           powerPct: 80,
           hits: 1,
-          hitRate: 85,
+          hitRate: '85',
           weaponLimit: '杖',
           effect: '敵単体に炎属性ダメージ',
           extraAttrs: [],
@@ -90,7 +92,7 @@ export const MultipleSprites: Story = {
           spCost: 15,
           powerPct: 50,
           hits: 1,
-          hitRate: 100,
+          hitRate: '100',
           weaponLimit: '杖',
           effect: '味単体に回復',
           extraAttrs: [],
@@ -104,7 +106,8 @@ export const MultipleSprites: Story = {
 export const MultipleSkills: Story = {
   args: {
     job: {
-      id: 'ranger',
+      id: 3,
+      parentId: 0,
       name: '弓使い',
       spriteUrls: ['/image/char/ranger.png'],
       description: '遠距離攻撃が得意。敏捷性が高い。',
@@ -118,7 +121,7 @@ export const MultipleSkills: Story = {
           spCost: 20,
           powerPct: 40,
           hits: 3,
-          hitRate: 75,
+          hitRate: '75',
           weaponLimit: '弓',
           effect: '敵全体に矢属性ダメージ',
           extraAttrs: [],
@@ -131,7 +134,7 @@ export const MultipleSkills: Story = {
           spCost: 25,
           powerPct: 150,
           hits: 1,
-          hitRate: 60,
+          hitRate: '60',
           weaponLimit: '弓',
           effect: '敵単体に超強力な攻撃',
           extraAttrs: ['ターン制限'],
@@ -144,7 +147,7 @@ export const MultipleSkills: Story = {
           spCost: 30,
           powerPct: 0,
           hits: 1,
-          hitRate: 80,
+          hitRate: '80',
           weaponLimit: '弓',
           effect: '敵単体を行動不能にする',
           extraAttrs: [],
@@ -158,7 +161,8 @@ export const MultipleSkills: Story = {
 export const AlternatingBackground: Story = {
   args: {
     job: {
-      id: 'priest',
+      id: 4,
+      parentId: 0,
       name: '僧侶',
       spriteUrls: ['/image/char/priest.png'],
       description: '回復とサポートが得意。HPとMPが高い。',
@@ -172,7 +176,7 @@ export const AlternatingBackground: Story = {
           spCost: 15,
           powerPct: 50,
           hits: 1,
-          hitRate: 100,
+          hitRate: '100',
           weaponLimit: '杖',
           effect: '味単体に回復',
           extraAttrs: [],
@@ -187,7 +191,8 @@ export const AlternatingBackground: Story = {
 export const LongDescription: Story = {
   args: {
     job: {
-      id: 'paladin',
+      id: 5,
+      parentId: 0,
       name: '聖騎士',
       spriteUrls: ['/image/char/paladin.png'],
       description: '攻撃と防御の両方に長けている。信仰心が強く、魔法も少しだけ使える。味方を守ることに長けている。',
@@ -201,7 +206,7 @@ export const LongDescription: Story = {
           spCost: 35,
           powerPct: 120,
           hits: 1,
-          hitRate: 70,
+          hitRate: '70',
           weaponLimit: '聖剣',
           effect: '敵単体に聖属性ダメージ',
           extraAttrs: [],
@@ -214,7 +219,7 @@ export const LongDescription: Story = {
           spCost: 25,
           powerPct: 0,
           hits: 1,
-          hitRate: 100,
+          hitRate: '100',
           weaponLimit: '聖盾',
           effect: '味全体の防御力をアップ',
           extraAttrs: [],

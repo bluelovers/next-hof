@@ -6,6 +6,7 @@
  * Handles the display of character sprite images
  */
 import React from 'react';
+import { buildSpriteStyle } from './gameDataUtils';
 import './CharacterSpriteDisplay.css';
 
 /**
@@ -49,11 +50,7 @@ export const CharacterSpriteDisplay: React.FC<ICharacterSpriteDisplayProps> = ({
         <div
           key={index}
           className={spriteClasses}
-          style={{
-            backgroundImage: `url(${url})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
+          style={buildSpriteStyle(url)}
         />
       ))}
     </div>

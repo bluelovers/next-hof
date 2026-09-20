@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import type { CSSProperties } from 'react';
+import { SPRITE_LAYOUT_WIDTH } from './types';
 import './BattleFieldSpriteLabel.css';
 
 /** 戰場精靈名稱標籤屬性 / Battlefield sprite name label props */
@@ -50,9 +51,9 @@ export const BattleFieldSpriteLabel: React.FC<IBattleFieldSpriteLabelProps> = ({
   name,
   x,
   y,
-  width = 480,
+  width = SPRITE_LAYOUT_WIDTH,
   style,
-  flipped = false,
+  flipped,
 }) => {
   // 右半側：標籤右緣對齊角色 x 並向左生長，避免超出右邊界
   // Right half: label right edge aligns to character x, grows left to avoid right overflow

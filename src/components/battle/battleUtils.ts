@@ -7,7 +7,7 @@
  * Centralizes percentage math, bar colors, and status/attribute → CSS class mappings
  * so BattleUnit and BattleAction share one implementation instead of diverging.
  */
-import type { IUnitStatus, IAttributeType, ITeamSide, ITeamSideClass } from './types';
+import type { IUnitStatus, IAttributeType, ITeamSide, ITeamSideClass, IActionType } from './types';
 import { TEAM_SIDE_CLASS } from './types';
 
 /** 條狀顏色高閾值（> 此值為高血量色） / Bar high threshold */
@@ -99,4 +99,49 @@ export function getAttrClass(attr?: IAttributeType): string {
  */
 export function getSideClass(side: ITeamSide): ITeamSideClass {
   return TEAM_SIDE_CLASS[side];
+}
+
+/**
+ * 依單位狀態取得 HP/SP 文字 CSS 類別
+ * Get the CSS class for HP/SP text from unit status
+ *
+ * 倒下時統一為 'dmg'；否則依欄位採用 fallback（HP 用 'recover'、SP 用 'support'）。
+ * Down → 'dmg'; otherwise the field-specific fallback (HP: 'recover', SP: 'support').
+ *
+ * @param status - 單位狀態 / Unit status
+ * @param fallback - 非倒下時的類別 / Class when not down
+ * @returns CSS class 字串 / CSS class string
+ */
+export function getStateTextClass(
+  status?: IUnitStatus,
+  fallback: 'recover' | 'support' = 'recover'
+): string {
+  return status === 'down' ? 'dmg' : fallback;
+}
+
+/**
+ * 依戰鬥行動類型取得數值變化 CSS 類別
+ * Get the CSS class for a value-change from an action type
+ *
+ * 傷害/倒下 → 'dmg'，治療 → 'recover'，其餘 → ''。
+ * Damage/down → 'dmg', heal → 'recover', others → ''.
+ *
+ * @param type - 行動類型 / Action type
+ * @returns CSS class 字串 / CSS class string
+ */
+export function getValueChangeClass(type?: IActionType): string {
+  if (type === 'damage' || type === 'down') return 'dmg';
+  if (type === 'heal') return 'recover';
+  return '';
+}
+
+/**
+ * 入場訊息的後綴文字（單一事實來源）
+ * Trailing text for the "enter the Battlefield" message (single source of truth)
+ *
+ * @param level - 單位等級（提供時顯示 "Lv.x"） / Unit level (shows "Lv.x" when given)
+ * @returns 訊息後綴 / Message suffix
+ */
+export function getEnterBattlefieldText(level?: number): string {
+  return level != null ? `Lv.${level} enter the Battlefield.` : 'enter the Battlefield.';
 }

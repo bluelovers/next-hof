@@ -62,7 +62,7 @@ export const CustomNav: Story = {
         <p>Page with custom navigation links.</p>
       </div>
     ),
-    customNavItems: [
+    navLinks: [
       { href: '/home', label: '首頁 / Home' },
       { href: '/game', label: '戰鬥 / Battle' },
       { href: '/data', label: '數據 / Data' },

@@ -55,7 +55,7 @@ export const GameLayout: React.FC<IGameLayoutProps> = ({
 }) => {
   return (
     <div className="game-layout">
-      <a name="top" />
+      <a id="top" />
 
       {/* 標題區 / Title */}
       <div className="game-title">

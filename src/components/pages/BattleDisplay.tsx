@@ -19,10 +19,10 @@ import { BattleFieldScene } from '#/components/battle/BattleFieldScene';
 import { BattleUnit } from '#/components/battle/BattleUnit';
 import { BattleLog } from '#/components/battle/BattleLog';
 import { BattleResult } from '#/components/battle/BattleResult';
-import { getSideClass } from '#/components/battle/battleUtils';
+import { getSideClass, getEnterBattlefieldText } from '#/components/battle/battleUtils';
 import type { ITeamSide } from '#/components/battle/types';
 import './BattleDisplay.css';
-import '#/components/pages/Shared.css';
+import '#/components/shared/SharedBase.css';
 
 /** 戰鬥顯示屬性 / Battle display props */
 export interface IBattleDisplayProps {
@@ -42,7 +42,7 @@ export interface IBattleDisplayProps {
  */
 export const BattleDisplay: React.FC<IBattleDisplayProps> = ({
   data,
-  showSpriteLabels = false,
+  showSpriteLabels,
   showHpBars = true,
   showSpBars = true,
 }) => {
@@ -79,7 +79,7 @@ export const BattleDisplay: React.FC<IBattleDisplayProps> = ({
             <tr key={`enter-left-${i}`}>
               <td className={getSideClass('left')}>
                 <span className="result">
-                  <span className="bold">{unit.name}</span> Lv.{unit.level} enter the Battlefield.
+                  <span className="bold">{unit.name}</span> {getEnterBattlefieldText(unit.level)}
                 </span>
               </td>
               <td className={getSideClass('right')}>&nbsp;</td>
@@ -90,7 +90,7 @@ export const BattleDisplay: React.FC<IBattleDisplayProps> = ({
               <td className={getSideClass('left')}>&nbsp;</td>
               <td className={getSideClass('right')}>
                 <span className="result">
-                  <span className="bold">{unit.name}</span> Lv.{unit.level} enter the Battlefield.
+                  <span className="bold">{unit.name}</span> {getEnterBattlefieldText(unit.level)}
                 </span>
               </td>
             </tr>

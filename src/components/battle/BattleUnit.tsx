@@ -8,12 +8,13 @@
 import React from 'react';
 import type { IBattleUnit } from './types';
 import './BattleUnit.css';
-import '../pages/Shared.css';
+import '#/components/shared/SharedBase.css';
 import {
   getStatusClass,
   clampPercent,
   getHpBarColor,
   getSpBarColor,
+  getStateTextClass,
 } from './battleUtils';
 
 /** 戰鬥單位屬性 / Battle unit props */
@@ -54,7 +55,7 @@ export const BattleUnit: React.FC<IBattleUnitProps> = ({
               }}
             />
           </div>
-          <span className={`hp-text ${status === 'down' ? 'dmg' : 'recover'}`}>
+          <span className={`hp-text ${getStateTextClass(status, 'recover')}`}>
             HP: {hp}/{maxHp}
           </span>
         </div>
@@ -70,7 +71,7 @@ export const BattleUnit: React.FC<IBattleUnitProps> = ({
               }}
             />
           </div>
-          <span className={`sp-text ${status === 'down' ? 'dmg' : 'support'}`}>
+          <span className={`sp-text ${getStateTextClass(status, 'support')}`}>
             SP: {sp}/{maxSp}
           </span>
         </div>

@@ -30,8 +30,11 @@ import './BattleFieldSpriteLayers.css';
 export interface IBattleFieldSpriteLayersProps {
   /** 精靈列表 / Sprite list */
   sprites: IBattleSprite[];
-  /** 當前處理的索引 / Current processing index */
-  index: number;
+  /**
+   * 當前處理的索引 / Current processing index
+   * @deprecated 保留為向後相容參數，同層渲染不再需要遞迴索引
+   */
+  index?: number;
   /** 畫布寬度 / Canvas width */
   width: number;
   /** 畫布高度 / Canvas height */
@@ -53,13 +56,13 @@ export interface IBattleFieldSpriteLayersProps {
  * never compound.
  */
 function buildSpriteLayers(
-  spriteList: IBattleSprite[],
+  sprites: IBattleSprite[],
   width: number,
   height: number,
-  showLabels: boolean,
+  showLabels?: boolean,
   style?: CSSProperties
 ): React.ReactNode[] {
-  return spriteList.map((sprite, index) => {
+  return sprites.map((sprite, index) => {
     const flipClass = sprite.flipped ? ' flip-h' : '';
 
     const layerStyle: CSSProperties = {
@@ -112,12 +115,9 @@ function buildSpriteLayers(
  */
 export const BattleFieldSpriteLayers: React.FC<IBattleFieldSpriteLayersProps> = ({
   sprites,
-  // index 保留為向後相容參數，同層渲染不再需要遞迴索引
-  // index kept for backward compatibility; sibling rendering needs no recursion index
-  index: _index,
   width,
   height,
-  showLabels = false,
+  showLabels,
   style,
 }) => {
   return <>{buildSpriteLayers(sprites, width, height, showLabels, style)}</>;

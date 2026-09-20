@@ -37,7 +37,7 @@ export interface IBattleFieldSceneProps {
 export const BattleFieldScene: React.FC<IBattleFieldSceneProps> = ({
   sprites,
   config,
-  showLabels = false,
+  showLabels,
 }) => {
   return (
     <td colSpan={2} className="btl-img">

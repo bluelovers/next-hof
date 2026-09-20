@@ -9,7 +9,7 @@
  */
 import React, { useState } from 'react';
 import './DashboardPage.css';
-import './Shared.css';
+import '#/components/shared/SharedBase.css';
 import { NavigationBar } from '#/components/navigation/NavigationBar';
 import type { INavLink } from '#/components/navigation/NavTypes';
 import { buildAppUrl } from '#/components/config/AppConfig';
@@ -17,6 +17,7 @@ import { TeamStatus } from '#/components/info/TeamStatus';
 import type { ITeamStatusProps } from '#/components/info/TeamStatus';
 import { CharacterList } from '#/components/characters/CharacterList';
 import type { ICharacterData } from '#/components/characters/CharacterTypes';
+import { buildCharacterImageUrl } from '#/components/characters/characterUtils';
 
 /** DashboardPage 屬性 / DashboardPage props */
 export interface IDashboardPageProps {
@@ -39,7 +40,7 @@ const DEFAULT_CHARACTERS: ICharacterData[] = [
   {
     id: '2f4954e7348fff17f92b46e8d72005d1',
     name: 'Mage1',
-    imageUrl: 'static/image/char/mon_018.png',
+    imageUrl: buildCharacterImageUrl('mon_018.png'),
     level: 3,
     className: 'Sorceress',
     hasStar: true,
@@ -48,7 +49,7 @@ const DEFAULT_CHARACTERS: ICharacterData[] = [
   {
     id: '6ece402a38eab57ef07afff56535d6e1',
     name: 'Healer1',
-    imageUrl: 'static/image/char/mon_214.png',
+    imageUrl: buildCharacterImageUrl('mon_214.png'),
     level: 3,
     className: 'Priestess',
     hasStar: true,
@@ -57,7 +58,7 @@ const DEFAULT_CHARACTERS: ICharacterData[] = [
   {
     id: 'b3e304903f09e14b8386a49a1e1e01e3',
     name: 'Hero1',
-    imageUrl: 'static/image/char/mon_079.png',
+    imageUrl: buildCharacterImageUrl('mon_079.png'),
     level: 3,
     className: 'Warrior',
     hasStar: true,
@@ -66,7 +67,7 @@ const DEFAULT_CHARACTERS: ICharacterData[] = [
   {
     id: 'de979500692a963857ea9d68868f2958',
     name: 'Priest1',
-    imageUrl: 'static/image/char/mon_214.png',
+    imageUrl: buildCharacterImageUrl('mon_214.png'),
     level: 3,
     className: 'Priestess',
     hasStar: true,

@@ -23,3 +23,21 @@ export function getCarpetClass(index = 0): string {
 export function buildCharacterUrl(id: string): string {
   return `${BASE_URL}/char/char?char=${id}`;
 }
+
+/** 角色精靈圖片路徑前綴（靜態資源） / Character sprite image path prefix (static asset) */
+export const CHAR_IMAGE_PREFIX = '/static/image/char/';
+
+/**
+ * 組合角色精靈圖片 URL（單一事實來源）
+ * Build a character sprite image URL (single source of truth)
+ *
+ * 統一靜態圖片前綴，避免各處硬編碼 '/static/image/char/...' 且格式不一致。
+ * Centralizes the static-image prefix so callers don't hardcode
+ * '/static/image/char/...' with divergent leading-slash conventions.
+ *
+ * @param file - 檔名（可含或不含開頭斜線） / Filename (with or without leading slash)
+ * @returns 完整圖片 URL / Full image URL
+ */
+export function buildCharacterImageUrl(file: string): string {
+  return `${CHAR_IMAGE_PREFIX}${file.replace(/^\//, '')}`;
+}

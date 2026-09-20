@@ -127,6 +127,18 @@ export interface IBattleMagicCircle {
   y?: number;
 }
 
+/** 戰場精靈框預設寬度（與 BattleFieldSpriteLabel 對齊） / Default sprite-frame width */
+export const SPRITE_LAYOUT_WIDTH = 480;
+
+/** 戰場精靈框預設高度 / Default sprite-frame height */
+export const SPRITE_LAYOUT_HEIGHT = 200;
+
+/** 魔方陣預設 X 位置（對應 PHP 魔方陣定位） / Default magic-circle X position */
+export const MAGIC_CIRCLE_DEFAULT_X = 280;
+
+/** 魔方陣預設 Y 位置 / Default magic-circle Y position */
+export const MAGIC_CIRCLE_DEFAULT_Y = 0;
+
 /** 戰場背景 / Battlefield background */
 export interface IBattleFieldConfig {
   /** 背景類型 / Background type */

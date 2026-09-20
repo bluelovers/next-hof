@@ -19,6 +19,7 @@ import type {
   IBattleFieldVAlign,
   IBattleFieldBgScale,
 } from './types';
+import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from './types';
 import { BattleFieldSpriteFrame } from './BattleFieldSpriteFrame';
 import { BattleFieldMagicCircle } from './BattleFieldMagicCircle';
 
@@ -104,8 +105,8 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
 }) => {
   // 角色排版尺寸：選填，未提供時使用預設值（保持原有設計）
   // Sprite layout size: optional, fall back to defaults when omitted
-  const width = rawWidth ?? 480;
-  const height = rawHeight ?? 200;
+  const width = rawWidth ?? SPRITE_LAYOUT_WIDTH;
+  const height = rawHeight ?? SPRITE_LAYOUT_HEIGHT;
 
   // 背景尺寸防禦：bgSize 任一維度低於角色排版尺寸時，該維度被無視並回退為角色排版尺寸
   // Background size guard: when any bgSize dimension is smaller than the sprite layout

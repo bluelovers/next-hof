@@ -8,7 +8,7 @@
 import React from 'react';
 import type { IBattleUnit, ITeamSideClass } from './types';
 import './BattleTeamInfo.css';
-import '../pages/Shared.css';
+import '#/components/shared/SharedBase.css';
 
 /** 隊伍資訊屬性 / Team info props */
 export interface IBattleTeamInfoProps {

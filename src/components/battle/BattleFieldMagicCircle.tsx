@@ -10,6 +10,7 @@
 import React from 'react';
 import type { CSSProperties } from 'react';
 import type { IBattleMagicCircle } from './types';
+import { MAGIC_CIRCLE_DEFAULT_X, MAGIC_CIRCLE_DEFAULT_Y } from './types';
 import './BattleFieldMagicCircle.css';
 
 /** 魔方陣圖層屬性 / Magic-circle layer props */
@@ -49,7 +50,7 @@ export const BattleFieldMagicCircle: React.FC<IBattleMagicCircleProps> = ({
     width,
     height,
     backgroundImage: `url(${magicCircle.imageUrl})`,
-    backgroundPosition: `${magicCircle.x ?? 280}px ${magicCircle.y ?? 0}px`,
+    backgroundPosition: `${magicCircle.x ?? MAGIC_CIRCLE_DEFAULT_X}px ${magicCircle.y ?? MAGIC_CIRCLE_DEFAULT_Y}px`,
     ...style,
   };
 

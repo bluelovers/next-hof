@@ -10,7 +10,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { makeDarkDecorator } from '../../decorators';
 import { BattlePage } from '../../../src/components/pages/BattlePage';
 import type { IBattleCharacterData } from '../../../src/components/characters/CharacterTypes';
-import type { IMonsterData } from '../../../src/components/monsters/MonsterCard';
+import type { IMonsterData } from '../../../src/components/monsters/MonsterTypes';
 
 const IMG = '/image/char';
 

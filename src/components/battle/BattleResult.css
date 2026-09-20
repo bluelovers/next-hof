@@ -5,8 +5,8 @@
  * 原始來源：BattleDisplay.css 第 243-268 行
  * Source: BattleDisplay.css lines 243-268
  *
- * 注意：分隔線樣式 .break 和 .break-top 已移至 Shared.css（多元件共用）
- * Note: Divider styles .break and .break-top moved to Shared.css (shared across components)
+ * 注意：分隔線樣式 .break 和 .break-top 已移至 SharedBase.css（多元件共用）
+ * Note: Divider styles .break and .break-top moved to SharedBase.css (shared across components)
  */
 
 /* ==================== 結果標題 / Result Title ==================== */

@@ -8,8 +8,8 @@
 import React from 'react';
 import type { IBattleAction } from './types';
 import './BattleAction.css';
-import '../pages/Shared.css';
-import { getAttrClass } from './battleUtils';
+import '#/components/shared/SharedBase.css';
+import { getAttrClass, getValueChangeClass, getEnterBattlefieldText } from './battleUtils';
 
 /** 戰鬥行動屬性 / Battle action props */
 export interface IBattleActionProps {
@@ -27,11 +27,7 @@ export interface IBattleActionProps {
 function formatValueChange(action: IBattleAction): React.ReactNode {
   if (!action.valueChange) return null;
 
-  const valClass = action.type === 'damage' || action.type === 'down'
-    ? 'dmg'
-    : action.type === 'heal'
-      ? 'recover'
-      : '';
+  const valClass = getValueChangeClass(action.type);
 
   return (
     <>
@@ -80,7 +76,7 @@ function renderActionContent(action: IBattleAction): React.ReactNode {
       const spanClass = `result ${attrClass}`;
       return (
         <span className={spanClass}>
-          <span className="bold">{action.source}</span> enter the Battlefield.
+          <span className="bold">{action.source}</span> {getEnterBattlefieldText()}
         </span>
       );
     }

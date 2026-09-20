@@ -13,11 +13,13 @@ import React, { useState } from 'react';
 import { GameLayout } from './GameLayout';
 import { BattleCharacterCard } from '#/components/characters/BattleCharacterCard';
 import type { IBattleCharacterData } from '#/components/characters/CharacterTypes';
-import { MonsterCard, IMonsterData } from '#/components/monsters/MonsterCard';
+import { MonsterCard } from '#/components/monsters/MonsterCard';
+import type { IMonsterData } from '#/components/monsters/MonsterTypes';
+import { buildCharacterImageUrl } from '#/components/characters/characterUtils';
 
-/** Shared.css 提供 clearfix 等工具類 */
-/** Shared.css provides utility classes like clearfix */
-import './Shared.css';
+/** SharedBase.css 提供 clearfix 等工具類 */
+/** SharedBase.css provides utility classes like clearfix */
+import '#/components/shared/SharedBase.css';
 import './BattlePage.css';
 
 /** BattlePage 屬性 / BattlePage props */
@@ -45,10 +47,10 @@ export interface IBattlePageProps {
  * Default character list (matching original site data)
  */
 const DEFAULT_CHARACTERS: IBattleCharacterData[] = [
-  { id: '1', name: '名探偵',     imageUrl: '/static/image/char/m_chr30101.png', level: 1,  className: '探偵' },
-  { id: '2', name: '新米錬金術師', imageUrl: '/static/image/char/f_chr03901.png', level: 1,  className: '錬金術師' },
-  { id: '3', name: '魔導剣士',     imageUrl: '/static/image/char/m_chr02901.png', level: 1,  className: '魔導剣士' },
-  { id: '4', name: '弓聖',         imageUrl: '/static/image/char/f_chr04201.png', level: 137, className: '弓聖' },
+  { id: '1', name: '名探偵',     imageUrl: buildCharacterImageUrl('m_chr30101.png'), level: 1,  className: '探偵' },
+  { id: '2', name: '新米錬金術師', imageUrl: buildCharacterImageUrl('f_chr03901.png'), level: 1,  className: '錬金術師' },
+  { id: '3', name: '魔導剣士',     imageUrl: buildCharacterImageUrl('m_chr02901.png'), level: 1,  className: '魔導剣士' },
+  { id: '4', name: '弓聖',         imageUrl: buildCharacterImageUrl('f_chr04201.png'), level: 137, className: '弓聖' },
 ];
 
 /**
@@ -56,8 +58,8 @@ const DEFAULT_CHARACTERS: IBattleCharacterData[] = [
  * Default monster list (matching original gb0 area data)
  */
 const DEFAULT_MONSTERS: IMonsterData[] = [
-  { name: 'GoblinAxe',  imageUrl: '/static/image/char/mon_053.png', level: 1, landType: 'grass' },
-  { name: 'GoblinMage', imageUrl: '/static/image/char/mon_052.png', level: 1, landType: 'grass' },
+  { name: 'GoblinAxe',  imageUrl: buildCharacterImageUrl('mon_053.png'), level: 1, landType: 'grass' },
+  { name: 'GoblinMage', imageUrl: buildCharacterImageUrl('mon_052.png'), level: 1, landType: 'grass' },
 ];
 
 /**
@@ -68,7 +70,7 @@ export const BattlePage: React.FC<IBattlePageProps> = ({
   areaTitle = 'ゴブリンと遊ぶ(最弱)',
   characters = DEFAULT_CHARACTERS,
   monsters = DEFAULT_MONSTERS,
-  savePartyChecked = false,
+  savePartyChecked,
   onSelectCharacter,
   onBattle,
   onReset,

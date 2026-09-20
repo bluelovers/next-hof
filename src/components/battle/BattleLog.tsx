@@ -11,7 +11,7 @@ import React from 'react';
 import type { IBattleAction, ITeamSide } from './types';
 import { BattleAction } from './BattleAction';
 import { getSideClass } from './battleUtils';
-import '../pages/Shared.css';
+import '#/components/shared/SharedBase.css';
 
 /** 戰鬥日誌屬性 / Battle log props */
 export interface IBattleLogProps {

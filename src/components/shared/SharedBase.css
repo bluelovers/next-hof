@@ -1,6 +1,13 @@
 /**
- * 頁面共享工具樣式
- * Shared utility styles for pages
+ * 共享工具樣式（單一事實來源）
+ * Shared utility styles (single source of truth)
+ *
+ * 跨頁面 / 跨元件共用的工具 class（bold、result、ttd*、break、charge…），
+ * 統一集中於此基底檔，供 Battle 子元件與各頁面以 `#/` 別名直接匯入，
+ * 避免元件反向依賴父頁面 CSS（AGENTS.md：禁止導入 ../pages/XXX.css）。
+ * Cross-cutting utility classes (bold, result, ttd*, break, charge, …) live
+ * here as one base file, imported directly via the `#/` alias by both Battle
+ * sub-components and pages, so components no longer depend on parent-page CSS.
  */
 
 /* ==================== Clearfix / 清除浮動 ==================== */
@@ -24,7 +31,7 @@
 
 /* ==================== Battle 共享樣式 / Battle Shared Styles ==================== */
 
-/* 這些樣式被多個 Battle 子元件使用，因此放在 Shared.css */
+/* 這些樣式被多個 Battle 子元件使用，因此放在共享基底檔 */
 .ttd1 {
   border-left: 1px solid #070b0e;
   padding-left: 10px;
