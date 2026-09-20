@@ -8,7 +8,7 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { BattleFieldScene } from '../../src/components/battle/BattleFieldScene';
-import { sampleSprites, sampleEnemySprites, sampleAllySprites, createSampleConfig } from './sampleData';
+import { sampleSprites, sampleEnemySprites, sampleAllySprites, sampleSpritesMixed, createSampleConfig } from './sampleData';
 
 const meta: Meta<typeof BattleFieldScene> = {
   title: 'Battle/Atoms/BattleFieldScene',
@@ -81,4 +81,22 @@ export const NoLabels: Story = {
     ...DefaultBattle.args,
     showLabels: false,
   } as any,
+};
+
+/**
+ * 同一隊伍混用 char / char_rev：驗證 flip 後仍能全部位於同一側
+ * Single team mixing char / char_rev: verify all sprites stay on the same side after flip
+ *
+ * 右隊同時包含 char（mon_052，需翻轉定位）與 char_rev（mon_018 / mon_079，直接定位）圖，
+ * 自動翻轉邏輯應讓三者都落在右側、且朝向一致（面向左）
+ * The right team mixes char (mon_052, needs flip positioning) and char_rev (mon_018 / mon_079,
+ * direct positioning) images; the auto-flip logic must place all three on the right side with a
+ * consistent facing (left).
+ */
+export const MixedCharRevTeam: Story = {
+  args: {
+    sprites: sampleSpritesMixed,
+    config: createSampleConfig('grass'),
+    showLabels: true,
+  },
 };

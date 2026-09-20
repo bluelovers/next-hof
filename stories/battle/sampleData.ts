@@ -184,5 +184,45 @@ export function createAutoSampleSprites(
   return computeBattleSpritePositions(input, { ...sampleFieldSize, ...options });
 }
 
+/**
+ * 建立「同一隊伍混用 char / char_rev」的展示用精靈陣列
+ * Create sprites for a single team that mixes char / char_rev images
+ *
+ * 用來驗證：同一隊伍內同時存在 char（需翻轉定位）與 char_rev（直接定位）圖時，
+ * 自動翻轉邏輯仍能讓所有人落在同一側、朝向一致
+ * Used to verify that when a single team mixes char (needs flip positioning) and
+ * char_rev (direct positioning) images, the auto-flip logic still places everyone
+ * on the same side with a consistent facing.
+ */
+const mixedRoster: { left: IRosterTeam; right: IRosterTeam } = {
+  left: { front: [], back: [] },
+  right: {
+    back: [
+      { id: 'mon_190', name: 'mon_190(char_rev)', imageUrl: '/image/char_rev/mon_190.png', position: 'back', side: 'right' },
+      { id: 'mon_170', name: 'mon_170(char_rev)', imageUrl: '/image/char/mon_170.png', position: 'back', side: 'right' },
+    ],
+    front: [
+      { id: 'mon_052', name: 'Goblin(char)', imageUrl: '/image/char/mon_052.png', position: 'front', side: 'right' },
+      { id: 'mon_018', name: 'Hero(char_rev)', imageUrl: '/image/char_rev/mon_018.png', position: 'front', side: 'right' },
+      { id: 'mon_079', name: 'Priest(char_rev)', imageUrl: '/image/char_rev/mon_079.png', position: 'front', side: 'right' },
+    ],
+  },
+};
+
+export function createMixedSampleSprites(
+  options?: Partial<IComputeSpritePositionsOptions>
+): IBattleSprite[] {
+  const input = {
+    left: toPositionChars(mixedRoster.left),
+    right: toPositionChars(mixedRoster.right),
+  };
+  // 不傳 flip：交由 computeBattleSpritePositions 依各圖檔目錄個別推導翻轉
+  // Omit flip so computeBattleSpritePositions auto-derives flip per sprite's directory.
+  return computeBattleSpritePositions(input, { ...sampleFieldSize, ...options });
+}
+
+/** 共用「混用 char / char_rev」精靈樣本（展示用） / Shared mixed char/char_rev sprite sample (demo) */
+export const sampleSpritesMixed: IBattleSprite[] = createMixedSampleSprites();
+
 /** 共用自動定位精靈樣本（展示用） / Shared auto-positioned sprite sample (demo) */
 export const sampleSpritesAuto: IBattleSprite[] = createAutoSampleSprites();

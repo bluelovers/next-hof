@@ -90,47 +90,40 @@ function computeRowPositions(
   const cellWidth = width / cellCount;
   const cellHeight = height;
   const yCenter = height / 2;
-
-  // 依本列圖檔目錄 + 隊伍側自動推導是否採「翻轉定位模式」
-  // Auto-derive flip positioning from this row's image directory + side:
-  // char 圖配右隊、char_rev 圖配左隊 時需要翻轉定位（其餘直接定位）
-  const teamDir = chars.find((c) => c.imageUrl)?.imageUrl ?? '';
-  const autoFlipMode = useFlipPositioning(teamDir, side);
-  const flipMode = explicitFlip ?? autoFlipMode;
-
-  // direction：翻轉定位模式下兩隊皆 0；非翻轉定位模式右隊為 1
-  // direction: flip positioning → 0 for both; non-flip → 1 for right team
-  const direction = flipMode ? 0 : side === 'right' ? 1 : 0;
-
-  // 列基準 x（column index）：
-  // 翻轉定位模式：前衛=2、後衛=1（兩隊相同，右隊靠 flipped 鏡像到右側）
-  // 非翻轉定位模式：左隊 前衛=2/後衛=1；右隊 前衛=4/後衛=5（直接置於右側）
-  // Column index:
-  // flip positioning: front=2, back=1 (same for both; right team mirrored via flipped)
-  // non-flip positioning: left front=2/back=1; right front=4/back=5 (directly on right)
-  let columnIndex: number;
-  if (flipMode) {
-    columnIndex = position === 'back' ? 1 : 2;
-  } else {
-    columnIndex = side === 'left'
-      ? position === 'back' ? 1 : 2
-      : position === 'back' ? 5 : 4;
-  }
-
-  // 對應 PHP：axis_x += (direction ? -cell/2 : +cell/2)；axis_y += -cell/2（兩分支皆同）
-  // Mirrors PHP: axis_x += (direction ? -cell/2 : +cell/2); axis_y += -cell/2 (both branches)
-  const axisX = columnIndex * cellWidth + (direction ? -cellWidth / 2 : cellWidth / 2);
-  const axisY = yCenter + -cellHeight / 2;
-
-  const gapX = (cellWidth / (number + 1)) * (direction ? 1 : -1);
   const gapY = (cellHeight / (number + 1)) * 1;
-
-  // flipped 於下方 map 內依各精靈圖檔目錄個別計算（見 computeSpriteFlipped）
-  // flipped is computed per-sprite inside the map below via computeSpriteFlipped
 
   let gap = 0;
   return chars.map((char) => {
     gap++;
+    // 逐個精靈依「自身圖檔目錄 + 隊伍側」決定翻轉定位模式，
+    // 使同一隊伍混用 char / char_rev 時仍能全部落於同一側
+    // Per-sprite flip positioning from this sprite's own image directory + side, so a
+    // single team mixing char / char_rev still lands entirely on the same side.
+    const spriteFlipMode = explicitFlip ?? useFlipPositioning(char.imageUrl, side);
+
+    // direction：翻轉定位模式下兩隊皆 0；非翻轉定位模式右隊為 1
+    // direction: flip positioning → 0 for both; non-flip → 1 for right team
+    const direction = spriteFlipMode ? 0 : side === 'right' ? 1 : 0;
+
+    // 列基準 x（column index）：
+    // 翻轉定位模式：前衛=2、後衛=1（右隊靠 flipped 鏡像到右側）
+    // 非翻轉定位模式：左隊 前衛=2/後衛=1；右隊 前衛=4/後衛=5（直接置於右側）
+    // Column index:
+    // flip positioning: front=2, back=1 (right team mirrored via flipped)
+    // non-flip positioning: left front=2/back=1; right front=4/back=5 (directly on right)
+    const columnIndex = spriteFlipMode
+      ? position === 'back' ? 1 : 2
+      : side === 'left'
+        ? position === 'back' ? 1 : 2
+        : position === 'back' ? 5 : 4;
+
+    // 對應 PHP：axis_x += (direction ? -cell/2 : +cell/2)；axis_y += -cell/2（兩分支皆同）
+    // Mirrors PHP: axis_x += (direction ? -cell/2 : +cell/2); axis_y += -cell/2 (both branches)
+    const axisX = columnIndex * cellWidth + (direction ? -cellWidth / 2 : cellWidth / 2);
+    const axisY = yCenter + -cellHeight / 2;
+
+    const gapX = (cellWidth / (number + 1)) * (direction ? 1 : -1);
+
     let x = axisX + gapX * gap;
     let y = axisY + gapY * gap;
     x = Math.floor(x);
