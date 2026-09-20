@@ -47,7 +47,7 @@ function buildSpriteLayers(
   index: number,
   width: number,
   height: number,
-  showLabels: boolean
+  showLabels?: boolean
 ): React.ReactNode {
   if (index >= spriteList.length) {
     // 最內層為空 div（結束遞迴）
@@ -108,7 +108,7 @@ export const BattleFieldSpriteLayers: React.FC<IBattleFieldSpriteLayersProps> = 
   index,
   width,
   height,
-  showLabels = false,
+  showLabels,
 }) => {
   return buildSpriteLayers(sprites, index, width, height, showLabels);
 };

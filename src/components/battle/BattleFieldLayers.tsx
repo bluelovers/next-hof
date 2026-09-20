@@ -11,7 +11,7 @@
  * when omitted, background and sprites share the same width/height.
  */
 import React from 'react';
-import type { IBattleSprite, IBattleFieldConfig, IBattleFieldBgSize } from './types';
+import type { IBattleSprite, IBattleFieldConfig, IBattleFieldBgSize, IBattleFieldVAlign } from './types';
 import { BattleFieldSpriteFrame } from './BattleFieldSpriteFrame';
 
 /** 戰場圖層屬性 / Battlefield layers props */
@@ -28,6 +28,8 @@ export interface IBattleFieldLayersProps {
   showLabels?: boolean;
   /** 背景尺寸（獨立於角色排版，選填寬或高其一或全部） / Background size, optional */
   bgSize?: IBattleFieldBgSize;
+  /** 角色精靈框垂直對齊方式（預設 bottom） / Sprite frame vertical alignment (default bottom) */
+  valign?: IBattleFieldVAlign;
 }
 
 /**
@@ -46,8 +48,9 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
   config,
   width: rawWidth,
   height: rawHeight,
-  showLabels = false,
+  showLabels,
   bgSize,
+  valign = 'bottom',
 }) => {
   // 角色排版尺寸：選填，未提供時使用預設值（保持原有設計）
   // Sprite layout size: optional, fall back to defaults when omitted
@@ -80,6 +83,7 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
         width={width}
         height={height}
         showLabels={showLabels}
+        valign={valign}
       />
     </div>
   );

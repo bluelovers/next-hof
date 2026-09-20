@@ -4,12 +4,36 @@
  *
  * 角色精靈排版框：位於背景之上、精靈之下的保護層
  * Sprite layout frame: a protective layer above the background and below the sprites
+ *
+ * 水平永遠置中；垂直位置由 valign 修飾類別控制（預設 bottom）
+ * Always horizontally centered; vertical position controlled by valign modifier
+ * classes (default bottom).
  */
 
 /* ==================== 精靈排版框 / Sprite Layout Frame ==================== */
 
 .battle-sprite-frame {
   position: absolute;
+  /* 水平永遠置中 / Always horizontally centered */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* 垂直對齊：置頂 / Vertical alignment: top */
+.battle-sprite-frame--top {
   top: 0;
-  left: 0;
+  bottom: auto;
+}
+
+/* 垂直對齊：置中 / Vertical alignment: middle */
+.battle-sprite-frame--middle {
+  top: 50%;
+  /* 同時維持水平置中 / keep horizontal centering */
+  transform: translate(-50%, -50%);
+}
+
+/* 垂直對齊：置底（預設） / Vertical alignment: bottom (default) */
+.battle-sprite-frame--bottom {
+  bottom: 0;
+  top: auto;
 }

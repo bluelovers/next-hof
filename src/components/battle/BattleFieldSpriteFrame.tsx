@@ -11,7 +11,7 @@
  * the character sprite layout.
  */
 import React from 'react';
-import type { IBattleSprite } from './types';
+import type { IBattleSprite, IBattleFieldVAlign } from './types';
 import { BattleFieldSpriteLayers } from './BattleFieldSpriteLayers';
 import './BattleFieldSpriteFrame.css';
 
@@ -25,6 +25,8 @@ export interface IBattleFieldSpriteFrameProps {
   height: number;
   /** 是否顯示名稱標籤 / Whether to show name labels */
   showLabels?: boolean;
+  /** 垂直對齊方式（預設 bottom） / Vertical alignment (default bottom) */
+  valign?: IBattleFieldVAlign;
 }
 
 /**
@@ -35,16 +37,20 @@ export interface IBattleFieldSpriteFrameProps {
  * 作為背景與精靈之間的保護層，固定角色排版座標的原點
  * Frames the sprite layers at width x height, acting as a protective
  * layer between background and sprites and fixing the sprite layout origin.
+ *
+ * 水平永遠置中；垂直位置由 valign 控制（預設 bottom）
+ * Always horizontally centered; vertical position controlled by valign (default bottom).
  */
 export const BattleFieldSpriteFrame: React.FC<IBattleFieldSpriteFrameProps> = ({
   sprites,
   width,
   height,
-  showLabels = false,
+  showLabels,
+  valign = 'bottom',
 }) => {
   return (
     <div
-      className="battle-sprite-frame"
+      className={`battle-sprite-frame battle-sprite-frame--${valign}`}
       style={{ width, height }}
     >
       <BattleFieldSpriteLayers

@@ -71,6 +71,9 @@ export type IBattleFieldBgSize = ITSRequireAtLeastOne<{
   height?: number;
 }>;
 
+/** 戰場精靈框垂直對齊方式 / Sprite frame vertical alignment */
+export type IBattleFieldVAlign = 'top' | 'middle' | 'bottom';
+
 /** 戰場背景 / Battlefield background */
 export interface IBattleFieldConfig {
   /** 背景類型 / Background type */
