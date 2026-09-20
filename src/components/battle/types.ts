@@ -8,6 +8,41 @@ import type { ITSRequireAtLeastOne } from 'ts-type';
 /** 隊伍顏色樣式 / Team color style */
 export type ITeamSide = 'left' | 'right';
 
+/**
+ * 隊伍側對應的 CSS 欄位 class（單一事實來源）
+ * CSS column class per team side (single source of truth)
+ *
+ * 對應關係為 left → ttd2、right → ttd1（與原始頁面欄位配置一致），
+ * 由 TEAM_SIDE_CLASS 統一管理，避免各元件各自硬編碼 'ttd1' / 'ttd2'。
+ * Mapping: left → ttd2, right → ttd1 (matches the original page's column layout),
+ * centralized in TEAM_SIDE_CLASS so components stop hard-coding 'ttd1' / 'ttd2'.
+ */
+export type ITeamSideClass = 'ttd1' | 'ttd2';
+
+/** 隊伍側 → CSS class 對應表（單一事實來源） / Team side → CSS class map */
+export const TEAM_SIDE_CLASS: Record<ITeamSide, ITeamSideClass> = {
+  left: 'ttd2',
+  right: 'ttd1',
+};
+
+/**
+ * 以隊伍側（left / right）為 key 的成對結構（通用單一事實來源）
+ * Generic left/right pair (single source of truth)
+ *
+ * 供戰鬥中各「左右成對」資料使用，例如：
+ * 精靈定位的 { left: ITeamBattleChars; right: ITeamBattleChars }、
+ * 戰鬥日誌的 { left: IBattleAction[]; right: IBattleAction[] } 等。
+ * Used by every left/right-paired battle structure, e.g. sprite positioning
+ * `{ left: ITeamBattleChars; right: ITeamBattleChars }` and battle-log columns
+ * `{ left: IBattleAction[]; right: IBattleAction[] }`.
+ */
+export interface IBattleSidePair<T> {
+  /** 左隊 / Left team */
+  left: T;
+  /** 右隊 / Right team */
+  right: T;
+}
+
 /** 單位狀態 / Unit status */
 export type IUnitStatus = 'alive' | 'down' | 'casting';
 

@@ -10,6 +10,7 @@
 import React from 'react';
 import type { IBattleAction, ITeamSide } from './types';
 import { BattleAction } from './BattleAction';
+import { getSideClass } from './battleUtils';
 import '../pages/Shared.css';
 
 /** 戰鬥日誌屬性 / Battle log props */
@@ -87,10 +88,10 @@ export const BattleLog: React.FC<IBattleLogProps> = ({
 
         return rows.map((row, colIndex) => (
           <tr key={`${rowIndex}-${colIndex}`}>
-            <td className="ttd2 break">
+            <td className={`${getSideClass('left')} break`}>
               {row.left && <BattleAction action={row.left} />}
             </td>
-            <td className="ttd1 break">
+            <td className={`${getSideClass('right')} break`}>
               {row.right && <BattleAction action={row.right} />}
             </td>
           </tr>

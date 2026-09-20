@@ -6,7 +6,7 @@
  * Displays team name, total level, average level, total HP
  */
 import React from 'react';
-import type { IBattleUnit } from './types';
+import type { IBattleUnit, ITeamSideClass } from './types';
 import './BattleTeamInfo.css';
 import '../pages/Shared.css';
 
@@ -17,7 +17,7 @@ export interface IBattleTeamInfoProps {
   /** 單位列表 / Unit list */
   units: IBattleUnit[];
   /** 隊伍側邊類別 / Team side CSS class */
-  sideClass: 'ttd1' | 'ttd2';
+  sideClass: ITeamSideClass;
 }
 
 /** 計算總等級 / Calculate total level */

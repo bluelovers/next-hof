@@ -7,7 +7,8 @@
  * Centralizes percentage math, bar colors, and status/attribute → CSS class mappings
  * so BattleUnit and BattleAction share one implementation instead of diverging.
  */
-import type { IUnitStatus, IAttributeType } from './types';
+import type { IUnitStatus, IAttributeType, ITeamSide, ITeamSideClass } from './types';
+import { TEAM_SIDE_CLASS } from './types';
 
 /** 條狀顏色高閾值（> 此值為高血量色） / Bar high threshold */
 const BAR_HIGH_THRESHOLD = 60;
@@ -87,4 +88,15 @@ export function getAttrClass(attr?: IAttributeType): string {
     default:
       return '';
   }
+}
+
+/**
+ * 依隊伍側取得 CSS 欄位 class（left → ttd2, right → ttd1）
+ * Get the CSS column class for a team side (left → ttd2, right → ttd1)
+ *
+ * @param side - 隊伍側 / Team side
+ * @returns CSS class 字串 / CSS class string
+ */
+export function getSideClass(side: ITeamSide): ITeamSideClass {
+  return TEAM_SIDE_CLASS[side];
 }

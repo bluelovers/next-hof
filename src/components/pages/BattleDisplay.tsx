@@ -19,6 +19,8 @@ import { BattleFieldScene } from '#/components/battle/BattleFieldScene';
 import { BattleUnit } from '#/components/battle/BattleUnit';
 import { BattleLog } from '#/components/battle/BattleLog';
 import { BattleResult } from '#/components/battle/BattleResult';
+import { getSideClass } from '#/components/battle/battleUtils';
+import type { ITeamSide } from '#/components/battle/types';
 import './BattleDisplay.css';
 import '#/components/pages/Shared.css';
 
@@ -63,30 +65,30 @@ export const BattleDisplay: React.FC<IBattleDisplayProps> = ({
             <BattleTeamInfo
               name={leftTeam.name}
               units={leftTeam.units}
-              sideClass="ttd2"
+              sideClass={getSideClass('left')}
             />
             <BattleTeamInfo
               name={rightTeam.name}
               units={rightTeam.units}
-              sideClass="ttd1"
+              sideClass={getSideClass('right')}
             />
           </tr>
 
           {/* Row 2: 單位入場 / Unit entrance */}
           {leftTeam.units.map((unit, i) => (
             <tr key={`enter-left-${i}`}>
-              <td className="ttd2">
+              <td className={getSideClass('left')}>
                 <span className="result">
                   <span className="bold">{unit.name}</span> Lv.{unit.level} enter the Battlefield.
                 </span>
               </td>
-              <td className="ttd1">&nbsp;</td>
+              <td className={getSideClass('right')}>&nbsp;</td>
             </tr>
           ))}
           {rightTeam.units.map((unit, i) => (
             <tr key={`enter-right-${i}`}>
-              <td className="ttd2">&nbsp;</td>
-              <td className="ttd1">
+              <td className={getSideClass('left')}>&nbsp;</td>
+              <td className={getSideClass('right')}>
                 <span className="result">
                   <span className="bold">{unit.name}</span> Lv.{unit.level} enter the Battlefield.
                 </span>
@@ -104,7 +106,7 @@ export const BattleDisplay: React.FC<IBattleDisplayProps> = ({
           {/* Row 4: HP/SP 狀態 / HP/SP status */}
           <tr>
             {/* 左側隊伍狀態 / Left team status */}
-            <td className="ttd2 break">
+            <td className={`${getSideClass('left')} break`}>
               <table style={{ width: '100%' }}>
                 <tbody>
                   <tr>
@@ -121,7 +123,7 @@ export const BattleDisplay: React.FC<IBattleDisplayProps> = ({
             </td>
 
             {/* 右側隊伍狀態 / Right team status */}
-            <td className="ttd1 break">
+            <td className={`${getSideClass('right')} break`}>
               <table style={{ width: '100%' }}>
                 <tbody>
                   <tr>
@@ -163,7 +165,7 @@ export const BattleDisplay: React.FC<IBattleDisplayProps> = ({
  */
 function renderUnitColumn(
   units: IBattleUnit[],
-  side: 'left' | 'right',
+  side: ITeamSide,
   showHpBars: boolean,
   showSpBars: boolean
 ): React.ReactNode {
@@ -221,7 +223,7 @@ function renderUnitColumnHead(
  * In the original page, remaining units are in the second column
  */
 function renderUnitColumnTail(
-  units: Array<{ name: string; level: number; hp: number; maxHp: number; sp: number; maxSp: number; status?: 'alive' | 'down' | 'casting'; side: 'left' | 'right'; spriteId?: string }>,
+  units: IBattleUnit[],
   showHpBars: boolean,
   showSpBars: boolean
 ): React.ReactNode {

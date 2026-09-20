@@ -10,7 +10,7 @@
  * Computes each character sprite's background-position (x, y) and flip flag
  * from the battlefield size and the front/back row distribution of each team.
  */
-import type { IBattleSprite } from './types';
+import type { IBattleSprite, ITeamSide, IBattleSidePair } from './types';
 import { getSpriteImageDir, computeSpriteFlipped, useFlipPositioning } from './spriteFlip';
 
 /** 角色輸入（含圖像尺寸與站位） / Character input (with image size and battle position) */
@@ -40,7 +40,7 @@ export interface IBattlePositionChar {
    * 由 groupBattleChars() 依此欄位將扁平名冊自動分類至 left / right 隊
    * Used by groupBattleChars() to auto-classify a flat roster into the left / right teams.
    */
-  side: 'left' | 'right';
+  side: ITeamSide;
 }
 
 /** 單一隊伍的前/後衛角色 / One team's front/back characters */
@@ -88,7 +88,7 @@ function computeRowPositions(
   chars: IBattlePositionChar[],
   options: IComputeSpritePositionsOptions,
   position: 'front' | 'back',
-  side: 'left' | 'right'
+  side: ITeamSide
 ): IBattleSprite[] {
   const { width, height, cellCount = 6 } = options;
   // 手動覆寫：呼叫端明確傳入 flip 時沿用舊定位模式；否則依圖檔目錄自動推導
@@ -185,7 +185,7 @@ function computeRowPositions(
  */
 export function groupBattleChars(
   chars: IBattlePositionChar[]
-): { left: ITeamBattleChars; right: ITeamBattleChars } {
+): IBattleSidePair<ITeamBattleChars> {
   const left: ITeamBattleChars = { front: [], back: [] };
   const right: ITeamBattleChars = { front: [], back: [] };
   for (const c of chars) {
@@ -204,7 +204,7 @@ export function groupBattleChars(
  * @returns 可直接作為 BattleFieldScene sprites 的 IBattleSprite[] / IBattleSprite[] ready for BattleFieldScene
  */
 export function computeBattleSpritePositions(
-  input: { left: ITeamBattleChars; right: ITeamBattleChars },
+  input: IBattleSidePair<ITeamBattleChars>,
   options: IComputeSpritePositionsOptions
 ): IBattleSprite[] {
   const result: IBattleSprite[] = [
