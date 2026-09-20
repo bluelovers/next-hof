@@ -11,7 +11,13 @@
  * when omitted, background and sprites share the same width/height.
  */
 import React from 'react';
-import type { IBattleSprite, IBattleFieldConfig, IBattleFieldBgSize, IBattleFieldVAlign } from './types';
+import type {
+  IBattleSprite,
+  IBattleFieldConfig,
+  IBattleFieldBgSize,
+  IBattleFieldVAlign,
+  IBattleFieldBgScale,
+} from './types';
 import { BattleFieldSpriteFrame } from './BattleFieldSpriteFrame';
 
 /** 戰場圖層屬性 / Battlefield layers props */
@@ -43,6 +49,45 @@ export interface IBattleFieldLayersProps {
  * character sprites are fixed inside a width x height frame, so enlarging
  * the background never affects the sprite layout coordinates.
  */
+/**
+ * 背景圖縮放模式 → CSS 背景屬性
+ * Background scale mode → CSS background properties
+ *
+ * 預設對齊為「水平置中 + 垂直置底」，確保背景圖在 bgSize 大於或小於
+ * 實際圖檔尺寸時都能正確排版而不會偏移或異常裁切
+ * Default alignment is horizontally centered + bottom-aligned, so the background
+ * image stays correctly placed whether bgSize is larger or smaller than the file.
+ */
+function resolveBgImageLayout(
+  scale: IBattleFieldBgScale,
+  bgWidth: number,
+  bgHeight: number
+): React.CSSProperties {
+  const position = 'center bottom';
+  switch (scale) {
+    case 'cover':
+      // 縮放至覆蓋整個背景框（可能裁切溢出部分）/ Scale to cover the box (may crop overflow)
+      return { backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: position };
+    case 'contain':
+      // 縮放至完整放入背景框（可能留白）/ Scale to fit entirely (may letterbox)
+      return { backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: position };
+    case 'stretch':
+      // 拉伸至背景框的確切尺寸（會變形）/ Stretch to exact box size (may distort)
+      return {
+        backgroundSize: `${bgWidth}px ${bgHeight}px`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: position,
+      };
+    case 'repeat':
+      // 平鋪（依原始尺寸重複）/ Repeat (tile at natural size)
+      return { backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: '0 0' };
+    case 'natural':
+    default:
+      // 原始尺寸，水平置中 + 垂直置底 / Natural size, horizontally centered + bottom-aligned
+      return { backgroundSize: 'auto', backgroundRepeat: 'no-repeat', backgroundPosition: position };
+  }
+}
+
 export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
   sprites,
   config,
@@ -62,6 +107,11 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
   const bgWidth = bgSize?.width ?? width;
   const bgHeight = bgSize?.height ?? height;
 
+  // 背景圖排版：預設自然尺寸 + 水平置中垂直置底，縮放模式由 config.bgScale 控制
+  // Background image layout: default natural size + centered/bottom; scale mode from config.bgScale
+  const bgScaleMode = config.bgScale ?? 'natural';
+  const bgImageLayout = resolveBgImageLayout(bgScaleMode, bgWidth, bgHeight);
+
   /** 背景樣式 / Background style */
   const bgStyle: React.CSSProperties = {
     width: bgWidth,
@@ -70,9 +120,8 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
     backgroundImage: config.backgroundImageUrl
       ? `url(${config.backgroundImageUrl})`
       : undefined,
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: '0px 0px',
     position: 'relative',
+    ...bgImageLayout,
   };
 
   return (

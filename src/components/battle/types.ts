@@ -74,6 +74,9 @@ export type IBattleFieldBgSize = ITSRequireAtLeastOne<{
 /** 戰場精靈框垂直對齊方式 / Sprite frame vertical alignment */
 export type IBattleFieldVAlign = 'top' | 'middle' | 'bottom';
 
+/** 背景圖縮放模式 / Background image scale mode */
+export type IBattleFieldBgScale = 'natural' | 'cover' | 'contain' | 'stretch' | 'repeat';
+
 /** 戰場背景 / Battlefield background */
 export interface IBattleFieldConfig {
   /** 背景類型 / Background type */
@@ -86,6 +89,8 @@ export interface IBattleFieldConfig {
   height?: number;
   /** 背景尺寸（獨立於角色排版，選填寬或高其一或全部） / Background size, independent of sprite layout; width/height individually optional */
   bgSize?: IBattleFieldBgSize;
+  /** 背景圖縮放模式（預設 natural） / Background image scale mode (default natural) */
+  bgScale?: IBattleFieldBgScale;
 }
 
 /** 戰鬥動作類型 / Battle action type */

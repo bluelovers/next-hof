@@ -38,6 +38,7 @@ export const sampleBackgroundUrls = {
   cave: '/image/land/bg_cave.png',
   snow: '/image/land/bg_snow.png',
   sand: '/image/land/bg_sand.png',
+  egypt: '/image/land/bg_egypt_001.png', // 實際圖檔尺寸 768×320 / actual file size 768×320
 } as const;
 
 /**
