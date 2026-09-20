@@ -9,24 +9,8 @@
  */
 import React, { useId } from 'react';
 import './CharacterCardBase.css';
-
-/** 角色資料 / Character data */
-export interface ICharacterData {
-  /** 角色 ID / Character ID */
-  id: string;
-  /** 角色名稱 / Character name */
-  name: string;
-  /** 圖像路徑 / Image path */
-  imageUrl: string;
-  /** 等級 / Level */
-  level: number;
-  /** 職業 / Class */
-  className: string;
-  /** 是否有星標記 / Has star marker */
-  hasStar?: boolean;
-  /** 是否選取 / Whether selected */
-  selected?: boolean;
-}
+import type { ICharacterData } from './CharacterTypes';
+import { getCarpetClass, buildCharacterUrl } from './characterUtils';
 
 /** CharacterCard 屬性 / CharacterCard props */
 export interface ICharacterCardProps {
@@ -37,10 +21,6 @@ export interface ICharacterCardProps {
   /** 選取變更回調 / Selection change callback */
   onSelect?: (id: string) => void;
 }
-
-/** 判斷 carpet 類別（偶數為 carpet0，奇數為 carpet1）/ Determine carpet class */
-const getCarpetClass = (index: number = 0): string =>
-  index % 2 === 0 ? 'carpet0' : 'carpet1';
 
 /**
  * CharacterCard 角色卡片元件
@@ -67,7 +47,7 @@ export const CharacterCard: React.FC<ICharacterCardProps> = ({
       {/** 角色頭像底座（交替 carpet0/carpet1）/ Avatar pedestal (alternating) */}
       <div className={getCarpetClass(index)}>
         <a
-          href={`http://127.0.0.1:8085/char/char?char=${character.id}`}
+          href={buildCharacterUrl(character.id)}
         >
           <img
             src={character.imageUrl}

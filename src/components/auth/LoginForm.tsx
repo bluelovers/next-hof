@@ -7,6 +7,7 @@
  */
 import React, { useState } from 'react';
 import './LoginForm.css';
+import { buildAppUrl } from '#/components/config/AppConfig';
 
 /** LoginForm 屬性 / LoginForm props */
 export interface ILoginFormProps {
@@ -26,7 +27,7 @@ export interface ILoginFormProps {
  */
 export const LoginForm: React.FC<ILoginFormProps> = ({
   onLogin,
-  newGameUrl = 'http://127.0.0.1:8085/game/newgame',
+  newGameUrl = buildAppUrl('/game/newgame'),
   defaultId = '',
   defaultPass = '',
 }) => {

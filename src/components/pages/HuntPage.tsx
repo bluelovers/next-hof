@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import './HuntPage.css';
-import type { IHuntSubNavItem } from '#/components/navigation/HuntSubNav';
+import type { INavLink } from '#/components/navigation/NavTypes';
 import { HuntSubNav } from '#/components/navigation/HuntSubNav';
 import type { IHuntAreaData } from '#/components/areas/HuntAreaLink';
 import { HuntAreaLink } from '#/components/areas/HuntAreaLink';
@@ -17,7 +17,7 @@ export interface IHuntPageProps {
   /** 頁面標題 / Page title */
   title?: string;
   /** 子導航項目 / Sub-nav items */
-  subNavItems?: IHuntSubNavItem[];
+  subNavItems?: INavLink[];
   /** 區域分類標題 / Area section title */
   sectionTitle?: string;
   /** 獵區列表 / Area list */

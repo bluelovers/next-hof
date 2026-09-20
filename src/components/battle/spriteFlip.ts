@@ -14,9 +14,7 @@
  * so it can be imported and unit-tested in isolation.
  */
 import type { ITeamSide } from './types';
-
-/** 精靈圖所在目錄 / Sprite image directory */
-export type ISpriteImageDir = 'char' | 'char_rev' | 'other';
+import type { ISpriteImageDir } from './spriteDirs';
 
 /**
  * 嚴格判斷圖檔目錄

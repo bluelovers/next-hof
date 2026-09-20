@@ -8,7 +8,7 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { BattleFieldScene } from '../../src/components/battle/BattleFieldScene';
-import { sampleSprites, sampleEnemySprites, sampleAllySprites, sampleSpritesMixed, createSampleConfig } from './sampleData';
+import { sampleSprites, sampleEnemySprites, sampleAllySprites, sampleSpritesMixed, sampleSpritesFlat, createSampleConfig } from './sampleData';
 
 const meta: Meta<typeof BattleFieldScene> = {
   title: 'Battle/Atoms/BattleFieldScene',
@@ -96,6 +96,24 @@ export const NoLabels: Story = {
 export const MixedCharRevTeam: Story = {
   args: {
     sprites: sampleSpritesMixed,
+    config: createSampleConfig('grass'),
+    showLabels: true,
+  },
+};
+
+/**
+ * 扁平名冊 + groupBattleChars 自動分隊：展示 IBattlePositionChar.side / .position 的實際用法
+ * Flat roster + groupBattleChars auto-grouping: demonstrates IBattlePositionChar.side / .position in action
+ *
+ * 與 DefaultBattle 視覺等價，但輸入是一張扁平清單，由 groupBattleChars 依各角色的
+ * side / position 自動建立左右隊的前/後衛結構（見 sampleData.flatRosterSample）。
+ * Visually equivalent to DefaultBattle, but the input is a single flat list and
+ * groupBattleChars builds the left/right teams' front/back structure from each
+ * character's side / position (see sampleData.flatRosterSample).
+ */
+export const FlatRosterGrouped: Story = {
+  args: {
+    sprites: sampleSpritesFlat,
     config: createSampleConfig('grass'),
     showLabels: true,
   },

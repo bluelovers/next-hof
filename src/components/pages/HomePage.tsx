@@ -11,16 +11,10 @@ import React, { useState } from 'react';
 import './HomePage.css';
 import { LoginForm } from '#/components/auth/LoginForm';
 import { RankingTable } from '#/components/info/RankingTable';
+import type { IRankingEntry } from '#/components/info/RankingTable';
 import { GameDescription } from '#/components/info/GameDescription';
 import { InfoSection } from '#/components/info/InfoSection';
-
-/** 排行条目 / Ranking entry */
-export interface IRankingEntry {
-  /** 排名 / Rank */
-  rank: number;
-  /** 隊伍名稱 / Team name */
-  teamName: string;
-}
+import { buildAppUrl } from '#/components/config/AppConfig';
 
 /** HomePage 屬性 / HomePage props */
 export interface IHomePageProps {
@@ -48,7 +42,7 @@ export const HomePage: React.FC<IHomePageProps> = ({
   maxUsers = 500,
   retentionDays = 14,
   onLogin,
-  newGameUrl = 'http://127.0.0.1:8085/game/newgame',
+  newGameUrl = buildAppUrl('/game/newgame'),
 }) => {
   return (
     <div className="home-page">

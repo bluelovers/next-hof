@@ -13,6 +13,8 @@
  * </div>
  */
 import React from 'react';
+import type { ILandType } from './landTypes';
+import { buildLandClass } from './landTypes';
 
 /** 獵區資料 / Hunting area data */
 export interface IHuntAreaData {
@@ -23,7 +25,7 @@ export interface IHuntAreaData {
   /** 等級範圍 / Level range (e.g. "Lv1", "Lv20-30") */
   levelRange?: string;
   /** 地形背景類型（對應 land_*.png）/ Land background type (maps to land_*.png) */
-  landType?: string;
+  landType?: ILandType;
 }
 
 /** HuntAreaLink 屬性 / HuntAreaLink props */
@@ -37,9 +39,7 @@ export interface IHuntAreaLinkProps {
  * HuntAreaLink component
  */
 export const HuntAreaLink: React.FC<IHuntAreaLinkProps> = ({ area }) => {
-  const landClass = area.landType
-    ? `land land_${area.landType}`
-    : 'land';
+  const landClass = buildLandClass(area.landType);
 
   return (
     <div className="land_frame">

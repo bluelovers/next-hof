@@ -6,47 +6,15 @@
  * Displays unit name, HP, and SP status
  */
 import React from 'react';
-import type { IBattleUnit, IUnitStatus } from './types';
+import type { IBattleUnit } from './types';
 import './BattleUnit.css';
 import '../pages/Shared.css';
-
-/** 根據狀態取得 CSS 類別 / Get CSS class based on status */
-function getStatusClass(status?: IUnitStatus): string {
-  switch (status) {
-    case 'down':
-      return 'dmg';
-    case 'casting':
-      return 'charge';
-    default:
-      return '';
-  }
-}
-
-/** 計算 HP 百分比 / Calculate HP percentage */
-function hpPercent(hp: number, maxHp: number): number {
-  if (maxHp <= 0) return 0;
-  return Math.max(0, Math.min(100, (hp / maxHp) * 100));
-}
-
-/** 根據 HP 百分比取得 HP 條顏色 / Get HP bar color based on percentage */
-function getHpBarColor(pct: number): string {
-  if (pct > 60) return '#3366ff';
-  if (pct > 30) return '#ffcc33';
-  return '#cc3300';
-}
-
-/** 根據 SP 百分比取得 SP 條顏色 / Get SP bar color based on percentage */
-function getSpBarColor(pct: number): string {
-  if (pct > 60) return '#66cc66';
-  if (pct > 30) return '#ffcc33';
-  return '#cc3300';
-}
-
-/** 計算 SP 百分比 / Calculate SP percentage */
-function spPercent(sp: number, maxSp: number): number {
-  if (maxSp <= 0) return 0;
-  return Math.max(0, Math.min(100, (sp / maxSp) * 100));
-}
+import {
+  getStatusClass,
+  clampPercent,
+  getHpBarColor,
+  getSpBarColor,
+} from './battleUtils';
 
 /** 戰鬥單位屬性 / Battle unit props */
 export interface IBattleUnitProps {
@@ -69,8 +37,8 @@ export const BattleUnit: React.FC<IBattleUnitProps> = ({
 }) => {
   const { name, hp, maxHp, sp, maxSp, status } = unit;
   const statusClass = getStatusClass(status);
-  const hpPct = hpPercent(hp, maxHp);
-  const spPct = spPercent(sp, maxSp);
+  const hpPct = clampPercent(hp, maxHp);
+  const spPct = clampPercent(sp, maxSp);
 
   return (
     <div className={`unit-summary ${statusClass}`}>

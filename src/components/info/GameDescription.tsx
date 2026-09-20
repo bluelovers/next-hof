@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import './GameDescription.css';
+import { buildAppUrl } from '#/components/config/AppConfig';
 
 /**
  * GameDescription 遊戲簡介元件
@@ -44,7 +45,7 @@ export const GameDescription: React.FC = () => {
             戦闘の状況に応じて技を使い分けます。
           </li>
           <li>
-            <a href="http://127.0.0.1:8085/log" className="battle-link">
+            <a href={buildAppUrl('/log')} className="battle-link">
               こちら
             </a>
             で戦闘ログが回覧できます。

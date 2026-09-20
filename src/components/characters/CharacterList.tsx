@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import { CharacterCard } from './CharacterCard';
-import type { ICharacterData } from './CharacterCard';
+import type { ICharacterData } from './CharacterTypes';
 import './CharacterCardBase.css';
 import './CharacterList.css';
 import './CharacterList.css';

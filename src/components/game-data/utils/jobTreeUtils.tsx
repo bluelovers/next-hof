@@ -5,15 +5,7 @@
  * 提供職業樹的建立和渲染功能
  * Provides job tree building and rendering functionality
  */
-import type { IJobData } from '#/components/game-data/GameDataTypes';
-
-/** 職業樹節點 / Job tree node */
-export interface IJobTreeNode {
-  /** 職業 / Job */
-  job: IJobData;
-  /** 子職業 / Child jobs */
-  children: IJobTreeNode[];
-}
+import type { IJobData, IJobTreeNode } from '#/components/game-data/GameDataTypes';
 
 /**
  * 建立職業樹 / Build job tree from flat job list

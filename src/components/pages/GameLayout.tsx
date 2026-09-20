@@ -7,16 +7,8 @@
  */
 import React from 'react';
 import './GameLayout.css';
-
-/** 導航連結 / Nav link */
-export interface INavLink {
-  /** 標籤 / Label */
-  label: string;
-  /** 連結 / URL */
-  href: string;
-  /** 是否為當前頁面 / Whether active */
-  active?: boolean;
-}
+import type { INavLink } from '#/components/navigation/NavTypes';
+import { buildAppUrl } from '#/components/config/AppConfig';
 
 /** GameLayout 屬性 / GameLayout props */
 export interface IGameLayoutProps {
@@ -34,19 +26,19 @@ export interface IGameLayoutProps {
 
 /** 預設導航連結 / Default nav links */
 const DEFAULT_NAV_LINKS: INavLink[] = [
-  { label: 'トップ', href: 'http://127.0.0.1:8085' },
-  { label: '新規', href: 'http://127.0.0.1:8085/game/newgame' },
-  { label: 'ルールとマニュアル', href: 'http://127.0.0.1:8085/manual' },
-  { label: 'ゲームデータ', href: 'http://127.0.0.1:8085/gamedata' },
-  { label: '戦闘ログ', href: 'http://127.0.0.1:8085/log' },
+  { label: 'トップ', href: buildAppUrl() },
+  { label: '新規', href: buildAppUrl('/game/newgame') },
+  { label: 'ルールとマニュアル', href: buildAppUrl('/manual') },
+  { label: 'ゲームデータ', href: buildAppUrl('/gamedata') },
+  { label: '戦闘ログ', href: buildAppUrl('/log') },
 ];
 
 /** 預設頁尾連結 / Default footer links */
 const DEFAULT_FOOTER_LINKS: INavLink[] = [
-  { label: 'UpDate', href: 'http://127.0.0.1:8085/log/update' },
-  { label: 'Manual', href: 'http://127.0.0.1:8085/manual' },
-  { label: 'Tutorial', href: 'http://127.0.0.1:8085/manual/tutorial' },
-  { label: 'GameData', href: 'http://127.0.0.1:8085/gamedata' },
+  { label: 'UpDate', href: buildAppUrl('/log/update') },
+  { label: 'Manual', href: buildAppUrl('/manual') },
+  { label: 'Tutorial', href: buildAppUrl('/manual/tutorial') },
+  { label: 'GameData', href: buildAppUrl('/gamedata') },
   { label: 'Top', href: '#top' },
 ];
 

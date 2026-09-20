@@ -6,27 +6,19 @@
  * Displays hunting category links like CommonMonster / UnionMonster
  */
 import React from 'react';
-
-/** 子導航項目 / Sub-navigation item */
-export interface IHuntSubNavItem {
-  /** 標籤 / Label */
-  label: string;
-  /** 連結 / URL */
-  href: string;
-  /** 是否為當前頁面 / Whether active */
-  active?: boolean;
-}
+import type { INavLink } from './NavTypes';
+import { buildAppUrl } from '#/components/config/AppConfig';
 
 /** HuntSubNav 屬性 / HuntSubNav props */
 export interface IHuntSubNavProps {
   /** 導航項目列表 / Nav items */
-  items?: IHuntSubNavItem[];
+  items?: INavLink[];
 }
 
 /** 預設子導航項目 / Default sub-nav items */
-const DEFAULT_ITEMS: IHuntSubNavItem[] = [
-  { label: 'CommonMonster', href: 'http://127.0.0.1:8085/battle/list_common', active: true },
-  { label: 'UnionMonster', href: 'http://127.0.0.1:8085/battle/list_union' },
+const DEFAULT_ITEMS: INavLink[] = [
+  { label: 'CommonMonster', href: buildAppUrl('/battle/list_common'), active: true },
+  { label: 'UnionMonster', href: buildAppUrl('/battle/list_union') },
 ];
 
 /**

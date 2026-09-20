@@ -11,16 +11,17 @@ import React, { useState } from 'react';
 import './DashboardPage.css';
 import './Shared.css';
 import { NavigationBar } from '#/components/navigation/NavigationBar';
-import type { INavItem } from '#/components/navigation/NavigationBar';
+import type { INavLink } from '#/components/navigation/NavTypes';
+import { buildAppUrl } from '#/components/config/AppConfig';
 import { TeamStatus } from '#/components/info/TeamStatus';
 import type { ITeamStatusProps } from '#/components/info/TeamStatus';
 import { CharacterList } from '#/components/characters/CharacterList';
-import type { ICharacterData } from '#/components/characters/CharacterCard';
+import type { ICharacterData } from '#/components/characters/CharacterTypes';
 
 /** DashboardPage 屬性 / DashboardPage props */
 export interface IDashboardPageProps {
   /** 導航項目 / Navigation items */
-  navItems?: INavItem[];
+  navItems?: INavLink[];
   /** 隊伍狀態 / Team status */
   teamStatus?: ITeamStatusProps;
   /** 角色列表 / Character list */
@@ -28,7 +29,7 @@ export interface IDashboardPageProps {
   /** 角色選取回調 / Character select callback */
   onCharacterSelect?: (id: string) => void;
   /** 頁尾連結 / Footer links */
-  footerLinks?: Array<{ label: string; href: string }>;
+  footerLinks?: INavLink[];
   /** 版權文字 / Copyright text */
   copyright?: string;
 }
@@ -74,11 +75,11 @@ const DEFAULT_CHARACTERS: ICharacterData[] = [
 ];
 
 /** 預設頁尾連結 / Default footer links */
-const DEFAULT_FOOTER_LINKS = [
-  { label: 'UpDate', href: 'http://127.0.0.1:8085/log/update' },
-  { label: 'Manual', href: 'http://127.0.0.1:8085/manual' },
-  { label: 'Tutorial', href: 'http://127.0.0.1:8085/manual/tutorial' },
-  { label: 'GameData', href: 'http://127.0.0.1:8085/gamedata' },
+const DEFAULT_FOOTER_LINKS: INavLink[] = [
+  { label: 'UpDate', href: buildAppUrl('/log/update') },
+  { label: 'Manual', href: buildAppUrl('/manual') },
+  { label: 'Tutorial', href: buildAppUrl('/manual/tutorial') },
+  { label: 'GameData', href: buildAppUrl('/gamedata') },
   { label: 'Top', href: '#top' },
 ];
 

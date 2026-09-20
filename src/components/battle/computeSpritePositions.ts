@@ -25,9 +25,21 @@ export interface IBattlePositionChar {
   imageWidth: number;
   /** 圖像高度（getimagesize） / Image height */
   imageHeight: number;
-  /** 站位：前衛 / 後衛 / Position: front / back */
+  /**
+   * 站位：前衛 / 後衛
+   * Position: front / back
+   *
+   * 由 groupBattleChars() 依此欄位將扁平名冊自動分類至 front / back 列
+   * Used by groupBattleChars() to auto-classify a flat roster into the front / back rows.
+   */
   position: 'front' | 'back';
-  /** 隊伍側：左 / 右 / Team side: left / right */
+  /**
+   * 隊伍側：左 / 右
+   * Team side: left / right
+   *
+   * 由 groupBattleChars() 依此欄位將扁平名冊自動分類至 left / right 隊
+   * Used by groupBattleChars() to auto-classify a flat roster into the left / right teams.
+   */
   side: 'left' | 'right';
 }
 
@@ -152,6 +164,35 @@ function computeRowPositions(
       flipped,
     };
   });
+}
+
+/**
+ * 將扁平名冊依各角色的 side / position 自動分類為左右隊的前/後衛結構
+ * Group a flat roster into left/right teams' front/back rows using each character's
+ * own side / position fields.
+ *
+ * 這讓 IBattlePositionChar.side / .position 具有明確意義：呼叫端只需提供一張扁平
+ * 清單（每個角色自帶 side 與 position），即可自動建立 computeBattleSpritePositions
+ * 所需的 { left, right } 隊伍結構，不必手動嵌套 front/back 陣列。
+ * This gives IBattlePositionChar.side / .position a concrete purpose: callers supply a
+ * single flat list (each char carrying side + position) and get the { left, right }
+ * structure that computeBattleSpritePositions expects, without manually nesting
+ * front/back arrays.
+ *
+ * @param chars 扁平名冊（含 side / position） / Flat roster (with side / position)
+ * @returns 可直接傳入 computeBattleSpritePositions 的隊伍結構
+ *          Team structure ready for computeBattleSpritePositions
+ */
+export function groupBattleChars(
+  chars: IBattlePositionChar[]
+): { left: ITeamBattleChars; right: ITeamBattleChars } {
+  const left: ITeamBattleChars = { front: [], back: [] };
+  const right: ITeamBattleChars = { front: [], back: [] };
+  for (const c of chars) {
+    const team = c.side === 'right' ? right : left;
+    (c.position === 'back' ? team.back : team.front).push(c);
+  }
+  return { left, right };
 }
 
 /**

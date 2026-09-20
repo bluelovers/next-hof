@@ -8,7 +8,7 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { CharacterList } from '../../src/components/characters/CharacterList';
-import type { ICharacterData } from '../../src/components/characters/CharacterCard';
+import type { ICharacterData } from '../../src/components/characters/CharacterTypes';
 
 const IMAGE_BASE = '/image/char';
 

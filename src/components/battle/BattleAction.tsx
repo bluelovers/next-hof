@@ -6,30 +6,15 @@
  * Displays a single skill/attack/action log entry
  */
 import React from 'react';
-import type { IBattleAction, IAttributeType } from './types';
+import type { IBattleAction } from './types';
 import './BattleAction.css';
 import '../pages/Shared.css';
+import { getAttrClass } from './battleUtils';
 
 /** 戰鬥行動屬性 / Battle action props */
 export interface IBattleActionProps {
   /** 行動資料 / Action data */
   action: IBattleAction;
-}
-
-/** 根據屬性類型取得 CSS 類別 / Get CSS class based on attribute type */
-function getAttrClass(attr?: IAttributeType): string {
-  switch (attr) {
-    case 'dmg':
-      return 'dmg';
-    case 'recover':
-      return 'recover';
-    case 'support':
-      return 'support';
-    case 'charge':
-      return 'charge';
-    default:
-      return '';
-  }
 }
 
 /**

@@ -7,31 +7,23 @@
  */
 import React from 'react';
 import './NavigationBar.css';
-
-/** 導航項目 / Nav item */
-export interface INavItem {
-  /** 標籤 / Label */
-  label: string;
-  /** 連結 / URL */
-  href: string;
-  /** 是否啟用中 / Whether it's the current page */
-  active?: boolean;
-}
+import type { INavLink } from './NavTypes';
+import { buildAppUrl } from '#/components/config/AppConfig';
 
 /** NavigationBar 屬性 / NavigationBar props */
 export interface INavigationBarProps {
   /** 導航項目列表 / Nav items */
-  items?: INavItem[];
+  items?: INavLink[];
 }
 
 /** 預設導航項目 / Default nav items */
-const DEFAULT_NAV_ITEMS: INavItem[] = [
-  { label: 'Top', href: 'http://127.0.0.1:8085/', active: true },
-  { label: 'Hunt', href: 'http://127.0.0.1:8085/battle/hunt' },
-  { label: 'Item', href: 'http://127.0.0.1:8085/item' },
-  { label: 'Town', href: 'http://127.0.0.1:8085/town' },
-  { label: 'Setting', href: 'http://127.0.0.1:8085/game/setting' },
-  { label: 'Log', href: 'http://127.0.0.1:8085/log' },
+const DEFAULT_NAV_ITEMS: INavLink[] = [
+  { label: 'Top', href: buildAppUrl('/'), active: true },
+  { label: 'Hunt', href: buildAppUrl('/battle/hunt') },
+  { label: 'Item', href: buildAppUrl('/item') },
+  { label: 'Town', href: buildAppUrl('/town') },
+  { label: 'Setting', href: buildAppUrl('/game/setting') },
+  { label: 'Log', href: buildAppUrl('/log') },
 ];
 
 /**

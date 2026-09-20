@@ -13,26 +13,8 @@ import '../characters/CharacterCardBase.css';
 /** MonsterCard 專用樣式（地形背景） */
 /** MonsterCard specific styles (land backgrounds) */
 import './MonsterCard.css';
-
-/** 地形類型 / Land type */
-export type ILandType =
-  | 'aband'
-  | 'grass'
-  | 'grass01'
-  | 'sea'
-  | 'cave'
-  | 'snow'
-  | 'swamp'
-  | 'ocean0'
-  | 'sand'
-  | 'sand1'
-  | 'mount'
-  | 'lava'
-  | 'pavement01'
-  | 'build01'
-  | 'jungle'
-  | 'nest'
-  | 'noimage';
+import type { ILandType } from '#/components/areas/landTypes';
+import { buildLandClass } from '#/components/areas/landTypes';
 
 /** 怪物資料 / Monster data */
 export interface IMonsterData {
@@ -57,9 +39,7 @@ export interface IMonsterCardProps {
  * MonsterCard component
  */
 export const MonsterCard: React.FC<IMonsterCardProps> = ({ monster }) => {
-  const landClass = monster.landType
-    ? `land land_${monster.landType}`
-    : 'land';
+  const landClass = buildLandClass(monster.landType);
 
   return (
     <div className="carpet_frame">

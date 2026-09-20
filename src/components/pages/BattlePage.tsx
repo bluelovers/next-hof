@@ -6,12 +6,13 @@
  * Battle formation screen — select party members and review monster info
  *
  * 原始網頁對照 / Original page reference:
- * - http://127.0.0.1:8085/battle/common?land=gb0
+ * - 對應 BASE_URL 下的 /battle/common?land=gb0（見 #/components/config/AppConfig）
  * - 結構：地區標題 → Teams → 角色列表(checkbox) → 按鈕 → SaveParty → hr → 怪物列表
  */
 import React, { useState } from 'react';
 import { GameLayout } from './GameLayout';
-import { BattleCharacterCard, IBattleCharacterData } from '#/components/characters/BattleCharacterCard';
+import { BattleCharacterCard } from '#/components/characters/BattleCharacterCard';
+import type { IBattleCharacterData } from '#/components/characters/CharacterTypes';
 import { MonsterCard, IMonsterData } from '#/components/monsters/MonsterCard';
 
 /** Shared.css 提供 clearfix 等工具類 */

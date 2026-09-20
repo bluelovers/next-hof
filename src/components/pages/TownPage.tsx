@@ -13,6 +13,7 @@ import { FacilityGroup } from '#/components/facilities/FacilityGroup';
 import type { IFacilityData } from '#/components/facilities/TownFacility';
 import { MessageBoard } from '#/components/facilities/MessageBoard';
 import type { IMessageBoardProps } from '#/components/facilities/MessageBoard';
+import { buildAppUrl } from '#/components/config/AppConfig';
 
 /** TownPage 屬性 / TownPage props */
 export interface ITownPageProps {
@@ -32,10 +33,10 @@ export interface ITownPageProps {
 
 /** 預設商店設施 / Default shop facilities */
 const DEFAULT_SHOP: IFacilityData[] = [
-  { name: '店', nameEn: 'Shop', href: 'http://127.0.0.1:8085/shop' },
-  { name: '買う', nameEn: 'Buy', href: 'http://127.0.0.1:8085/shop/buy' },
-  { name: '売る', nameEn: 'Sell', href: 'http://127.0.0.1:8085/shop/sell' },
-  { name: 'アルバイト', href: 'http://127.0.0.1:8085/shop/work' },
+  { name: '店', nameEn: 'Shop', href: buildAppUrl('/shop') },
+  { name: '買う', nameEn: 'Buy', href: buildAppUrl('/shop/buy') },
+  { name: '売る', nameEn: 'Sell', href: buildAppUrl('/shop/sell') },
+  { name: 'アルバイト', href: buildAppUrl('/shop/work') },
 ];
 
 /** 預設人材設施 / Default recruit facilities */
@@ -43,7 +44,7 @@ const DEFAULT_RECRUIT: IFacilityData[] = [
   {
     name: '人材斡旋所',
     nameEn: 'Recruit',
-    href: 'http://127.0.0.1:8085/recruit',
+    href: buildAppUrl('/recruit'),
   },
 ];
 
@@ -52,17 +53,17 @@ const DEFAULT_SMITHY: IFacilityData[] = [
   {
     name: '鍛冶屋',
     nameEn: 'Smithy',
-    href: 'http://127.0.0.1:8085/smithy',
+    href: buildAppUrl('/smithy'),
   },
   {
     name: '精錬工房',
     nameEn: 'Refine',
-    href: 'http://127.0.0.1:8085/smithy/refine',
+    href: buildAppUrl('/smithy/refine'),
   },
   {
     name: '製作工房',
     nameEn: 'Create',
-    href: 'http://127.0.0.1:8085/smithy/create',
+    href: buildAppUrl('/smithy/create'),
   },
 ];
 
@@ -71,7 +72,7 @@ const DEFAULT_AUCTION: IFacilityData[] = [
   {
     name: 'オークション会場',
     nameEn: 'Auction',
-    href: 'http://127.0.0.1:8085/auction',
+    href: buildAppUrl('/auction'),
   },
 ];
 
@@ -80,7 +81,7 @@ const DEFAULT_COLOSSEUM: IFacilityData[] = [
   {
     name: 'コロシアム',
     nameEn: 'Colosseum',
-    href: 'http://127.0.0.1:8085/rank',
+    href: buildAppUrl('/rank'),
   },
 ];
 

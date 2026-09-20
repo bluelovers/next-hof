@@ -8,7 +8,6 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { NavigationBar } from '../../src/components/navigation/NavigationBar';
-import type { INavItem } from '../../src/components/navigation/NavigationBar';
 
 /** 背景裝飾器 — 模擬遊戲導航背景 / Navigation background decorator */
 const NavDecorator = (Story: React.FC) => (

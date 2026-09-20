@@ -9,7 +9,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { GameLayout } from '../../src/components/pages/GameLayout';
 import { DashboardPage } from '../../src/components/pages/DashboardPage';
-import type { ICharacterData } from '../../src/components/characters/CharacterCard';
+import type { ICharacterData } from '../../src/components/characters/CharacterTypes';
 
 const IMAGE_BASE = '/image/char';
 

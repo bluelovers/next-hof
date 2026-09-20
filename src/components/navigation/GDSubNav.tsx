@@ -7,19 +7,21 @@
  */
 import React from 'react';
 import './GDSubNav.css';
+import type { INavLink } from './NavTypes';
+import { buildAppUrl } from '#/components/config/AppConfig';
 
 /** 預設子頁面連結 / Default sub-page links */
-export const DEFAULT_SUB_LINKS = [
-  { label: '職(Job)', href: 'http://127.0.0.1:8085/gamedata/job' },
-  { label: 'アイテム(item)', href: 'http://127.0.0.1:8085/gamedata/item' },
-  { label: '判定', href: 'http://127.0.0.1:8085/gamedata/judge' },
-  { label: 'モンスター', href: 'http://127.0.0.1:8085/gamedata/monster' },
+export const DEFAULT_SUB_LINKS: INavLink[] = [
+  { label: '職(Job)', href: buildAppUrl('/gamedata/job') },
+  { label: 'アイテム(item)', href: buildAppUrl('/gamedata/item') },
+  { label: '判定', href: buildAppUrl('/gamedata/judge') },
+  { label: 'モンスター', href: buildAppUrl('/gamedata/monster') },
 ];
 
 /** 子導航組件屬性 / Sub-navigation component properties */
 export interface IGDSubNavProps {
   /** 子頁面連結 / Sub-page links */
-  subLinks?: Array<{ label: string; href: string }>;
+  subLinks?: INavLink[];
 }
 
 /**

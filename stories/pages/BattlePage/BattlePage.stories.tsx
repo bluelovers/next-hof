@@ -8,7 +8,7 @@
 import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { BattlePage } from '../../../src/components/pages/BattlePage';
-import type { IBattleCharacterData } from '../../../src/components/characters/BattleCharacterCard';
+import type { IBattleCharacterData } from '../../../src/components/characters/CharacterTypes';
 import type { IMonsterData } from '../../../src/components/monsters/MonsterCard';
 
 const IMG = '/image/char';

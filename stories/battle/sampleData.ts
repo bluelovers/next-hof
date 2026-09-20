@@ -9,6 +9,7 @@
 import type { IBattleSprite, IBattleFieldConfig, IBattleMagicCircle } from '../../src/components/battle/types';
 import {
   computeBattleSpritePositions,
+  groupBattleChars,
   type IComputeSpritePositionsOptions,
   type IBattlePositionChar,
   type ITeamBattleChars,
@@ -185,8 +186,8 @@ export function createAutoSampleSprites(
 }
 
 /**
- * 建立「同一隊伍混用 char / char_rev」的展示用精靈陣列
- * Create sprites for a single team that mixes char / char_rev images
+ * 建立「同一隊伍混用 char / char_rev」的展示用精靈陣列（結構化名冊）
+ * Create sprites for a single team mixing char / char_rev (structured roster)
  *
  * 用來驗證：同一隊伍內同時存在 char（需翻轉定位）與 char_rev（直接定位）圖時，
  * 自動翻轉邏輯仍能讓所有人落在同一側、朝向一致
@@ -220,6 +221,64 @@ export function createMixedSampleSprites(
   // Omit flip so computeBattleSpritePositions auto-derives flip per sprite's directory.
   return computeBattleSpritePositions(input, { ...sampleFieldSize, ...options });
 }
+
+// ============================================================================
+// 新增展示：扁平名冊 + groupBattleChars 自動分隊
+// NEW demo: flat roster + groupBattleChars auto-grouping
+// （這正是 IBattlePositionChar.side / .position 的實際用法）
+// (this is exactly what IBattlePositionChar.side / .position are for)
+// ============================================================================
+
+/**
+ * 扁平名冊：所有角色放在同一陣列，各自帶 side / position
+ * Flat roster: every character in a single array, each carrying its own side / position.
+ *
+ * 這正是 IBattlePositionChar.side / .position 的用意——呼叫端只需給出一張扁平清單，
+ * 由 groupBattleChars() 依 side / position 自動分類為 left/right 隊的 front/back 列，
+ * 不必手動嵌套 front/back 陣列。
+ * This is exactly what IBattlePositionChar.side / .position are for: callers supply one
+ * flat list and groupBattleChars() classifies it into left/right teams' front/back rows
+ * by side / position, with no manual front/back nesting.
+ */
+const flatRosterSample: IRosterChar[] = [
+  { id: 'mon_018', name: 'Hero1', imageUrl: '/image/char/mon_018.png', position: 'back', side: 'left' },
+  { id: 'mon_014', name: 'Mage1', imageUrl: '/image/char/mon_014.png', position: 'front', side: 'left' },
+  { id: 'mon_079', name: 'Priest1', imageUrl: '/image/char/mon_079.png', position: 'front', side: 'left' },
+  { id: 'mon_052a', name: 'GoblinWarrior(A)', imageUrl: '/image/char/mon_052.png', position: 'back', side: 'right' },
+  { id: 'mon_052b', name: 'GoblinWarrior(B)', imageUrl: '/image/char/mon_052.png', position: 'front', side: 'right' },
+  { id: 'mon_053', name: 'GoblinAxe', imageUrl: '/image/char/mon_053.png', position: 'front', side: 'right' },
+];
+
+/** 將扁平名冊補上真實圖像尺寸，轉為 groupBattleChars 所需的 IBattlePositionChar[] */
+function toBattlePositionChars(roster: IRosterChar[]): IBattlePositionChar[] {
+  return roster.map((c): IBattlePositionChar => {
+    const size = getSpriteImageSize(c.imageUrl);
+    return { ...c, imageWidth: size.width, imageHeight: size.height };
+  });
+}
+
+/**
+ * 建立「扁平名冊 + groupBattleChars 自動分隊」的展示用精靈陣列
+ * Create sprites from a flat roster auto-grouped by groupBattleChars()
+ *
+ * 效果等同 createAutoSampleSprites，但輸入形式為扁平名冊，由 groupBattleChars 依
+ * 各角色的 side / position 自動建立隊伍結構。
+ * Equivalent to createAutoSampleSprites, but the input is a flat roster and
+ * groupBattleChars builds the team structure from each char's side / position.
+ */
+export function createFlatSampleSprites(
+  options?: Partial<IComputeSpritePositionsOptions>
+): IBattleSprite[] {
+  // 扁平名冊 → groupBattleChars 依 side/position 自動分隊 → 傳入計算
+  // Flat roster → groupBattleChars auto-groups by side/position → passed to compute.
+  const input = groupBattleChars(toBattlePositionChars(flatRosterSample));
+  // 不傳 flip：交由 computeBattleSpritePositions 依圖檔目錄自動推導翻轉
+  // Omit flip so computeBattleSpritePositions auto-derives flipping from the directory.
+  return computeBattleSpritePositions(input, { ...sampleFieldSize, ...options });
+}
+
+/** 共用「扁平名冊自動分隊」精靈樣本（展示用） / Shared flat-roster auto-grouped sprite sample (demo) */
+export const sampleSpritesFlat: IBattleSprite[] = createFlatSampleSprites();
 
 /** 共用「混用 char / char_rev」精靈樣本（展示用） / Shared mixed char/char_rev sprite sample (demo) */
 export const sampleSpritesMixed: IBattleSprite[] = createMixedSampleSprites();
