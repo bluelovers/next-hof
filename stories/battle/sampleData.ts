@@ -22,11 +22,25 @@ export const sampleEnemySprites: IBattleSprite[] = [
   { id: 'mon_053', imageUrl: '/image/char/mon_053.png', x: 124, y: 96, flipped: false, name: 'GoblinAxe' },
 ];
 
-/** 共用友方精靈樣本 / Shared ally sprite samples */
+/**
+ * 共用友方精靈樣本 / Shared ally sprite samples
+ *
+ * 友方為「右隊」，使用 char_rev（已預先鏡像、面向左）圖，
+ * flipped:false 直接置於右側，因此全員都在同一側、朝向一致
+ * Allies are the "right team": use char_rev (pre-mirrored, facing left) images
+ * with flipped:false placed directly on the right side, so all sprites share the
+ * same side and the same facing direction.
+ *
+ * 注意：不可在 char_rev 上再加 flipped:true —— 那會造成「雙重鏡像」，
+ * 且因 BattleFieldSpriteLayers 舊版巢狀結構會累積翻轉，導致同隊出現
+ * 「左 2 右 1」等位置/朝向錯亂（見 BattleFieldSpriteLayers 修正說明）
+ * Note: do NOT add flipped:true on top of char_rev — that double-mirrors and,
+ * combined with the old nested layering, split a single team across sides.
+ */
 export const sampleAllySprites: IBattleSprite[] = [
-  { id: 'mon_018', imageUrl: '/image/char_rev/mon_018.png', x: 352, y: 14, flipped: true, name: 'Hero1' },
-  { id: 'mon_214', imageUrl: '/image/char_rev/mon_214.png', x: 388, y: 64, flipped: true, name: 'Mage1' },
-  { id: 'mon_079', imageUrl: '/image/char_rev/mon_079.png', x: 300, y: 110, flipped: true, name: 'Priest1' },
+  { id: 'mon_018', imageUrl: '/image/char_rev/mon_018.png', x: 352, y: 14, flipped: false, name: 'Hero1' },
+  { id: 'mon_214', imageUrl: '/image/char_rev/mon_214.png', x: 388, y: 64, flipped: false, name: 'Mage1' },
+  { id: 'mon_079', imageUrl: '/image/char_rev/mon_079.png', x: 300, y: 110, flipped: false, name: 'Priest1' },
 ];
 
 /** 共用完整戰場精靈樣本（敵方 + 友方） / Shared full battlefield sprite samples (enemies + allies) */
