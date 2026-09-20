@@ -1,0 +1,882 @@
+{
+  "eiyusenki_012.png": {
+    "width": 99,
+    "height": 136,
+    "timestamp": 1778340857398
+  },
+  "eiyusenki_018.png": {
+    "width": 99,
+    "height": 131,
+    "timestamp": 1778340857399
+  },
+  "eiyusenki_080.png": {
+    "width": 113,
+    "height": 118,
+    "timestamp": 1778340857399
+  },
+  "eiyusenki_246.png": {
+    "width": 117,
+    "height": 127,
+    "timestamp": 1778340857400
+  },
+  "hero.png": {
+    "width": 64,
+    "height": 64,
+    "timestamp": 1778340857400
+  },
+  "mon_008.png": {
+    "width": 72,
+    "height": 72,
+    "timestamp": 1778340857402
+  },
+  "mon_008r.png": {
+    "width": 72,
+    "height": 72,
+    "timestamp": 1778340857403
+  },
+  "mon_012.png": {
+    "width": 88,
+    "height": 104,
+    "timestamp": 1778340857403
+  },
+  "mon_013.png": {
+    "width": 124,
+    "height": 122,
+    "timestamp": 1778340857403
+  },
+  "mon_013r.png": {
+    "width": 88,
+    "height": 120,
+    "timestamp": 1778340857403
+  },
+  "mon_014.png": {
+    "width": 125,
+    "height": 97,
+    "timestamp": 1778340857404
+  },
+  "mon_018.png": {
+    "width": 56,
+    "height": 72,
+    "timestamp": 1778340857405
+  },
+  "mon_018r.png": {
+    "width": 56,
+    "height": 72,
+    "timestamp": 1778340857406
+  },
+  "mon_019.png": {
+    "width": 88,
+    "height": 96,
+    "timestamp": 1778340857406
+  },
+  "mon_019r.png": {
+    "width": 88,
+    "height": 96,
+    "timestamp": 1778340857408
+  },
+  "mon_021.png": {
+    "width": 55,
+    "height": 61,
+    "timestamp": 1778340857408
+  },
+  "mon_024.png": {
+    "width": 96,
+    "height": 104,
+    "timestamp": 1778340857409
+  },
+  "mon_026.png": {
+    "width": 88,
+    "height": 104,
+    "timestamp": 1778340857409
+  },
+  "mon_028.png": {
+    "width": 80,
+    "height": 104,
+    "timestamp": 1778340857410
+  },
+  "mon_030.png": {
+    "width": 88,
+    "height": 98,
+    "timestamp": 1778340857411
+  },
+  "mon_032.png": {
+    "width": 75,
+    "height": 51,
+    "timestamp": 1778340857411
+  },
+  "mon_034.png": {
+    "width": 74,
+    "height": 63,
+    "timestamp": 1778340857412
+  },
+  "mon_034z.png": {
+    "width": 96,
+    "height": 48,
+    "timestamp": 1778340857412
+  },
+  "mon_036.png": {
+    "width": 69,
+    "height": 33,
+    "timestamp": 1778340857413
+  },
+  "mon_036z.png": {
+    "width": 72,
+    "height": 32,
+    "timestamp": 1778340857415
+  },
+  "mon_042r.png": {
+    "width": 64,
+    "height": 72,
+    "timestamp": 1778340857415
+  },
+  "mon_042z.png": {
+    "width": 64,
+    "height": 68,
+    "timestamp": 1778340857416
+  },
+  "mon_043z.png": {
+    "width": 128,
+    "height": 104,
+    "timestamp": 1778340857416
+  },
+  "mon_047.png": {
+    "width": 32,
+    "height": 56,
+    "timestamp": 1778340857417
+  },
+  "mon_049.png": {
+    "width": 57,
+    "height": 76,
+    "timestamp": 1778340857417
+  },
+  "mon_051.png": {
+    "width": 48,
+    "height": 72,
+    "timestamp": 1778340857417
+  },
+  "mon_052.png": {
+    "width": 40,
+    "height": 48,
+    "timestamp": 1778340857419
+  },
+  "mon_053.png": {
+    "width": 56,
+    "height": 48,
+    "timestamp": 1778340857419
+  },
+  "mon_053r.png": {
+    "width": 72,
+    "height": 48,
+    "timestamp": 1778340857420
+  },
+  "mon_053rz.png": {
+    "width": 72,
+    "height": 48,
+    "timestamp": 1778340857420
+  },
+  "mon_054.png": {
+    "width": 56,
+    "height": 88,
+    "timestamp": 1778340857421
+  },
+  "mon_054r.png": {
+    "width": 48,
+    "height": 88,
+    "timestamp": 1778340857421
+  },
+  "mon_054ry.png": {
+    "width": 48,
+    "height": 88,
+    "timestamp": 1778340857421
+  },
+  "mon_054rz.png": {
+    "width": 48,
+    "height": 88,
+    "timestamp": 1778340857422
+  },
+  "mon_063.png": {
+    "width": 56,
+    "height": 64,
+    "timestamp": 1778340857422
+  },
+  "mon_065.png": {
+    "width": 64,
+    "height": 72,
+    "timestamp": 1778340857423
+  },
+  "mon_066.png": {
+    "width": 64,
+    "height": 56,
+    "timestamp": 1778340857423
+  },
+  "mon_068.png": {
+    "width": 64,
+    "height": 48,
+    "timestamp": 1778340857423
+  },
+  "mon_070.png": {
+    "width": 136,
+    "height": 80,
+    "timestamp": 1778340857425
+  },
+  "mon_076z.png": {
+    "width": 60,
+    "height": 65,
+    "timestamp": 1778340857425
+  },
+  "mon_078.png": {
+    "width": 112,
+    "height": 96,
+    "timestamp": 1778340857426
+  },
+  "mon_078r.png": {
+    "width": 104,
+    "height": 56,
+    "timestamp": 1778340857426
+  },
+  "mon_079.png": {
+    "width": 64,
+    "height": 64,
+    "timestamp": 1778340857427
+  },
+  "mon_080r.png": {
+    "width": 64,
+    "height": 72,
+    "timestamp": 1778340857428
+  },
+  "mon_085r.png": {
+    "width": 80,
+    "height": 88,
+    "timestamp": 1778340857428
+  },
+  "mon_095.png": {
+    "width": 48,
+    "height": 56,
+    "timestamp": 1778340857428
+  },
+  "mon_095r.png": {
+    "width": 48,
+    "height": 40,
+    "timestamp": 1778340857429
+  },
+  "mon_100r.png": {
+    "width": 80,
+    "height": 88,
+    "timestamp": 1778340857429
+  },
+  "mon_101.png": {
+    "width": 64,
+    "height": 48,
+    "timestamp": 1778340857430
+  },
+  "mon_102.png": {
+    "width": 87,
+    "height": 65,
+    "timestamp": 1778340857430
+  },
+  "mon_104.png": {
+    "width": 56,
+    "height": 72,
+    "timestamp": 1778340857431
+  },
+  "mon_104r.png": {
+    "width": 40,
+    "height": 88,
+    "timestamp": 1778340857431
+  },
+  "mon_105.png": {
+    "width": 63,
+    "height": 54,
+    "timestamp": 1778340857432
+  },
+  "mon_106.png": {
+    "width": 64,
+    "height": 48,
+    "timestamp": 1778340857432
+  },
+  "mon_107.png": {
+    "width": 52,
+    "height": 83,
+    "timestamp": 1778340857433
+  },
+  "mon_108.png": {
+    "width": 50,
+    "height": 91,
+    "timestamp": 1778340857433
+  },
+  "mon_108z.png": {
+    "width": 48,
+    "height": 64,
+    "timestamp": 1778340857433
+  },
+  "mon_111.png": {
+    "width": 40,
+    "height": 40,
+    "timestamp": 1778340857434
+  },
+  "mon_114r.png": {
+    "width": 48,
+    "height": 56,
+    "timestamp": 1778340857435
+  },
+  "mon_116.png": {
+    "width": 61,
+    "height": 76,
+    "timestamp": 1778340857436
+  },
+  "mon_116r.png": {
+    "width": 64,
+    "height": 88,
+    "timestamp": 1778340857436
+  },
+  "mon_117.png": {
+    "width": 49,
+    "height": 92,
+    "timestamp": 1778340857437
+  },
+  "mon_117r.png": {
+    "width": 56,
+    "height": 88,
+    "timestamp": 1778340857437
+  },
+  "mon_118.png": {
+    "width": 64,
+    "height": 96,
+    "timestamp": 1778340857438
+  },
+  "mon_120.png": {
+    "width": 116,
+    "height": 117,
+    "timestamp": 1778340857438
+  },
+  "mon_121.png": {
+    "width": 31,
+    "height": 39,
+    "timestamp": 1778340857438
+  },
+  "mon_121r.png": {
+    "width": 32,
+    "height": 40,
+    "timestamp": 1778340857438
+  },
+  "mon_124.png": {
+    "width": 64,
+    "height": 64,
+    "timestamp": 1778340857439
+  },
+  "mon_125.png": {
+    "width": 56,
+    "height": 88,
+    "timestamp": 1778340857440
+  },
+  "mon_126z.png": {
+    "width": 56,
+    "height": 48,
+    "timestamp": 1778340857440
+  },
+  "mon_127.png": {
+    "width": 48,
+    "height": 64,
+    "timestamp": 1778340857440
+  },
+  "mon_128.png": {
+    "width": 80,
+    "height": 88,
+    "timestamp": 1778340857440
+  },
+  "mon_129.png": {
+    "width": 72,
+    "height": 104,
+    "timestamp": 1778340857442
+  },
+  "mon_129r.png": {
+    "width": 112,
+    "height": 88,
+    "timestamp": 1778340857442
+  },
+  "mon_130.png": {
+    "width": 72,
+    "height": 88,
+    "timestamp": 1778340857443
+  },
+  "mon_134.png": {
+    "width": 72,
+    "height": 56,
+    "timestamp": 1778340857443
+  },
+  "mon_135.png": {
+    "width": 72,
+    "height": 72,
+    "timestamp": 1778340857444
+  },
+  "mon_136.png": {
+    "width": 56,
+    "height": 64,
+    "timestamp": 1778340857444
+  },
+  "mon_138.png": {
+    "width": 64,
+    "height": 96,
+    "timestamp": 1778340857445
+  },
+  "mon_139.png": {
+    "width": 80,
+    "height": 80,
+    "timestamp": 1778340857445
+  },
+  "mon_139r.png": {
+    "width": 80,
+    "height": 72,
+    "timestamp": 1778340857446
+  },
+  "mon_140.png": {
+    "width": 126,
+    "height": 117,
+    "timestamp": 1778340857446
+  },
+  "mon_141.png": {
+    "width": 48,
+    "height": 48,
+    "timestamp": 1778340857446
+  },
+  "mon_142.png": {
+    "width": 40,
+    "height": 64,
+    "timestamp": 1778340857447
+  },
+  "mon_143.png": {
+    "width": 48,
+    "height": 64,
+    "timestamp": 1778340857447
+  },
+  "mon_143r.png": {
+    "width": 56,
+    "height": 72,
+    "timestamp": 1778340857448
+  },
+  "mon_144.png": {
+    "width": 67,
+    "height": 98,
+    "timestamp": 1778340857448
+  },
+  "mon_144r.png": {
+    "width": 88,
+    "height": 96,
+    "timestamp": 1778340857449
+  },
+  "mon_145.png": {
+    "width": 48,
+    "height": 48,
+    "timestamp": 1778340857449
+  },
+  "mon_146.png": {
+    "width": 64,
+    "height": 96,
+    "timestamp": 1778340857451
+  },
+  "mon_146r.png": {
+    "width": 72,
+    "height": 72,
+    "timestamp": 1778340857451
+  },
+  "mon_147z.png": {
+    "width": 64,
+    "height": 88,
+    "timestamp": 1778340857452
+  },
+  "mon_149r.png": {
+    "width": 64,
+    "height": 80,
+    "timestamp": 1778340857453
+  },
+  "mon_150.png": {
+    "width": 90,
+    "height": 93,
+    "timestamp": 1778340857455
+  },
+  "mon_162.png": {
+    "width": 80,
+    "height": 128,
+    "timestamp": 1778340857455
+  },
+  "mon_163.png": {
+    "width": 38,
+    "height": 37,
+    "timestamp": 1778340857455
+  },
+  "mon_163r.png": {
+    "width": 40,
+    "height": 40,
+    "timestamp": 1778340857456
+  },
+  "mon_164.png": {
+    "width": 89,
+    "height": 76,
+    "timestamp": 1778340857457
+  },
+  "mon_164r.png": {
+    "width": 80,
+    "height": 72,
+    "timestamp": 1778340857457
+  },
+  "mon_168.png": {
+    "width": 64,
+    "height": 80,
+    "timestamp": 1778340857458
+  },
+  "mon_169.png": {
+    "width": 56,
+    "height": 72,
+    "timestamp": 1778340857459
+  },
+  "mon_170.png": {
+    "width": 96,
+    "height": 88,
+    "timestamp": 1778340857459
+  },
+  "mon_170rz.png": {
+    "width": 144,
+    "height": 112,
+    "timestamp": 1778340857459
+  },
+  "mon_172r.png": {
+    "width": 56,
+    "height": 72,
+    "timestamp": 1778340857460
+  },
+  "mon_174.png": {
+    "width": 72,
+    "height": 88,
+    "timestamp": 1778340857461
+  },
+  "mon_181.png": {
+    "width": 48,
+    "height": 48,
+    "timestamp": 1778340857461
+  },
+  "mon_182.png": {
+    "width": 56,
+    "height": 64,
+    "timestamp": 1778340857462
+  },
+  "mon_183r.png": {
+    "width": 72,
+    "height": 56,
+    "timestamp": 1778340857463
+  },
+  "mon_184.png": {
+    "width": 67,
+    "height": 36,
+    "timestamp": 1778340857463
+  },
+  "mon_184rz.png": {
+    "width": 64,
+    "height": 48,
+    "timestamp": 1778340857463
+  },
+  "mon_186.png": {
+    "width": 72,
+    "height": 88,
+    "timestamp": 1778340857464
+  },
+  "mon_187.png": {
+    "width": 37,
+    "height": 64,
+    "timestamp": 1778340857464
+  },
+  "mon_188.png": {
+    "width": 72,
+    "height": 88,
+    "timestamp": 1778340857464
+  },
+  "mon_189.png": {
+    "width": 77,
+    "height": 76,
+    "timestamp": 1778340857465
+  },
+  "mon_189r.png": {
+    "width": 88,
+    "height": 72,
+    "timestamp": 1778340857466
+  },
+  "mon_190.png": {
+    "width": 96,
+    "height": 88,
+    "timestamp": 1778340857466
+  },
+  "mon_190r.png": {
+    "width": 96,
+    "height": 96,
+    "timestamp": 1778340857467
+  },
+  "mon_193.png": {
+    "width": 56,
+    "height": 80,
+    "timestamp": 1778340857467
+  },
+  "mon_194.png": {
+    "width": 96,
+    "height": 64,
+    "timestamp": 1778340857468
+  },
+  "mon_194r.png": {
+    "width": 88,
+    "height": 88,
+    "timestamp": 1778340857469
+  },
+  "mon_195r.png": {
+    "width": 64,
+    "height": 80,
+    "timestamp": 1778340857469
+  },
+  "mon_196x.png": {
+    "width": 72,
+    "height": 96,
+    "timestamp": 1778340857469
+  },
+  "mon_196y.png": {
+    "width": 80,
+    "height": 96,
+    "timestamp": 1778340857470
+  },
+  "mon_196z.png": {
+    "width": 80,
+    "height": 96,
+    "timestamp": 1778340857471
+  },
+  "mon_199r.png": {
+    "width": 120,
+    "height": 80,
+    "timestamp": 1778340857471
+  },
+  "mon_205.png": {
+    "width": 56,
+    "height": 72,
+    "timestamp": 1778340857472
+  },
+  "mon_205r.png": {
+    "width": 56,
+    "height": 40,
+    "timestamp": 1778340857472
+  },
+  "mon_206.png": {
+    "width": 64,
+    "height": 48,
+    "timestamp": 1778340857473
+  },
+  "mon_207.png": {
+    "width": 64,
+    "height": 32,
+    "timestamp": 1778340857473
+  },
+  "mon_208.png": {
+    "width": 92,
+    "height": 69,
+    "timestamp": 1778340857473
+  },
+  "mon_208r.png": {
+    "width": 64,
+    "height": 88,
+    "timestamp": 1778340857473
+  },
+  "mon_208rz.png": {
+    "width": 64,
+    "height": 83,
+    "timestamp": 1778340857475
+  },
+  "mon_210.png": {
+    "width": 72,
+    "height": 96,
+    "timestamp": 1778340857475
+  },
+  "mon_210r.png": {
+    "width": 72,
+    "height": 96,
+    "timestamp": 1778340857475
+  },
+  "mon_213.png": {
+    "width": 40,
+    "height": 68,
+    "timestamp": 1778340857476
+  },
+  "mon_213r.png": {
+    "width": 56,
+    "height": 72,
+    "timestamp": 1778340857476
+  },
+  "mon_213rz.png": {
+    "width": 56,
+    "height": 72,
+    "timestamp": 1778340857477
+  },
+  "mon_214.png": {
+    "width": 24,
+    "height": 72,
+    "timestamp": 1778340857477
+  },
+  "mon_214r.png": {
+    "width": 48,
+    "height": 64,
+    "timestamp": 1778340857478
+  },
+  "mon_214rz.png": {
+    "width": 48,
+    "height": 64,
+    "timestamp": 1778340857478
+  },
+  "mon_214rzz.png": {
+    "width": 48,
+    "height": 64,
+    "timestamp": 1778340857478
+  },
+  "mon_215r.png": {
+    "width": 56,
+    "height": 64,
+    "timestamp": 1778340857479
+  },
+  "mon_216.png": {
+    "width": 56,
+    "height": 56,
+    "timestamp": 1778340857479
+  },
+  "mon_216r.png": {
+    "width": 56,
+    "height": 56,
+    "timestamp": 1778340857480
+  },
+  "mon_216y.png": {
+    "width": 56,
+    "height": 56,
+    "timestamp": 1778340857480
+  },
+  "mon_216z.png": {
+    "width": 70,
+    "height": 56,
+    "timestamp": 1778340857481
+  },
+  "mon_217.png": {
+    "width": 56,
+    "height": 48,
+    "timestamp": 1778340857481
+  },
+  "mon_217r.png": {
+    "width": 48,
+    "height": 48,
+    "timestamp": 1778340857482
+  },
+  "mon_217rz.png": {
+    "width": 56,
+    "height": 48,
+    "timestamp": 1778340857482
+  },
+  "mon_217z.png": {
+    "width": 69,
+    "height": 54,
+    "timestamp": 1778340857483
+  },
+  "mon_219r.png": {
+    "width": 56,
+    "height": 88,
+    "timestamp": 1778340857483
+  },
+  "mon_219rr.png": {
+    "width": 56,
+    "height": 88,
+    "timestamp": 1778340857484
+  },
+  "mon_220r.png": {
+    "width": 40,
+    "height": 80,
+    "timestamp": 1778340857484
+  },
+  "mon_223.png": {
+    "width": 72,
+    "height": 96,
+    "timestamp": 1778340857485
+  },
+  "mon_225.png": {
+    "width": 64,
+    "height": 72,
+    "timestamp": 1778340857485
+  },
+  "mon_227.png": {
+    "width": 128,
+    "height": 80,
+    "timestamp": 1778340857485
+  },
+  "mon_228.png": {
+    "width": 104,
+    "height": 72,
+    "timestamp": 1778340857486
+  },
+  "mon_234.png": {
+    "width": 57,
+    "height": 102,
+    "timestamp": 1778340857487
+  },
+  "mon_234r.png": {
+    "width": 48,
+    "height": 120,
+    "timestamp": 1778340857487
+  },
+  "mon_238.png": {
+    "width": 40,
+    "height": 80,
+    "timestamp": 1778340857488
+  },
+  "mon_239.png": {
+    "width": 152,
+    "height": 168,
+    "timestamp": 1778340857488
+  },
+  "mon_239r.png": {
+    "width": 104,
+    "height": 160,
+    "timestamp": 1778340857488
+  },
+  "mon_240r.png": {
+    "width": 112,
+    "height": 160,
+    "timestamp": 1778340857488
+  },
+  "mon_246r.png": {
+    "width": 72,
+    "height": 96,
+    "timestamp": 1778340857490
+  },
+  "mon_246y.png": {
+    "width": 72,
+    "height": 96,
+    "timestamp": 1778340857491
+  },
+  "mon_246z.png": {
+    "width": 72,
+    "height": 96,
+    "timestamp": 1778340857491
+  },
+  "mon_249.png": {
+    "width": 72,
+    "height": 56,
+    "timestamp": 1778340857492
+  },
+  "mon_267r.png": {
+    "width": 40,
+    "height": 72,
+    "timestamp": 1778340857492
+  },
+  "noimage.png": {
+    "width": 45,
+    "height": 53,
+    "timestamp": 1778340857493
+  },
+  "ori_002.png": {
+    "width": 42,
+    "height": 66,
+    "timestamp": 1778340857494
+  },
+  "ori_003.png": {
+    "width": 45,
+    "height": 69,
+    "timestamp": 1778340857494
+  }
+}
