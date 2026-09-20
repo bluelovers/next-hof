@@ -2,19 +2,17 @@
  * 戰場圖層組件
  * Battlefield layers component
  *
- * 最外層背景 + 巢狀精靈圖層
- * Outermost background + nested sprite layers
+ * 三層結構：最外層背景 > 角色精靈排版框 > 巢狀精靈圖層
+ * Three-layer structure: outermost background > sprite layout frame > nested sprite layers
  *
- * 原始頁面使用巢狀 div 疊加：
- * 最外層是背景 -> 內層是每個角色的精靈圖層
- * 每個 div 都是 480x200，使用 background-position 定位角色
- * The original page uses nested div layers:
- * Outermost is background -> inner layers are character sprites
- * Each div is 480x200, uses background-position for character placement
+ * 背景尺寸（bgSize）可獨立於角色排版尺寸，
+ * 未提供時背景與角色使用相同 width/height
+ * The background size (bgSize) can differ from the sprite layout size;
+ * when omitted, background and sprites share the same width/height.
  */
 import React from 'react';
-import type { IBattleSprite, IBattleFieldConfig } from './types';
-import { BattleFieldSpriteLayers } from './BattleFieldSpriteLayers';
+import type { IBattleSprite, IBattleFieldConfig, IBattleFieldBgSize } from './types';
+import { BattleFieldSpriteFrame } from './BattleFieldSpriteFrame';
 
 /** 戰場圖層屬性 / Battlefield layers props */
 export interface IBattleFieldLayersProps {
@@ -22,32 +20,49 @@ export interface IBattleFieldLayersProps {
   sprites: IBattleSprite[];
   /** 戰場配置 / Battlefield config */
   config: IBattleFieldConfig;
-  /** 畫布寬度 / Canvas width */
-  width: number;
-  /** 畫布高度 / Canvas height */
-  height: number;
+  /** 角色排版寬度（選填，預設 480） / Sprite layout width (optional, default 480) */
+  width?: number;
+  /** 角色排版高度（選填，預設 200） / Sprite layout height (optional, default 200) */
+  height?: number;
   /** 是否顯示名稱標籤 / Whether to show name labels */
   showLabels?: boolean;
+  /** 背景尺寸（獨立於角色排版，選填寬或高其一或全部） / Background size, optional */
+  bgSize?: IBattleFieldBgSize;
 }
 
 /**
  * 戰場圖層組件
  * Battlefield layers component
  *
- * 負責渲染最外層背景，並遞迴疊加每個角色的精靈圖層
- * Renders the outermost background and recursively stacks each character's sprite layer
+ * 背景使用 bgSize（未提供則回退 width/height），
+ * 角色精靈則固定於 width x height 的排版框中，
+ * 因此放大背景不會影響角色精靈的排版座標
+ * Background uses bgSize (falls back to width/height when omitted);
+ * character sprites are fixed inside a width x height frame, so enlarging
+ * the background never affects the sprite layout coordinates.
  */
 export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
   sprites,
   config,
-  width,
-  height,
+  width: rawWidth,
+  height: rawHeight,
   showLabels = false,
+  bgSize,
 }) => {
+  // 角色排版尺寸：選填，未提供時使用預設值（保持原有設計）
+  // Sprite layout size: optional, fall back to defaults when omitted
+  const width = rawWidth ?? 480;
+  const height = rawHeight ?? 200;
+
+  // 背景尺寸：優先使用 bgSize，未提供則回退為角色排版尺寸
+  // Background size: prefer bgSize; fall back to sprite layout size when omitted
+  const bgWidth = bgSize?.width ?? width;
+  const bgHeight = bgSize?.height ?? height;
+
   /** 背景樣式 / Background style */
   const bgStyle: React.CSSProperties = {
-    width,
-    height,
+    width: bgWidth,
+    height: bgHeight,
     overflow: 'hidden',
     backgroundImage: config.backgroundImageUrl
       ? `url(${config.backgroundImageUrl})`
@@ -59,9 +74,9 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
 
   return (
     <div style={bgStyle}>
-      <BattleFieldSpriteLayers
+      {/* 角色精靈排版框（保護角色排版尺寸） / Sprite layout frame (protects sprite layout size) */}
+      <BattleFieldSpriteFrame
         sprites={sprites}
-        index={0}
         width={width}
         height={height}
         showLabels={showLabels}

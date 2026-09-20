@@ -11,6 +11,7 @@ import React from 'react';
 import type { IBattleSprite, IBattleFieldConfig } from './types';
 import { BattleFieldLayers } from './BattleFieldLayers';
 import './BattleFieldScene.css';
+import { ITSRequireAtLeastOne } from 'ts-type';
 
 /** 戰場畫面屬性 / Battlefield scene props */
 export interface IBattleFieldSceneProps {
@@ -38,9 +39,6 @@ export const BattleFieldScene: React.FC<IBattleFieldSceneProps> = ({
   config,
   showLabels = false,
 }) => {
-  const width = config.width ?? 480;
-  const height = config.height ?? 200;
-
   return (
     <td colSpan={2} className="btl-img">
       <div style={{ width: '100%', position: 'relative' }}>
@@ -53,9 +51,10 @@ export const BattleFieldScene: React.FC<IBattleFieldSceneProps> = ({
         <BattleFieldLayers
           sprites={sprites}
           config={config}
-          width={width}
-          height={height}
+          width={config.width}
+          height={config.height}
           showLabels={showLabels}
+          bgSize={config.bgSize}
         />
       </div>
     </td>

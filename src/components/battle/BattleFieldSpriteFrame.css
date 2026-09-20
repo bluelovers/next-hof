@@ -1,0 +1,15 @@
+/**
+ * BattleFieldSpriteFrame 元件樣式
+ * BattleFieldSpriteFrame component styles
+ *
+ * 角色精靈排版框：位於背景之上、精靈之下的保護層
+ * Sprite layout frame: a protective layer above the background and below the sprites
+ */
+
+/* ==================== 精靈排版框 / Sprite Layout Frame ==================== */
+
+.battle-sprite-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

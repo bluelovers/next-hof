@@ -2,6 +2,7 @@
  * BattleDisplay 類型定義
  * BattleDisplay type definitions
  */
+import type { ITSRequireAtLeastOne } from 'ts-type';
 
 /** 隊伍顏色樣式 / Team color style */
 export type ITeamSide = 'left' | 'right';
@@ -62,16 +63,26 @@ export interface IBattleSprite {
   name?: string;
 }
 
+/** 戰場背景尺寸 / Battlefield background size */
+export type IBattleFieldBgSize = ITSRequireAtLeastOne<{
+  /** 寬度 / Width */
+  width?: number;
+  /** 高度 / Height */
+  height?: number;
+}>;
+
 /** 戰場背景 / Battlefield background */
 export interface IBattleFieldConfig {
   /** 背景類型 / Background type */
   backgroundType?: string;
   /** 背景圖片 URL / Background image URL */
   backgroundImageUrl?: string;
-  /** 寬度 / Width */
+  /** 寬度（角色排版尺寸） / Width (sprite layout size) */
   width?: number;
-  /** 高度 / Height */
+  /** 高度（角色排版尺寸） / Height (sprite layout size) */
   height?: number;
+  /** 背景尺寸（獨立於角色排版，選填寬或高其一或全部） / Background size, independent of sprite layout; width/height individually optional */
+  bgSize?: IBattleFieldBgSize;
 }
 
 /** 戰鬥動作類型 / Battle action type */
