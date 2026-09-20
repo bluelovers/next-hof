@@ -9,6 +9,7 @@
  */
 import React from 'react';
 import type { IBattleSprite, IBattleFieldConfig } from './types';
+import { BattleFieldLayers } from './BattleFieldLayers';
 import './BattleFieldScene.css';
 
 /** 戰場畫面屬性 / Battlefield scene props */
@@ -40,71 +41,6 @@ export const BattleFieldScene: React.FC<IBattleFieldSceneProps> = ({
   const width = config.width ?? 480;
   const height = config.height ?? 200;
 
-  /** 遞迴建立巢狀 div 精靈圖層 / Recursively build nested div sprite layers */
-  function buildSpriteLayers(
-    spriteList: IBattleSprite[],
-    index: number
-  ): React.ReactNode {
-    if (index >= spriteList.length) {
-      // 最內層為空 div（結束遞迴）
-      // Innermost is empty div (end recursion)
-      return null;
-    }
-
-    const sprite = spriteList[index];
-    const flipClass = sprite.flipped ? ' flip-h' : '';
-
-    const layerStyle: React.CSSProperties = {
-      width,
-      height: height + (showLabels ? 20 : 0),
-      backgroundImage: sprite.imageUrl
-        ? `url(${sprite.imageUrl})`
-        : undefined,
-      backgroundRepeat: 'no-repeat',
-      backgroundPosition: `${sprite.x}px ${sprite.y}px`,
-      position: 'relative',
-    };
-
-    return (
-      <div
-        className={`battle-sprite${flipClass}`}
-        style={layerStyle}
-      >
-        {showLabels && sprite.name && (
-          <div
-            className="sprite-label"
-            style={{
-              position: 'absolute',
-              bottom: 2,
-              [sprite.x > 240 ? 'right' : 'left']: 4,
-              fontSize: 10,
-              color: '#bdc8d7',
-              whiteSpace: 'nowrap',
-              textShadow: '0 0 4px #000',
-              pointerEvents: 'none',
-            }}
-          >
-            {sprite.name}
-          </div>
-        )}
-        {buildSpriteLayers(spriteList, index + 1)}
-      </div>
-    );
-  }
-
-  /** 背景樣式 / Background style */
-  const bgStyle: React.CSSProperties = {
-    width,
-    height,
-    overflow: 'hidden',
-    backgroundImage: config.backgroundImageUrl
-      ? `url(${config.backgroundImageUrl})`
-      : undefined,
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: '0px 0px',
-    position: 'relative',
-  };
-
   return (
     <td colSpan={2} className="btl-img">
       <div style={{ width: '100%', position: 'relative' }}>
@@ -114,9 +50,13 @@ export const BattleFieldScene: React.FC<IBattleFieldSceneProps> = ({
         </div>
 
         {/* 最外層背景 + 巢狀精靈圖層 / Outermost background + nested sprite layers */}
-        <div style={bgStyle}>
-          {buildSpriteLayers(sprites, 0)}
-        </div>
+        <BattleFieldLayers
+          sprites={sprites}
+          config={config}
+          width={width}
+          height={height}
+          showLabels={showLabels}
+        />
       </div>
     </td>
   );

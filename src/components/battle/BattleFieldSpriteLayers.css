@@ -1,0 +1,35 @@
+/**
+ * BattleFieldSpriteLayers 元件樣式
+ * BattleFieldSpriteLayers component styles
+ *
+ * 精靈圖層樣式，由 BattleFieldLayers.css 抽離而來
+ * Sprite layer styles, extracted from BattleFieldLayers.css
+ */
+
+/* ==================== 精靈圖層 / Sprite Layers ==================== */
+
+.battle-sprite {
+  position: absolute;
+  background-repeat: no-repeat;
+}
+
+.battle-sprite.flip-h {
+  -moz-transform: scaleX(-1);
+  -o-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
+  filter: FlipH;
+  -ms-filter: "FlipH";
+}
+
+.sprite-label {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #bdc8d7;
+  white-space: nowrap;
+  text-shadow: 0 0 4px #000;
+  pointer-events: none;
+}
