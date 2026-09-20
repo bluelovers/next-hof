@@ -7,6 +7,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeDarkDecorator } from '../decorators';
 import { InfoSection } from '../../src/components/info/InfoSection';
 
 /** InfoSection 元件設定 / InfoSection component settings */
@@ -16,16 +17,11 @@ const meta: Meta<typeof InfoSection> = {
   parameters: {
     // Storybook 裝飾器配置 / Storybook decorators configuration
     decorators: [
-      (Story) => (
-        <div className="home-page" style={{ 
-          backgroundColor: '#10151b', 
-          padding: '20px',
-          color: '#e0e0e0',
-          fontFamily: 'Arial, sans-serif'
-        }}>
-          <Story />
-        </div>
-      ),
+      makeDarkDecorator({
+        className: 'home-page',
+        color: '#e0e0e0',
+        fontFamily: 'Arial, sans-serif',
+      }),
     ],
   },
 };

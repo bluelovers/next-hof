@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeDarkDecorator } from '../decorators';
 import { BattleAction } from '../../src/components/battle/BattleAction';
 import type { IBattleAction } from '../../src/components/battle/types';
 
@@ -19,11 +20,13 @@ const meta: Meta<typeof BattleAction> = {
   },
   tags: ['autodocs'],
   decorators: [
-    (Story) => (
-      <div style={{ background: '#10151b', padding: '10px', borderRadius: '4px', width: '450px', color: '#bdc8d7', fontSize: '12px' }}>
-        <Story />
-      </div>
-    ),
+    makeDarkDecorator({
+      padding: '10px',
+      borderRadius: '4px',
+      width: '450px',
+      color: '#bdc8d7',
+      fontSize: '12px',
+    }),
   ],
 };
 

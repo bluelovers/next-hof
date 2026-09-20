@@ -5,28 +5,21 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeDarkDecorator, makeFlexDecorator } from '../../decorators';
 import { HuntAreaLink } from '../../../src/components/areas/HuntAreaLink';
 
 /** Dark game background decorator */
-const DarkDecorator = (Story: React.FC) => (
-  <div
-    style={{
-      backgroundColor: '#10151b',
-      padding: '20px',
-      minHeight: '200px',
-      fontFamily: "'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif",
-      fontSize: '12px',
-      color: '#bdc8d7',
-    }}
-  >
-    <Story />
-  </div>
-);
-
 const meta: Meta<typeof HuntAreaLink> = {
   title: 'Pages/HuntPage/HuntAreaLink',
   component: HuntAreaLink,
-  decorators: [DarkDecorator],
+  decorators: [
+    makeDarkDecorator({
+      padding: '20px',
+      minHeight: '200px',
+      fontSize: '12px',
+      color: '#bdc8d7',
+    }),
+  ],
   tags: ['autodocs'],
 };
 
@@ -105,13 +98,7 @@ export const NoBackground: Story = {
 
 /** Horizontal row showcase */
 export const RowShowcase: Story = {
-  decorators: [
-    (Story) => (
-      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-        <Story />
-      </div>
-    ),
-  ],
+  decorators: [makeFlexDecorator({ gap: '10px', flexWrap: 'wrap' })],
   render: () => (
     <>
       <HuntAreaLink area={{ name: 'Grass', land: 'g', levelRange: 'Lv1', landType: 'grass' }} />

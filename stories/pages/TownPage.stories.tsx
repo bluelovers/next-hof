@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { DarkDecorator } from '../decorators';
 import { GameLayout } from '../../src/components/pages/GameLayout';
 import { TownPage } from '../../src/components/pages/TownPage';
 import { TownFacility } from '../../src/components/facilities/TownFacility';
@@ -102,18 +103,6 @@ export const ManyMessages: Story = {
 /** ==================== TownFacility 獨立故事 / TownFacility standalone stories ==================== */
 
 /** Dark decorator for standalone stories */
-const DarkDecorator = (Story: React.FC) => (
-  <div
-    style={{
-      backgroundColor: '#10151b',
-      padding: '20px',
-      fontFamily: "'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif",
-    }}
-  >
-    <Story />
-  </div>
-);
-
 const facilityMeta: Meta<typeof TownFacility> = {
   title: 'Facilities/TownFacility',
   component: TownFacility,

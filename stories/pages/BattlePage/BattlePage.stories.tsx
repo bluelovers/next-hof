@@ -7,6 +7,7 @@
  */
 import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeDarkDecorator } from '../../decorators';
 import { BattlePage } from '../../../src/components/pages/BattlePage';
 import type { IBattleCharacterData } from '../../../src/components/characters/CharacterTypes';
 import type { IMonsterData } from '../../../src/components/monsters/MonsterCard';
@@ -14,21 +15,6 @@ import type { IMonsterData } from '../../../src/components/monsters/MonsterCard'
 const IMG = '/image/char';
 
 /** 背景裝飾器 / Dark game background decorator */
-const DarkDecorator = (Story: React.FC) => (
-  <div
-    style={{
-      backgroundColor: '#10151b',
-      padding: '20px',
-      minHeight: '400px',
-      fontFamily: "'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif",
-      fontSize: '12px',
-      color: '#bdc8d7',
-    }}
-  >
-    <Story />
-  </div>
-);
-
 const meta: Meta<typeof BattlePage> = {
   title: 'Pages/BattlePage',
   component: BattlePage,
@@ -42,7 +28,14 @@ const meta: Meta<typeof BattlePage> = {
     },
   },
   tags: ['autodocs'],
-  decorators: [DarkDecorator],
+  decorators: [
+    makeDarkDecorator({
+      padding: '20px',
+      minHeight: '400px',
+      fontSize: '12px',
+      color: '#bdc8d7',
+    }),
+  ],
 };
 
 export default meta;

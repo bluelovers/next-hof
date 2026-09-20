@@ -12,6 +12,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeDarkDecorator } from '../decorators';
 import { BattleFieldScene } from '../../src/components/battle/BattleFieldScene';
 import { sampleSpritesAuto, sampleSprites, createSampleConfig, sampleMagicCircles } from './sampleData';
 
@@ -33,17 +34,7 @@ const meta: Meta<typeof BattleFieldScene> = {
   },
   tags: ['autodocs'],
   decorators: [
-    (Story) => (
-      <div style={{ background: '#10151b', padding: '10px', borderRadius: '4px' }}>
-        <table style={{ borderCollapse: 'collapse' }}>
-          <tbody>
-            <tr>
-              <Story />
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    ),
+    makeDarkDecorator({ table: true, padding: '10px', borderRadius: '4px' }),
   ],
 };
 

@@ -5,28 +5,21 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeDarkDecorator } from '../../decorators';
 import { HuntSubNav } from '../../../src/components/navigation/HuntSubNav';
 
 /** Dark game background decorator */
-const DarkDecorator = (Story: React.FC) => (
-  <div
-    style={{
-      backgroundColor: '#10151b',
-      padding: '20px',
-      minHeight: '100px',
-      fontFamily: "'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif",
-      fontSize: '12px',
-      color: '#bdc8d7',
-    }}
-  >
-    <Story />
-  </div>
-);
-
 const meta: Meta<typeof HuntSubNav> = {
   title: 'Pages/HuntPage/HuntSubNav',
   component: HuntSubNav,
-  decorators: [DarkDecorator],
+  decorators: [
+    makeDarkDecorator({
+      padding: '20px',
+      minHeight: '100px',
+      fontSize: '12px',
+      color: '#bdc8d7',
+    }),
+  ],
   tags: ['autodocs'],
 };
 

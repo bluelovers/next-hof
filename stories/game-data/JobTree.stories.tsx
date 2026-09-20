@@ -7,26 +7,11 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeDarkDecorator } from '../decorators';
 import { JobTree } from '../../src/components/game-data/JobTree';
 import type { IJobData } from '../../src/components/game-data/GameDataTypes';
 
 /** 背景裝飾器 — 模擬遊戲深色背景 / Dark game background decorator */
-const DarkDecorator = (Story: React.FC) => (
-  <div
-    style={{
-      backgroundColor: '#10151b',
-      padding: '30px',
-      minHeight: '400px',
-      display: 'flex',
-      alignItems: 'flex-start',
-      justifyContent: 'center',
-      fontFamily: "'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif",
-    }}
-  >
-    <Story />
-  </div>
-);
-
 const meta: Meta<typeof JobTree> = {
   title: 'GameData/JobTree',
   component: JobTree,
@@ -39,7 +24,15 @@ const meta: Meta<typeof JobTree> = {
     },
   },
   tags: ['autodocs'],
-  decorators: [DarkDecorator],
+  decorators: [
+    makeDarkDecorator({
+      padding: '30px',
+      minHeight: '400px',
+      display: 'flex',
+      alignItems: 'flex-start',
+      justifyContent: 'center',
+    }),
+  ],
 };
 
 export default meta;

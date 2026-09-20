@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeDarkDecorator } from '../decorators';
 import { BattleResult } from '../../src/components/battle/BattleResult';
 
 const meta: Meta<typeof BattleResult> = {
@@ -18,13 +19,7 @@ const meta: Meta<typeof BattleResult> = {
   },
   tags: ['autodocs'],
   decorators: [
-    (Story) => (
-      <div style={{ background: '#10151b', borderRadius: '4px', width: '600px' }}>
-        <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-          <tbody><Story /></tbody>
-        </table>
-      </div>
-    ),
+    makeDarkDecorator({ table: true, borderRadius: '4px', width: '600px', tableStyle: { width: '100%' } }),
   ],
 };
 

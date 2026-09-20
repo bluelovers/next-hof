@@ -7,21 +7,10 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeDarkDecorator } from '../decorators';
 import { TeamStatus } from '../../src/components/info/TeamStatus';
 
 /** 背景裝飾器 / Background decorator */
-const DarkDecorator = (Story: React.FC) => (
-  <div
-    style={{
-      backgroundColor: '#10151b',
-      padding: '0',
-      fontFamily: "'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif",
-    }}
-  >
-    <Story />
-  </div>
-);
-
 const meta: Meta<typeof TeamStatus> = {
   title: 'Info/TeamStatus',
   component: TeamStatus,
@@ -34,7 +23,7 @@ const meta: Meta<typeof TeamStatus> = {
     },
   },
   tags: ['autodocs'],
-  decorators: [DarkDecorator],
+  decorators: [makeDarkDecorator({ padding: 0 })],
 };
 
 export default meta;

@@ -7,6 +7,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeDarkDecorator } from '../decorators';
 import { JobDetailCard } from '../../src/components/game-data/JobDetailCard';
 
 /** JobDetailCard 元件設定 / JobDetailCard component settings */
@@ -16,20 +17,13 @@ const meta: Meta<typeof JobDetailCard> = {
   parameters: {
     // Storybook 裝飾器配置 / Storybook decorators configuration
     decorators: [
-      (Story) => (
-        <div className="home-page" style={{ 
-          backgroundColor: '#10151b', 
-          padding: '20px',
-          color: '#e0e0e0',
-          fontFamily: 'Arial, sans-serif'
-        }}>
-          <table style={{ border: '1px solid #1a232d', width: '100%' }}>
-            <tbody>
-              <Story />
-            </tbody>
-          </table>
-        </div>
-      ),
+      makeDarkDecorator({
+        className: 'home-page',
+        color: '#e0e0e0',
+        fontFamily: 'Arial, sans-serif',
+        table: true,
+        tableStyle: { border: '1px solid #1a232d', width: '100%' },
+      }),
     ],
   },
 };

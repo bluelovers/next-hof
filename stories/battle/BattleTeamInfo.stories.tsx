@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeDarkDecorator } from '../decorators';
 import { BattleTeamInfo } from '../../src/components/battle/BattleTeamInfo';
 
 const meta: Meta<typeof BattleTeamInfo> = {
@@ -18,11 +19,7 @@ const meta: Meta<typeof BattleTeamInfo> = {
   },
   tags: ['autodocs'],
   decorators: [
-    (Story) => (
-      <table style={{ background: '#10151b', borderCollapse: 'collapse', width: '400px' }}>
-        <tbody><tr><Story /></tr></tbody>
-      </table>
-    ),
+    makeDarkDecorator({ table: true, tableStyle: { width: '400px' } }),
   ],
 };
 

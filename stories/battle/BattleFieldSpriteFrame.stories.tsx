@@ -10,6 +10,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeStageDecorator } from '../decorators';
 import { BattleFieldSpriteFrame } from '../../src/components/battle/BattleFieldSpriteFrame';
 import { sampleSprites, sampleFieldSize } from './sampleData';
 
@@ -38,22 +39,12 @@ const meta: Meta<typeof BattleFieldSpriteFrame> = {
   // 模擬放大後的背景舞台（640×360），框（480×200）在其中依 valign 定位
   // Simulated enlarged background stage (640×360); the frame (480×200) positions within by valign
   decorators: [
-    (Story) => (
-      <div style={{ background: '#10151b', padding: '12px', borderRadius: '4px' }}>
-        <div
-          style={{
-            position: 'relative',
-            width: 640,
-            height: 360,
-            background: '#1a2230',
-            border: '1px dashed #3a4658',
-            overflow: 'hidden',
-          }}
-        >
-          <Story />
-        </div>
-      </div>
-    ),
+    makeStageDecorator({
+      width: 640,
+      height: 360,
+      border: '1px dashed #3a4658',
+      overflowHidden: true,
+    }),
   ],
 };
 

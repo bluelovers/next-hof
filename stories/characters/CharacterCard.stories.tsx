@@ -9,24 +9,12 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeDarkDecorator } from '../decorators';
 import { CharacterCard } from '../../src/components/characters/CharacterCard';
 
 const IMG = '/image/char';
 
 /** 背景裝飾器 — 模擬遊戲深色背景 / Dark game background decorator */
-const DarkDecorator = (Story: React.FC) => (
-  <div
-    style={{
-      backgroundColor: '#10151b',
-      padding: '30px',
-      minHeight: '200px',
-      fontFamily: "'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif",
-    }}
-  >
-    <Story />
-  </div>
-);
-
 const meta: Meta<typeof CharacterCard> = {
   title: 'Characters/CharacterCard',
   component: CharacterCard,
@@ -42,7 +30,7 @@ const meta: Meta<typeof CharacterCard> = {
   argTypes: {
     onSelect: { action: 'selected' },
   },
-  decorators: [DarkDecorator],
+  decorators: [makeDarkDecorator({ padding: '30px', minHeight: '200px' })],
 };
 
 export default meta;

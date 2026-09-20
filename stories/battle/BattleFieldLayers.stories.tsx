@@ -10,6 +10,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeDarkDecorator } from '../decorators';
 import { BattleFieldLayers } from '../../src/components/battle/BattleFieldLayers';
 import { sampleSprites, createSampleConfig, sampleFieldSize } from './sampleData';
 
@@ -43,11 +44,7 @@ const meta: Meta<typeof BattleFieldLayers> = {
   // 外層舞台，方便觀察背景尺寸與角色框的相對位置
   // Outer stage to visualize the relationship between background size and sprite frame
   decorators: [
-    (Story) => (
-      <div style={{ background: '#10151b', padding: '12px', borderRadius: '4px' }}>
-        <Story />
-      </div>
-    ),
+    makeDarkDecorator({ padding: '12px', borderRadius: '4px' }),
   ],
 };
 

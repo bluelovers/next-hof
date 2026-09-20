@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeStageDecorator } from '../decorators';
 import { BattleFieldSpriteLabel } from '../../src/components/battle/BattleFieldSpriteLabel';
 
 const meta: Meta<typeof BattleFieldSpriteLabel> = {
@@ -26,13 +27,7 @@ const meta: Meta<typeof BattleFieldSpriteLabel> = {
   // 提供相對定位舞台，使絕對定位的標籤有正確原點
   // Provide a relatively-positioned stage so the absolutely-positioned label has a correct origin
   decorators: [
-    (Story) => (
-      <div style={{ background: '#10151b', padding: '12px', borderRadius: '4px' }}>
-        <div style={{ position: 'relative', width: 480, height: 120, background: '#1a2230' }}>
-          <Story />
-        </div>
-      </div>
-    ),
+    makeStageDecorator({ width: 480, height: 120 }),
   ],
   args: {
     name: 'Hero1',

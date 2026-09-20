@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeStageDecorator } from '../decorators';
 import { BattleFieldSpriteLayers } from '../../src/components/battle/BattleFieldSpriteLayers';
 import { sampleSprites, sampleFieldSize } from './sampleData';
 
@@ -34,24 +35,11 @@ const meta: Meta<typeof BattleFieldSpriteLayers> = {
   // Provide a relatively-positioned stage matching the sprite frame size so the
   // absolutely-positioned sprite layers have a correct origin
   decorators: [
-    (Story, context) => {
-      const { width, height } = context.args as { width: number; height: number };
-      return (
-        <div style={{ background: '#10151b', padding: '12px', borderRadius: '4px' }}>
-          <div
-            style={{
-              position: 'relative',
-              width,
-              height,
-              background: '#1a2230',
-              overflow: 'hidden',
-            }}
-          >
-            <Story />
-          </div>
-        </div>
-      );
-    },
+    makeStageDecorator((args) => ({
+      width: args.width as number,
+      height: args.height as number,
+      overflowHidden: true,
+    })),
   ],
 };
 

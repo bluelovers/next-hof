@@ -7,25 +7,10 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeDarkDecorator, makeCenteredDecorator } from '../decorators';
 import { GDSubNav } from '../../src/components/navigation/GDSubNav';
 
 /** 背景裝飾器 — 模擬遊戲深色背景 / Dark game background decorator */
-const DarkDecorator = (Story: React.FC) => (
-  <div
-    style={{
-      backgroundColor: '#10151b',
-      padding: '20px',
-      minHeight: '100px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontFamily: "'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif",
-    }}
-  >
-    <Story />
-  </div>
-);
-
 const meta: Meta<typeof GDSubNav> = {
   title: 'Navigation/GDSubNav',
   component: GDSubNav,
@@ -38,7 +23,15 @@ const meta: Meta<typeof GDSubNav> = {
     },
   },
   tags: ['autodocs'],
-  decorators: [DarkDecorator],
+  decorators: [
+    makeDarkDecorator({
+      padding: '20px',
+      minHeight: '100px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }),
+  ],
 };
 
 export default meta;
@@ -57,13 +50,7 @@ export const Default: Story = {
       },
     },
   },
-  decorators: [
-    (Story) => (
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <Story />
-      </div>
-    ),
-  ],
+  decorators: [makeCenteredDecorator(800)],
 };
 
 /** 自訂導航連結 / Custom navigation links */
@@ -84,13 +71,7 @@ export const CustomLinks: Story = {
       },
     },
   },
-  decorators: [
-    (Story) => (
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <Story />
-      </div>
-    ),
-  ],
+  decorators: [makeCenteredDecorator(800)],
 };
 
 /** 最少連結 / Minimal links */
@@ -109,13 +90,7 @@ export const MinimalLinks: Story = {
       },
     },
   },
-  decorators: [
-    (Story) => (
-      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-        <Story />
-      </div>
-    ),
-  ],
+  decorators: [makeCenteredDecorator(600)],
 };
 
 /** 長標籤連結 / Long label links */
@@ -136,11 +111,5 @@ export const LongLabels: Story = {
       },
     },
   },
-  decorators: [
-    (Story) => (
-      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-        <Story />
-      </div>
-    ),
-  ],
+  decorators: [makeCenteredDecorator(900)],
 };

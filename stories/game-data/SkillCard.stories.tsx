@@ -7,6 +7,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
+import { makeDarkDecorator } from '../decorators';
 import { SkillCard } from '../../src/components/game-data/SkillCard';
 import type { ISkillData, ISkillTarget, ISkillScope } from '../../src/components/game-data/GameDataTypes';
 
@@ -17,16 +18,12 @@ const meta: Meta<typeof SkillCard> = {
   parameters: {
     // Storybook 裝飾器配置 / Storybook decorators configuration
     decorators: [
-      (Story) => (
-        <div className="home-page" style={{ 
-          backgroundColor: '#10151b', 
-          padding: '20px',
-          color: '#e0e0e0',
-          fontFamily: 'Arial, sans-serif'
-        }}>
-          <Story />
-        </div>
-      ),
+      makeDarkDecorator({
+        className: 'home-page',
+        color: '#e0e0e0',
+        fontFamily: 'Arial, sans-serif',
+        padding: '20px',
+      }),
     ],
   },
 };
