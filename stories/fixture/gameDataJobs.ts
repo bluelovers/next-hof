@@ -20,7 +20,7 @@ export const allJobs: IJobData[] = [
     name: 'Warrior',
     parentId: 0,
     description: '戦士系基本職。<br />そこそこ耐えて、攻撃もそこそこ。',
-    spriteUrls: ['mon_079.png', 'mon_080r.png'],
+    spriteUrls: ['/image/char/mon_079.png', '/image/char/mon_080r.png'],
     equipment: ['Sword', 'TwoHandSword', 'Shield', 'Armor', 'Cloth', 'Robe', 'Item'],
     skills: [
       { name: 'DoubleAttack', iconUrl: '/image/icon/skill/skill_073.png', target: 'enemy', scope: 'normal', sp: 15, powerPct: 90, hits: 2, effect: '连续发动两次攻击' },
@@ -33,7 +33,7 @@ export const allJobs: IJobData[] = [
     name: 'RoyalGuard',
     parentId: 100,
     description: '戦士系上級職。<br />防御も攻撃も一回り強くなる。',
-    spriteUrls: ['mon_199r.png', 'mon_234r.png'],
+    spriteUrls: ['/image/char/mon_199r.png', '/image/char/mon_234r.png'],
     equipment: ['Sword', 'TwoHandSword', 'Shield', 'Armor', 'Cloth', 'Robe', 'Item'],
     skills: [
       { name: 'FatalStab', iconUrl: '/image/icon/skill/skill_074z.png', target: 'enemy', scope: 'normal', sp: 50, powerPct: 360, hits: 1, hitRate: '0:50', effect: '致命一擊，造成大量傷害' },
@@ -46,7 +46,7 @@ export const allJobs: IJobData[] = [
     name: 'Sacrier',
     parentId: 100,
     description: '戦士系上級職。<br />攻撃に特化した戦士。<br />自分の体力を犠牲に強力な技が使える。',
-    spriteUrls: ['mon_100r.png', 'mon_012.png'],
+    spriteUrls: ['/image/char/mon_100r.png', '/image/char/mon_012.png'],
     equipment: ['Sword', 'TwoHandSword', 'Shield', 'Cloth', 'Robe', 'Item'],
     skills: [
       { name: 'ObtainMind', iconUrl: '/image/icon/skill/skill_057.png', target: 'self', scope: 'normal', sp: 0, sacrificePct: 15, upStats: { INT: 100 }, effect: '知力上昇' },
@@ -59,7 +59,7 @@ export const allJobs: IJobData[] = [
     name: 'WitchHunt',
     parentId: 100,
     description: '戦士系上級職。<br />相手の魔力を奪ったりする、やや変則的な戦士。',
-    spriteUrls: ['mon_150.png', 'mon_234.png'],
+    spriteUrls: ['/image/char/mon_150.png', '/image/char/mon_234.png'],
     equipment: ['Sword', 'Dagger', 'Shield', 'Armor', 'Cloth', 'Robe', 'Item'],
     skills: [
       { name: 'WeaponBreak', iconUrl: '/image/icon/skill/skill_072.png', target: 'enemy', scope: 'normal', sp: 30, powerPct: 100, hits: 1, downStats: { ATK: 50, MATK: 50 }, effect: '攻撃力低下' },
@@ -74,7 +74,7 @@ export const allJobs: IJobData[] = [
     name: 'Sorcerer',
     parentId: 0,
     description: '魔法系基本職。<br />撃たれ弱いが強い魔法が使える。',
-    spriteUrls: ['mon_106.png', 'mon_018.png'],
+    spriteUrls: ['/image/char/mon_106.png', '/image/char/mon_018.png'],
     equipment: ['Wand', 'Staff', 'Book', 'Cloth', 'Robe', 'Item'],
     skills: [
       { name: 'FireBall', iconUrl: '/image/icon/skill/skill_018.png', target: 'enemy', scope: 'multi', sp: 20, powerPct: 100, hits: 4, skillType: 'magic', isInvalid: true, hitRate: '60:0', effect: '施放一個火球對多個敵人造成範圍傷害' },
@@ -87,7 +87,7 @@ export const allJobs: IJobData[] = [
     name: 'Warlock',
     parentId: 200,
     description: '魔法系上級職。<br />さらに強力な魔法が使えるようになる。',
-    spriteUrls: ['mon_196z.png', 'mon_246r.png'],
+    spriteUrls: ['/image/char/mon_196z.png', '/image/char/mon_246r.png'],
     equipment: ['Wand', 'Staff', 'Book', 'Cloth', 'Robe', 'Item'],
     skills: [
       { name: 'Blizzard', iconUrl: '/image/icon/skill/skill_006b.png', target: 'enemy', scope: 'multi', sp: 240, powerPct: 90, hits: 10, skillType: 'magic', hitRate: '90:0', effect: '对多个敌人造成冰霜伤害' },
@@ -100,7 +100,7 @@ export const allJobs: IJobData[] = [
     name: 'Summoner',
     parentId: 200,
     description: '魔法系上級職。<br />時間はかかるが強力な召喚獣を呼べる。',
-    spriteUrls: ['mon_196y.png', 'mon_246z.png'],
+    spriteUrls: ['/image/char/mon_196y.png', '/image/char/mon_246z.png'],
     equipment: ['Wand', 'Staff', 'Book', 'Robe', 'Item'],
     skills: [
       { name: 'FireStorm', iconUrl: '/image/icon/skill/skill_004a.png', target: 'enemy', scope: 'multi', sp: 70, powerPct: 100, hits: 6, skillType: 'magic', isInvalid: true, hitRate: '70:0', effect: '施展火焰风暴，对多个敌人造成伤害' },
@@ -113,7 +113,7 @@ export const allJobs: IJobData[] = [
     name: 'Necromancer',
     parentId: 200,
     description: '魔法系上級職。<br />相手の能力を下げたり、ゾンビを作ったり出来る。<br />毒も扱える。',
-    spriteUrls: ['mon_196x.png', 'mon_246y.png'],
+    spriteUrls: ['/image/char/mon_196x.png', '/image/char/mon_246y.png'],
     equipment: ['Wand', 'Staff', 'Book', 'Cloth', 'Robe', 'Item'],
     skills: [
       { name: 'IcePrison', iconUrl: '/image/icon/skill/skill_055.png', target: 'enemy', scope: 'normal', sp: 40, powerPct: 180, hits: 1, skillType: 'magic', isInvalid: true, downStats: { DEF: 30, MDEF: 30 }, hitRate: '40:0', effect: '防御DOWN' },
@@ -128,7 +128,7 @@ export const allJobs: IJobData[] = [
     name: 'Priest',
     parentId: 0,
     description: '聖職基本職。<br />味方のHP,SPの回復ができる。',
-    spriteUrls: ['mon_213.png', 'mon_214.png'],
+    spriteUrls: ['/image/char/mon_213.png', '/image/char/mon_214.png'],
     equipment: ['Wand', 'Book', 'Cloth', 'Robe', 'Item'],
     skills: [
       { name: 'PartyHeal', iconUrl: '/image/icon/skill/skill_013c.png', target: 'friend', scope: 'all', sp: 30, powerPct: 150, hits: 1, skillType: 'magic', isSupport: true, hitRate: '50:0', effect: 'HP回復' },
@@ -141,7 +141,7 @@ export const allJobs: IJobData[] = [
     name: 'Bishop',
     parentId: 300,
     description: '聖職上級職。<br />味方の能力値も上げれるようになる。',
-    spriteUrls: ['mon_213r.png', 'mon_214r.png'],
+    spriteUrls: ['/image/char/mon_213r.png', '/image/char/mon_214r.png'],
     equipment: ['Wand', 'Book', 'Cloth', 'Robe', 'Item'],
     skills: [
       { name: 'QuickHeal', iconUrl: '/image/icon/skill/skill_013b.png', target: 'friend', scope: 'multi', sp: 20, powerPct: 180, hits: 2, skillType: 'magic', isSupport: true, effect: 'HP回復' },
@@ -154,7 +154,7 @@ export const allJobs: IJobData[] = [
     name: 'Druid',
     parentId: 300,
     description: '聖職上級職。<br />特殊な支援能力を持っている。',
-    spriteUrls: ['mon_213rz.png', 'mon_214rz.png'],
+    spriteUrls: ['/image/char/mon_213rz.png', '/image/char/mon_214rz.png'],
     equipment: ['Wand', 'Book', 'Cloth', 'Robe', 'Item'],
     skills: [
       { name: 'HealRabbit', iconUrl: '/image/icon/skill/skill_038.png', target: 'self', scope: 'normal', sp: 60, skillType: 'magic', isQuick: true, effect: '癒し兎召喚' },
@@ -169,7 +169,7 @@ export const allJobs: IJobData[] = [
     name: 'Hunter',
     parentId: 0,
     description: '弓系基本職。<br />相手の前衛に影響されずに攻撃できる。',
-    spriteUrls: ['mon_219rr.png', 'mon_219r.png'],
+    spriteUrls: ['/image/char/mon_219rr.png', '/image/char/mon_219r.png'],
     equipment: ['Bow', 'Cloth', 'Robe', 'Item'],
     skills: [
       { name: 'Shoot', iconUrl: '/image/icon/skill/item_042.png', target: 'enemy', scope: 'normal', sp: 0, powerPct: 100, hits: 1, weaponLimit: 'Bow', isInvalid: true, priority: 'Back', effect: '射击' },
@@ -182,7 +182,7 @@ export const allJobs: IJobData[] = [
     name: 'Sniper',
     parentId: 400,
     description: '弓系上級職。<br />さらに強力な攻撃が可能。',
-    spriteUrls: ['mon_076z.png', 'mon_042z.png'],
+    spriteUrls: ['/image/char/mon_076z.png', '/image/char/mon_042z.png'],
     equipment: ['Bow', 'Cloth', 'Robe', 'Item'],
     skills: [
       { name: 'HurricaneShot', iconUrl: '/image/icon/skill/item_042.png', target: 'enemy', scope: 'multi', sp: 180, powerPct: 70, hits: 16, weaponLimit: 'Bow', isInvalid: true, hitRate: '50:80', effect: '飓风射击' },
@@ -195,7 +195,7 @@ export const allJobs: IJobData[] = [
     name: 'BeastTamer',
     parentId: 400,
     description: '弓系上級職。<br />素早い召喚と召喚獣の強化が得意。',
-    spriteUrls: ['mon_216z.png', 'mon_217z.png'],
+    spriteUrls: ['/image/char/mon_216z.png', '/image/char/mon_217z.png'],
     equipment: ['Bow', 'Whip', 'Cloth', 'Robe', 'Item'],
     skills: [
       { name: 'PowerShoot', iconUrl: '/image/icon/skill/item_042.png', target: 'enemy', scope: 'normal', sp: 10, powerPct: 200, hits: 1, weaponLimit: 'Bow', isInvalid: true, hitRate: '0:30', effect: '强力射击' },
@@ -208,7 +208,7 @@ export const allJobs: IJobData[] = [
     name: 'Murderer',
     parentId: 400,
     description: '弓系上級職。<br />毒の扱いに長けた職業。',
-    spriteUrls: ['mon_216y.png', 'mon_217rz.png'],
+    spriteUrls: ['/image/char/mon_216y.png', '/image/char/mon_217rz.png'],
     equipment: ['Dagger', 'Bow', 'Armor', 'Cloth', 'Item'],
     skills: [
       { name: 'ScatterKnife', iconUrl: '/image/icon/skill/we_sword001z.png', target: 'enemy', scope: 'multi', sp: 30, powerPct: 130, hits: 4, weaponLimit: 'Dagger', isInvalid: true, effect: '向多個敵人散射匕首進行攻擊' },

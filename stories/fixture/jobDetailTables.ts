@@ -17,7 +17,7 @@ export const mixedJobs: IJobData[] = [
     name: 'Ranger',
     parentId: 400,
     description: '弓系上級職。<br />野生の知識に長けた弓使い。',
-    spriteUrls: ['mon_216.png', 'mon_216y.png'],
+    spriteUrls: ['/image/char/mon_216.png', '/image/char/mon_216y.png'],
     equipment: ['Dagger', 'Bow', 'Armor', 'Cloth', 'Item'],
     skills: [
       { name: 'ArrowRain', iconUrl: '', target: 'enemy', scope: 'multi', sp: 35, powerPct: 120, hits: 3, hitRate: '30:50' },
@@ -33,7 +33,7 @@ export const highSkillJob: IJobData[] = [
     name: 'MasterOfAll',
     parentId: 0,
     description: '萬能職業。<br />すべてのスキルを習得可能。',
-    spriteUrls: ['mon_999.png', 'mon_999r.png'],
+    spriteUrls: ['/image/char/mon_999.png', '/image/char/mon_999r.png'],
     equipment: ['All'],
     skills: [
       { name: 'Fire', iconUrl: '', target: 'enemy', scope: 'normal', sp: 8, powerPct: 150, hits: 1, hitRate: '20:20', skillType: 'magic' },
