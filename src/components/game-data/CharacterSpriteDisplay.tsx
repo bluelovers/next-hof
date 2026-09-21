@@ -1,12 +1,13 @@
 /**
- * 角色精靈顯示組件
- * Character sprite display component
+ * 角色精靈顯示組件（向後兼容包裝）
+ * Character sprite display component (backward-compatible wrapper)
  *
- * 負責顯示角色精靈圖片
- * Handles the display of character sprite images
+ * 建議直接使用 CharacterSprite / CharacterSpriteGroup 取代此組件。
+ * Prefer using CharacterSprite / CharacterSpriteGroup directly.
  */
 import React from 'react';
-import { buildSpriteStyle } from './gameDataUtils';
+import { CharacterSpriteGroup } from '#/components/characters/CharacterSpriteGroup';
+import type { ISpriteSize } from '#/components/characters/CharacterSprite';
 import './CharacterSpriteDisplay.css';
 
 /**
@@ -32,27 +33,22 @@ export interface ICharacterSpriteDisplayProps {
  */
 export const CharacterSpriteDisplay: React.FC<ICharacterSpriteDisplayProps> = ({
   spriteUrls,
-  className = "character-sprite-display",
+  className = 'character-sprite-display',
   size = 'normal',
   spriteType = 'neutral',
   hoverable = true,
 }) => {
-  const spriteClasses = [
-    'character-sprite',
-    size !== 'normal' ? size : '',
+  const extraClasses = [
     spriteType !== 'neutral' ? spriteType : '',
     hoverable ? 'hoverable' : '',
   ].filter(Boolean).join(' ');
 
   return (
-    <div className={className}>
-      {spriteUrls.map((url, index) => (
-        <div
-          key={index}
-          className={spriteClasses}
-          style={buildSpriteStyle(url)}
-        />
-      ))}
+    <div className={`${className} ${extraClasses}`}>
+      <CharacterSpriteGroup
+        urls={spriteUrls}
+        size={size as ISpriteSize}
+      />
     </div>
   );
 };

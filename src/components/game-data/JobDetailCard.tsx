@@ -6,9 +6,9 @@
  * Displays job name, sprites, description, equipment, and skill list
  */
 import React from 'react';
-import type { IJobData } from './GameDataTypes';
-import { SkillCard } from './SkillCard';
-import { buildSpriteStyle } from './gameDataUtils';
+import type { IJobData } from '../game-data/GameDataTypes';
+import { SkillCard } from '../game-data/SkillCard';
+import { CharacterSprite } from '#/components/characters/CharacterSprite';
 import './JobDetailCard.css';
 
 /** 職業詳細卡片屬性 / Job detail card props */
@@ -40,11 +40,7 @@ export const JobDetailCard: React.FC<IJobDetailCardProps> = ({
         </td>
         <td className={`job-sprite-cell ${bgClass}`}>
           {spriteUrls.map((url, i) => (
-            <span
-              key={i}
-              className="job-sprite"
-              style={buildSpriteStyle(url)}
-            />
+            <CharacterSprite key={i} url={url} variant="avatar" />
           ))}
         </td>
         <td className={`job-desc-cell ${bgClass}`}>

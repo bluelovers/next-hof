@@ -7,9 +7,10 @@
  * Uses carpet_frame pedestal structure:
  * avatar(carpet0/1) + name/level/class(text) + selection(radio)
  */
-import React, { useId } from 'react';
+import React from 'react';
 import './CharacterCardBase.css';
 import type { ICharacterData } from './CharacterTypes';
+import { CharacterSprite } from './CharacterSprite';
 import { getCarpetClass, buildCharacterUrl } from './characterUtils';
 
 /** CharacterCard 屬性 / CharacterCard props */
@@ -36,7 +37,6 @@ export const CharacterCard: React.FC<ICharacterCardProps> = ({
 
   /** 點擊文字區塊切換選取 / Click text to toggle selection */
   const handleTextClick = (e: React.MouseEvent) => {
-    // 避免點擊到 input 元素時觸發兩次
     if (!(e.target as HTMLElement).closest('input')) {
       onSelect?.(character.id);
     }
@@ -44,20 +44,18 @@ export const CharacterCard: React.FC<ICharacterCardProps> = ({
 
   return (
     <div className="carpet_frame">
-      {/** 角色頭像底座（交替 carpet0/carpet1）/ Avatar pedestal (alternating) */}
+      {/* 角色頭像底座（交替 carpet0/carpet1）/ Avatar pedestal (alternating) */}
       <div className={getCarpetClass(index)}>
-        <a
-          href={buildCharacterUrl(character.id)}
-        >
-          <img
-            src={character.imageUrl}
-            title={character.imageUrl}
+        <a href={buildCharacterUrl(character.id)}>
+          <CharacterSprite
+            url={character.imageUrl}
+            variant="avatar"
             alt={character.name}
           />
         </a>
       </div>
 
-      {/** 角色資訊區（可點擊選取）/ Character info (clickable to select) */}
+      {/* 角色資訊區（可點擊選取）/ Character info (clickable to select) */}
       <div
         id={textId}
         className={character.selected ? '' : 'unselect'}
@@ -73,7 +71,7 @@ export const CharacterCard: React.FC<ICharacterCardProps> = ({
         {character.className}
       </div>
 
-      {/** 選取 radio / Selection radio */}
+      {/* 選取 radio / Selection radio */}
       <input
         type="radio"
         id={boxId}

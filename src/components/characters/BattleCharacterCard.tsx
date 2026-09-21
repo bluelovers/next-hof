@@ -2,18 +2,14 @@
  * BattleCharacterCard 戰鬥編成角色卡片元件
  * BattleCharacterCard component
  *
- * 和 DashboardPage 的 CharacterCard 類似，但使用 checkbox（可複選）
+ * 和 CharacterCard 類似，但使用 checkbox（可複選）
  * Similar to CharacterCard but uses checkbox (multi-select)
  */
 import React from 'react';
-
-/** 共享 carpet_frame 底座樣式 */
-/** Shared carpet_frame pedestal styles */
 import './CharacterCardBase.css';
-/** BattleCharacterCard 專用樣式（checkbox 選取樣式） */
-/** BattleCharacterCard specific styles (checkbox selection) */
 import './BattleCharacterCard.css';
 import type { IBattleCharacterData } from './CharacterTypes';
+import { CharacterSprite } from './CharacterSprite';
 import { getCarpetClass, buildCharacterUrl } from './characterUtils';
 
 /** BattleCharacterCard 屬性 / BattleCharacterCard props */
@@ -47,12 +43,12 @@ export const BattleCharacterCard: React.FC<IBattleCharacterCardProps> = ({
 
   return (
     <div className="carpet_frame">
-      {/* 角色頭像底座（交替 carpet0/carpet1） / Avatar pedestal (alternating) */}
+      {/* 角色頭像底座（交替 carpet0/carpet1）/ Avatar pedestal (alternating) */}
       <div className={getCarpetClass(index)}>
         <a href={buildCharacterUrl(character.id)}>
-          <img
-            src={character.imageUrl}
-            title={character.imageUrl}
+          <CharacterSprite
+            url={character.imageUrl}
+            variant="avatar"
             alt={character.name}
           />
         </a>

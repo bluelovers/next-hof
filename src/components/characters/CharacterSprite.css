@@ -1,0 +1,90 @@
+/**
+ * CharacterSprite 角色精靈樣式
+ * CharacterSprite styles
+ *
+ * 三種顯示模式各有獨立 CSS 區塊。
+ * Three display variants with independent CSS blocks.
+ */
+
+/* ==================== 基底 / Base ==================== */
+
+.character-sprite {
+  display: inline-block;
+  vertical-align: middle;
+  background-size: cover;
+  background-position: center;
+}
+
+/* ==================== boxed — 帶背景框（預設）/ With frame (default) ==================== */
+
+.character-sprite--boxed {
+  width: 48px;
+  height: 48px;
+  background-color: #1b222c;
+  border: 1px solid #070b0e;
+  border-radius: 3px;
+  margin: 0 2px;
+}
+
+.character-sprite--boxed:hover {
+  border-color: #8a9cb7;
+}
+
+/* --- 尺寸變體 / Size variants --- */
+
+.character-sprite--boxed.character-sprite--small {
+  width: 32px;
+  height: 32px;
+}
+
+.character-sprite--boxed.character-sprite--large {
+  width: 64px;
+  height: 64px;
+}
+
+/* --- 背景與邊框開關 / Background & border toggles --- */
+
+.character-sprite--boxed.character-sprite--no-bg {
+  background-color: transparent;
+}
+
+.character-sprite--boxed.character-sprite--no-border {
+  border: none;
+}
+
+.character-sprite--boxed.character-sprite--no-bg.character-sprite--no-border {
+  background-color: transparent;
+}
+
+/* ==================== raw — 無框，保留尺寸 / No frame, keep size ==================== */
+
+.character-sprite--raw {
+  width: 48px;
+  height: 48px;
+}
+
+.character-sprite--raw.character-sprite--small {
+  width: 32px;
+  height: 32px;
+}
+
+.character-sprite--raw.character-sprite--large {
+  width: 64px;
+  height: 64px;
+}
+
+/* ==================== original — 原始大小 / Natural size ==================== */
+
+.character-sprite--original {
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+}
+
+/* ==================== avatar — 純圖片，由外層控制尺寸 / Plain image, outer controls size ==================== */
+
+.character-sprite--avatar {
+  border: 0;
+  vertical-align: baseline;
+}
