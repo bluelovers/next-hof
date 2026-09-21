@@ -20,10 +20,11 @@
  * among sprite[0..i]). That produced split sides / mixed facing such as "left 2,
  * right 1" within a single team.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { CSSProperties } from 'react';
 import type { IBattleSprite } from './types';
 import { BattleFieldSpriteLabel } from './BattleFieldSpriteLabel';
+import { useSpriteLabelRegistry, type ISpriteLabelRegistry, type ISpriteLabelComputeInput } from './useSpriteLabelRegistry';
 import './BattleFieldSpriteLayers.css';
 
 /** 戰場精靈圖層屬性 / Battlefield sprite layers props */
@@ -56,7 +57,8 @@ export interface IBattleFieldSpriteLayersProps {
  * never compound.
  */
 function buildSpriteLayers(
-  props: IBattleFieldSpriteLayersProps
+  props: IBattleFieldSpriteLayersProps,
+  registry: ISpriteLabelRegistry,
 ): React.ReactNode[] {
   const { sprites, width, height, showLabels, style } = props;
 
@@ -82,6 +84,10 @@ function buildSpriteLayers(
       ...sprite.style,
     };
 
+    // 由上層 useSpriteLabelRegistry 預先算好的防重疊位置（依順序對應）
+    // Pre-computed anti-overlap position from useSpriteLabelRegistry (matched by order).
+    const entry = registry.entries[index];
+
     return (
       <div
         key={sprite.id ?? index}
@@ -103,6 +109,7 @@ function buildSpriteLayers(
             frameSize={{ width, height }}
             flipped={sprite.flipped}
             style={sprite.labelStyle}
+            position={entry?.pos}
           />
         )}
       </div>
@@ -114,9 +121,31 @@ function buildSpriteLayers(
  * 戰場精靈圖層組件
  * Battlefield sprite layers component
  *
- * 轉發 props 給輔助函式 buildSpriteLayers 產生同層（兄弟）圖層
- * Forwards props to the buildSpriteLayers helper to produce sibling layers
+ * 轉發 props 給輔助函式 buildSpriteLayers 產生同層（兄弟）圖層；
+ * 並以 useSpriteLabelRegistry（ref 快取）預先計算每個標籤的防重疊位置，
+ * 再透過 position prop 傳給各標籤組件，避免標籤彼此重疊。
+ * Forwards props to buildSpriteLayers for sibling layers; also uses useSpriteLabelRegistry
+ * (a ref-backed cache) to pre-compute each label's anti-overlap position, then passes it down
+ * via the position prop so labels don't overlap each other.
  */
 export const BattleFieldSpriteLayers: React.FC<IBattleFieldSpriteLayersProps> = (props) => {
-  return <>{buildSpriteLayers(props)}</>;
+  const { sprites, width, height } = props;
+  // 依序把精靈轉為標籤運算輸入；memo 化使 inputs 在 sprites 不變時保持穩定，
+  // 進而讓 useSpriteLabelRegistry 的 useMemo / ref 快取能跨渲染生效。
+  // Map sprites to label-compute inputs in order; memoized so inputs stay stable when
+  // sprites is unchanged, letting useSpriteLabelRegistry's useMemo/ref cache persist across renders.
+  const inputs = useMemo<ISpriteLabelComputeInput[]>(
+    () =>
+      sprites.map((s, i) => ({
+        x: s.x,
+        y: s.y,
+        imageWidth: s.imageWidth,
+        imageHeight: s.imageHeight,
+        placement: s.placement,
+        id: s.id ?? String(i),
+      })),
+    [sprites],
+  );
+  const registry = useSpriteLabelRegistry(inputs, { width, height });
+  return <>{buildSpriteLayers(props, registry)}</>;
 };

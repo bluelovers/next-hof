@@ -21,7 +21,12 @@ import type { ISpriteImageSize } from './spriteImageSizes';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from './types';
 import {
   computeSpriteLabelPosition,
+  clampLabelToBoundary,
+  rectsOverlap,
+  largestFreeGap,
+  DEFAULT_IMAGE_SIZE,
   type ISpriteLabelPlacement,
+  type ISpriteLabelPositionResult,
 } from './labelPosition';
 import './BattleFieldSpriteLabel.css';
 
@@ -34,13 +39,19 @@ export {
   computeLabelTop,
   labelFitsInFrame,
   clamp,
+  clampLabelToBoundary,
+  rectsOverlap,
+  largestFreeGap,
   DEFAULT_LABEL_HEIGHT,
   DEFAULT_GAP,
+  DEFAULT_IMAGE_SIZE,
 } from './labelPosition';
-export type { ISpriteLabelPlacement, ISpriteLabelPositionInput, ISpriteLabelPositionResult } from './labelPosition';
-
-/** 未提供角色圖像尺寸時的預設值（組件內不讀取圖檔，僅作收斂下限） / Fallback image size when missing (no disk read in component) */
-const DEFAULT_IMAGE_SIZE: ISpriteImageSize = { width: 56, height: 72 };
+export type {
+  ISpriteLabelPlacement,
+  ISpriteLabelPositionInput,
+  ISpriteLabelPositionResult,
+  IRect,
+} from './labelPosition';
 
 /** 戰場精靈名稱標籤屬性 / Battlefield sprite name label props */
 export interface IBattleFieldSpriteLabelProps {
@@ -81,6 +92,16 @@ export interface IBattleFieldSpriteLabelProps {
    * so the text reads normally while staying anchored under the character.
    */
   flipped?: boolean;
+  /**
+   * 由上層（BattleFieldSpriteLayers + useSpriteLabelRegistry）預先算好的最終位置。
+   * 提供時直接採用（含防重疊後的 top/left/height），組件不再自行計算；
+   * 不提供時（如 Storybook 單體展示）則由組件內部自行計算。
+   * Pre-computed final position from the parent (BattleFieldSpriteLayers + useSpriteLabelRegistry).
+   * When provided, it is used as-is (including anti-overlap top/left/height) and the
+   * component skips its own computation; when omitted (e.g. standalone Storybook), the
+   * component computes it internally.
+   */
+  position?: ISpriteLabelPositionResult;
 }
 
 /**
@@ -104,30 +125,39 @@ export const BattleFieldSpriteLabel: React.FC<IBattleFieldSpriteLabelProps> = ({
   gap,
   style,
   flipped,
+  position,
 }) => {
   const resolvedImageSize = imageSize ?? DEFAULT_IMAGE_SIZE;
-  const pos = computeSpriteLabelPosition({
-    x,
-    y,
-    imageSize: resolvedImageSize,
-    placement,
-    frameSize: frameSize ?? { width: SPRITE_LAYOUT_WIDTH, height: SPRITE_LAYOUT_HEIGHT },
-    labelSize,
-    gap,
-  });
+  // 優先採用上層預算好的位置（含防重疊）；否則組件自行計算
+  // Prefer the parent's pre-computed position (incl. anti-overlap); otherwise compute internally.
+  const pos =
+    position ??
+    computeSpriteLabelPosition({
+      x,
+      y,
+      imageSize: resolvedImageSize,
+      placement,
+      frameSize: frameSize ?? { width: SPRITE_LAYOUT_WIDTH, height: SPRITE_LAYOUT_HEIGHT },
+      labelSize,
+      gap,
+    });
 
   /** 基礎標籤樣式 / Base label style */
   const baseStyle: CSSProperties = {
-    // position: 'absolute',
     top: pos.top,
     left: pos.left,
     // 標籤最小寬度＝角色圖像寬度，使標籤盒寬度至少涵蓋角色，便於文字置中對齊角色
     // Label min-width = character image width, so the box spans at least the character (text centers over it).
     minWidth: resolvedImageSize.width,
-    // 文字水平置中於標籤盒內 / Center the text horizontally within the label box.
-    // textAlign: 'center',
-    // whiteSpace: 'nowrap',
-    // pointerEvents: 'none',
+    // 最終高度由 labelPosition 決定：超出邊界或避免重疊時會被縮減，故以 height 鎖定並裁切，
+    // 文字在盒內垂直水平置中，縮減時自動裁切溢出部分。
+    // Final height from labelPosition: reduced when out of bounds / avoiding overlap, so lock it
+    // and clip; text is centered inside, overflow is clipped when the height shrinks.
+    height: pos.height,
+    overflow: 'hidden',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     // 父層 flip-h 已鏡像整個精靈 div；若所屬精靈翻轉，此處再加一次 scaleX(-1)
     // 抵銷鏡像，使文字正向、位置仍貼齊角色
     // Parent flip-h already mirrors the whole sprite div; when the owning sprite is
