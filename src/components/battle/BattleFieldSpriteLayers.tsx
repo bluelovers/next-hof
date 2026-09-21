@@ -69,9 +69,9 @@ function buildSpriteLayers(
       backgroundImage: sprite.imageUrl
         ? `url(${sprite.imageUrl})`
         : undefined,
-      backgroundRepeat: 'no-repeat',
+      // backgroundRepeat: 'no-repeat',
       backgroundPosition: `${sprite.x}px ${sprite.y}px`,
-      position: 'absolute',
+      // position: 'absolute',
     };
 
     // 合併順序：基礎樣式 < 元件/輔助函式 style < 單體精靈 style（最優先）

@@ -49,12 +49,12 @@ export const BattleFieldSpriteFrame: React.FC<IBattleFieldSpriteFrameProps> = ({
   width,
   height,
   showLabels,
-  valign = 'bottom',
+  valign,
   style,
 }) => {
   return (
     <div
-      className={`battle-sprite-frame battle-sprite-frame--${valign}`}
+      className={`battle-sprite-frame battle-sprite-frame--${valign ?? 'bottom'}`}
       style={{ width, height, ...style }}
     >
       <BattleFieldSpriteLayers

@@ -16,4 +16,5 @@
   background-repeat: no-repeat;
   /* 不攔截滑鼠事件，避免擋住其上方的角色精靈互動 / don't block pointer events over sprites */
   pointer-events: none;
+  filter: drop-shadow(2px 5px 1px rgba(0, 0, 0, 0.3));
 }

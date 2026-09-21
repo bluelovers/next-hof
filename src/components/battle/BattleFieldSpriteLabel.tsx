@@ -66,11 +66,11 @@ export const BattleFieldSpriteLabel: React.FC<IBattleFieldSpriteLabelProps> = ({
     // 緊貼角色下方，拉近與角色的距離 / just below the character, close to it
     top: y + 4,
     ...horizontal,
-    fontSize: 10,
-    color: '#bdc8d7',
-    whiteSpace: 'nowrap',
-    textShadow: '0 0 4px #000',
-    pointerEvents: 'none',
+    // fontSize: 10,
+    // color: '#bdc8d7',
+    // whiteSpace: 'nowrap',
+    // textShadow: '0 0 4px #000',
+    // pointerEvents: 'none',
     // 父層 flip-h 已鏡像整個精靈 div；若所屬精靈翻轉，此處再加一次 scaleX(-1)
     // 抵銷鏡像，使文字正向、位置仍貼齊角色
     // Parent flip-h already mirrors the whole sprite div; when the owning sprite is
