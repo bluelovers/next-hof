@@ -4,22 +4,68 @@
  *
  * 由 BattleFieldSpriteLayers 中的 showLabels 邏輯抽離而來
  * Extracted from the showLabels logic in BattleFieldSpriteLayers
+ *
+ * 標籤位置由 labelPosition.ts 的 computeSpriteLabelPosition() 這個「純邏輯工具」自動計算，
+ * 組件本身不呼叫任何 IO（例如 getSpriteImageSize 讀圖檔），所需圖像尺寸
+ * 由呼叫端以 imageSize（ISpriteImageSize）傳入（參考 toPositionChars：同樣是把
+ * 已知資料轉為定位資訊，而不在此處讀取圖檔）。
+ * The label position is auto-computed by the pure logic helper
+ * computeSpriteLabelPosition() in labelPosition.ts; the component itself performs no IO
+ * (e.g. it never calls getSpriteImageSize). Image sizes are supplied by the caller via
+ * imageSize (ISpriteImageSize) — mirroring toPositionChars, which also turns known
+ * data into positioning info instead of reading image files here.
  */
 import React from 'react';
 import type { CSSProperties } from 'react';
-import { SPRITE_LAYOUT_WIDTH } from './types';
+import type { ISpriteImageSize } from './spriteImageSizes';
+import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from './types';
+import {
+  computeSpriteLabelPosition,
+  type ISpriteLabelPlacement,
+} from './labelPosition';
 import './BattleFieldSpriteLabel.css';
+
+// 將純邏輯工具重新匯出，使 BattleFieldSpriteLabel 模組同時提供組件與標籤定位邏輯
+// Re-export the pure logic tool so the BattleFieldSpriteLabel module exposes both the
+// component and the label-positioning logic.
+export {
+  computeSpriteLabelPosition,
+  computeLabelLeft,
+  computeLabelTop,
+  labelFitsInFrame,
+  clamp,
+  DEFAULT_LABEL_SIZE,
+  DEFAULT_GAP,
+} from './labelPosition';
+export type { ISpriteLabelPlacement, ISpriteLabelPositionInput, ISpriteLabelPositionResult } from './labelPosition';
+
+/** 未提供角色圖像尺寸時的預設值（組件內不讀取圖檔，僅作收斂下限） / Fallback image size when missing (no disk read in component) */
+const DEFAULT_IMAGE_SIZE: ISpriteImageSize = { width: 56, height: 72 };
 
 /** 戰場精靈名稱標籤屬性 / Battlefield sprite name label props */
 export interface IBattleFieldSpriteLabelProps {
   /** 名稱 / Name */
   name: string;
-  /** X 軸位置（角色錨點與左右對齊依據） / X position (character anchor & side alignment) */
+  /** X 軸位置（角色圖像左上角 x） / X position (character image top-left x) */
   x: number;
-  /** Y 軸位置（角色錨點，標籤置於其正下方） / Y position (character anchor; label placed just below) */
+  /** Y 軸位置（角色圖像左上角 y） / Y position (character image top-left y) */
   y: number;
-  /** 畫布寬度（判斷左右半側與水平對齊） / Canvas width (side detection & horizontal alignment) */
-  width?: number;
+  /**
+   * 角色圖像尺寸（由呼叫端提供；組件內禁止呼叫 getSpriteImageSize IO）
+   * Character image size (caller-supplied; the component must NOT call getSpriteImageSize).
+   */
+  imageSize?: ISpriteImageSize;
+  /**
+   * 標籤演算法：角色上方 / 下方（預設 below）
+   * Label placement: above / below the character (default below)
+   */
+  placement?: ISpriteLabelPlacement;
+  /** 顯示範圍（戰場精靈框）尺寸 / Display range (sprite frame) size */
+  frameSize?: ISpriteImageSize;
+  /** 標籤預估尺寸（邊界收斂用） / Estimated label size (for clamping) */
+  labelSize?: ISpriteImageSize;
+  /** 標籤與角色圖像間距 / Gap between label and character */
+  gap?: number;
   /** 自訂樣式（可複寫或追加） / Custom style (override or append) */
   style?: CSSProperties;
   /**
@@ -28,7 +74,7 @@ export interface IBattleFieldSpriteLabelProps {
    *
    * 標籤本身位於翻轉的精靈 div 內，會被父層 transform 連帶鏡像，
    * 導致文字左右顛倒。傳入 flipped 時對標籤本身再加一次 scaleX(-1)，
-   * 與父層鏡像抵銷（淨效果為不鏡像），文字恢復正向、位置仍貼齊角色
+   * 與父層鏡像抵銷（淨效果為不鏡像），文字恢復正向、位置仍貼齊角色。
    * The label lives inside the flipped sprite div and is mirrored by the parent's
    * transform, rendering the text backwards. When flipped, we apply another
    * scaleX(-1) to the label itself, cancelling the parent mirror (net identity),
@@ -41,36 +87,41 @@ export interface IBattleFieldSpriteLabelProps {
  * 戰場精靈名稱標籤組件
  * Battlefield sprite name label component
  *
- * 標籤直接錨定在角色 (x, y) 正下方，水平依 x 決定靠左或靠右並對齊角色，
- * 因此不論角色在場景何處都緊貼角色、且不會因排版框置底而跑出可視範圍
- * The label is anchored just below the character (x, y); horizontal side is
- * decided by x and aligned to the character, so it stays close to the character
- * and never falls outside the visible area when the frame is bottom-aligned.
+ * 標籤位置由 computeSpriteLabelPosition() 自動計算（角色上方/下方兩種演算法，
+ * 並收斂在戰場精靈框顯示範圍內）；組件本身不進行任何 IO。
+ * The label position is auto-computed by computeSpriteLabelPosition() (above/below
+ * algorithms, clamped inside the sprite-frame display range); the component itself
+ * performs no IO.
  */
 export const BattleFieldSpriteLabel: React.FC<IBattleFieldSpriteLabelProps> = ({
   name,
   x,
   y,
-  width = SPRITE_LAYOUT_WIDTH,
+  imageSize,
+  placement = 'below',
+  frameSize,
+  labelSize,
+  gap,
   style,
   flipped,
 }) => {
-  // 右半側：標籤右緣對齊角色 x 並向左生長，避免超出右邊界
-  // Right half: label right edge aligns to character x, grows left to avoid right overflow
-  // 左半側：標籤左緣對齊角色 x / Left half: label left edge aligns to character x
-  const horizontal = x > width / 2 ? { right: width - x } : { left: x };
+  const pos = computeSpriteLabelPosition({
+    x,
+    y,
+    imageSize: imageSize ?? DEFAULT_IMAGE_SIZE,
+    placement,
+    frameSize: frameSize ?? { width: SPRITE_LAYOUT_WIDTH, height: SPRITE_LAYOUT_HEIGHT },
+    labelSize,
+    gap,
+  });
 
   /** 基礎標籤樣式 / Base label style */
   const baseStyle: CSSProperties = {
     position: 'absolute',
-    // 緊貼角色下方，拉近與角色的距離 / just below the character, close to it
-    top: y + 4,
-    ...horizontal,
-    // fontSize: 10,
-    // color: '#bdc8d7',
-    // whiteSpace: 'nowrap',
-    // textShadow: '0 0 4px #000',
-    // pointerEvents: 'none',
+    top: pos.top,
+    left: pos.left,
+    whiteSpace: 'nowrap',
+    pointerEvents: 'none',
     // 父層 flip-h 已鏡像整個精靈 div；若所屬精靈翻轉，此處再加一次 scaleX(-1)
     // 抵銷鏡像，使文字正向、位置仍貼齊角色
     // Parent flip-h already mirrors the whole sprite div; when the owning sprite is

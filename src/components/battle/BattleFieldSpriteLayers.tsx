@@ -94,7 +94,13 @@ function buildSpriteLayers(
             name={sprite.name}
             x={sprite.x}
             y={sprite.y}
-            width={width}
+            imageSize={
+              sprite.imageWidth != null && sprite.imageHeight != null
+                ? { width: sprite.imageWidth, height: sprite.imageHeight }
+                : undefined
+            }
+            placement={sprite.placement}
+            frameSize={{ width, height }}
             flipped={sprite.flipped}
             style={sprite.labelStyle}
           />

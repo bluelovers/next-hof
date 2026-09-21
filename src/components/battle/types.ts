@@ -4,6 +4,7 @@
  */
 import type { CSSProperties } from 'react';
 import type { ITSRequireAtLeastOne } from 'ts-type';
+import type { ISpriteLabelPlacement } from './labelPosition';
 
 /** 隊伍顏色樣式 / Team color style */
 export type ITeamSide = 'left' | 'right';
@@ -95,12 +96,18 @@ export interface IBattleSprite {
   y: number;
   /** 是否翻轉 / Whether flipped horizontally */
   flipped?: boolean;
+  /** 角色圖像寬度（中心對齊用；由上游 computeBattleSpritePositions 提供，組件內不讀取圖檔） / Image width (for centering; supplied upstream, never read from disk in components) */
+  imageWidth?: number;
+  /** 角色圖像高度（中心對齊用；由上游提供，組件內不讀取圖檔） / Image height (supplied upstream, never read from disk in components) */
+  imageHeight?: number;
   /** 角色名稱 / Character name */
   name?: string;
   /** 精靈圖層自訂樣式（可複寫或追加） / Custom sprite layer style (override or append) */
   style?: CSSProperties;
   /** 名稱標籤自訂樣式（可複寫或追加） / Custom name label style (override or append) */
   labelStyle?: CSSProperties;
+  /** 名稱標籤演算法（角色上方 / 下方；預設 below，由 BattleFieldSpriteLabel 使用） / Name-label placement (above / below; default below, used by BattleFieldSpriteLabel) */
+  placement?: ISpriteLabelPlacement;
 }
 
 /** 戰場背景尺寸 / Battlefield background size */

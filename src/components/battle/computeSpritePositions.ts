@@ -162,6 +162,8 @@ function computeRowPositions(
       x,
       y,
       flipped,
+      imageWidth: char.imageWidth,
+      imageHeight: char.imageHeight,
     };
   });
 }
