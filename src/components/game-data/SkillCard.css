@@ -1,6 +1,9 @@
 /**
  * SkillCard 技能卡片樣式
  * SkillCard styles
+ *
+ * CSS 類別與 PHP 頁面 skill.detail.php 一致。
+ * CSS classes match PHP page skill.detail.php.
  */
 
 /* ==================== 技能卡片容器 / Skill card container ==================== */
@@ -43,18 +46,21 @@
 
 /* ==================== 目標顏色 / Target colors ==================== */
 
+/* 敵方目標（紅色）/ Enemy target (red) — PHP: class="dmg" */
 .tgt-enemy,
 .dmg {
   color: #cc3300;
   text-shadow: 0 0 0.2em #e63d3d;
 }
 
+/* 友方目標（藍色）/ Friend target (blue) — PHP: class="recover" */
 .tgt-friend,
 .recover {
   color: #3366ff;
   text-shadow: 0 0 0.2em #2e7398;
 }
 
+/* 自我目標（綠色）/ Self target (green) — PHP: class="support" */
 .tgt-self,
 .support {
   color: #66cc66;
@@ -63,17 +69,20 @@
 
 /* ==================== 範圍顏色 / Scope colors ==================== */
 
+/* 單體（藍色）/ Individual (blue) — PHP: class="recover" */
 .scp-normal {
   color: #3366ff;
   text-shadow: 0 0 0.2em #2e7398;
 }
 
+/* 多目標（紫色）/ Multi (purple) — PHP: class="spdmg" */
 .scp-multi,
 .spdmg {
   color: #993399;
   text-shadow: 0 0 0.2em #b02fdd;
 }
 
+/* 全體 / 金色（charge/flags）/ All (gold) — PHP: class="charge" */
 .scp-all,
 .charge {
   color: #cc9933;
@@ -111,4 +120,10 @@
 
 .skill-effect {
   color: #bdc8d7;
+}
+
+/* ==================== 粗體 / Bold (learn points) ==================== */
+
+.g-skill .bold {
+  font-weight: bold;
 }
