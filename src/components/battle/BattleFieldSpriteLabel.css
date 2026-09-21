@@ -17,9 +17,13 @@
   /* 視覺預設（可被元件內聯樣式覆寫） / Visual defaults (overridable by inline styles) */
   font-size: 10px;
   color: #bdc8d7;
+
+  text-align: center;
   white-space: nowrap;
   /* text-shadow: 0 0 4px #000; */
   pointer-events: none;
+
+  position: absolute;
 
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
   -webkit-text-stroke: 1px black;
