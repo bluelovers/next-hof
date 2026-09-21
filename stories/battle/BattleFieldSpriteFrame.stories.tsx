@@ -15,7 +15,7 @@ import { BattleFieldSpriteFrame } from '../../src/components/battle/BattleFieldS
 import { sampleSprites, sampleFieldSize } from './sampleData';
 
 const meta: Meta<typeof BattleFieldSpriteFrame> = {
-  title: 'Battle/Atoms/BattleFieldSpriteFrame',
+  title: 'BattleField/BattleFieldSpriteFrame',
   component: BattleFieldSpriteFrame,
   parameters: {
     layout: 'centered',
@@ -40,8 +40,8 @@ const meta: Meta<typeof BattleFieldSpriteFrame> = {
   // Simulated enlarged background stage (640×360); the frame (480×200) positions within by valign
   decorators: [
     makeStageDecorator({
-      width: 640,
-      height: 360,
+      width: 768,
+      height: 320,
       border: '1px dashed #3a4658',
       overflowHidden: true,
     }),

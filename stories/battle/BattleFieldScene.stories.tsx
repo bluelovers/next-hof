@@ -12,7 +12,7 @@ import { BattleFieldScene } from '../../src/components/battle/BattleFieldScene';
 import { sampleSprites, sampleEnemySprites, sampleAllySprites, sampleSpritesMixed, sampleSpritesFlat, createSampleConfig } from './sampleData';
 
 const meta: Meta<typeof BattleFieldScene> = {
-  title: 'Battle/Atoms/BattleFieldScene',
+  title: 'BattleField/BattleFieldScene',
   component: BattleFieldScene,
   parameters: {
     layout: 'centered',

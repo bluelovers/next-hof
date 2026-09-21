@@ -17,7 +17,7 @@ import { BattleFieldScene } from '../../src/components/battle/BattleFieldScene';
 import { sampleSpritesAuto, sampleSprites, createSampleConfig, sampleMagicCircles } from './sampleData';
 
 const meta: Meta<typeof BattleFieldScene> = {
-  title: 'Battle/Atoms/BattleFieldSceneAuto',
+  title: 'BattleField/BattleFieldSceneAuto',
   component: BattleFieldScene,
   parameters: {
     layout: 'centered',

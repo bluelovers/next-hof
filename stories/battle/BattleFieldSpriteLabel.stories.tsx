@@ -26,7 +26,7 @@ import {
 } from './sampleData';
 import {
   BattleFieldSpriteLabel,
-  type BattleFieldSpriteLabelProps,
+  type IBattleFieldSpriteLabelProps,
 } from '../../src/components/battle/BattleFieldSpriteLabel';
 import { BattleFieldSpriteFrame } from '../../src/components/battle/BattleFieldSpriteFrame';
 import type { IBattleSprite } from '../../src/components/battle/types';
@@ -74,7 +74,7 @@ function buildSprite(char: IStoryRosterChar): IBattleSprite {
  * 建立渲染函式：以邏輯計算出的精靈 + 真實 frame 呈現標籤排版
  * Build the render: show the logic-computed sprite inside the real frame.
  */
-const makeRender = (char: IStoryRosterChar) => (args: BattleFieldSpriteLabelProps) => {
+const makeRender = (char: IStoryRosterChar) => (args: IBattleFieldSpriteLabelProps) => {
   const sprite = buildSprite(char);
   sprite.name = char.name;
   sprite.placement = args.placement;
@@ -120,7 +120,7 @@ const goblinRight = {
 };
 
 const meta: Meta<typeof BattleFieldSpriteLabel> = {
-  title: 'Battle/Atoms/BattleFieldSpriteLabel',
+  title: 'BattleField/BattleFieldSpriteLabel',
   component: BattleFieldSpriteLabel,
   parameters: {
     layout: 'centered',

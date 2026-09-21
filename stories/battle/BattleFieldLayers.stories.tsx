@@ -15,7 +15,7 @@ import { BattleFieldLayers } from '../../src/components/battle/BattleFieldLayers
 import { sampleSprites, createSampleConfig, sampleFieldSize } from './sampleData';
 
 const meta: Meta<typeof BattleFieldLayers> = {
-  title: 'Battle/Atoms/BattleFieldLayers',
+  title: 'BattleField/BattleFieldLayers',
   component: BattleFieldLayers,
   parameters: {
     layout: 'centered',
