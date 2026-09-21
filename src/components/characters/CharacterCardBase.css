@@ -43,8 +43,9 @@
   display: inline;
 }
 
-.carpet0 img,
-.carpet1 img {
+/* 所有 carpet_frame 內的圖片統一 reset */
+/* Unified img reset for all carpet_frame contexts */
+.carpet_frame img {
   border: 0;
   vertical-align: baseline;
 }

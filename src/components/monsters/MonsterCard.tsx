@@ -16,6 +16,7 @@ import './MonsterCard.css';
 import type { ILandType } from '#/components/areas/landTypes';
 import { buildLandClass } from '#/components/areas/landTypes';
 import type { IMonsterData } from './MonsterTypes';
+import { CharacterSprite } from '#/components/characters/CharacterSprite';
 
 /** MonsterCard 屬性 / MonsterCard props */
 export interface IMonsterCardProps {
@@ -33,8 +34,9 @@ export const MonsterCard: React.FC<IMonsterCardProps> = ({ monster }) => {
   return (
     <div className="carpet_frame">
       <div className={landClass}>
-        <img
-          src={monster.imageUrl}
+        <CharacterSprite
+          url={monster.imageUrl}
+          variant="avatar"
           alt={monster.name}
         />
       </div>

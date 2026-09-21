@@ -42,9 +42,6 @@
 .carpet_frame .land_nest       { background-image: url('/image/land/land_nest.png'); }
 .carpet_frame .land_noimage    { background-image: url('/image/land/land_noimage.png'); }
 
-/* ==================== 怪物圖片 / Monster image ==================== */
-
-.carpet_frame .land img {
-  border: 0;
-  vertical-align: baseline;
-}
+/* ==================== 怪物圖片（CharacterSprite avatar 變體共用） ==================== */
+/* 使用 CharacterSprite 後，avatar 變體已自帶 border:0 + vertical-align:baseline */
+/* With CharacterSprite, avatar variant自带 border:0 + vertical-align:baseline */
