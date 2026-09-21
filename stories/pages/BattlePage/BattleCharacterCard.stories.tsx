@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { makeDarkDecorator } from '../../decorators';
+import { MUTED_TEXT_COLOR, CardDarkDecorator } from '../../decorators';
 import { BattleCharacterCard } from '../../../src/components/characters/BattleCharacterCard';
 
 const IMG = '/image/char';
@@ -29,7 +29,7 @@ const meta: Meta<typeof BattleCharacterCard> = {
   argTypes: {
     onChange: { action: 'changed' },
   },
-  decorators: [makeDarkDecorator({ padding: '30px', minHeight: '200px' })],
+  decorators: [CardDarkDecorator],
 };
 
 export default meta;
@@ -140,7 +140,7 @@ export const CheckCompare: Story = {
             checked: true,
           }}
         />
-        <p style={{ textAlign: 'center', color: '#bdc8d7', marginTop: 4 }}>
+        <p style={{ textAlign: 'center', color: MUTED_TEXT_COLOR, marginTop: 4 }}>
           已勾選（高亮 / Highlighted）
         </p>
       </div>

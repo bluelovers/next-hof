@@ -7,7 +7,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { makeDarkDecorator } from '../decorators';
+import { HomePageDarkDecorator } from '../decorators';
 import { LoginForm } from '../../src/components/auth/LoginForm';
 
 /** LoginForm 元件設定 / LoginForm component settings */
@@ -17,7 +17,7 @@ const meta: Meta<typeof LoginForm> = {
   parameters: {
     // Storybook 裝飾器配置 / Storybook decorators configuration
     decorators: [
-      makeDarkDecorator({ className: 'home-page', color: '#e0e0e0' }),
+      HomePageDarkDecorator,
     ],
   },
   argTypes: {

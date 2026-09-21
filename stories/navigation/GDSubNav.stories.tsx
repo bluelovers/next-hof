@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { makeDarkDecorator, makeCenteredDecorator } from '../decorators';
+import { makeCenteredDecorator, CENTERED_MAX_WIDTH, GDSubNavDarkDecorator } from '../decorators';
 import { GDSubNav } from '../../src/components/navigation/GDSubNav';
 
 /** 背景裝飾器 — 模擬遊戲深色背景 / Dark game background decorator */
@@ -23,15 +23,7 @@ const meta: Meta<typeof GDSubNav> = {
     },
   },
   tags: ['autodocs'],
-  decorators: [
-    makeDarkDecorator({
-      padding: '20px',
-      minHeight: '100px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }),
-  ],
+  decorators: [GDSubNavDarkDecorator],
 };
 
 export default meta;
@@ -50,7 +42,7 @@ export const Default: Story = {
       },
     },
   },
-  decorators: [makeCenteredDecorator(800)],
+  decorators: [makeCenteredDecorator({ maxWidth: CENTERED_MAX_WIDTH })],
 };
 
 /** 自訂導航連結 / Custom navigation links */
@@ -71,7 +63,7 @@ export const CustomLinks: Story = {
       },
     },
   },
-  decorators: [makeCenteredDecorator(800)],
+  decorators: [makeCenteredDecorator({ maxWidth: CENTERED_MAX_WIDTH })],
 };
 
 /** 最少連結 / Minimal links */
@@ -90,7 +82,7 @@ export const MinimalLinks: Story = {
       },
     },
   },
-  decorators: [makeCenteredDecorator(600)],
+  decorators: [makeCenteredDecorator({ maxWidth: 600 })],
 };
 
 /** 長標籤連結 / Long label links */
@@ -111,5 +103,5 @@ export const LongLabels: Story = {
       },
     },
   },
-  decorators: [makeCenteredDecorator(900)],
+  decorators: [makeCenteredDecorator({ maxWidth: 900 })],
 };

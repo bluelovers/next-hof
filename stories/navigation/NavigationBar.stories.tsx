@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { makeDarkDecorator } from '../decorators';
+import { FlushDarkDecorator } from '../decorators';
 import { NavigationBar } from '../../src/components/navigation/NavigationBar';
 
 /** 背景裝飾器 — 模擬遊戲導航背景 / Navigation background decorator */
@@ -23,7 +23,7 @@ const meta: Meta<typeof NavigationBar> = {
     },
   },
   tags: ['autodocs'],
-  decorators: [makeDarkDecorator({ padding: 0 })],
+  decorators: [FlushDarkDecorator],
 };
 
 export default meta;

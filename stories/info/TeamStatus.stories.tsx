@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { makeDarkDecorator } from '../decorators';
+import { FlushDarkDecorator } from '../decorators';
 import { TeamStatus } from '../../src/components/info/TeamStatus';
 
 /** 背景裝飾器 / Background decorator */
@@ -23,7 +23,7 @@ const meta: Meta<typeof TeamStatus> = {
     },
   },
   tags: ['autodocs'],
-  decorators: [makeDarkDecorator({ padding: 0 })],
+  decorators: [FlushDarkDecorator],
 };
 
 export default meta;

@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { makeDarkDecorator } from '../decorators';
+import { BattleResultDarkDecorator } from '../decorators';
 import { BattleResult } from '../../src/components/battle/BattleResult';
 
 const meta: Meta<typeof BattleResult> = {
@@ -18,9 +18,7 @@ const meta: Meta<typeof BattleResult> = {
     docs: { description: { component: '戰鬥結果：勝利方宣告與雙方最終統計。\nBattle result: winner announcement and final statistics.' } },
   },
   tags: ['autodocs'],
-  decorators: [
-    makeDarkDecorator({ table: true, borderRadius: '4px', width: '600px', tableStyle: { width: '100%' } }),
-  ],
+  decorators: [BattleResultDarkDecorator],
 };
 
 export default meta;

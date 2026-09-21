@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { makeDarkDecorator } from '../../decorators';
+import { CardDarkDecorator } from '../../decorators';
 import { MonsterCard } from '../../../src/components/monsters/MonsterCard';
 
 const IMG = '/image/char';
@@ -26,7 +26,7 @@ const meta: Meta<typeof MonsterCard> = {
     },
   },
   tags: ['autodocs'],
-  decorators: [makeDarkDecorator({ padding: '30px', minHeight: '200px' })],
+  decorators: [CardDarkDecorator],
 };
 
 export default meta;

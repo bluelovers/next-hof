@@ -9,6 +9,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { BattleDisplay } from '#/components/pages/BattleDisplay';
 import type { IBattleDisplayData, IBattleAction } from '#/components/battle/types';
+import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
 
 const meta: Meta<typeof BattleDisplay> = {
   title: 'Pages/BattlePage/BattleDisplay',
@@ -274,8 +275,8 @@ function createBattleData(overrides?: Partial<IBattleDisplayData>): IBattleDispl
     battlefield: {
       backgroundImageUrl: '/image/land/bg_grass.png',
       backgroundType: 'grass',
-      width: 480,
-      height: 200,
+      width: SPRITE_LAYOUT_WIDTH,
+      height: SPRITE_LAYOUT_HEIGHT,
     },
     sprites: battleSprites,
     actions: battleActions,

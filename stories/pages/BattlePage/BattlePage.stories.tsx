@@ -7,7 +7,7 @@
  */
 import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { makeDarkDecorator } from '../../decorators';
+import { BattlePageCharDarkDecorator } from '../../decorators';
 import { BattlePage } from '../../../src/components/pages/BattlePage';
 import type { IBattleCharacterData } from '../../../src/components/characters/CharacterTypes';
 import type { IMonsterData } from '../../../src/components/monsters/MonsterTypes';
@@ -28,14 +28,7 @@ const meta: Meta<typeof BattlePage> = {
     },
   },
   tags: ['autodocs'],
-  decorators: [
-    makeDarkDecorator({
-      padding: '20px',
-      minHeight: '400px',
-      fontSize: '12px',
-      color: '#bdc8d7',
-    }),
-  ],
+  decorators: [BattlePageCharDarkDecorator],
 };
 
 export default meta;

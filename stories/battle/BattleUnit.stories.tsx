@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { makeDarkDecorator } from '../decorators';
+import { BattleUnitDarkDecorator } from '../decorators';
 import { BattleUnit } from '../../src/components/battle/BattleUnit';
 import type { IBattleUnit } from '../../src/components/battle/types';
 
@@ -19,9 +19,7 @@ const meta: Meta<typeof BattleUnit> = {
     docs: { description: { component: '單一戰鬥單位的 HP/SP 狀態條。\nIndividual battle unit HP/SP status bars.' } },
   },
   tags: ['autodocs'],
-  decorators: [
-    makeDarkDecorator({ padding: '20px', borderRadius: '4px', width: '300px' }),
-  ],
+  decorators: [BattleUnitDarkDecorator],
 };
 
 export default meta;

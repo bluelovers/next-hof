@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { makeDarkDecorator } from '../../decorators';
+import { HuntAreaDarkDecorator } from '../../decorators';
 import { HuntPage } from '../../../src/components/pages/HuntPage';
 
 /** 背景裝飾器 / Dark game background decorator */
@@ -24,14 +24,7 @@ const meta: Meta<typeof HuntPage> = {
     },
   },
   tags: ['autodocs'],
-  decorators: [
-    makeDarkDecorator({
-      padding: '20px',
-      minHeight: '200px',
-      fontSize: '12px',
-      color: '#bdc8d7',
-    }),
-  ],
+  decorators: [HuntAreaDarkDecorator],
 };
 
 export default meta;

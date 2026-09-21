@@ -5,21 +5,14 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { makeDarkDecorator } from '../../decorators';
+import { HuntSubNavDarkDecorator } from '../../decorators';
 import { HuntSubNav } from '../../../src/components/navigation/HuntSubNav';
 
 /** Dark game background decorator */
 const meta: Meta<typeof HuntSubNav> = {
   title: 'Pages/HuntPage/HuntSubNav',
   component: HuntSubNav,
-  decorators: [
-    makeDarkDecorator({
-      padding: '20px',
-      minHeight: '100px',
-      fontSize: '12px',
-      color: '#bdc8d7',
-    }),
-  ],
+  decorators: [HuntSubNavDarkDecorator],
   tags: ['autodocs'],
 };
 

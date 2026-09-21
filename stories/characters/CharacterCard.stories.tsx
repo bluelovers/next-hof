@@ -9,7 +9,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { makeDarkDecorator } from '../decorators';
+import { MUTED_TEXT_COLOR, CardDarkDecorator } from '../decorators';
 import { CharacterCard } from '../../src/components/characters/CharacterCard';
 
 const IMG = '/image/char';
@@ -30,7 +30,7 @@ const meta: Meta<typeof CharacterCard> = {
   argTypes: {
     onSelect: { action: 'selected' },
   },
-  decorators: [makeDarkDecorator({ padding: '30px', minHeight: '200px' })],
+  decorators: [CardDarkDecorator],
 };
 
 export default meta;
@@ -183,7 +183,7 @@ export const SelectionCompare: Story = {
             selected: true,
           }}
         />
-        <p style={{ textAlign: 'center', color: '#bdc8d7', marginTop: 4 }}>
+        <p style={{ textAlign: 'center', color: MUTED_TEXT_COLOR, marginTop: 4 }}>
           選取中（高亮 / Highlighted）
         </p>
       </div>

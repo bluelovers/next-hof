@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { makeDarkDecorator, makeScaleDecorator } from '../decorators';
+import { makeScaleDecorator, CharacterSpriteDisplayDarkDecorator } from '../decorators';
 import { CharacterSpriteDisplay } from '../../src/components/game-data/CharacterSpriteDisplay';
 
 /** 圖像基礎路徑 / Image base path */
@@ -26,15 +26,7 @@ const meta: Meta<typeof CharacterSpriteDisplay> = {
     },
   },
   tags: ['autodocs'],
-  decorators: [
-    makeDarkDecorator({
-      padding: '30px',
-      minHeight: '300px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }),
-  ],
+  decorators: [CharacterSpriteDisplayDarkDecorator],
 };
 
 export default meta;
@@ -168,7 +160,7 @@ export const LargeSprites: Story = {
   args: {
     spriteUrls: [`${IMG}/mon_079.png`, `${IMG}/mon_080r.png`, `${IMG}/mon_199r.png`, `${IMG}/mon_234r.png`],
   },
-  decorators: [makeScaleDecorator(1.5)],
+  decorators: [makeScaleDecorator({ scale: 1.5 })],
   parameters: {
     docs: {
       description: {
@@ -184,7 +176,7 @@ export const SmallSprites: Story = {
   args: {
     spriteUrls: [`${IMG}/mon_079.png`, `${IMG}/mon_080r.png`],
   },
-  decorators: [makeScaleDecorator(0.8)],
+  decorators: [makeScaleDecorator({ scale: 0.8 })],
   parameters: {
     docs: {
       description: {

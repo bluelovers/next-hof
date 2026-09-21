@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { makeDarkDecorator } from '../decorators';
+import { BattleTeamInfoDarkDecorator } from '../decorators';
 import { BattleTeamInfo } from '../../src/components/battle/BattleTeamInfo';
 
 const meta: Meta<typeof BattleTeamInfo> = {
@@ -18,9 +18,7 @@ const meta: Meta<typeof BattleTeamInfo> = {
     docs: { description: { component: '隊伍標頭資訊：隊伍名稱、等級總和、平均等級、總 HP。\nTeam header info: name, total level, average level, total HP.' } },
   },
   tags: ['autodocs'],
-  decorators: [
-    makeDarkDecorator({ table: true, tableStyle: { width: '400px' } }),
-  ],
+  decorators: [BattleTeamInfoDarkDecorator],
 };
 
 export default meta;

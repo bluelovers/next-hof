@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { makeDarkDecorator } from '../decorators';
+import { JobDetailTableDarkDecorator } from '../decorators';
 import { JobDetailTable } from '../../src/components/game-data/JobDetailTable';
 import type { IJobData } from '../../src/components/game-data/GameDataTypes';
 
@@ -24,15 +24,7 @@ const meta: Meta<typeof JobDetailTable> = {
     },
   },
   tags: ['autodocs'],
-  decorators: [
-    makeDarkDecorator({
-      padding: '30px',
-      minHeight: '500px',
-      display: 'flex',
-      alignItems: 'flex-start',
-      justifyContent: 'center',
-    }),
-  ],
+  decorators: [JobDetailTableDarkDecorator],
 };
 
 export default meta;

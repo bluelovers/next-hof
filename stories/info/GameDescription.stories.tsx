@@ -7,7 +7,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { makeDarkDecorator } from '../decorators';
+import { GameDescriptionDarkDecorator } from '../decorators';
 import { GameDescription } from '../../src/components/info/GameDescription';
 
 /** GameDescription 元件設定 / GameDescription component settings */
@@ -16,14 +16,7 @@ const meta: Meta<typeof GameDescription> = {
   component: GameDescription,
   parameters: {
     // Storybook 裝飾器配置 / Storybook decorators configuration
-    decorators: [
-      makeDarkDecorator({
-        className: 'home-page',
-        color: '#e0e0e0',
-        fontFamily: 'Arial, sans-serif',
-        width: '400px',
-      }),
-    ],
+    decorators: [GameDescriptionDarkDecorator],
   },
 };
 

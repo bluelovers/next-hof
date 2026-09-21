@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { makeDarkDecorator } from '../decorators';
+import { CharacterListDarkDecorator } from '../decorators';
 import { CharacterList } from '../../src/components/characters/CharacterList';
 import type { ICharacterData } from '../../src/components/characters/CharacterTypes';
 
@@ -29,7 +29,7 @@ const meta: Meta<typeof CharacterList> = {
   argTypes: {
     onSelect: { action: 'selected' },
   },
-  decorators: [makeDarkDecorator({ padding: '20px', minHeight: '300px' })],
+  decorators: [CharacterListDarkDecorator],
 };
 
 export default meta;
