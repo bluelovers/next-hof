@@ -24,9 +24,9 @@ const meta: Meta<typeof SkillCard> = {
   title: 'GameData/SkillCard',
   component: SkillCard,
   parameters: {
-    // Storybook 裝飾器配置 / Storybook decorators configuration
-    decorators: [SkillCardDarkDecorator],
+    layout: 'centered',
   },
+  decorators: [SkillCardDarkDecorator],
 };
 
 export default meta;
