@@ -6,7 +6,7 @@
  * Displays winner announcement and final stats for both teams
  */
 import React from 'react';
-import type { IBattleResult } from './types';
+import type { IBattleResult, ITeamFinalStats } from './types';
 import './BattleResult.css';
 
 /** 戰鬥結果屬性 / Battle result props */
@@ -18,6 +18,37 @@ export interface IBattleResultProps {
   /** 右側隊伍名稱 / Right team name */
   rightTeamName: string;
 }
+
+/**
+ * 渲染隊伍統計數據（單一事實來源）
+ * Render team final stats (single source of truth)
+ *
+ * 提取自 leftTeam / rightTeam 重複渲染邏輯
+ * Extracted from duplicated leftTeam / rightTeam rendering logic
+ */
+const TeamStats: React.FC<{ stats: ITeamFinalStats }> = ({ stats }) => (
+  <td className="result-stats">
+    <div className="stat-row">
+      HP remain : {stats.hpRemain}/{stats.totalUnits > 0 ? stats.hpRemain : 0}
+    </div>
+    <div className="stat-row">
+      Alive : {stats.alive}/{stats.totalUnits}
+    </div>
+    <div className="stat-row">
+      TotalDamage : {stats.totalDamage ?? 0}
+    </div>
+    {stats.totalExp !== undefined && (
+      <div className="stat-row">
+        TotalExp : {stats.totalExp}
+      </div>
+    )}
+    {stats.funds !== undefined && (
+      <div className="stat-row">
+        Funds : $&nbsp;{stats.funds}
+      </div>
+    )}
+  </td>
+);
 
 /**
  * 戰鬥結果組件
@@ -50,48 +81,8 @@ export const BattleResult: React.FC<IBattleResultProps> = ({
         </td>
       </tr>
       <tr>
-        <td className="result-stats">
-          <div className="stat-row">
-            HP remain : {leftTeam.hpRemain}/{leftTeam.totalUnits > 0 ? leftTeam.hpRemain : 0}
-          </div>
-          <div className="stat-row">
-            Alive : {leftTeam.alive}/{leftTeam.totalUnits}
-          </div>
-          <div className="stat-row">
-            TotalDamage : {leftTeam.totalDamage ?? 0}
-          </div>
-          {leftTeam.totalExp !== undefined && (
-            <div className="stat-row">
-              TotalExp : {leftTeam.totalExp}
-            </div>
-          )}
-          {leftTeam.funds !== undefined && (
-            <div className="stat-row">
-              Funds : $&nbsp;{leftTeam.funds}
-            </div>
-          )}
-        </td>
-        <td className="result-stats">
-          <div className="stat-row">
-            HP remain : {rightTeam.hpRemain}/{rightTeam.totalUnits > 0 ? rightTeam.hpRemain : 0}
-          </div>
-          <div className="stat-row">
-            Alive : {rightTeam.alive}/{rightTeam.totalUnits}
-          </div>
-          <div className="stat-row">
-            TotalDamage : {rightTeam.totalDamage ?? 0}
-          </div>
-          {rightTeam.totalExp !== undefined && (
-            <div className="stat-row">
-              TotalExp : {rightTeam.totalExp}
-            </div>
-          )}
-          {rightTeam.funds !== undefined && (
-            <div className="stat-row">
-              Funds : $&nbsp;{rightTeam.funds}
-            </div>
-          )}
-        </td>
+        <TeamStats stats={leftTeam} />
+        <TeamStats stats={rightTeam} />
       </tr>
     </>
   );

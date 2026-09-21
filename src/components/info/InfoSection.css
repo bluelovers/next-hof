@@ -18,8 +18,8 @@
 .info-section-wrapper h4 {
   padding-left: 5px;
   margin: 10px 0px;
-  border-left: 15px solid #cad3df;
-  border-bottom: 1px solid #cad3df;
+  border-left: 15px solid var(--color-border-heading);
+  border-bottom: 1px solid var(--color-border-heading);
 }
 
 /* ==================== 資訊文字 / Info text ==================== */

@@ -8,6 +8,8 @@
 import React from 'react';
 import './GameLayout.css';
 import type { INavLink } from '#/components/navigation/NavTypes';
+import { DEFAULT_FOOTER_LINKS, COPYRIGHT_TEXT } from '#/components/navigation/NavTypes';
+import { NavList } from '#/components/navigation/NavList';
 import { buildAppUrl } from '#/components/config/AppConfig';
 
 /** GameLayout 屬性 / GameLayout props */
@@ -33,15 +35,6 @@ const DEFAULT_NAV_LINKS: INavLink[] = [
   { label: '戦闘ログ', href: buildAppUrl('/log') },
 ];
 
-/** 預設頁尾連結 / Default footer links */
-const DEFAULT_FOOTER_LINKS: INavLink[] = [
-  { label: 'UpDate', href: buildAppUrl('/log/update') },
-  { label: 'Manual', href: buildAppUrl('/manual') },
-  { label: 'Tutorial', href: buildAppUrl('/manual/tutorial') },
-  { label: 'GameData', href: buildAppUrl('/gamedata') },
-  { label: 'Top', href: '#top' },
-];
-
 /**
  * GameLayout 共用佈局組件
  * GameLayout shared layout component
@@ -51,7 +44,7 @@ export const GameLayout: React.FC<IGameLayoutProps> = ({
   navLinks = DEFAULT_NAV_LINKS,
   subtitle = 'Welcome to [ Hall of Rumor 噂のホール ]',
   footerLinks = DEFAULT_FOOTER_LINKS,
-  copyright = 'Copy Right Tekito 2007-2008. Fork (c) 2026 bluelovers',
+  copyright = COPYRIGHT_TEXT,
 }) => {
   return (
     <div className="game-layout">
@@ -67,17 +60,11 @@ export const GameLayout: React.FC<IGameLayoutProps> = ({
 
       {/* 導航欄 / Navigation */}
       <div className="game-nav">
-        {navLinks.map((link, i) => (
-          <React.Fragment key={i}>
-            {i > 0 && <span className="nav-divide" />}
-            <a
-              href={link.href}
-              className={link.active ? 'nav-link-active' : undefined}
-            >
-              {link.label}
-            </a>
-          </React.Fragment>
-        ))}
+        <NavList
+          links={navLinks}
+          separator={<span className="nav-divide" />}
+          activeClassName="nav-link-active"
+        />
       </div>
 
       {/* 副標題 / Subtitle */}
@@ -88,12 +75,10 @@ export const GameLayout: React.FC<IGameLayoutProps> = ({
 
       {/* 頁尾 / Footer */}
       <div className="game-footer">
-        {footerLinks.map((link, i) => (
-          <React.Fragment key={i}>
-            {i > 0 && ' - '}
-            <a href={link.href}>{link.label}</a>
-          </React.Fragment>
-        ))}
+        <NavList
+          links={footerLinks}
+          separator={' - '}
+        />
         <br />
         {copyright}
       </div>

@@ -17,24 +17,8 @@
   font-size: 13px;
 }
 
-/* Sub-navigation */
-.hunt-page .hunt-subnav {
-  margin: 5px 20px;
-}
-.hunt-page .hunt-subnav-link {
-  text-decoration: none;
-  color: var(--color-text-secondary);
-  font-weight: bold;
-  font-size: 12px;
-}
-.hunt-page .hunt-subnav-link:hover {
-  text-decoration: underline;
-  color: var(--color-text-hover);
-}
-.hunt-page .subnav-separator {
-  color: var(--color-text-primary);
-  font-size: 12px;
-}
+/* Sub-navigation — 樣式已移至 HuntSubNav.css（元件 CSS 獨立性） */
+/* Sub-navigation — styles moved to HuntSubNav.css (component CSS independence) */
 
 /* Area list container */
 .hunt-page .hunt-area-list {

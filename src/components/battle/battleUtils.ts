@@ -145,3 +145,37 @@ export function getValueChangeClass(type?: IActionType): string {
 export function getEnterBattlefieldText(level?: number): string {
   return level != null ? `Lv.${level} enter the Battlefield.` : 'enter the Battlefield.';
 }
+
+/**
+ * 計算隊伍總等級（單一事實來源）
+ * Calculate total team level (single source of truth)
+ *
+ * 從 BattleTeamInfo.tsx 提取，供多處共用。
+ * Extracted from BattleTeamInfo.tsx for shared use.
+ *
+ * @param units - 單位列表 / Unit list
+ * @returns 總等級 / Total level
+ */
+export function calcTotalLevel(units: { level: number }[]): number {
+  return units.reduce((sum, u) => sum + u.level, 0);
+}
+
+/**
+ * 計算隊伍總 HP（單一事實來源）
+ * Calculate total team HP (single source of truth)
+ *
+ * 從 BattleTeamInfo.tsx 提取，供多處共用。
+ * Extracted from BattleTeamInfo.tsx for shared use.
+ *
+ * @param units - 單位列表 / Unit list
+ * @returns 當前 HP 總和與最大 HP 總和 / Current and max HP totals
+ */
+export function calcTotalHp(units: { hp: number; maxHp: number }[]): { current: number; max: number } {
+  return units.reduce(
+    (acc, u) => ({
+      current: acc.current + u.hp,
+      max: acc.max + u.maxHp,
+    }),
+    { current: 0, max: 0 }
+  );
+}

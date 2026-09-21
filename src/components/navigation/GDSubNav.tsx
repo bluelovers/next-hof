@@ -8,6 +8,7 @@
 import React from 'react';
 import './GDSubNav.css';
 import type { INavLink } from './NavTypes';
+import { NavList } from './NavList';
 import { buildAppUrl } from '#/components/config/AppConfig';
 
 /** 預設子頁面連結 / Default sub-page links */
@@ -34,14 +35,12 @@ export const GDSubNav: React.FC<IGDSubNavProps> = ({
   return (
     <div className="gd-subnav">
       <h4>GameData</h4>
-      <div style={{ margin: '0 20px' }}>
+      <div className="gd-subnav-links">
         {'| '}
-        {subLinks.map((link, i) => (
-          <React.Fragment key={i}>
-            {i > 0 && <span className="subnav-divide"> | </span>}
-            <a href={link.href}>{link.label}</a>
-          </React.Fragment>
-        ))}
+        <NavList
+          links={subLinks}
+          separator={<span className="subnav-divide"> | </span>}
+        />
         {' |'}
       </div>
     </div>

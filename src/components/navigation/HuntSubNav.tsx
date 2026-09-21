@@ -7,7 +7,9 @@
  */
 import React from 'react';
 import type { INavLink } from './NavTypes';
+import { NavList } from './NavList';
 import { buildAppUrl } from '#/components/config/AppConfig';
+import './HuntSubNav.css';
 
 /** HuntSubNav 屬性 / HuntSubNav props */
 export interface IHuntSubNavProps {
@@ -30,17 +32,11 @@ export const HuntSubNav: React.FC<IHuntSubNavProps> = ({
 }) => {
   return (
     <div className="hunt-subnav">
-      {items.map((item, i) => (
-        <React.Fragment key={i}>
-          {i > 0 && <span className="subnav-separator"> / </span>}
-          <a
-            className="hunt-subnav-link"
-            href={item.href}
-          >
-            {item.label}
-          </a>
-        </React.Fragment>
-      ))}
+      <NavList
+        links={items}
+        separator={<span className="subnav-separator"> / </span>}
+        linkClassName="hunt-subnav-link"
+      />
     </div>
   );
 };

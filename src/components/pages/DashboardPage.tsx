@@ -12,7 +12,8 @@ import './DashboardPage.css';
 import '#/components/shared/SharedBase.css';
 import { NavigationBar } from '#/components/navigation/NavigationBar';
 import type { INavLink } from '#/components/navigation/NavTypes';
-import { buildAppUrl } from '#/components/config/AppConfig';
+import { DEFAULT_FOOTER_LINKS, COPYRIGHT_TEXT } from '#/components/navigation/NavTypes';
+import { NavList } from '#/components/navigation/NavList';
 import { TeamStatus } from '#/components/info/TeamStatus';
 import type { ITeamStatusProps } from '#/components/info/TeamStatus';
 import { CharacterList } from '#/components/characters/CharacterList';
@@ -75,15 +76,6 @@ const DEFAULT_CHARACTERS: ICharacterData[] = [
   },
 ];
 
-/** 預設頁尾連結 / Default footer links */
-const DEFAULT_FOOTER_LINKS: INavLink[] = [
-  { label: 'UpDate', href: buildAppUrl('/log/update') },
-  { label: 'Manual', href: buildAppUrl('/manual') },
-  { label: 'Tutorial', href: buildAppUrl('/manual/tutorial') },
-  { label: 'GameData', href: buildAppUrl('/gamedata') },
-  { label: 'Top', href: '#top' },
-];
-
 /**
  * DashboardPage 登入後首頁元件
  * DashboardPage component
@@ -94,7 +86,7 @@ export const DashboardPage: React.FC<IDashboardPageProps> = ({
   characters = DEFAULT_CHARACTERS,
   onCharacterSelect,
   footerLinks = DEFAULT_FOOTER_LINKS,
-  copyright = 'Copy Right Tekito 2007-2008. Fork (c) 2026 bluelovers',
+  copyright = COPYRIGHT_TEXT,
 }) => {
   const [selectedChar, setSelectedChar] = useState<string>(
     characters.find((c) => c.selected)?.id ?? '',
@@ -130,14 +122,11 @@ export const DashboardPage: React.FC<IDashboardPageProps> = ({
 
       {/* 頁尾 / Footer */}
       <div className="dashboard-footer">
-        {footerLinks.map((link, i) => (
-          <React.Fragment key={i}>
-            {i > 0 && ' - '}
-            <a href={link.href} className="footer-link">
-              {link.label}
-            </a>
-          </React.Fragment>
-        ))}
+        <NavList
+          links={footerLinks}
+          separator={' - '}
+          linkClassName="footer-link"
+        />
         <br />
         <span className="footer-copyright">{copyright}</span>
       </div>

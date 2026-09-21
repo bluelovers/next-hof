@@ -1,0 +1,36 @@
+/**
+ * HuntSubNav 狩獵子導航樣式
+ * HuntSubNav styles
+ *
+ * 之前缺失此 CSS 檔案，導致元件樣式依賴父頁面 CSS 洩漏。
+ * 此檔案補建，確保元件 CSS 獨立性（AGENTS.md 規範）。
+ * Previously missing, causing style leakage from parent pages.
+ * This file restores component CSS independence per AGENTS.md.
+ */
+
+/* ==================== 子導航容器 / Sub-navigation container ==================== */
+
+.hunt-subnav {
+  margin: 5px 20px;
+}
+
+/* ==================== 分隔符 / Separator ==================== */
+
+.subnav-separator {
+  color: var(--color-text-primary);
+  font-size: 12px;
+}
+
+/* ==================== 導航連結 / Navigation links ==================== */
+
+.hunt-subnav-link {
+  text-decoration: none;
+  color: var(--color-text-secondary);
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.hunt-subnav-link:hover {
+  text-decoration: underline;
+  color: var(--color-text-hover);
+}

@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import type { IBattleUnit, ITeamSideClass } from './types';
+import { calcTotalLevel, calcTotalHp } from './battleUtils';
 import './BattleTeamInfo.css';
 import '#/components/shared/SharedBase.css';
 
@@ -18,22 +19,6 @@ export interface IBattleTeamInfoProps {
   units: IBattleUnit[];
   /** 隊伍側邊類別 / Team side CSS class */
   sideClass: ITeamSideClass;
-}
-
-/** 計算總等級 / Calculate total level */
-function calcTotalLevel(units: IBattleUnit[]): number {
-  return units.reduce((sum, u) => sum + u.level, 0);
-}
-
-/** 計算總 HP（當前）/ Calculate total current HP */
-function calcTotalHp(units: IBattleUnit[]): { current: number; max: number } {
-  return units.reduce(
-    (acc, u) => ({
-      current: acc.current + u.hp,
-      max: acc.max + u.maxHp,
-    }),
-    { current: 0, max: 0 }
-  );
 }
 
 /**
