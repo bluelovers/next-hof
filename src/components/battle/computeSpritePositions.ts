@@ -11,6 +11,7 @@
  * from the battlefield size and the front/back row distribution of each team.
  */
 import type { IBattleSprite, ITeamSide, IBattleSidePair } from './types';
+import type { ISpriteImageSize } from './spriteImageSizes';
 import { getSpriteImageDir, computeSpriteFlipped, useFlipPositioning } from './spriteFlip';
 
 /** 角色輸入（含圖像尺寸與站位） / Character input (with image size and battle position) */
@@ -21,10 +22,8 @@ export interface IBattlePositionChar {
   name?: string;
   /** 精靈圖片路徑 / Sprite image path */
   imageUrl: string;
-  /** 圖像寬度（getimagesize） / Image width */
-  imageWidth: number;
-  /** 圖像高度（getimagesize） / Image height */
-  imageHeight: number;
+  /** 圖像尺寸（getimagesize） / Image size */
+  imageSize: ISpriteImageSize;
   /**
    * 站位：前衛 / 後衛
    * Position: front / back
@@ -143,8 +142,8 @@ function computeRowPositions(
 
     // 以圖像中心對齊 (x, y) 後，減去半寬高得到 background-position 左上角
     // Center the image on (x, y), then subtract half size for background-position top-left
-    x -= Math.round(char.imageWidth / 2);
-    y -= Math.round(char.imageHeight / 2);
+    x -= Math.round(char.imageSize.width / 2);
+    y -= Math.round(char.imageSize.height / 2);
 
     // 翻轉標記：明確傳入 flip 時沿用舊公式；否則依圖檔目錄 + 隊伍自動計算
     // Flipped flag: explicit flip keeps the legacy formula; otherwise auto-compute
@@ -162,8 +161,7 @@ function computeRowPositions(
       x,
       y,
       flipped,
-      imageWidth: char.imageWidth,
-      imageHeight: char.imageHeight,
+      imageSize: char.imageSize,
     };
   });
 }

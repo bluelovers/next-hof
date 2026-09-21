@@ -155,7 +155,7 @@ const demoRoster: { left: IRosterTeam; right: IRosterTeam } = {
 function toPositionChars(team: IRosterTeam): ITeamBattleChars {
   const map = (c: IRosterChar): IBattlePositionChar => {
     const size = getSpriteImageSize(c.imageUrl);
-    return { ...c, imageWidth: size.width, imageHeight: size.height };
+    return { ...c, imageSize: size };
   };
   return { back: team.back.map(map), front: team.front.map(map) };
 }
@@ -253,7 +253,7 @@ const flatRosterSample: IRosterChar[] = [
 function toBattlePositionChars(roster: IRosterChar[]): IBattlePositionChar[] {
   return roster.map((c): IBattlePositionChar => {
     const size = getSpriteImageSize(c.imageUrl);
-    return { ...c, imageWidth: size.width, imageHeight: size.height };
+    return { ...c, imageSize: size };
   });
 }
 

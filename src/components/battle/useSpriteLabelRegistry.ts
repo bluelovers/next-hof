@@ -26,10 +26,8 @@ export interface ISpriteLabelComputeInput {
   x: number;
   /** 角色圖像左上角 y / Character image top-left y */
   y: number;
-  /** 角色圖像寬度（缺省用 DEFAULT_IMAGE_SIZE） / Character image width (defaults to DEFAULT_IMAGE_SIZE) */
-  imageWidth?: number;
-  /** 角色圖像高度（缺省用 DEFAULT_IMAGE_SIZE） / Character image height (defaults to DEFAULT_IMAGE_SIZE) */
-  imageHeight?: number;
+  /** 角色圖像尺寸（缺省用 DEFAULT_IMAGE_SIZE） / Character image size (defaults to DEFAULT_IMAGE_SIZE) */
+  imageSize?: ISpriteImageSize;
   /** 標籤演算法：角色上方 / 下方（缺省 below） / Placement (default below) */
   placement?: ISpriteLabelPlacement;
   /** 精靈 id（用於對應 entries） / Sprite id (for matching entries) */
@@ -75,10 +73,7 @@ export function useSpriteLabelRegistry(
     // Compute in order; each label feeds the previously placed rects as `occupied`, avoiding overlap.
     const occupied: IRect[] = [];
     return sprites.map((s, i) => {
-      const imageSize =
-        s.imageWidth != null && s.imageHeight != null
-          ? { width: s.imageWidth, height: s.imageHeight }
-          : DEFAULT_IMAGE_SIZE;
+      const imageSize = s.imageSize ?? DEFAULT_IMAGE_SIZE;
       const pos = computeSpriteLabelPosition({
         x: s.x,
         y: s.y,

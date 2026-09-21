@@ -63,8 +63,7 @@ function buildSprite(char: IStoryRosterChar): IBattleSprite {
   const size = getSpriteImageSize(char.imageUrl);
   const positioned: IBattlePositionChar = {
     ...char,
-    imageWidth: size.width,
-    imageHeight: size.height,
+    imageSize: size,
   };
   const teams = groupBattleChars([positioned]);
   return computeBattleSpritePositions(teams, fieldSize)[0];

@@ -5,6 +5,7 @@
 import type { CSSProperties } from 'react';
 import type { ITSRequireAtLeastOne } from 'ts-type';
 import type { ISpriteLabelPlacement } from './labelPosition';
+import type { ISpriteImageSize } from './spriteImageSizes';
 
 /** 隊伍顏色樣式 / Team color style */
 export type ITeamSide = 'left' | 'right';
@@ -96,10 +97,8 @@ export interface IBattleSprite {
   y: number;
   /** 是否翻轉 / Whether flipped horizontally */
   flipped?: boolean;
-  /** 角色圖像寬度（中心對齊用；由上游 computeBattleSpritePositions 提供，組件內不讀取圖檔） / Image width (for centering; supplied upstream, never read from disk in components) */
-  imageWidth?: number;
-  /** 角色圖像高度（中心對齊用；由上游提供，組件內不讀取圖檔） / Image height (supplied upstream, never read from disk in components) */
-  imageHeight?: number;
+  /** 角色圖像尺寸（中心對齊用；由上游 computeBattleSpritePositions 提供，組件內不讀取圖檔） / Image size (for centering; supplied upstream, never read from disk in components) */
+  imageSize?: ISpriteImageSize;
   /** 角色名稱 / Character name */
   name?: string;
   /** 精靈圖層自訂樣式（可複寫或追加） / Custom sprite layer style (override or append) */
@@ -111,12 +110,7 @@ export interface IBattleSprite {
 }
 
 /** 戰場背景尺寸 / Battlefield background size */
-export type IBattleFieldBgSize = ITSRequireAtLeastOne<{
-  /** 寬度 / Width */
-  width?: number;
-  /** 高度 / Height */
-  height?: number;
-}>;
+export type IBattleFieldBgSize = ITSRequireAtLeastOne<Partial<ISpriteImageSize>>;
 
 /** 戰場精靈框垂直對齊方式 / Sprite frame vertical alignment */
 export type IBattleFieldVAlign = 'top' | 'middle' | 'bottom';

@@ -100,11 +100,7 @@ function buildSpriteLayers(
             name={sprite.name}
             x={sprite.x}
             y={sprite.y}
-            imageSize={
-              sprite.imageWidth != null && sprite.imageHeight != null
-                ? { width: sprite.imageWidth, height: sprite.imageHeight }
-                : undefined
-            }
+            imageSize={sprite.imageSize}
             placement={sprite.placement}
             frameSize={{ width, height }}
             flipped={sprite.flipped}
@@ -139,8 +135,7 @@ export const BattleFieldSpriteLayers: React.FC<IBattleFieldSpriteLayersProps> = 
       sprites.map((s, i) => ({
         x: s.x,
         y: s.y,
-        imageWidth: s.imageWidth,
-        imageHeight: s.imageHeight,
+        imageSize: s.imageSize,
         placement: s.placement,
         id: s.id ?? String(i),
       })),

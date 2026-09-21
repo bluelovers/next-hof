@@ -78,6 +78,9 @@ export interface ISpriteLabelPositionResult {
 export const DEFAULT_LABEL_HEIGHT = 16;
 export const DEFAULT_GAP = 4;
 
+/** 標籤觸底時與 frame 底邊保留的間距（避免完全貼底） / Bottom inset kept when a label touches the frame bottom */
+export const FRAME_BOTTOM_MARGIN = 5;
+
 /** 未提供角色圖像尺寸時的預設值（元件內不讀取圖檔，僅作收斂下限；供 hook 與元件共用） / Fallback image size when missing (no disk read; shared by the hook & component) */
 export const DEFAULT_IMAGE_SIZE: ISpriteImageSize = { width: 56, height: 72 };
 
@@ -131,7 +134,7 @@ export function labelFitsInFrame(
 ): boolean {
   return placement === 'above'
     ? top >= 0
-    : top + labelSize.height <= frameSize.height;
+    : top + labelSize.height <= frameSize.height - FRAME_BOTTOM_MARGIN;
 }
 
 /**
@@ -164,7 +167,9 @@ export function clampLabelToBoundary(
     return { top: top0, height: labelSize.height };
   }
   // below
-  const bandBottom = frameSize.height;
+  // 觸底時與 frame 底邊保留 FRAME_BOTTOM_MARGIN，避免完全貼底
+  // Keep FRAME_BOTTOM_MARGIN from the frame bottom so the label never fully sticks to it.
+  const bandBottom = Math.max(0, frameSize.height - FRAME_BOTTOM_MARGIN);
   if (top0 + labelSize.height > bandBottom) {
     // 低於邊界 → 縮減高度並收斂到 frame 內 / Below boundary → shrink height, clamp inside.
     const height = Math.max(0, bandBottom - top0);
@@ -279,7 +284,10 @@ export function computeSpriteLabelPosition(input: ISpriteLabelPositionInput): IS
   if (occupied && occupied.length > 0) {
     const rect0: IRect = { left, top, width, height };
     if (occupied.some((o) => rectsOverlap(rect0, o))) {
-      const end = placement === 'above' ? 0 : Math.max(0, frameSize.height - height);
+      const end =
+        placement === 'above'
+          ? 0
+          : Math.max(0, frameSize.height - FRAME_BOTTOM_MARGIN - height);
       const step = placement === 'above' ? -1 : 1;
       let found = false;
       for (let t = top; placement === 'above' ? t >= end : t <= end; t += step) {
@@ -292,7 +300,10 @@ export function computeSpriteLabelPosition(input: ISpriteLabelPositionInput): IS
       }
       if (!found) {
         const bandTop = placement === 'above' ? 0 : y + imageSize.height + gap;
-        const bandBottom = placement === 'above' ? Math.max(0, y - gap) : frameSize.height;
+        const bandBottom =
+          placement === 'above'
+            ? Math.max(0, y - gap)
+            : Math.max(0, frameSize.height - FRAME_BOTTOM_MARGIN);
         const gapInfo = largestFreeGap(occupied, bandTop, bandBottom, left, width);
         if (gapInfo.size > 0) {
           height = Math.max(0, Math.min(height, Math.floor(gapInfo.size)));

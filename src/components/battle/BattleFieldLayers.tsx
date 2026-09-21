@@ -20,6 +20,7 @@ import type {
   IBattleFieldBgScale,
 } from './types';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from './types';
+import type { ISpriteImageSize } from './spriteImageSizes';
 import { BattleFieldSpriteFrame } from './BattleFieldSpriteFrame';
 import { BattleFieldMagicCircle } from './BattleFieldMagicCircle';
 
@@ -65,8 +66,7 @@ export interface IBattleFieldLayersProps {
  */
 function resolveBgImageLayout(
   scale: IBattleFieldBgScale,
-  bgWidth: number,
-  bgHeight: number
+  bgSize: ISpriteImageSize
 ): React.CSSProperties {
   const position = 'center bottom';
   switch (scale) {
@@ -79,7 +79,7 @@ function resolveBgImageLayout(
     case 'stretch':
       // 拉伸至背景框的確切尺寸（會變形）/ Stretch to exact box size (may distort)
       return {
-        backgroundSize: `${bgWidth}px ${bgHeight}px`,
+        backgroundSize: `${bgSize.width}px ${bgSize.height}px`,
         backgroundRepeat: 'no-repeat',
         backgroundPosition: position,
       };
@@ -111,20 +111,20 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
   // 背景尺寸防禦：bgSize 任一維度低於角色排版尺寸時，該維度被無視並回退為角色排版尺寸
   // Background size guard: when any bgSize dimension is smaller than the sprite layout
   // size, that dimension is ignored and falls back to the sprite layout size.
-  const bgWidth =
-    bgSize?.width != null && bgSize.width >= width ? bgSize.width : width;
-  const bgHeight =
-    bgSize?.height != null && bgSize.height >= height ? bgSize.height : height;
+  const resolvedBgSize: ISpriteImageSize = {
+    width: bgSize?.width! >= width ? bgSize!.width! : width,
+    height: bgSize?.height! >= height ? bgSize!.height! : height,
+  };
 
   // 背景圖排版：預設自然尺寸 + 水平置中垂直置底，縮放模式由 config.bgScale 控制
   // Background image layout: default natural size + centered/bottom; scale mode from config.bgScale
   const bgScaleMode = config.bgScale ?? 'natural';
-  const bgImageLayout = resolveBgImageLayout(bgScaleMode, bgWidth, bgHeight);
+  const bgImageLayout = resolveBgImageLayout(bgScaleMode, resolvedBgSize);
 
   /** 背景樣式 / Background style */
   const bgStyle: React.CSSProperties = {
-    width: bgWidth,
-    height: bgHeight,
+    width: resolvedBgSize.width,
+    height: resolvedBgSize.height,
     overflow: 'hidden',
     backgroundImage: config.backgroundImageUrl
       ? `url(${config.backgroundImageUrl})`
