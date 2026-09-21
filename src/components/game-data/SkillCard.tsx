@@ -16,20 +16,27 @@ export interface ISkillCardProps {
   skill: ISkillData;
 }
 
-/** 根據目標類型取得 CSS 類別 / Get CSS class based on target type */
+/**
+ * 根據目標類型取得 CSS 類別（與 PHP 頁面 dmg / recover / support 一致）
+ * Get CSS class based on target type (matches PHP dmg / recover / support)
+ */
 function targetClass(target: ISkillTarget): string {
   switch (target) {
-    case 'enemy': return 'tgt-enemy';
-    case 'friend': return 'tgt-friend';
-    case 'self': return 'tgt-self';
+    case 'enemy': return 'dmg';
+    case 'friend': return 'recover';
+    case 'self': return 'support';
   }
 }
 
-/** 根據範圍取得 CSS 類別 / Get CSS class based on scope */
+/**
+ * 根據範圍取得 CSS 類別（與 PHP 頁面 spdmg / charge 一致）
+ * Get CSS class based on scope (matches PHP spdmg / charge)
+ */
 function scopeClass(scope: ISkillScope): string {
   switch (scope) {
-    case 'multi': return 'scp-multi';
-    default: return 'scp-normal';
+    case 'multi': return 'spdmg';
+    case 'all': return 'charge';
+    default: return 'recover';
   }
 }
 

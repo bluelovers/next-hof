@@ -43,17 +43,20 @@
 
 /* ==================== 目標顏色 / Target colors ==================== */
 
-.tgt-enemy {
+.tgt-enemy,
+.dmg {
   color: #cc3300;
   text-shadow: 0 0 0.2em #e63d3d;
 }
 
-.tgt-friend {
+.tgt-friend,
+.recover {
   color: #3366ff;
   text-shadow: 0 0 0.2em #2e7398;
 }
 
-.tgt-self {
+.tgt-self,
+.support {
   color: #66cc66;
   text-shadow: 0 0 0.2em #88ff77;
 }
@@ -65,9 +68,16 @@
   text-shadow: 0 0 0.2em #2e7398;
 }
 
-.scp-multi {
+.scp-multi,
+.spdmg {
   color: #993399;
   text-shadow: 0 0 0.2em #b02fdd;
+}
+
+.scp-all,
+.charge {
+  color: #cc9933;
+  text-shadow: 0 0 0.2em #ddaa44;
 }
 
 /* ==================== SP / Power / Hit rate ==================== */

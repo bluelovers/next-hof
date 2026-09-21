@@ -9,7 +9,8 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { JobDetailTableDarkDecorator } from '../decorators';
 import { JobDetailTable } from '../../src/components/game-data/JobDetailTable';
-import type { IJobData } from '../../src/components/game-data/GameDataTypes';
+import { baseJobs, advancedJobs } from '../fixture/gameDataJobs';
+import { mixedJobs, highSkillJob } from '../fixture/jobDetailTables';
 
 /** 背景裝飾器 — 模擬遊戲深色背景 / Dark game background decorator */
 const meta: Meta<typeof JobDetailTable> = {
@@ -29,131 +30,6 @@ const meta: Meta<typeof JobDetailTable> = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-
-/** ==================== Mock 資料 ==================== */
-
-/** 基礎職業資料 / Base job data */
-const baseJobs: IJobData[] = [
-  {
-    id: 100,
-    name: 'Warrior',
-    parentId: 0,
-    description: '戦士系基本職。',
-    spriteUrls: ['mon_079.png', 'mon_080r.png'],
-    equipment: ['Sword', 'TwoHandSword', 'Shield', 'Armor', 'Cloth', 'Robe', 'Item'],
-    skills: [
-      { name: 'Bash', iconUrl: '', target: 'enemy', scope: 'individual', spCost: 8, powerPct: 160, hits: 1, hitRate: '20:20' },
-      { name: 'DoubleAttack', iconUrl: '', target: 'enemy', scope: 'individual', spCost: 15, powerPct: 90, hits: 2 },
-      { name: 'FirstAid', iconUrl: '', target: 'self', scope: 'individual', spCost: 0, effect: '自己HP回復' },
-    ],
-  },
-  {
-    id: 200,
-    name: 'Sorcerer',
-    parentId: 0,
-    description: '魔術系基本職。',
-    spriteUrls: ['mon_201.png', 'mon_202.png'],
-    equipment: ['Wand', 'Staff', 'Robe', 'Cloth', 'Orb', 'Item'],
-    skills: [
-      { name: 'Fire', iconUrl: '', target: 'enemy', scope: 'individual', spCost: 8, powerPct: 150, hits: 1, hitRate: '20:20' },
-      { name: 'Heal', iconUrl: '', target: 'friend', scope: 'individual', spCost: 10, effect: 'HP回復' },
-    ],
-  },
-  {
-    id: 300,
-    name: 'Priest',
-    parentId: 0,
-    description: '回復系基本職。<br />パーティーの回復を担当する。',
-    spriteUrls: ['mon_203.png', 'mon_204.png'],
-    equipment: ['Wand', 'Mace', 'Robe', 'Cloth', 'Shield', 'Item'],
-    skills: [
-      { name: 'Heal', iconUrl: '', target: 'friend', scope: 'individual', spCost: 8, effect: 'HP回復' },
-      { name: 'Cure', iconUrl: '', target: 'friend', scope: 'individual', spCost: 6, effect: '状態異常回復' },
-      { name: 'HolyLight', iconUrl: '', target: 'enemy', scope: 'individual', spCost: 15, powerPct: 120, hits: 1, effect: '不死系特攻' },
-    ],
-  },
-];
-
-/** 上級職業資料 / Advanced job data */
-const advancedJobs: IJobData[] = [
-  {
-    id: 101,
-    name: 'RoyalGuard',
-    parentId: 100,
-    description: '戦士系上級職。<br />防御も攻撃も一回り強くなる。',
-    spriteUrls: ['mon_199r.png', 'mon_234r.png'],
-    equipment: ['Sword', 'TwoHandSword', 'Shield', 'Armor', 'Cloth', 'Robe', 'Item'],
-    skills: [
-      { name: 'KnockBack', iconUrl: '', target: 'enemy', scope: 'individual', spCost: 60, powerPct: 150, hits: 1, hitRate: '40:20', effect: '後衛化' },
-      { name: 'RagingBlow', iconUrl: '', target: 'enemy', scope: 'multi', spCost: 40, powerPct: 100, hits: 5, hitRate: '40:60' },
-      { name: 'SelfRecovery', iconUrl: '', target: 'self', scope: 'individual', spCost: 15 },
-    ],
-  },
-  {
-    id: 201,
-    name: 'Warlock',
-    parentId: 200,
-    description: '魔術系上級職。<br />攻撃魔術に特化している。',
-    spriteUrls: ['mon_210.png', 'mon_211.png'],
-    equipment: ['Wand', 'Staff', 'Robe', 'Cloth', 'Orb', 'Item'],
-    skills: [
-      { name: 'FireBall', iconUrl: '', target: 'enemy', scope: 'multi', spCost: 25, powerPct: 200, hits: 1, hitRate: '30:30' },
-      { name: 'Meteor', iconUrl: '', target: 'enemy', scope: 'all', spCost: 60, powerPct: 120, hits: 5, hitRate: '20:60' },
-    ],
-  },
-  {
-    id: 301,
-    name: 'Bishop',
-    parentId: 300,
-    description: '回復系上級職。<br />より強力な回復魔術が使える。',
-    spriteUrls: ['mon_205.png', 'mon_206.png'],
-    equipment: ['Wand', 'Mace', 'Robe', 'Cloth', 'Shield', 'Item'],
-    skills: [
-      { name: 'FullHeal', iconUrl: '', target: 'friend', scope: 'individual', spCost: 30, effect: '完全回復' },
-      { name: 'HolyWave', iconUrl: '', target: 'friend', scope: 'all', spCost: 50, effect: '全体回復' },
-    ],
-  },
-];
-
-/** 混合職業資料 / Mixed job data */
-const mixedJobs: IJobData[] = [
-  ...baseJobs,
-  ...advancedJobs,
-  {
-    id: 401,
-    name: 'Ranger',
-    parentId: 400,
-    description: '弓系上級職。<br />野生の知識に長けた弓使い。',
-    spriteUrls: ['mon_216.png', 'mon_216y.png'],
-    equipment: ['Dagger', 'Bow', 'Armor', 'Cloth', 'Item'],
-    skills: [
-      { name: 'ArrowRain', iconUrl: '', target: 'enemy', scope: 'multi', spCost: 35, powerPct: 120, hits: 3, hitRate: '30:50' },
-      { name: 'EagleEye', iconUrl: '', target: 'self', scope: 'individual', spCost: 20, effect: '命中率大幅上昇' },
-    ],
-  },
-];
-
-/** 高技能數量職業 / High skill count job */
-const highSkillJob: IJobData[] = [
-  {
-    id: 999,
-    name: 'MasterOfAll',
-    parentId: 0,
-    description: '萬能職業。<br />すべてのスキルを習得可能。',
-    spriteUrls: ['mon_999.png', 'mon_999r.png'],
-    equipment: ['All'],
-    skills: [
-      { name: 'Fire', iconUrl: '', target: 'enemy', scope: 'individual', spCost: 8, powerPct: 150, hits: 1, hitRate: '20:20' },
-      { name: 'Ice', iconUrl: '', target: 'enemy', scope: 'individual', spCost: 8, powerPct: 140, hits: 1, hitRate: '25:25' },
-      { name: 'Lightning', iconUrl: '', target: 'enemy', scope: 'individual', spCost: 8, powerPct: 160, hits: 1, hitRate: '15:30' },
-      { name: 'Heal', iconUrl: '', target: 'friend', scope: 'individual', spCost: 10, effect: 'HP回復' },
-      { name: 'Cure', iconUrl: '', target: 'friend', scope: 'individual', spCost: 6, effect: '状態異常回復' },
-      { name: 'Revive', iconUrl: '', target: 'friend', scope: 'individual', spCost: 60, effect: '味方一人を復活' },
-      { name: 'Buff', iconUrl: '', target: 'friend', scope: 'all', spCost: 40, effect: '全能力上昇' },
-      { name: 'Debuff', iconUrl: '', target: 'enemy', scope: 'all', spCost: 40, effect: '全能力低下' },
-    ],
-  },
-];
 
 /** ==================== 故事 ==================== */
 

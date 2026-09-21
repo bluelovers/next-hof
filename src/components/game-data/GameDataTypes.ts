@@ -7,7 +7,7 @@
 export type ISkillTarget = 'enemy' | 'friend' | 'self';
 
 /** 技能範圍 / Skill scope */
-export type ISkillScope = 'individual' | 'multi' | 'all';
+export type ISkillScope = 'normal' | 'multi' | 'all';
 
 /** 技能資料 / Skill data */
 export interface ISkillData {
