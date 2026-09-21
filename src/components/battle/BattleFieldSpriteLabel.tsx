@@ -34,7 +34,7 @@ export {
   computeLabelTop,
   labelFitsInFrame,
   clamp,
-  DEFAULT_LABEL_SIZE,
+  DEFAULT_LABEL_HEIGHT,
   DEFAULT_GAP,
 } from './labelPosition';
 export type { ISpriteLabelPlacement, ISpriteLabelPositionInput, ISpriteLabelPositionResult } from './labelPosition';
@@ -105,10 +105,11 @@ export const BattleFieldSpriteLabel: React.FC<IBattleFieldSpriteLabelProps> = ({
   style,
   flipped,
 }) => {
+  const resolvedImageSize = imageSize ?? DEFAULT_IMAGE_SIZE;
   const pos = computeSpriteLabelPosition({
     x,
     y,
-    imageSize: imageSize ?? DEFAULT_IMAGE_SIZE,
+    imageSize: resolvedImageSize,
     placement,
     frameSize: frameSize ?? { width: SPRITE_LAYOUT_WIDTH, height: SPRITE_LAYOUT_HEIGHT },
     labelSize,
@@ -120,6 +121,11 @@ export const BattleFieldSpriteLabel: React.FC<IBattleFieldSpriteLabelProps> = ({
     position: 'absolute',
     top: pos.top,
     left: pos.left,
+    // 標籤最小寬度＝角色圖像寬度，使標籤盒寬度至少涵蓋角色，便於文字置中對齊角色
+    // Label min-width = character image width, so the box spans at least the character (text centers over it).
+    minWidth: resolvedImageSize.width,
+    // 文字水平置中於標籤盒內 / Center the text horizontally within the label box.
+    textAlign: 'center',
     whiteSpace: 'nowrap',
     pointerEvents: 'none',
     // 父層 flip-h 已鏡像整個精靈 div；若所屬精靈翻轉，此處再加一次 scaleX(-1)

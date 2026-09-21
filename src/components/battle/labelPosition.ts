@@ -37,7 +37,7 @@ export interface ISpriteLabelPositionInput {
   placement: ISpriteLabelPlacement;
   /** 顯示範圍（戰場精靈框）尺寸 / Display range (sprite frame) size */
   frameSize: ISpriteImageSize;
-  /** 標籤預估尺寸（邊界收斂用；缺省以 DEFAULT_LABEL_SIZE 估計） / Estimated label size for clamping */
+  /** 標籤預估尺寸（邊界收斂用；缺省寬度＝圖像寬度、高度＝DEFAULT_LABEL_HEIGHT） / Estimated label size for clamping (default width = image width, height = DEFAULT_LABEL_HEIGHT) */
   labelSize?: ISpriteImageSize;
   /** 標籤與角色圖像間距 / Gap between label and character */
   gap?: number;
@@ -53,8 +53,8 @@ export interface ISpriteLabelPositionResult {
   actualPlacement: ISpriteLabelPlacement;
 }
 
-/** 標籤預設尺寸與間距（無法取得文字精確寬度時的估計值） / Default label size & gap (estimates when exact text width is unknown) */
-export const DEFAULT_LABEL_SIZE: ISpriteImageSize = { width: 80, height: 16 };
+/** 標籤預設高度與間距（寬度預設為「圖像寬度」，由呼叫端以 imageSize 帶入） / Default label height & gap (width defaults to the image width via imageSize) */
+export const DEFAULT_LABEL_HEIGHT = 16;
 export const DEFAULT_GAP = 4;
 
 /**
@@ -125,7 +125,9 @@ export function labelFitsInFrame(
  */
 export function computeSpriteLabelPosition(input: ISpriteLabelPositionInput): ISpriteLabelPositionResult {
   const { x, y, imageSize, placement, frameSize } = input;
-  const labelSize = input.labelSize ?? DEFAULT_LABEL_SIZE;
+  // 標籤預設寬度＝圖像寬度（對應組件 min-width: imageSize.width），高度用預設值
+  // Default label width = image width (matches the component's min-width: imageSize.width); height uses the default.
+  const labelSize = input.labelSize ?? { width: imageSize.width, height: DEFAULT_LABEL_HEIGHT };
   const gap = input.gap ?? DEFAULT_GAP;
 
   // 水平：以角色圖像中心對齊，再收斂在 frame 左右邊界內
