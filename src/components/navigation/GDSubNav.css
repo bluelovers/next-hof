@@ -13,18 +13,18 @@
 
 .gd-subnav a {
   text-decoration: none;
-  color: #8a9cb7;
+  color: var(--color-text-secondary);
   font-weight: bold;
   margin: 0 4px;
 }
 
 .gd-subnav a:hover {
   text-decoration: underline;
-  color: #cbd3de;
+  color: var(--color-text-hover);
 }
 
 /* ==================== 分隔符 / Divider ==================== */
 
 .gd-subnav .subnav-divide {
-  color: #5a708f;
+  color: var(--color-text-dim);
 }

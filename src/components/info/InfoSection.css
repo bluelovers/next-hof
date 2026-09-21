@@ -15,7 +15,7 @@
 
 /* ==================== 資訊標題 / Info heading ==================== */
 
-.info-section h4 {
+.info-section-wrapper h4 {
   padding-left: 5px;
   margin: 10px 0px;
   border-left: 15px solid #cad3df;
@@ -24,6 +24,6 @@
 
 /* ==================== 資訊文字 / Info text ==================== */
 
-.info-section .info-text {
+.info-section-wrapper .info-text {
   margin: 4px 0;
 }

@@ -7,14 +7,14 @@
 
 .town-facility-link {
   text-decoration: none;
-  color: #bdc8d7;
+  color: var(--color-text-primary);
   font-weight: bold;
   font-size: 12px;
 }
 
 .town-facility-link:hover {
   text-decoration: underline;
-  color: #c69500;
+  color: var(--color-accent-gold);
 }
 
 /* ==================== 設施圖示 / Facility icon ==================== */
@@ -26,11 +26,11 @@
 /* ==================== 設施名稱 / Facility name ==================== */
 
 .town-facility-name {
-  color: #bdc8d7;
+  color: var(--color-text-primary);
 }
 
 .town-facility-name-en {
-  color: #8a9cb7;
+  color: var(--color-text-secondary);
   font-weight: normal;
   font-size: 11px;
   margin-left: 2px;
@@ -39,6 +39,6 @@
 /* ==================== 分隔符 / Divider ==================== */
 
 .town-facility-divide {
-  color: #5a708f;
+  color: var(--color-text-dim);
   margin: 0 4px;
 }

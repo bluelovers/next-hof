@@ -12,7 +12,7 @@
 
 .job-name-bold {
   font-weight: bold;
-  color: #bdc8d7;
+  color: var(--color-text-primary);
 }
 
 /* ==================== 精靈單元格 / Sprite cell ==================== */
@@ -25,8 +25,8 @@
   display: inline-block;
   width: 48px;
   height: 48px;
-  background: #1b222c;
-  border: 1px solid #070b0e;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-dark);
   margin: 0 2px;
   vertical-align: middle;
 }
@@ -34,7 +34,7 @@
 /* ==================== 描述單元格 / Description cell ==================== */
 
 .job-desc-cell {
-  color: #bdc8d7;
+  color: var(--color-text-primary);
 }
 
 /* ==================== 裝備列 / Equipment row ==================== */

@@ -1,22 +1,22 @@
 /**
- * CharacterSpriteDisplay Storybook 故事
- * CharacterSpriteDisplay Storybook stories
+ * CharacterSprite Storybook 故事（原 CharacterSpriteDisplay 已合併）
+ * CharacterSprite Storybook stories (merged from CharacterSpriteDisplay)
  *
- * 展示角色精靈顯示組件的各種狀態與配置
- * Showcases character sprite display component in various states and configurations
+ * 展示角色精靈的各種狀態與配置
+ * Showcases character sprites in various states and configurations
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { makeScaleDecorator, CharacterSpriteDisplayDarkDecorator } from '../decorators';
-import { CharacterSpriteDisplay } from '../../src/components/game-data/CharacterSpriteDisplay';
+import { CharacterSprite } from '../../src/components/characters/CharacterSprite';
 
 /** 圖像基礎路徑 / Image base path */
 const IMG = '/image/char';
 
 /** 背景裝飾器 — 模擬遊戲深色背景 / Dark background decorator */
-const meta: Meta<typeof CharacterSpriteDisplay> = {
-  title: 'GameData/CharacterSpriteDisplay',
-  component: CharacterSpriteDisplay,
+const meta: Meta<typeof CharacterSprite> = {
+  title: 'GameData/CharacterSprite',
+  component: CharacterSprite,
   parameters: {
     docs: {
       description: {
@@ -34,122 +34,85 @@ type Story = StoryObj<typeof meta>;
 
 /** ==================== 故事 ==================== */
 
-/** 單一精靈 / Single sprite */
+/** 單一精靈（boxed） / Single sprite (boxed) */
 export const SingleSprite: Story = {
   args: {
-    spriteUrls: [`${IMG}/mon_079.png`],
+    url: `${IMG}/mon_079.png`,
+    variant: 'boxed',
   },
   parameters: {
     docs: {
       description: {
         story:
-          '單一角色精靈顯示。\nSingle character sprite display.',
+          '單一角色精靈顯示（boxed 變體）。\nSingle character sprite display (boxed variant).',
       },
     },
   },
 };
 
-/** 雙精靈 / Dual sprites */
-export const DualSprites: Story = {
+/** 女性精靈（大） / Female sprite (large) */
+export const FemaleLarge: Story = {
   args: {
-    spriteUrls: [`${IMG}/mon_079.png`, `${IMG}/mon_080r.png`],
+    url: `${IMG}/mon_080r.png`,
+    variant: 'boxed',
+    size: 'large',
   },
   parameters: {
     docs: {
       description: {
         story:
-          '雙重角色精靈顯示（通常用於男女版本）。\nDual character sprite display (typically for male/female versions).',
+          '女性角色精靈，大尺寸顯示。\nFemale character sprite, large size.',
       },
     },
   },
 };
 
-/** 多精靈 / Multiple sprites */
-export const MultipleSprites: Story = {
+/** 女性精靈（小） / Female sprite (small) */
+export const FemaleSmall: Story = {
   args: {
-    spriteUrls: [`${IMG}/mon_079.png`, `${IMG}/mon_080r.png`, `${IMG}/mon_199r.png`, `${IMG}/mon_234r.png`],
+    url: `${IMG}/mon_080r.png`,
+    variant: 'boxed',
+    size: 'small',
   },
   parameters: {
     docs: {
       description: {
         story:
-          '多重角色精靈顯示。\nMultiple character sprite display.',
+          '女性角色精靈，小尺寸顯示。\nFemale character sprite, small size.',
       },
     },
   },
 };
 
-/** 戰士系列精靈 / Warrior series sprites */
-export const WarriorSprites: Story = {
+/** 無邊框精靈 / Borderless sprite */
+export const BorderlessSprite: Story = {
   args: {
-    spriteUrls: [`${IMG}/mon_079.png`, `${IMG}/mon_080r.png`, `${IMG}/mon_199r.png`, `${IMG}/mon_234r.png`, `${IMG}/mon_100r.png`, `${IMG}/mon_012.png`],
+    url: `${IMG}/mon_079.png`,
+    variant: 'boxed',
+    border: false,
   },
   parameters: {
     docs: {
       description: {
         story:
-          '戰士系列職業的精靈集合。\nWarrior job series sprite collection.',
+          '不顯示邊框的精靈。\nSprite without border.',
       },
     },
   },
 };
 
-/** 法師系列精靈 / Sorcerer series sprites */
-export const SorcererSprites: Story = {
+/** 無背景精靈 / No-background sprite */
+export const NoBackgroundSprite: Story = {
   args: {
-    spriteUrls: [`${IMG}/mon_205.png`, `${IMG}/mon_206.png`, `${IMG}/mon_210.png`, `${IMG}/mon_210r.png`, `${IMG}/mon_213r.png`, `${IMG}/mon_213.png`],
+    url: `${IMG}/mon_079.png`,
+    variant: 'boxed',
+    background: false,
   },
   parameters: {
     docs: {
       description: {
         story:
-          '法師系列職業的精靈集合。\nSorcerer job series sprite collection.',
-      },
-    },
-  },
-};
-
-/** 祭司系列精靈 / Priest series sprites */
-export const PriestSprites: Story = {
-  args: {
-    spriteUrls: [`${IMG}/mon_214.png`, `${IMG}/mon_214r.png`, `${IMG}/mon_205.png`, `${IMG}/mon_206.png`, `${IMG}/mon_207.png`, `${IMG}/mon_208.png`],
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '祭司系列職業的精靈集合。\nPriest job series sprite collection.',
-      },
-    },
-  },
-};
-
-/** 弓箭手系列精靈 / Archer series sprites */
-export const ArcherSprites: Story = {
-  args: {
-    spriteUrls: [`${IMG}/mon_214.png`, `${IMG}/mon_214r.png`, `${IMG}/mon_216.png`, `${IMG}/mon_216y.png`, `${IMG}/mon_217.png`, `${IMG}/mon_217z.png`],
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '弓箭手系列職業的精靈集合。\nArcher job series sprite collection.',
-      },
-    },
-  },
-};
-
-/** 自訂樣式 / Custom styling */
-export const CustomStyling: Story = {
-  args: {
-    spriteUrls: [`${IMG}/mon_079.png`, `${IMG}/mon_080r.png`],
-    className: 'custom-sprite-display',
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '自訂 CSS 樣式的角色精靈顯示。\nCharacter sprite display with custom CSS styling.',
+          '不顯示背景的精靈。\nSprite without background.',
       },
     },
   },
@@ -158,7 +121,9 @@ export const CustomStyling: Story = {
 /** 大型精靈顯示 / Large sprite display */
 export const LargeSprites: Story = {
   args: {
-    spriteUrls: [`${IMG}/mon_079.png`, `${IMG}/mon_080r.png`, `${IMG}/mon_199r.png`, `${IMG}/mon_234r.png`],
+    url: `${IMG}/mon_079.png`,
+    variant: 'boxed',
+    size: 'large',
   },
   decorators: [makeScaleDecorator({ scale: 1.5 })],
   parameters: {
@@ -174,7 +139,9 @@ export const LargeSprites: Story = {
 /** 小型精靈顯示 / Small sprite display */
 export const SmallSprites: Story = {
   args: {
-    spriteUrls: [`${IMG}/mon_079.png`, `${IMG}/mon_080r.png`],
+    url: `${IMG}/mon_079.png`,
+    variant: 'boxed',
+    size: 'small',
   },
   decorators: [makeScaleDecorator({ scale: 0.8 })],
   parameters: {
@@ -182,21 +149,6 @@ export const SmallSprites: Story = {
       description: {
         story:
           '縮小顯示的角色精靈。\nSmall character sprite display.',
-      },
-    },
-  },
-};
-
-/** 空精靈列表 / Empty sprite list */
-export const EmptySprites: Story = {
-  args: {
-    spriteUrls: [],
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '空的精靈列表顯示。\nEmpty sprite list display.',
       },
     },
   },

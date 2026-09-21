@@ -295,8 +295,8 @@ export const makeCenteredDecorator = (
 };
 
 /**
- * 縮放裝飾器工廠（CharacterSpriteDisplay 放大/縮小預覽）
- * Scale decorator factory (CharacterSpriteDisplay zoom preview)
+ * 縮放裝飾器工廠（放大/縮小預覽）
+ * Scale decorator factory (zoom preview)
  */
 export const makeScaleDecorator = (
   options: ScaleDecoratorOptions = {}

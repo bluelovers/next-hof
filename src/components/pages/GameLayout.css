@@ -7,16 +7,16 @@
  */
 
 .game-layout {
-  font-family: 'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif;
+  font-family: var(--font-primary);
   font-size: 12px;
-  color: #bdc8d7;
-  background: #10151b;
-  max-width: 780px;
-  min-width: 505px;
+  color: var(--color-text-primary);
+  background: var(--color-bg-page);
+  max-width: var(--page-max-width);
+  min-width: var(--page-min-width);
   margin: 0 auto;
-  border-left: 1px solid #070b0e;
-  border-right: 1px solid #070b0e;
-  border-bottom: 1px solid #070b0e;
+  border-left: 1px solid var(--color-border-dark);
+  border-right: 1px solid var(--color-border-dark);
+  border-bottom: 1px solid var(--color-border-dark);
   min-height: 100%;
   position: relative;
 }
@@ -36,25 +36,25 @@
 
 .game-layout .game-nav {
   padding: 8px 10px 5px 10px;
-  border-top: 1px solid #070b0e;
-  background: #304052;
+  border-top: 1px solid var(--color-border-dark);
+  background: var(--color-bg-mid);
 }
 
 .game-layout .game-nav a {
   text-decoration: none;
-  color: #8a9cb7;
+  color: var(--color-text-secondary);
   font-weight: bold;
 }
 
 .game-layout .game-nav a:hover {
   text-decoration: underline;
-  color: #cbd3de;
+  color: var(--color-text-hover);
 }
 
 .game-layout .game-nav .nav-divide {
-  border-left: 1px solid #070b0e;
+  border-left: 1px solid var(--color-border-dark);
   width: 1px;
-  background: #070b0e;
+  background: var(--color-border-dark);
   margin: 0px 15px;
   display: inline-block;
   height: 14px;
@@ -62,18 +62,18 @@
 }
 
 .game-layout .game-nav .nav-link-active {
-  color: #c69500;
+  color: var(--color-accent-gold);
 }
 
 .game-layout .game-nav .nav-link-active:hover {
-  color: #ffcc33;
+  color: var(--color-accent-gold-bright);
 }
 
 /* ==================== 次標題 / Subtitle ==================== */
 
 .game-layout .game-subtitle {
-  border-top: 1px dotted #070b0e;
-  border-bottom: 1px solid #070b0e;
+  border-top: 1px dotted var(--color-border-dark);
+  border-bottom: 1px solid var(--color-border-dark);
   padding: 5px 10px 2px 10px;
   background: #202935;
 }
@@ -89,21 +89,21 @@
 .game-layout .game-footer {
   width: 100%;
   padding: 8px 0 4px 0;
-  background: #1b222c;
-  border-top: 1px solid #070b0e;
+  background: var(--color-bg-surface);
+  border-top: 1px solid var(--color-border-dark);
   text-align: center;
-  color: #5a708f;
+  color: var(--color-text-dim);
 }
 
 .game-layout .game-footer a {
   text-decoration: none;
-  color: #8a9cb7;
+  color: var(--color-text-secondary);
   font-weight: bold;
 }
 
 .game-layout .game-footer a:hover {
   text-decoration: underline;
-  color: #cbd3de;
+  color: var(--color-text-hover);
 }
 
 /* ==================== 通用元素 / Common ==================== */
@@ -111,8 +111,8 @@
 .game-layout h4 {
   padding-left: 5px;
   margin: 10px 0px;
-  border-left: 15px solid #cad3df;
-  border-bottom: 1px solid #cad3df;
+  border-left: 15px solid var(--color-border-heading);
+  border-bottom: 1px solid var(--color-border-heading);
   display: block;
 }
 
@@ -125,6 +125,6 @@
 }
 
 .game-layout .td6 {
-  background-color: #304052;
+  background-color: var(--color-bg-mid);
   padding: 3px;
 }

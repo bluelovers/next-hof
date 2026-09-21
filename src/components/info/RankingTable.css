@@ -24,6 +24,6 @@
 }
 
 .ranking-table .td-header {
-  background-color: #304052;
+  background-color: var(--color-bg-mid);
   text-align: center;
 }

@@ -16,9 +16,9 @@
 /* ==================== 戰鬥編成頁容器 / Battle page container ==================== */
 
 .battle-page {
-  font-family: 'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif;
+  font-family: var(--font-primary);
   font-size: 12px;
-  color: #bdc8d7;
+  color: var(--color-text-primary);
 }
 
 /* ==================== 標題 / Headings ==================== */
@@ -26,8 +26,8 @@
 .battle-page h4 {
   padding-left: 5px;
   margin: 10px 0;
-  border-left: 15px solid #cad3df;
-  border-bottom: 1px solid #cad3df;
+  border-left: 15px solid var(--color-border-heading);
+  border-bottom: 1px solid var(--color-border-heading);
   display: block;
 }
 
@@ -57,12 +57,12 @@
 
 .battle-page .battle-save-label {
   font-size: 12px;
-  color: #bdc8d7;
+  color: var(--color-text-primary);
   cursor: default;
 }
 
 .battle-page .battle-save-label input[type="checkbox"] {
-  accent-color: #c69500;
+  accent-color: var(--color-accent-gold);
 }
 
 /* ==================== 分隔線 / Horizontal rule ==================== */

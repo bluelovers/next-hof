@@ -18,13 +18,13 @@
 }
 
 .result-title.win {
-  color: #66cc66;
-  text-shadow: 0 0 0.2em #3C6237;
+  color: var(--color-result);
+  text-shadow: 0 0 0.2em var(--color-result-glow);
 }
 
 .result-title.lose {
-  color: #cc3300;
-  text-shadow: 0 0 0.2em #E63D3D;
+  color: var(--color-dmg);
+  text-shadow: 0 0 0.2em var(--color-dmg-glow);
 }
 
 /* ==================== 統計數據 / Statistics ==================== */

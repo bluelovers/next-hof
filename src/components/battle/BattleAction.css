@@ -4,24 +4,10 @@
  *
  * 原始來源：BattleDisplay.css 第 174-239 行
  * Source: BattleDisplay.css lines 174-239
+ *
+ * 屬性顏色（.dmg/.recover/.support）已統一至 SharedBase.css
+ * Attribute colors (.dmg/.recover/.support) centralized in SharedBase.css
  */
-
-/* ==================== 屬性顏色 / Attribute Colors ==================== */
-
-.dmg {
-  color: #cc3300;
-  text-shadow: 0 0 0.2em #E63D3D;
-}
-
-.recover {
-  color: #3366ff;
-  text-shadow: 0 0 0.2em #2E7398;
-}
-
-.support {
-  color: #66cc66;
-  text-shadow: 0 0 0.2em #88FF77;
-}
 
 /* ==================== 行動日誌 / Action Log ==================== */
 
@@ -43,8 +29,8 @@
   width: 18px;
   height: 18px;
   margin: 0 5px;
-  background: #304052;
-  border: 1px solid #334357;
+  background: var(--color-bg-mid);
+  border: 1px solid var(--color-border-mid);
   border-radius: 3px;
   text-align: center;
   line-height: 18px;

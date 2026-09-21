@@ -19,7 +19,7 @@
 /* ==================== 背景顏色交替 / Background alternation ==================== */
 
 .td-base {
-  background-color: #304052;
+  background-color: var(--color-bg-mid);
 }
 
 .td-alt {

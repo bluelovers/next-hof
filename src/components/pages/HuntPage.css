@@ -5,15 +5,15 @@
  * Includes land_frame card pedestal and terrain background classes
  */
 .hunt-page {
-  font-family: 'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif;
+  font-family: var(--font-primary);
   font-size: 12px;
-  color: #bdc8d7;
+  color: var(--color-text-primary);
 }
 .hunt-page h4 {
   padding: 0 0 0 5px;
   margin: 10px 0;
-  border-left: 14px solid #cad3df;
-  border-bottom: 1px solid #cad3df;
+  border-left: 14px solid var(--color-border-heading);
+  border-bottom: 1px solid var(--color-border-heading);
   font-size: 13px;
 }
 
@@ -23,16 +23,16 @@
 }
 .hunt-page .hunt-subnav-link {
   text-decoration: none;
-  color: #8a9cb7;
+  color: var(--color-text-secondary);
   font-weight: bold;
   font-size: 12px;
 }
 .hunt-page .hunt-subnav-link:hover {
   text-decoration: underline;
-  color: #cbd3de;
+  color: var(--color-text-hover);
 }
 .hunt-page .subnav-separator {
-  color: #bdc8d7;
+  color: var(--color-text-primary);
   font-size: 12px;
 }
 
@@ -90,16 +90,16 @@
 /* Area name link */
 .hunt-page .g_name a {
   text-decoration: none;
-  color: #8a9cb7;
+  color: var(--color-text-secondary);
   font-size: 12px;
 }
 .hunt-page .g_name a:hover {
   text-decoration: underline;
-  color: #cbd3de;
+  color: var(--color-text-hover);
 }
 
 /* Level range text */
 .hunt-page .hunt-level-range {
-  color: #bdc8d7;
+  color: var(--color-text-primary);
   font-size: 12px;
 }

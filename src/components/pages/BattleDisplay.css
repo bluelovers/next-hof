@@ -12,16 +12,16 @@
 /* ==================== 主容器 / Main Container ==================== */
 
 .battle-display {
-  font-family: 'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif;
+  font-family: var(--font-primary);
   font-size: 12px;
-  color: #bdc8d7;
-  background: #10151b;
-  max-width: 780px;
-  min-width: 505px;
+  color: var(--color-text-primary);
+  background: var(--color-bg-page);
+  max-width: var(--page-max-width);
+  min-width: var(--page-min-width);
   margin: 0 auto;
-  border-left: 1px solid #070b0e;
-  border-right: 1px solid #070b0e;
-  border-bottom: 1px solid #070b0e;
+  border-left: 1px solid var(--color-border-dark);
+  border-right: 1px solid var(--color-border-dark);
+  border-bottom: 1px solid var(--color-border-dark);
 }
 
 /* ==================== 戰鬥表格框架 / Battle Table Frame ==================== */
@@ -46,14 +46,14 @@
 
 .nav-arrow a {
   text-decoration: none;
-  color: #8a9cb7;
+  color: var(--color-text-secondary);
   font-weight: bold;
   font-size: 14px;
 }
 
 .nav-arrow a:hover {
   text-decoration: underline;
-  color: #cbd3de;
+  color: var(--color-text-hover);
 }
 
 /* ==================== 入場動畫 / Entrance Animation ==================== */

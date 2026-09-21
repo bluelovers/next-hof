@@ -2,11 +2,11 @@
  * GameData 元件工具函式（單一事實來源）
  * GameData component utilities (single source of truth)
  *
- * 集中維護精靈背景樣式組合，供 CharacterSpriteDisplay 與 JobDetailCard 共用，
+ * 集中維護精靈背景樣式組合，供 JobDetailCard 等元件共用，
  * 避免相同三項 inline 樣式散落多處。
- * Centralizes sprite-background style composition so CharacterSpriteDisplay and
- * JobDetailCard share one implementation instead of duplicating the same three
- * inline style properties.
+ * Centralizes sprite-background style composition so JobDetailCard
+ * and other components share one implementation instead of duplicating the same
+ * three inline style properties.
  */
 import type { CSSProperties } from 'react';
 

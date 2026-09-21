@@ -12,7 +12,7 @@
 /* ==================== 戰鬥畫面背景 / Battle Scene Background ==================== */
 
 .btl-img {
-  background: #070b0e;
+  background: var(--color-border-dark);
   padding: 3px;
 }
 

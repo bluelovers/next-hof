@@ -13,7 +13,7 @@
 
 .town-facility-group-title {
   font-size: 12px;
-  color: #8a9cb7;
+  color: var(--color-text-secondary);
   margin: 6px 0 3px 0;
   padding: 0;
   border: none;

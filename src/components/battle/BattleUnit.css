@@ -29,7 +29,7 @@
   flex: 1;
   height: 10px;
   background: #1a232d;
-  border: 1px solid #334357;
+  border: 1px solid var(--color-border-mid);
   border-radius: 2px;
   overflow: hidden;
   max-width: 120px;
@@ -59,7 +59,7 @@
   flex: 1;
   height: 10px;
   background: #1a232d;
-  border: 1px solid #334357;
+  border: 1px solid var(--color-border-mid);
   border-radius: 2px;
   overflow: hidden;
   max-width: 120px;

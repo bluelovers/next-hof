@@ -14,11 +14,11 @@
 .town-message-board-title {
   padding-left: 5px;
   margin: 10px 0px;
-  border-left: 15px solid #cad3df;
-  border-bottom: 1px solid #cad3df;
+  border-left: 15px solid var(--color-border-heading);
+  border-bottom: 1px solid var(--color-border-heading);
   display: block;
   font-size: 13px;
-  color: #bdc8d7;
+  color: var(--color-text-primary);
 }
 
 /* ==================== 留言板內容 / Message board content ==================== */
@@ -37,9 +37,9 @@
 
 .town-message-item {
   padding: 4px 8px;
-  color: #8a9cb7;
+  color: var(--color-text-secondary);
   font-size: 12px;
-  border-bottom: 1px solid #1b222c;
+  border-bottom: 1px solid var(--color-bg-surface);
 }
 
 /* ==================== 輸入表單 / Input form ==================== */
@@ -53,16 +53,16 @@
 .town-message-input {
   flex: 1;
   padding: 3px 5px;
-  color: #bdc8d7;
-  border: 1px solid #304052;
-  background: #1b222c;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-bg-mid);
+  background: var(--color-bg-surface);
   font-size: 12px;
-  font-family: 'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif;
+  font-family: var(--font-primary);
 }
 
 .town-message-input:focus {
   outline: none;
-  border-color: #c69500;
+  border-color: var(--color-accent-gold);
 }
 
 /* ==================== 送出按鈕 / Submit button ==================== */
@@ -71,14 +71,14 @@
   padding: 3px 12px;
   font-size: 12px;
   font-weight: bold;
-  color: #bdc8d7;
-  border: 1px solid #304052;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-bg-mid);
   background: #202935;
   cursor: pointer;
-  font-family: 'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif;
+  font-family: var(--font-primary);
 }
 
 .town-message-button:hover {
-  background: #304052;
+  background: var(--color-bg-mid);
   color: #fff;
 }
