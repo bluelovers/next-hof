@@ -12,10 +12,11 @@
 import React, { useState } from 'react';
 import { GameLayout } from './GameLayout';
 import { BattleCharacterCard } from '#/components/characters/BattleCharacterCard';
+import { CharacterSprite } from '#/components/characters/CharacterSprite';
 import type { IBattleCharacterData } from '#/components/characters/CharacterTypes';
 import { MonsterCard } from '#/components/monsters/MonsterCard';
 import type { IMonsterData } from '#/components/monsters/MonsterTypes';
-import { buildCharacterImageUrl } from '#/components/characters/characterUtils';
+import { buildCharacterImageUrl, buildCharacterUrl, getCarpetClass } from '#/components/characters/characterUtils';
 
 /** SharedBase.css 提供 clearfix 等工具類 */
 /** SharedBase.css provides utility classes like clearfix */
@@ -91,6 +92,13 @@ export const BattlePage: React.FC<IBattlePageProps> = ({
               character={character}
               index={index}
               onChange={onSelectCharacter}
+              renderPedestal={({ character: c, index: i }) => (
+                <div className={getCarpetClass(i)}>
+                  <a href={buildCharacterUrl(c.id)}>
+                    <CharacterSprite url={c.imageUrl} variant="avatar" alt={c.name} />
+                  </a>
+                </div>
+              )}
             />
           ))}
         </div>
