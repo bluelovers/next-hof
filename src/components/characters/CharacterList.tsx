@@ -7,9 +7,8 @@
  */
 import React from 'react';
 import { CharacterCard } from './CharacterCard';
-import { CharacterSprite } from './CharacterSprite';
 import type { ICharacterData } from './CharacterTypes';
-import { getCarpetClass, buildCharacterUrl } from './characterUtils';
+import { buildCharacterUrl } from './characterUtils';
 import './CharacterCardBase.css';
 import './CharacterList.css';
 
@@ -36,18 +35,9 @@ export const CharacterList: React.FC<ICharacterListProps> = ({
           key={char.id}
           character={char}
           index={index}
-          onSelect={onSelect}
-          renderPedestal={({ character, index: i }) => (
-            <div className={getCarpetClass(i)}>
-              <a href={buildCharacterUrl(character.id)}>
-                <CharacterSprite
-                  url={character.imageUrl}
-                  variant="avatar"
-                  alt={character.name}
-                />
-              </a>
-            </div>
-          )}
+          selection="radio"
+          avatarHref={buildCharacterUrl(char.id)}
+          onActiveChange={(id) => onSelect?.(id)}
         />
       ))}
       <div className="clearfix" />

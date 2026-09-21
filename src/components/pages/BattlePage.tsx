@@ -11,12 +11,11 @@
  */
 import React, { useState } from 'react';
 import { GameLayout } from './GameLayout';
-import { BattleCharacterCard } from '#/components/characters/BattleCharacterCard';
-import { CharacterSprite } from '#/components/characters/CharacterSprite';
+import { CharacterCard } from '#/components/characters/CharacterCard';
 import type { IBattleCharacterData } from '#/components/characters/CharacterTypes';
 import { MonsterCard } from '#/components/monsters/MonsterCard';
 import type { IMonsterData } from '#/components/monsters/MonsterTypes';
-import { buildCharacterImageUrl, buildCharacterUrl, getCarpetClass } from '#/components/characters/characterUtils';
+import { buildCharacterImageUrl, buildCharacterUrl } from '#/components/characters/characterUtils';
 
 /** SharedBase.css 提供 clearfix 等工具類 */
 /** SharedBase.css provides utility classes like clearfix */
@@ -87,18 +86,13 @@ export const BattlePage: React.FC<IBattlePageProps> = ({
         <h4>Teams</h4>
         <div className="battle-characters">
           {characters.map((character, index) => (
-            <BattleCharacterCard
+            <CharacterCard
               key={character.id}
               character={character}
               index={index}
-              onChange={onSelectCharacter}
-              renderPedestal={({ character: c, index: i }) => (
-                <div className={getCarpetClass(i)}>
-                  <a href={buildCharacterUrl(c.id)}>
-                    <CharacterSprite url={c.imageUrl} variant="avatar" alt={c.name} />
-                  </a>
-                </div>
-              )}
+              selection="checkbox"
+              avatarHref={buildCharacterUrl(character.id)}
+              onActiveChange={onSelectCharacter}
             />
           ))}
         </div>

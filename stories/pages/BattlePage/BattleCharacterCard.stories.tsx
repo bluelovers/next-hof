@@ -1,135 +1,98 @@
 /**
- * BattleCharacterCard Storybook 故事
- * BattleCharacterCard Storybook stories
+ * CharacterCard (checkbox 模式) Storybook 故事
+ * CharacterCard (checkbox mode) Storybook stories
  *
- * 展示戰鬥編成用的 checkbox 版角色卡片
- * Showcases the checkbox-based character card for battle formation
+ * 展示 selection="checkbox" 的戰鬥編成角色卡片
+ * Showcases CharacterCard in checkbox mode for battle formation
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { MUTED_TEXT_COLOR, CardDarkDecorator } from '../../decorators';
-import { BattleCharacterCard } from '../../../src/components/characters/BattleCharacterCard';
+import { CharacterCard } from '../../../src/components/characters/CharacterCard';
+import { buildCharacterUrl } from '../../../src/components/characters/characterUtils';
 
 const IMG = '/image/char';
 
-/** 背景裝飾器 — 模擬遊戲深色背景 / Dark game background decorator */
-const meta: Meta<typeof BattleCharacterCard> = {
-  title: 'Characters/BattleCharacterCard',
-  component: BattleCharacterCard,
+const meta: Meta<typeof CharacterCard> = {
+  title: 'Characters/CharacterCard (Checkbox)',
+  component: CharacterCard,
   parameters: {
     docs: {
       description: {
         component:
-          '戰鬥編成角色卡片（checkbox 版）。和 CharacterCard 類似但使用 checkbox（可複選）。\n'
-          + 'Battle formation character card (checkbox version). Similar to CharacterCard but uses checkbox (multi-select).',
+          'CharacterCard checkbox 模式（selection="checkbox"）。用於戰鬥編成等多選場景。\n'
+          + 'CharacterCard in checkbox mode (selection="checkbox"). For multi-select scenarios like battle formation.',
       },
     },
   },
   tags: ['autodocs'],
-  argTypes: {
-    onChange: { action: 'changed' },
-  },
   decorators: [CardDarkDecorator],
 };
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** ==================== 故事 ==================== */
-
-/** 法師未勾選 / Sorceress unchecked */
-export const SorceressUnchecked: Story = {
+/** 未勾選 / Unchecked */
+export const Unchecked: Story = {
   args: {
     index: 0,
+    selection: 'checkbox',
     character: {
-      id: '1',
+      id: 'char-uncheck',
       name: 'Mage1',
       imageUrl: `${IMG}/mon_018.png`,
       level: 3,
       className: 'Sorceress',
       hasStar: true,
-      checked: false,
+      active: false,
     },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: '法師（carpet0 背景），未勾選。\nSorceress (carpet0), unchecked.',
-      },
-    },
+    onActiveChange: (id, active) => console.log(`${id} → ${active}`),
   },
 };
 
-/** 祭司已勾選 / Priestess checked */
-export const PriestessChecked: Story = {
+/** 已勾選 / Checked */
+export const Checked: Story = {
   args: {
     index: 1,
+    selection: 'checkbox',
     character: {
-      id: '2',
+      id: 'char-check',
       name: 'Healer1',
       imageUrl: `${IMG}/mon_214.png`,
-      level: 3,
+      level: 5,
       className: 'Priestess',
       hasStar: true,
-      checked: true,
+      active: true,
     },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: '祭司（carpet1 背景），已勾選。\nPriestess (carpet1), checked.',
-      },
-    },
+    onActiveChange: (id, active) => console.log(`${id} → ${active}`),
   },
 };
 
-/** 戰士未勾選無星 / Warrior unchecked no star */
-export const WarriorNoStar: Story = {
-  args: {
-    index: 2,
-    character: {
-      id: '3',
-      name: 'Hero1',
-      imageUrl: `${IMG}/mon_079.png`,
-      level: 5,
-      className: 'Warrior',
-      hasStar: false,
-      checked: false,
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: '戰士（index=2→carpet0），無星標未勾選。\nWarrior, no star, unchecked.',
-      },
-    },
-  },
-};
-
-/** 勾選對比 / Checked vs unchecked comparison */
+/** 勾選對比 / Check compare */
 export const CheckCompare: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '20px' }}>
       <div>
-        <BattleCharacterCard
+        <CharacterCard
           index={0}
+          selection="checkbox"
           character={{
             id: 'uncheck',
             name: 'Unchecked',
             imageUrl: `${IMG}/mon_018.png`,
             level: 1,
             className: 'Novice',
-            hasStar: false,
-            checked: false,
+            active: false,
           }}
         />
-        <p style={{ textAlign: 'center', color: '#5a708f', marginTop: 4 }}>
-          未勾選（unselect / Dimmed）
+        <p style={{ textAlign: 'center', color: MUTED_TEXT_COLOR, marginTop: 4 }}>
+          未勾選
         </p>
       </div>
       <div>
-        <BattleCharacterCard
+        <CharacterCard
           index={1}
+          selection="checkbox"
           character={{
             id: 'checked',
             name: 'Checked',
@@ -137,21 +100,38 @@ export const CheckCompare: Story = {
             level: 5,
             className: 'Warrior',
             hasStar: true,
-            checked: true,
+            active: true,
           }}
         />
         <p style={{ textAlign: 'center', color: MUTED_TEXT_COLOR, marginTop: 4 }}>
-          已勾選（高亮 / Highlighted）
+          已勾選
         </p>
       </div>
     </div>
   ),
+};
+
+/** 帶連結底座 + checkbox / Linked pedestal + checkbox */
+export const WithLink: Story = {
+  args: {
+    index: 0,
+    selection: 'checkbox',
+    character: {
+      id: 'char-link',
+      name: 'LinkedChar',
+      imageUrl: `${IMG}/mon_079.png`,
+      level: 10,
+      className: 'Warrior',
+      hasStar: true,
+      active: false,
+    },
+    avatarHref: buildCharacterUrl('char-link'),
+    onActiveChange: (id, active) => console.log(`${id} → ${active}`),
+  },
   parameters: {
     docs: {
       description: {
-        story:
-          '未勾選（unselect 半透明）vs 已勾選（高亮）的對比。\n'
-          + 'Unchecked (dimmed) vs Checked (highlighted) comparison.',
+        story: '傳入 avatarHref 自動加連結 + selection="checkbox" 多選模式。\nPass avatarHref for auto-link + checkbox multi-select.',
       },
     },
   },

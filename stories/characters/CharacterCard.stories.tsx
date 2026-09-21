@@ -2,19 +2,20 @@
  * CharacterCard Storybook 故事
  * CharacterCard Storybook stories
  *
- * 展示 carpet_frame 底座結構的角色卡片
- * 包含 carpet0/carpet1 交替背景、unselect/selected 狀態
- * Showcases character card with carpet_frame pedestal structure
- * Includes carpet0/carpet1 alternating backgrounds and selection states
+ * 展示統一版角色卡片：
+ * - radio / checkbox 模式
+ * - render prop 替換各區塊
+ * - 傳 false 隱藏區塊
+ * - 自訂 children
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { MUTED_TEXT_COLOR, CardDarkDecorator } from '../decorators';
 import { CharacterCard } from '../../src/components/characters/CharacterCard';
+import type { ICharacterInfoProps } from '../../src/components/characters/CharacterCard';
 
 const IMG = '/image/char';
 
-/** 背景裝飾器 — 模擬遊戲深色背景 / Dark game background decorator */
 const meta: Meta<typeof CharacterCard> = {
   title: 'Characters/CharacterCard',
   component: CharacterCard,
@@ -22,230 +23,214 @@ const meta: Meta<typeof CharacterCard> = {
     docs: {
       description: {
         component:
-          '角色卡片（carpet_frame 底座）。顯示頭像、名稱、等級、職業與選取狀態。\nCharacter card (carpet_frame pedestal). Shows avatar, name, level, class, and selection.',
+          '統一版角色卡片。透過 selection 切換 radio/checkbox，各區塊可 render prop 替換或傳 false 隱藏。\n'
+          + 'Unified character card. Switch radio/checkbox via selection; override sections with render props or hide with false.',
       },
     },
   },
   tags: ['autodocs'],
-  argTypes: {
-    onSelect: { action: 'selected' },
-  },
   decorators: [CardDarkDecorator],
 };
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** ==================== 故事 ==================== */
+// ==================== 基本展示 / Basic showcase ====================
 
-/**
- * 法師 / Mage - Sorceress (carpet0)
- * index=0 → carpet0 背景
- */
-export const Sorceress: Story = {
+/** radio 模式（預設）/ Radio mode (default) */
+export const RadioMode: Story = {
   args: {
     index: 0,
+    selection: 'radio',
     character: {
-      id: 'char-mage-1',
+      id: 'char-mage',
       name: 'Mage1',
       imageUrl: `${IMG}/mon_018.png`,
       level: 3,
       className: 'Sorceress',
       hasStar: true,
-      selected: false,
+      active: false,
     },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '法師（carpet0 背景），附帶星標記。\nSorceress (carpet0 background) with star marker.',
-      },
-    },
+    onActiveChange: (id, active) => console.log(`radio: ${id} → ${active}`),
   },
 };
 
-/**
- * 補師 / Healer - Priestess (carpet1)
- * index=1 → carpet1 背景
- */
-export const Priestess: Story = {
+/** checkbox 模式 / Checkbox mode */
+export const CheckboxMode: Story = {
   args: {
     index: 1,
+    selection: 'checkbox',
     character: {
-      id: 'char-healer-1',
+      id: 'char-healer',
       name: 'Healer1',
       imageUrl: `${IMG}/mon_214.png`,
-      level: 3,
+      level: 5,
       className: 'Priestess',
       hasStar: true,
-      selected: false,
+      active: true,
     },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '祭司（carpet1 背景）。\nPriestess (carpet1 background).',
-      },
-    },
+    onActiveChange: (id, active) => console.log(`checkbox: ${id} → ${active}`),
   },
 };
 
-/**
- * 戰士 / Hero - Warrior (carpet2 → carpet0 交替)
- * index=2 → carpet0 背景（因為偶數）
- */
-export const Warrior: Story = {
+/** 已選取狀態 / Active state */
+export const Active: Story = {
   args: {
     index: 2,
     character: {
-      id: 'char-hero-1',
+      id: 'char-warrior',
       name: 'Hero1',
       imageUrl: `${IMG}/mon_079.png`,
-      level: 3,
+      level: 10,
       className: 'Warrior',
       hasStar: true,
-      selected: false,
+      active: true,
     },
+  },
+};
+
+// ==================== Render Props 展示 / Render props showcase ====================
+
+/** 自訂底座 — 帶連結 / Custom pedestal — with link */
+export const WithLink: Story = {
+  args: {
+    index: 0,
+    character: {
+      id: 'char-link',
+      name: 'Linked',
+      imageUrl: `${IMG}/mon_079.png`,
+      level: 1,
+      className: 'Warrior',
+    },
+    avatarHref: '/char/char?char=char-link',
   },
   parameters: {
     docs: {
       description: {
-        story:
-          '戰士（index=2 → carpet0 交替）。\nWarrior (index=2 → carpet0 alternation).',
+        story: '傳入 avatarHref 即可在頭像自動加入超連結，無需手動複製底座。\nPass avatarHref to auto-wrap avatar with a hyperlink — no need to copy pedestal code.',
       },
     },
   },
 };
 
-/**
- * 已選取狀態 / Selected state
- * selected=true 時文字區塊無 unselect 類別 = 高亮
- */
-export const Selected: Story = {
+/** 自訂資訊區 — 只顯示名稱 / Custom info — name only */
+export const CustomInfo: Story = {
   args: {
-    index: 3,
+    index: 0,
     character: {
-      id: 'char-selected',
-      name: 'Hero1',
+      id: 'char-nameonly',
+      name: 'SimpleChar',
+      imageUrl: `${IMG}/mon_018.png`,
+      level: 1,
+      className: 'Novice',
+      active: false,
+    },
+    renderInfo: ({ character, textId, highlighted, onClick }) => (
+      <div id={textId} className={highlighted ? '' : 'unselect'} onClick={onClick}>
+        <strong>{character.name}</strong>
+      </div>
+    ),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '透過 renderInfo 自訂資訊區，僅顯示名稱。\nCustom info via renderInfo showing name only.',
+      },
+    },
+  },
+};
+
+/** 隱藏選取控件 / Hide selection control */
+export const NoSelection: Story = {
+  args: {
+    index: 0,
+    character: {
+      id: 'char-noselect',
+      name: 'DisplayOnly',
+      imageUrl: `${IMG}/mon_018.png`,
+      level: 7,
+      className: 'Mage',
+      hasStar: true,
+    },
+    renderSelection: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '傳 renderSelection={false} 隱藏 radio/checkbox。\nPass renderSelection={false} to hide the selection control.',
+      },
+    },
+  },
+};
+
+/** 隱藏底座 / Hide pedestal */
+export const NoPedestal: Story = {
+  args: {
+    index: 0,
+    character: {
+      id: 'char-nopedestal',
+      name: 'NoCarpet',
+      imageUrl: `${IMG}/mon_018.png`,
+      level: 1,
+      className: 'Novice',
+    },
+    renderPedestal: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '傳 renderPedestal={false} 隱藏底座。\nPass renderPedestal={false} to hide the pedestal.',
+      },
+    },
+  },
+};
+
+/** 自訂子元件 / Custom children */
+export const WithChildren: Story = {
+  args: {
+    index: 0,
+    character: {
+      id: 'char-child',
+      name: 'WithBadge',
       imageUrl: `${IMG}/mon_079.png`,
       level: 5,
       className: 'Warrior',
       hasStar: true,
-      selected: true,
     },
+    children: (
+      <div style={{ textAlign: 'center', fontSize: 10, color: '#ffcc33' }}>
+        ★ VIP ★
+      </div>
+    ),
   },
   parameters: {
     docs: {
       description: {
-        story:
-          '已選取的角色（selected=true）：文字無 unselect 類別，呈高亮狀態，Radio 為選中。\nSelected character (selected=true): text without unselect class, highlighted, radio checked.',
+        story: '透過 children 在卡片底部插入自訂內容。\nInsert custom content at the bottom via children.',
       },
     },
   },
 };
 
-/**
- * 未選取 vs 已選取對比 / Compare unselected vs selected
- * 使用 render 客製化展示兩個卡片對比
- */
-export const SelectionCompare: Story = {
-  render: () => (
-    <div style={{ display: 'flex', gap: '20px' }}>
-      <div>
-        <CharacterCard
-          index={0}
-          character={{
-            id: 'char-unsel',
-            name: 'Unselected',
-            imageUrl: `${IMG}/mon_018.png`,
-            level: 1,
-            className: 'Novice',
-            hasStar: false,
-            selected: false,
-          }}
-        />
-        <p style={{ textAlign: 'center', color: '#5a708f', marginTop: 4 }}>
-          unselect（未選取 / Dimmed）
-        </p>
-      </div>
-      <div>
-        <CharacterCard
-          index={1}
-          character={{
-            id: 'char-sel',
-            name: 'Selected',
-            imageUrl: `${IMG}/mon_079.png`,
-            level: 5,
-            className: 'Warrior',
-            hasStar: true,
-            selected: true,
-          }}
-        />
-        <p style={{ textAlign: 'center', color: MUTED_TEXT_COLOR, marginTop: 4 }}>
-          選取中（高亮 / Highlighted）
-        </p>
-      </div>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '未選取（unselect 半透明）vs 已選取（高亮）的對比。\nUnselected (dimmed) vs Selected (highlighted) comparison.',
-      },
-    },
-  },
-};
+// ==================== 向後兼容 / Backward compatibility ====================
 
-/**
- * 高等級角色 / High level character
- */
-export const HighLevel: Story = {
+/** 向後兼容 selected / Backward compat with selected */
+export const BackwardSelected: Story = {
   args: {
     index: 0,
     character: {
-      id: 'char-high',
-      name: 'ArchMage',
+      id: 'char-backward',
+      name: 'OldAPI',
       imageUrl: `${IMG}/mon_018.png`,
-      level: 99,
-      className: 'Arch Sorceress',
-      hasStar: true,
-      selected: false,
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '高等級角色展示。\nHigh level character display.',
-      },
-    },
-  },
-};
-
-/**
- * 無星標角色 / Without star marker
- */
-export const WithoutStar: Story = {
-  args: {
-    index: 1,
-    character: {
-      id: 'char-nostar',
-      name: 'Recruit',
-      imageUrl: `${IMG}/mon_214.png`,
       level: 1,
       className: 'Novice',
-      hasStar: false,
-      selected: false,
-    },
+      selected: true,
+    } as any,
   },
   parameters: {
     docs: {
       description: {
-        story:
-          '無星標記的新手角色。\nNovice character without star marker.',
+        story: '向後兼容：使用舊版 selected 欄位仍可正常運作。\nBackward compat: legacy selected field still works.',
       },
     },
   },

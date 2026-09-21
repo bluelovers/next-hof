@@ -3,9 +3,9 @@
  * Character-related utilities (single source of truth)
  *
  * 集中維護 carpet 底座交替邏輯與角色頁面連結組合，
- * 供 CharacterCard 與 BattleCharacterCard 共用。
+ * 供 CharacterCard 共用。
  * Centralizes the alternating carpet-pedestal logic and character-page URL builder
- * so CharacterCard and BattleCharacterCard share one implementation.
+ * for CharacterCard.
  */
 import { BASE_URL } from '#/components/config/AppConfig';
 
