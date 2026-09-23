@@ -59,13 +59,20 @@ export const BattleResult: React.FC<IBattleResultProps> = ({
   leftTeamName,
   rightTeamName,
 }) => {
-  const { winner, leftTeam, rightTeam } = result;
+  const { winner, leftTeam, rightTeam, isDraw } = result;
 
   /**
    * 判斷左側是否勝利
    * Determine if left side wins
    */
   const leftWins = winner === leftTeamName;
+
+  /**
+   * 標題樣式與文字：平手時不帶 win/lose 配色，改顯示「Draw!」
+   * Title style/text: a draw gets no win/lose colouring and shows "Draw!"
+   */
+  const titleClass = isDraw ? 'result-title' : leftWins ? 'result-title win' : 'result-title lose';
+  const titleText = isDraw ? 'Draw!' : `${winner} Wins!`;
 
   return (
     <>
@@ -75,9 +82,7 @@ export const BattleResult: React.FC<IBattleResultProps> = ({
           className="break break-top"
           style={{ textAlign: 'center', padding: '10px 0px' }}
         >
-          <div className={`result-title ${leftWins ? 'win' : 'lose'}`}>
-            {winner} Wins!
-          </div>
+          <div className={titleClass}>{titleText}</div>
         </td>
       </tr>
       <tr>

@@ -1,0 +1,18 @@
+/**
+ * 全域樣式 / Global styles
+ * 僅含頁面級規則：字型、頁面容器 — 不放任何元件專用 class。
+ * Page-level rules only (fonts, page container) — no component-specific classes.
+ */
+
+body {
+  margin: 0;
+  font-family: メイリオ, Meiryo, "MS PGothic", "Microsoft JhengHei", sans-serif;
+  background: #f5f0e6;
+  color: #2b2b2b;
+}
+
+.showcase-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
