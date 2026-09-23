@@ -3,9 +3,8 @@
 // 僅對怪物生效；玩家角色不受影響（回傳 false）。
 
 import type { Character } from './Character';
+import { PRIMARY_STATS } from './status-attrs';
 import type { RNG } from '../core/rng';
-
-const SCALE_ATTRS = ['str', 'int', 'dex', 'spd', 'luk'] as const;
 
 export function levelFix(char: Character, delta = 0, rng?: RNG): boolean {
 	if (char.isChar()) return false; // 玩家角色不調整
@@ -25,7 +24,7 @@ export function levelFix(char: Character, delta = 0, rng?: RNG): boolean {
 			factor = (factor - reduce) * mult;
 		}
 
-		for (const k of SCALE_ATTRS) {
+		for (const k of PRIMARY_STATS) {
 			char[k] = Math.ceil(char[k] * factor);
 		}
 		char.maxhp = Math.ceil(char.maxhp * factor);

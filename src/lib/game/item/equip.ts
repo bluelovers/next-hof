@@ -3,6 +3,7 @@
 // CalcEquips 計算 atk/def 與 P_*/M_* 補正；setEquip 處理雙手互斥與負荷限制。
 
 import type { Character } from '../character/Character';
+import { COMP_FIELDS } from '../character/status-attrs';
 import type { IDataRepository } from '../data/repository';
 import type { IEquipSlot, IWeaponType } from '../types';
 import { parseItem } from './Item';
@@ -41,15 +42,9 @@ export function CalcEquips(char: Character, repo: IDataRepository): void {
 		char.def[2] += item.def?.[2] ?? 0;
 		char.def[3] += item.def?.[3] ?? 0;
 
-		char.P_MAXHP += item.P_MAXHP ?? 0;
-		char.P_MAXSP += item.P_MAXSP ?? 0;
-		char.M_MAXHP += item.M_MAXHP ?? 0;
-		char.M_MAXSP += item.M_MAXSP ?? 0;
-		char.P_STR += item.P_STR ?? 0;
-		char.P_INT += item.P_INT ?? 0;
-		char.P_DEX += item.P_DEX ?? 0;
-		char.P_SPD += item.P_SPD ?? 0;
-		char.P_LUK += item.P_LUK ?? 0;
+		for (const f of COMP_FIELDS) {
+			char[f] += item[f] ?? 0;
+		}
 
 		if (item.P_SUMMON) char.addSpecial('Summon', item.P_SUMMON);
 		if (item.P_PIERCE) {

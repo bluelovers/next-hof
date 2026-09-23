@@ -3,6 +3,7 @@
 
 import { EnumState, EnumPosition } from '../constants';
 import type { Character } from './Character';
+import { BASE_STAT_COMP_MAP, PRIMARY_STATS } from './status-attrs';
 import { skillPassive } from '../skill/passive';
 import { CalcEquips } from '../item/equip';
 import type { IDataRepository } from '../data/repository';
@@ -15,11 +16,10 @@ export function setBattleVariable(char: Character, repo: IDataRepository, rng: R
 	skillPassive(char, repo);
 	CalcEquips(char, repo);
 
-	char.STR = char.str + char.P_STR;
-	char.INT = char.int + char.P_INT;
-	char.DEX = char.dex + char.P_DEX;
-	char.SPD = char.spd + char.P_SPD;
-	char.LUK = char.luk + char.P_LUK;
+	for (const k of PRIMARY_STATS) {
+		const m = BASE_STAT_COMP_MAP[k];
+		char[m.battle] = char[k] + char[m.comp];
+	}
 
 	char.MAXHP = Math.round(char.maxhp * (1 + char.M_MAXHP / 100) + char.P_MAXHP);
 	char.HP = Math.round(char.hp * (1 + char.M_MAXHP / 100) + char.P_MAXHP);

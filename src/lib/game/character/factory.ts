@@ -4,6 +4,7 @@
 import { Character } from './Character';
 import { setBattleVariable } from './battle-variable';
 import { levelFix } from './level-fix';
+import { PRIMARY_STATS } from './status-attrs';
 import type { IDataRepository } from '../data/repository';
 import type { RNG } from '../core/rng';
 import type { ICharDef, IMonDef } from '../types';
@@ -55,7 +56,7 @@ export function newMon(def: IMonDef, repo: IDataRepository, rng: RNG, strength =
 	});
 	c.rng = rng;
 	if (strength && strength !== 1) {
-		for (const k of ['str', 'int', 'dex', 'spd', 'luk'] as const) {
+		for (const k of PRIMARY_STATS) {
 			c[k] = Math.ceil(c[k] * strength);
 		}
 		c.maxhp = Math.ceil(c.maxhp * strength);

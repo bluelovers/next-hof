@@ -2,9 +2,10 @@
 // 對應 docs/log/battle/02 §3（傷害/回復）, §4（守護由 battle/guard 處理）, §7（Buff/Debuff）,
 // docs/data/skill.md（Up*/Down*/Plus*/Poison/CurePoison/HpRegen/SpRegen ...）。
 
-import { MAX_STATUS_MAXIMUM, EnumState } from '../constants';
+import { EnumState } from '../constants';
 import type { Character } from '../character/Character';
 import { hpDamage, hpRecover, getPoison, getNormal } from '../character/status';
+import { UPMAP, DOWNMAP, PLUSMAP } from '../character/status-attrs';
 import type { ISkillDef, IBattleEvent } from '../types';
 import type { RNG } from '../core/rng';
 
@@ -56,67 +57,6 @@ export function calcRecoveryValue(skill: ISkillDef, user: Character): number {
 	return Math.ceil(heal * (skill.pow ?? 100) / 100);
 }
 
-
-/**
- * 屬性函式 / Attribute function
- * 型別別名 / type alias
- */
-type IAttrFn = (c: Character, n: number) => void;
-
-const upAttr = (get: (c: Character) => number, set: (c: Character, v: number) => void): IAttrFn =>
-	(c, n) => {
-		const orig = get(c);
-		const cap = orig * (MAX_STATUS_MAXIMUM / 100);
-		const next = Math.round(orig * (1 + n / 100));
-		set(c, Math.min(next, cap));
-	};
-
-const downAttr = (get: (c: Character) => number, set: (c: Character, v: number) => void): IAttrFn =>
-	(c, n) => {
-		const orig = get(c);
-		set(c, Math.round(orig * (1 - n / 100)));
-	};
-
-const plusAttr = (get: (c: Character) => number, set: (c: Character, v: number) => void): IAttrFn =>
-	(c, n) => set(c, get(c) + n);
-
-const UPMAP: Record<string, IAttrFn> = {
-	UpSTR: upAttr((c) => c.STR, (c, v) => (c.STR = v)),
-	UpINT: upAttr((c) => c.INT, (c, v) => (c.INT = v)),
-	UpDEX: upAttr((c) => c.DEX, (c, v) => (c.DEX = v)),
-	UpSPD: upAttr((c) => c.SPD, (c, v) => (c.SPD = v)),
-	UpLUK: upAttr((c) => c.LUK, (c, v) => (c.LUK = v)),
-	UpATK: upAttr((c) => c.atk[0], (c, v) => (c.atk[0] = v)),
-	UpMATK: upAttr((c) => c.atk[1], (c, v) => (c.atk[1] = v)),
-	UpDEF: (c, n) => { c.def[0] += Math.floor((100 - c.def[0]) * (n / 100)); },
-	UpMDEF: (c, n) => { c.def[2] += Math.floor((100 - c.def[2]) * (n / 100)); },
-	UpMAXHP: upAttr((c) => c.MAXHP, (c, v) => (c.MAXHP = v)),
-	UpMAXSP: upAttr((c) => c.MAXSP, (c, v) => (c.MAXSP = v)),
-};
-
-const DOWNMAP: Record<string, IAttrFn> = {
-	DownSTR: downAttr((c) => c.STR, (c, v) => (c.STR = v)),
-	DownINT: downAttr((c) => c.INT, (c, v) => (c.INT = v)),
-	DownDEX: downAttr((c) => c.DEX, (c, v) => (c.DEX = v)),
-	DownSPD: downAttr((c) => c.SPD, (c, v) => (c.SPD = v)),
-	DownLUK: downAttr((c) => c.LUK, (c, v) => (c.LUK = v)),
-	DownATK: downAttr((c) => c.atk[0], (c, v) => (c.atk[0] = v)),
-	DownMATK: downAttr((c) => c.atk[1], (c, v) => (c.atk[1] = v)),
-	DownDEF: (c, n) => { c.def[0] = Math.round(c.def[0] * (1 - n / 100)); },
-	DownMDEF: (c, n) => { c.def[2] = Math.round(c.def[2] * (1 - n / 100)); },
-	DownMAXHP: downAttr((c) => c.MAXHP, (c, v) => (c.MAXHP = v)),
-	DownMAXSP: downAttr((c) => c.MAXSP, (c, v) => (c.MAXSP = v)),
-};
-
-const PLUSMAP: Record<string, IAttrFn> = {
-	PlusSTR: plusAttr((c) => c.STR, (c, v) => (c.STR = v)),
-	PlusINT: plusAttr((c) => c.INT, (c, v) => (c.INT = v)),
-	PlusDEX: plusAttr((c) => c.DEX, (c, v) => (c.DEX = v)),
-	PlusSPD: plusAttr((c) => c.SPD, (c, v) => (c.SPD = v)),
-	PlusLUK: plusAttr((c) => c.LUK, (c, v) => (c.LUK = v)),
-	PlusMAXHP: plusAttr((c) => c.MAXHP, (c, v) => (c.MAXHP = v)),
-	PlusMAXSP: plusAttr((c) => c.MAXSP, (c, v) => (c.MAXSP = v)),
-};
 
 /** 套用技能的状态變化（對應 StatusChanges）。增益/減益分別作用於使用者/目標。 */
 export function statusChanges(skill: ISkillDef, target: Character, user: Character, rng?: RNG): void {

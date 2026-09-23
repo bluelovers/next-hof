@@ -22,7 +22,7 @@ export const TURN_EXTENDS = 20;
 export const BATTLE_MAX_EXTENDS = 100;
 export const BATTLE_STAT_TURNS = 10;
 export const MAX_BATTLE_LOG = 100;
-export const MAX_STATUS_MAXIMUM = 2500;
+export const MAX_STATUS_MAXIMUM = MAX_STATUS * 10; // 絕對上限 = 基礎上限的 10 倍 / absolute cap = 10x base cap
 
 // Delay 系統 / Delay system
 export const DELAY_TYPE = 1; // 1 = 新版（依 SPD 距離）
