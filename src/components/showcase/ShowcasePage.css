@@ -1,0 +1,88 @@
+/**
+ * ShowcasePage 展示頁樣式（元件自包含，不依賴父頁面 class）
+ * Showcase page styles (self-contained; no parent-page class dependency)
+ *
+ * 僅含本元件自身的容器、頁首、按鈕與提示樣式；
+ * PartySelect／EncounterSelect 的樣式各自獨立於其元件 CSS。
+ * Only this component's container, header, buttons and hints; PartySelect /
+ * EncounterSelect styles live in their own component CSS files.
+ */
+
+/* ==================== 主容器 / Main container ==================== */
+
+.showcase {
+  font-family: var(--font-primary);
+}
+
+/* ==================== 頁首 / Header ==================== */
+
+.showcase-header {
+  margin-bottom: 18px;
+}
+
+.showcase-title {
+  margin: 0 0 6px;
+  font-size: 22px;
+  color: #2b2b2b;
+}
+
+.showcase-desc {
+  margin: 0;
+  font-size: 13px;
+  color: #5a6b7f;
+}
+
+/* ==================== 流程區塊 / Flow sections ==================== */
+
+.showcase-setup,
+.showcase-result {
+  display: block;
+}
+
+/* ==================== 操作列 / Action bar ==================== */
+
+.showcase-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* ==================== Battle / 再戰 按鈕 / Battle & rematch buttons ==================== */
+
+.showcase-battle-button {
+  font-family: var(--font-primary);
+  font-size: 15px;
+  font-weight: bold;
+  padding: 10px 26px;
+  border: 1px solid #7a5c00;
+  border-radius: 3px;
+  background: linear-gradient(#ffcc33, #c69500);
+  color: #1b1200;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.showcase-battle-button:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.showcase-battle-button:disabled {
+  filter: grayscale(0.7);
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ==================== 提示與錯誤 / Hints and errors ==================== */
+
+.showcase-hint {
+  font-size: 13px;
+  color: #7a5c00;
+}
+
+.showcase-error {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--color-dmg);
+}

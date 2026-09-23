@@ -1,0 +1,127 @@
+/**
+ * PartySelect 選角樣式（元件自包含，不依賴父頁面 class）
+ * PartySelect styles (self-contained; no parent-page class dependency)
+ */
+
+/* ==================== 區塊容器 / Section container ==================== */
+
+.party-select {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-mid);
+  border-radius: 4px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  font-family: var(--font-primary);
+}
+
+.party-select-heading {
+  margin: 0 0 10px;
+  font-size: 16px;
+  color: var(--color-border-heading);
+}
+
+/* ==================== 已選計數 / Selected counter ==================== */
+
+.party-select-count {
+  margin-left: 10px;
+  font-size: 13px;
+  color: var(--color-accent-gold-bright);
+}
+
+.party-select-count.is-full {
+  color: var(--color-dmg-glow);
+}
+
+/* ==================== 卡片列表 / Card list ==================== */
+
+.party-select-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+/* ==================== 單一角色卡片 / Character card ==================== */
+
+.party-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: var(--color-bg-page);
+  border: 1px solid var(--color-border-mid);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.party-card:hover {
+  border-color: var(--color-accent-gold);
+}
+
+.party-card.is-checked {
+  border-color: var(--color-accent-gold-bright);
+  background: var(--color-bg-mid);
+}
+
+.party-card.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.party-card input[type='checkbox'] {
+  accent-color: var(--color-accent-gold-bright);
+  cursor: inherit;
+  flex: none;
+}
+
+/* ==================== 精靈縮圖 / Sprite thumbnail ==================== */
+
+.party-card-sprite {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  /* 圖片缺漏時的可見占位底色 / Visible backing colour when the image is missing */
+  background-color: var(--color-bg-mid);
+  border: 1px solid var(--color-border-dark);
+  border-radius: 2px;
+}
+
+/* ==================== 名稱與資訊 / Name and info ==================== */
+
+.party-card-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.party-card-name {
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
+.party-card.is-checked .party-card-name {
+  color: var(--color-accent-gold-bright);
+}
+
+.party-card-meta {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+/* ==================== 提示訊息 / Hints ==================== */
+
+.party-select-hint {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--color-dmg-glow);
+}
+
+.party-select-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--color-text-dim);
+}

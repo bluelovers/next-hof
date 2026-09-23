@@ -1,0 +1,115 @@
+/**
+ * EncounterSelect 敵方編選樣式（元件自包含，不依賴父頁面 class）
+ * EncounterSelect styles (self-contained; no parent-page class dependency)
+ */
+
+/* ==================== 區塊容器 / Section container ==================== */
+
+.encounter-select {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-mid);
+  border-radius: 4px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  font-family: var(--font-primary);
+}
+
+.encounter-select-heading {
+  margin: 0 0 10px;
+  font-size: 16px;
+  color: var(--color-border-heading);
+}
+
+/* ==================== 選項列表 / Option list ==================== */
+
+.encounter-select-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+/* ==================== 單一編選卡片 / Encounter card ==================== */
+
+.encounter-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px;
+  background: var(--color-bg-page);
+  border: 1px solid var(--color-border-mid);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.encounter-card:hover {
+  border-color: var(--color-accent-gold);
+}
+
+.encounter-card.is-checked {
+  border-color: var(--color-accent-gold-bright);
+  background: var(--color-bg-mid);
+}
+
+.encounter-card input[type='radio'] {
+  accent-color: var(--color-accent-gold-bright);
+  cursor: inherit;
+  flex: none;
+  margin-top: 3px;
+}
+
+/* ==================== 卡片內容 / Card body ==================== */
+
+.encounter-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.encounter-card-name {
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
+.encounter-card.is-checked .encounter-card-name {
+  color: var(--color-accent-gold-bright);
+}
+
+.encounter-card-team {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+/* ==================== 怪物構成 / Monster composition ==================== */
+
+.encounter-card-mons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.encounter-mon {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.encounter-mon-sprite {
+  width: 24px;
+  height: 24px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  /* 圖片缺漏時的可見占位底色 / Visible backing colour when the image is missing */
+  background-color: var(--color-bg-mid);
+  border: 1px solid var(--color-border-dark);
+  border-radius: 2px;
+}
+
+.encounter-mon-name {
+  font-size: 12px;
+  color: var(--color-text-primary);
+}
