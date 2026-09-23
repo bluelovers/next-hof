@@ -3,7 +3,7 @@
 // CalcEquips 計算 atk/def 與 P_*/M_* 補正；setEquip 處理雙手互斥與負荷限制。
 
 import type { Character } from '../character/Character';
-import { COMP_FIELDS } from '../character/status-attrs';
+import { COMP_FIELDS, EnumAtkSlot, EnumDefSlot } from '../character/status-attrs';
 import type { IDataRepository } from '../data/repository';
 import type { IEquipSlot, IWeaponType } from '../types';
 import { parseItem } from './Item';
@@ -35,12 +35,12 @@ export function CalcEquips(char: Character, repo: IDataRepository): void {
 		if (!item) continue;
 		if (slot === 'main_hand') char.WEAPON = item.type as IWeaponType;
 
-		char.atk[0] += item.atk?.[0] ?? 0;
-		char.atk[1] += item.atk?.[1] ?? 0;
-		char.def[0] += item.def?.[0] ?? 0;
-		char.def[1] += item.def?.[1] ?? 0;
-		char.def[2] += item.def?.[2] ?? 0;
-		char.def[3] += item.def?.[3] ?? 0;
+		char.atk[EnumAtkSlot.Phys] += item.atk?.[EnumAtkSlot.Phys] ?? 0;
+		char.atk[EnumAtkSlot.Mag] += item.atk?.[EnumAtkSlot.Mag] ?? 0;
+		char.def[EnumDefSlot.PhysPct] += item.def?.[EnumDefSlot.PhysPct] ?? 0;
+		char.def[EnumDefSlot.PhysFlat] += item.def?.[EnumDefSlot.PhysFlat] ?? 0;
+		char.def[EnumDefSlot.MagPct] += item.def?.[EnumDefSlot.MagPct] ?? 0;
+		char.def[EnumDefSlot.MagFlat] += item.def?.[EnumDefSlot.MagFlat] ?? 0;
 
 		for (const f of COMP_FIELDS) {
 			char[f] += item[f] ?? 0;
@@ -48,8 +48,8 @@ export function CalcEquips(char: Character, repo: IDataRepository): void {
 
 		if (item.P_SUMMON) char.addSpecial('Summon', item.P_SUMMON);
 		if (item.P_PIERCE) {
-			char.SPECIAL.Pierce[0] += item.P_PIERCE;
-			char.SPECIAL.Pierce[1] += item.P_PIERCE;
+			char.SPECIAL.Pierce[EnumAtkSlot.Phys] += item.P_PIERCE;
+			char.SPECIAL.Pierce[EnumAtkSlot.Mag] += item.P_PIERCE;
 		}
 	}
 }

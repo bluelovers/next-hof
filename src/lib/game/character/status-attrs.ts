@@ -5,8 +5,26 @@
 
 import { MAX_STATUS_MAXIMUM } from '../constants';
 import type { Character } from './Character';
-import type { IStatusAttr } from '../types';
 
+/**
+ * atk 陣列索引（物理/魔法）/ atk array indices (physical/magic)
+ * 列舉 / enumeration
+ */
+export enum EnumAtkSlot {
+	Phys = 0,
+	Mag = 1,
+}
+
+/**
+ * def 陣列索引（物理%, 物理-, 魔法%, 魔法-）/ def array indices
+ * 列舉 / enumeration
+ */
+export enum EnumDefSlot {
+	PhysPct = 0,
+	PhysFlat = 1,
+	MagPct = 2,
+	MagFlat = 3,
+}
 
 /**
  * 屬性函式 / Attribute function
@@ -49,6 +67,18 @@ const plusAttr = (get: (c: Character) => number, set: (c: Character, v: number) 
 	(c, n) => set(c, get(c) + n);
 
 /**
+ * 狀態屬性鍵（單一事實來源；對照表與型別皆由此衍生）/ Status attribute keys (single source)
+ * 型別別名 / type alias
+ */
+export const STATUS_ATTR_KEYS = [
+	'STR', 'INT', 'DEX', 'SPD', 'LUK',
+	'ATK', 'MATK', 'DEF', 'MDEF', 'MAXHP', 'MAXSP',
+] as const;
+
+/** 狀態屬性鍵型別 / Status attribute key type */
+export type IStatusAttr = typeof STATUS_ATTR_KEYS[number];
+
+/**
  * 狀態屬性對照表（單一事實來源）/ Status attribute lookup table (single source of truth)
  * 鍵為 IStatusAttr；每個屬性描述其角色欄位讀寫與 up/down/plus 語意。
  * DEF/MDEF 的 up/down 採百分比累計，與其他屬性不同，故自定。
@@ -59,19 +89,19 @@ export const STATUS_ATTR_TABLE: Record<IStatusAttr, IStatusAttrEntry> = {
 	DEX: { get: (c) => c.DEX, set: (c, v) => { c.DEX = v; }, plus: plusAttr((c) => c.DEX, (c, v) => { c.DEX = v; }) },
 	SPD: { get: (c) => c.SPD, set: (c, v) => { c.SPD = v; }, plus: plusAttr((c) => c.SPD, (c, v) => { c.SPD = v; }) },
 	LUK: { get: (c) => c.LUK, set: (c, v) => { c.LUK = v; }, plus: plusAttr((c) => c.LUK, (c, v) => { c.LUK = v; }) },
-	ATK: { get: (c) => c.atk[0], set: (c, v) => { c.atk[0] = v; } },
-	MATK: { get: (c) => c.atk[1], set: (c, v) => { c.atk[1] = v; } },
+	ATK: { get: (c) => c.atk[EnumAtkSlot.Phys], set: (c, v) => { c.atk[EnumAtkSlot.Phys] = v; } },
+	MATK: { get: (c) => c.atk[EnumAtkSlot.Mag], set: (c, v) => { c.atk[EnumAtkSlot.Mag] = v; } },
 	DEF: {
-		get: (c) => c.def[0],
-		set: (c, v) => { c.def[0] = v; },
-		up: (c, n) => { c.def[0] += Math.floor((100 - c.def[0]) * (n / 100)); },
-		down: (c, n) => { c.def[0] = Math.round(c.def[0] * (1 - n / 100)); },
+		get: (c) => c.def[EnumDefSlot.PhysPct],
+		set: (c, v) => { c.def[EnumDefSlot.PhysPct] = v; },
+		up: (c, n) => { c.def[EnumDefSlot.PhysPct] += Math.floor((100 - c.def[EnumDefSlot.PhysPct]) * (n / 100)); },
+		down: (c, n) => { c.def[EnumDefSlot.PhysPct] = Math.round(c.def[EnumDefSlot.PhysPct] * (1 - n / 100)); },
 	},
 	MDEF: {
-		get: (c) => c.def[2],
-		set: (c, v) => { c.def[2] = v; },
-		up: (c, n) => { c.def[2] += Math.floor((100 - c.def[2]) * (n / 100)); },
-		down: (c, n) => { c.def[2] = Math.round(c.def[2] * (1 - n / 100)); },
+		get: (c) => c.def[EnumDefSlot.MagPct],
+		set: (c, v) => { c.def[EnumDefSlot.MagPct] = v; },
+		up: (c, n) => { c.def[EnumDefSlot.MagPct] += Math.floor((100 - c.def[EnumDefSlot.MagPct]) * (n / 100)); },
+		down: (c, n) => { c.def[EnumDefSlot.MagPct] = Math.round(c.def[EnumDefSlot.MagPct] * (1 - n / 100)); },
 	},
 	MAXHP: { get: (c) => c.MAXHP, set: (c, v) => { c.MAXHP = v; }, plus: plusAttr((c) => c.MAXHP, (c, v) => { c.MAXHP = v; }) },
 	MAXSP: { get: (c) => c.MAXSP, set: (c, v) => { c.MAXSP = v; }, plus: plusAttr((c) => c.MAXSP, (c, v) => { c.MAXSP = v; }) },

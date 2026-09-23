@@ -5,7 +5,7 @@
 import { EnumState } from '../constants';
 import type { Character } from '../character/Character';
 import { hpDamage, hpRecover, getPoison, getNormal } from '../character/status';
-import { UPMAP, DOWNMAP, PLUSMAP } from '../character/status-attrs';
+import { UPMAP, DOWNMAP, PLUSMAP, EnumAtkSlot, EnumDefSlot } from '../character/status-attrs';
 import type { ISkillDef, IBattleEvent } from '../types';
 import type { RNG } from '../core/rng';
 
@@ -26,17 +26,17 @@ export function calcBasicDamage(skill: ISkillDef, user: Character, target: Chara
 	const stat = skill.inf === 'dex'
 		? user.DEX
 		: (isMagic ? user.INT : user.STR);
-	const atkIdx = isMagic ? 1 : 0;
+	const atkIdx = isMagic ? EnumAtkSlot.Mag : EnumAtkSlot.Phys;
 	const base = Math.sqrt(stat) * 10 + (user.atk[atkIdx] ?? 0);
 	let raw = base * (skill.pow ?? 100) / 100;
 
 	if (!skill.pierce) {
 		if (isMagic) {
-			raw = raw * (1 - (target.def[2] ?? 0) / 100);
-			raw = raw - (target.def[3] ?? 0);
+			raw = raw * (1 - (target.def[EnumDefSlot.MagPct] ?? 0) / 100);
+			raw = raw - (target.def[EnumDefSlot.MagFlat] ?? 0);
 		} else {
-			raw = raw * (1 - (target.def[0] ?? 0) / 100);
-			raw = raw - (target.def[1] ?? 0);
+			raw = raw * (1 - (target.def[EnumDefSlot.PhysPct] ?? 0) / 100);
+			raw = raw - (target.def[EnumDefSlot.PhysFlat] ?? 0);
 		}
 	}
 
@@ -44,7 +44,7 @@ export function calcBasicDamage(skill: ISkillDef, user: Character, target: Chara
 	let dmg = Math.max(raw, minDmg);
 
 	if (skill.pierce) {
-		const p = user.SPECIAL.Pierce[isMagic ? 1 : 0] ?? 0;
+		const p = user.SPECIAL.Pierce[isMagic ? EnumAtkSlot.Mag : EnumAtkSlot.Phys] ?? 0;
 		dmg += (p * (skill.pow ?? 100)) / 100;
 	}
 
@@ -53,7 +53,7 @@ export function calcBasicDamage(skill: ISkillDef, user: Character, target: Chara
 
 /** 回復量計算（對應 CalcRecoveryValue） */
 export function calcRecoveryValue(skill: ISkillDef, user: Character): number {
-	const heal = Math.sqrt(user.INT) * 10 + (user.atk[1] ?? 0);
+	const heal = Math.sqrt(user.INT) * 10 + (user.atk[EnumAtkSlot.Mag] ?? 0);
 	return Math.ceil(heal * (skill.pow ?? 100) / 100);
 }
 

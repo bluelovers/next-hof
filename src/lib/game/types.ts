@@ -2,6 +2,7 @@
 // 欄位對應 docs/data/{char,job,skill,item,mon}.md 分析的 YAML 結構。
 
 import { EnumState } from './constants';
+import type { ICompField } from './character/status-attrs';
 
 /**
  * 角色類型 / Character type
@@ -75,9 +76,13 @@ export type ITargetSpec = [ITargetType, ITargetMethod, number];
  * 狀態屬性 / Status attribute
  * 型別別名 / type alias
  */
-export type IStatusAttr =
-	| 'STR' | 'INT' | 'DEX' | 'SPD' | 'LUK'
-	| 'ATK' | 'MATK' | 'DEF' | 'MDEF' | 'MAXHP' | 'MAXSP';
+export type { IStatusAttr } from './character/status-attrs';
+
+/**
+ * 補正欄位型別（P_* / M_*，單一事實來源由 COMP_FIELDS 衍生）/ Compensation bonus type
+ * 型別別名 / type alias
+ */
+export type ICompBonuses = Partial<Record<ICompField, number>>;
 
 /**
  * 特殊能力定義 / Special ability definition
@@ -98,7 +103,7 @@ export interface ISpecial {
  * 技能定義 / Skill definition
  * 介面 / interface
  */
-export interface ISkillDef {
+export interface ISkillDef extends ICompBonuses {
 	no: number;
 	name: string;
 	img?: string;
@@ -115,10 +120,6 @@ export interface ISkillDef {
 	charge?: [number, number]; // [詠唱/蓄力, 硬直]
 	stiff?: number;
 	inf?: 'dex' | 'str';
-	// 被動技能授予的能力補正 / passive-granted compensation
-	P_MAXHP?: number; P_MAXSP?: number;
-	P_STR?: number; P_INT?: number; P_DEX?: number; P_SPD?: number; P_LUK?: number;
-	M_MAXHP?: number; M_MAXSP?: number;
 	HealBonus?: number;
 	// 能力變化 / status effects
 	UpSTR?: number; UpINT?: number; UpDEX?: number; UpSPD?: number; UpLUK?: number;
@@ -153,7 +154,7 @@ export interface ISkillDef {
  * 道具定義 / Item definition
  * 介面 / interface
  */
-export interface IItemDef {
+export interface IItemDef extends ICompBonuses {
 	no: number;
 	name: string;
 	type: IWeaponType;
@@ -167,9 +168,6 @@ export interface IItemDef {
 	handle?: number; // 負荷
 	need?: Record<number, number>; // { job_no: level }
 	base_name?: string;
-	P_MAXHP?: number; P_MAXSP?: number;
-	P_STR?: number; P_INT?: number; P_DEX?: number; P_SPD?: number; P_LUK?: number;
-	M_MAXHP?: number; M_MAXSP?: number;
 	P_SUMMON?: number;
 	P_PIERCE?: number;
 }
