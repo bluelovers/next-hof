@@ -4,21 +4,25 @@
  * 介面 / interface
  */
 export interface ITimeService {
-	/** 目前虛擬時間（毫秒） */
+	/** 目前虛擬時間（毫秒）/ current virtual time (ms) */
 	now(): number;
-	/** 推進虛擬時鐘 */
+	/** 推進虛擬時鐘 / advance the virtual clock */
 	advance(ms: number): void;
 	/**
 	 * 冷卻狀態判斷。
 	 * 對應規格場景：now()=1200 時，isReady(0,1000)=false、isReady(0,1500)=true。
 	 * 語意：回傳 true 表示 at+cooldownMs 尚未到達（仍在冷卻中）。
+	 *
+	 * Cooldown check.
+	 * Spec scenario: with now()=1200, isReady(0,1000)=false and isReady(0,1500)=true.
+	 * Semantics: returns true while at+cooldownMs has NOT been reached (still cooling down).
 	 */
 	isReady(at: number, cooldownMs: number): boolean;
-	/** 冷卻結束的絕對時間 */
+	/** 冷卻結束的絕對時間 / absolute time when the cooldown ends */
 	nextReadyAt(at: number, cooldownMs: number): number;
 }
 
-/** 測試用：以計數器模擬時間 */
+/** 測試用：以計數器模擬時間 / For tests: virtual time simulated by a counter */
 export class FakeTimeService implements ITimeService {
 	private t = 0;
 
@@ -39,7 +43,7 @@ export class FakeTimeService implements ITimeService {
 	}
 }
 
-/** 正式環境：以真實 Date.now() 為基礎（無法 advance） */
+/** 正式環境：以真實 Date.now() 為基礎（無法 advance）/ production: based on real Date.now() (advance not supported) */
 export class RealTimeService implements ITimeService {
 	now(): number {
 		return Date.now();

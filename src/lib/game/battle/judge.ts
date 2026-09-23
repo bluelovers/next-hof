@@ -6,10 +6,16 @@ import type { Character } from '../character/Character';
 
 /**
  * 判定某行為條件碼是否成立。
- * @param code 判定碼
- * @param char 觸發角色
- * @param battle 戰鬥（可選，部分判定會參考 turn 等）
- * @returns 是否成立
+ * Evaluate whether a behavior condition (judge code) holds.
+ *
+ * 已實作 / implemented: 1000/1001（恆真 default）、1101（HP% ≤ 40）、1940（約 10% 機率）；
+ * 1300–1381、1405、9000、1205 及其餘未實作碼一律回傳 false（保守退回預設動作）。
+ * 1300–1381, 1405, 9000, 1205 and any unimplemented code return false (conservatively falls back to the default action).
+ *
+ * @param code 判定碼 / judge code
+ * @param char 觸發角色 / acting character
+ * @param battle 戰鬥（可選，部分判定會參考 turn 等）/ battle (optional; some codes inspect turn, etc.)
+ * @returns 是否成立 / whether the condition holds
  */
 export function DecideJudge(code: number, char: Character, battle?: unknown): boolean {
 	// 預設動作碼：恆真

@@ -8,10 +8,16 @@ import type { IDataRepository } from '../data/repository';
 /**
  * 原始道具資料 / Raw item data
  * 型別別名 / type alias
+ *
+ * 必填欄位（no/name/type）+ 其餘 IItemDef 欄位皆可缺省。
+ * Required fields (no/name/type) plus optional remaining IItemDef fields.
  */
 type IRawItem = Partial<IItemDef> & { no: number; name: string; type: EnumWeaponType };
 
-/** 正規化原始物品資料，補齊陣列預設值 */
+/**
+ * 正規化原始物品資料，補齊陣列預設值
+ * Normalize raw item data, filling in array defaults
+ */
 export function parseItem(raw: IRawItem): IItemDef {
 	return {
 		...raw,
@@ -33,6 +39,9 @@ export function parseItem(raw: IRawItem): IItemDef {
 	};
 }
 
+/**
+ * 依編號取得道具（倉庫無此筆回傳 undefined）/ fetch an item by number (undefined when absent)
+ */
 export function getItem(no: number, repo: IDataRepository): IItemDef | undefined {
 	const d = repo.getItem(no);
 	return d ? parseItem(d) : undefined;

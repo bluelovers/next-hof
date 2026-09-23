@@ -27,21 +27,38 @@ import { EnumTargetType, EnumTargetMethod, EnumBattleEventType } from '../types'
  * 介面 / interface
  */
 export interface IBattleConfig {
+	/** 資料儲存庫（技能/職業/物品/怪物/角色）/ data repository (skills/jobs/items/mons/chars) */
 	repo: IDataRepository;
+	/** 可注入的隨機源 / injectable random source */
 	rng: RNG;
+	/** 虛擬時間服務（省略時不啟用時間相關功能）/ virtual time service (time features disabled when omitted) */
 	time?: ITimeService;
 }
 
 export class Battle {
+	/** 資料儲存庫 / data repository */
 	repo: IDataRepository;
+	/** 隨機源 / random source */
 	rng: RNG;
+	/** 時間服務（可為 null）/ time service (may be null) */
 	time: ITimeService | null;
+	/** 雙方隊伍（鍵 '0'／'1'）/ both teams (keys '0' / '1') */
 	teams: { '0': BattleTeam; '1': BattleTeam };
+	/** 當前回合數 / current turn counter */
 	turn = 0;
+	/** 延長次數 / extension count */
 	extend = 0;
+	/** 戰鬥事件紀錄 / battle event log */
 	log: IBattleEvent[] = [];
+	/** 戰鬥結果（null＝尚未分出勝負）/ battle result (null = not decided yet) */
 	result: BattleResult | null = null;
 
+	/**
+	 * 建立戰鬥並初始化雙方單位 / Create the battle and initialize both sides
+	 * @param team0 己方角色 / own characters
+	 * @param team1 敵方角色 / enemy characters
+	 * @param cfg 戰鬥配置 / battle configuration
+	 */
 	constructor(team0: Character[], team1: Character[], cfg: IBattleConfig) {
 		this.repo = cfg.repo;
 		this.rng = cfg.rng;
@@ -55,20 +72,23 @@ export class Battle {
 		}
 	}
 
+	/** 所有單位（己隊 + 敵隊）/ every unit on both teams */
 	allChars(): Character[] {
 		return [...this.teams['0'].members, ...this.teams['1'].members];
 	}
 
+	/** 取得該單位的敵對隊伍 / the opposing team of the given unit */
 	enemyTeamOf(char: Character): BattleTeam {
 		const side = (char.team as BattleTeam).side;
 		return side === '0' ? this.teams['1'] : this.teams['0'];
 	}
 
+	/** 行動延遲值：sqrt(SPD) + DELAY_BASE（SPD 越高延遲越短）/ action delay: sqrt(SPD) + DELAY_BASE (higher SPD = shorter delay) */
 	DelayValue(c: Character): number {
 		return Math.sqrt(c.SPD) + DELAY_BASE;
 	}
 
-	/** 選出下一個行動者：delay 最小者；同 delay 時高 SPD 優先（對應 SPD 越高越早上場） */
+	/** 選出下一個行動者：delay 最小者；同 delay 時高 SPD 優先（對應 SPD 越高越早上場）/ pick the next actor: lowest delay, ties broken by higher SPD (higher SPD acts earlier) */
 	NextActer(): Character | null {
 		let best: Character | null = null;
 		let bestDelay = Infinity;
@@ -85,18 +105,35 @@ export class Battle {
 		return best;
 	}
 
+	/** 死亡者 delay 設為 Infinity（NextActer 永遠跳過死亡者）/ set dead units' delay to Infinity so NextActer always skips them */
 	SetDelay(): void {
 		for (const c of this.allChars()) {
 			if (c.STATE === EnumState.Dead) c.delay = Infinity;
 		}
 	}
 
+	/**
+	 * 取得下一個技能編號（樣式判定失敗時回預設 1000 攻擊）
+	 * Pick the next skill number (falls back to the default attack 1000 when no rule matches)
+	 */
 	ChooseSkill(actor: Character): number {
 		const keys = buildPattern(actor);
 		const action = MultiFactJudge(keys, actor, this);
 		return action ?? 1000;
 	}
 
+	/**
+	 * 依技能 target 規格選取目標 / Pick targets per the skill's target spec
+	 *
+	 * 分支 / branches:
+	 * - Enemy + all → 敵方全體存活者 / all living enemies
+	 * - Enemy + multi → 敵方隨機 count 人 / random `count` enemies
+	 * - Enemy + individual → 敵方隨機 1 人 / one random enemy
+	 * - Friend + all/multi/individual → 己方對應分支（同上，改為 friendTeam）
+	 *   friend-side equivalents of the enemy branches above
+	 * - Self → 使用者本人 / the actor itself
+	 * - 其餘（如 All）→ 雙方所有存活單位 / otherwise (e.g. All) → every living unit on both sides
+	 */
 	selectTargets(actor: Character, skill: ISkillDef): Character[] {
 		const enemyTeam = this.enemyTeamOf(actor);
 		const friendTeam = actor.team as BattleTeam;
@@ -120,6 +157,14 @@ export class Battle {
 		return this.allChars().filter((c) => c.STATE !== EnumState.Dead);
 	}
 
+	/**
+	 * 施放技能 / Execute a skill
+	 *
+	 * 流程 / flow: 取技能 → 詠唱/蓄力門檻（charge）→ SP 檢查（怪物 ×0.7）→ 選目標 →
+	 * 守護攔截（非 support/invalid/All）→ applySkill → HP<=0 標記死亡。
+	 * fetch skill → charge gate → SP check (monsters ×0.7) → pick targets →
+	 * guard interception (unless support/invalid/All) → applySkill → mark death at HP<=0.
+	 */
 	UseSkill(actor: Character, skillNo: number): void {
 		const skill = getSkill(skillNo, this.repo);
 		if (!skill) return;
@@ -158,6 +203,11 @@ export class Battle {
 		}
 	}
 
+	/**
+	 * 執行單一單位的回合 / Run one unit's turn
+	 * 自動回復 → 中毒傷害 → 死亡則跳過 → 選技能 → 施放 → 行動計數 +1。
+	 * auto-regen → poison damage → skip if dead → choose skill → cast → actCount +1.
+	 */
 	Action(actor: Character): void {
 		autoRegeneration(actor);
 		poisonDamage(actor);
@@ -167,7 +217,10 @@ export class Battle {
 		actor.actCount++;
 	}
 
-	/** 執行整場戰鬥直到分出勝負或超時平手 */
+	/**
+	 * 執行整場戰鬥直到分出勝負或超時平手
+	 * Run the whole battle until an outcome or a timeout draw
+	 */
 	run(): BattleResult {
 		while (!this.result) {
 			const actor = this.NextActer();

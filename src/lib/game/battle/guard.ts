@@ -7,7 +7,15 @@ import type { BattleTeam } from '../team/BattleTeam';
 import type { ISkillDef } from '../types';
 import { EnumGuardKind, EnumTargetType } from '../types';
 
-/** 依守護種類判斷前排守護者是否當前生效 */
+/**
+ * 依守護種類判斷前排守護者是否當前生效
+ * Whether the front-row guardian is currently active, per its guard kind
+ *
+ * Always/Never 為恆真/恆假；Life25/50/75 依 HP% 門檻；
+ * Prob25/50/75 以 randInt(0,99) 擲出百分比機率（無 rng 時視為 false）。
+ * Always/Never are constant; Life25/50/75 check an HP% threshold;
+ * Prob25/50/75 roll randInt(0,99) against a percentage chance (false without an rng).
+ */
 export function guardActive(guardChar: Character): boolean {
 	const kind = guardChar.behavior?.guard ?? EnumGuardKind.Always;
 	switch (kind) {
@@ -26,6 +34,8 @@ export function guardActive(guardChar: Character): boolean {
 /**
  * 若目標位於後排且技能非全體/貫穿/支援，則回傳可攔截的前排守護者；
  * 否則回傳 null（直接命中目標）。
+ * If the target is in the back row and the skill is not all/guard-piercing/support,
+ * returns the intercepting front-row guardian; otherwise null (target is hit directly).
  */
 export function Defending(team: BattleTeam, target: Character, skill: ISkillDef): Character | null {
 	if (skill.target?.[0] === EnumTargetType.All) return null;

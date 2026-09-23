@@ -11,7 +11,9 @@ import type { Character } from './Character';
  * 列舉 / enumeration
  */
 export enum EnumAtkSlot {
+	/** 物理攻擊（atk[0]）/ physical attack (atk[0]) */
 	Phys = 0,
+	/** 魔法攻擊（atk[1]）/ magic attack (atk[1]) */
 	Mag = 1,
 }
 
@@ -20,15 +22,23 @@ export enum EnumAtkSlot {
  * 列舉 / enumeration
  */
 export enum EnumDefSlot {
+	/** 物理減傷 %（def[0]）/ physical damage reduction % (def[0]) */
 	PhysPct = 0,
+	/** 物理定值減傷（def[1]）/ physical flat damage reduction (def[1]) */
 	PhysFlat = 1,
+	/** 魔法減傷 %（def[2]）/ magic damage reduction % (def[2]) */
 	MagPct = 2,
+	/** 魔法定值減傷（def[3]）/ magic flat damage reduction (def[3]) */
 	MagFlat = 3,
 }
 
 /**
  * 屬性函式 / Attribute function
  * 型別別名 / type alias
+ *
+ * 接收角色與數值 n（% 或點數，依公式而定），直接對角色套用變化。
+ * Receives the character and a number n (% or flat, depending on the formula)
+ * and mutates the character in place.
  */
 export type IAttrFn = (c: Character, n: number) => void;
 
@@ -50,7 +60,10 @@ export interface IStatusAttrEntry {
 	plus?: IAttrFn;
 }
 
-/** 通用增益：round(orig*(1+n/100))，上限 orig*(MAX_STATUS_MAXIMUM/100) */
+/**
+ * 通用增益：round(orig*(1+n/100))，上限 orig*(MAX_STATUS_MAXIMUM/100)
+ * Generic buff: round(orig*(1+n/100)), capped at orig*(MAX_STATUS_MAXIMUM/100)
+ */
 const upAttr = (get: (c: Character) => number, set: (c: Character, v: number) => void): IAttrFn =>
 	(c, n) => {
 		const orig = get(c);
@@ -58,11 +71,17 @@ const upAttr = (get: (c: Character) => number, set: (c: Character, v: number) =>
 		set(c, Math.min(Math.round(orig * (1 + n / 100)), cap));
 	};
 
-/** 通用減益：round(orig*(1-n/100)) */
+/**
+ * 通用減益：round(orig*(1-n/100))
+ * Generic debuff: round(orig*(1-n/100))
+ */
 const downAttr = (get: (c: Character) => number, set: (c: Character, v: number) => void): IAttrFn =>
 	(c, n) => set(c, Math.round(get(c) * (1 - n / 100)));
 
-/** 通用加成：orig + n */
+/**
+ * 通用加成：orig + n
+ * Generic flat bonus: orig + n
+ */
 const plusAttr = (get: (c: Character) => number, set: (c: Character, v: number) => void): IAttrFn =>
 	(c, n) => set(c, get(c) + n);
 
@@ -75,7 +94,10 @@ export const STATUS_ATTR_KEYS = [
 	'ATK', 'MATK', 'DEF', 'MDEF', 'MAXHP', 'MAXSP',
 ] as const;
 
-/** 狀態屬性鍵型別 / Status attribute key type */
+/**
+ * 狀態屬性鍵型別 / Status attribute key type
+ * 型別別名 / type alias（由 STATUS_ATTR_KEYS 衍生 / derived from STATUS_ATTR_KEYS）
+ */
 export type IStatusAttr = typeof STATUS_ATTR_KEYS[number];
 
 /**
@@ -92,22 +114,41 @@ export const STATUS_ATTR_TABLE: Record<IStatusAttr, IStatusAttrEntry> = {
 	ATK: { get: (c) => c.atk[EnumAtkSlot.Phys], set: (c, v) => { c.atk[EnumAtkSlot.Phys] = v; } },
 	MATK: { get: (c) => c.atk[EnumAtkSlot.Mag], set: (c, v) => { c.atk[EnumAtkSlot.Mag] = v; } },
 	DEF: {
+		/** DEF 掛在物理%減傷槽 / DEF maps to the physical-% reduction slot */
 		get: (c) => c.def[EnumDefSlot.PhysPct],
 		set: (c, v) => { c.def[EnumDefSlot.PhysPct] = v; },
+		/**
+		 * 自定增益：填補剩餘空間的 n%（不會超過 100%）
+		 * custom up: adds n% of the remaining room toward 100% (never exceeds 100%)
+		 */
 		up: (c, n) => { c.def[EnumDefSlot.PhysPct] += Math.floor((100 - c.def[EnumDefSlot.PhysPct]) * (n / 100)); },
+		/** 自定減益：現值乘以 (1-n/100) / custom down: multiplies current value by (1-n/100) */
 		down: (c, n) => { c.def[EnumDefSlot.PhysPct] = Math.round(c.def[EnumDefSlot.PhysPct] * (1 - n / 100)); },
 	},
 	MDEF: {
+		/** MDEF 掛在魔法%減傷槽 / MDEF maps to the magic-% reduction slot */
 		get: (c) => c.def[EnumDefSlot.MagPct],
 		set: (c, v) => { c.def[EnumDefSlot.MagPct] = v; },
+		/**
+		 * 自定增益：填補剩餘空間的 n%（不會超過 100%）
+		 * custom up: adds n% of the remaining room toward 100% (never exceeds 100%)
+		 */
 		up: (c, n) => { c.def[EnumDefSlot.MagPct] += Math.floor((100 - c.def[EnumDefSlot.MagPct]) * (n / 100)); },
+		/** 自定減益：現值乘以 (1-n/100) / custom down: multiplies current value by (1-n/100) */
 		down: (c, n) => { c.def[EnumDefSlot.MagPct] = Math.round(c.def[EnumDefSlot.MagPct] * (1 - n / 100)); },
 	},
 	MAXHP: { get: (c) => c.MAXHP, set: (c, v) => { c.MAXHP = v; }, plus: plusAttr((c) => c.MAXHP, (c, v) => { c.MAXHP = v; }) },
 	MAXSP: { get: (c) => c.MAXSP, set: (c, v) => { c.MAXSP = v; }, plus: plusAttr((c) => c.MAXSP, (c, v) => { c.MAXSP = v; }) },
 };
 
-/** 由對照表衍生 Up* / Down* / Plus* 操作對照（單一事實來源衍生）/ Derived op maps */
+/**
+ * 由對照表衍生 Up* / Down* / Plus* 操作對照（單一事實來源衍生）/ Derived op maps
+ *
+ * 逐一走訪 STATUS_ATTR_TABLE：up/down 缺省時回退至通用 upAttr/downAttr；
+ * plus 僅在有登錄時才建立 Plus* 鍵（Plus 只對六維與 MAXHP/MAXSP 存在）。
+ * Walks STATUS_ATTR_TABLE: missing up/down fall back to the generic upAttr/downAttr;
+ * Plus* keys are created only where plus is registered (six primary stats + MAXHP/MAXSP).
+ */
 function buildStatusMaps(): { UPMAP: Record<string, IAttrFn>; DOWNMAP: Record<string, IAttrFn>; PLUSMAP: Record<string, IAttrFn> } {
 	const UPMAP: Record<string, IAttrFn> = {};
 	const DOWNMAP: Record<string, IAttrFn> = {};
@@ -136,6 +177,11 @@ export const COMP_FIELDS = [
 	'P_STR', 'P_INT', 'P_DEX', 'P_SPD', 'P_LUK',
 	'P_MAXHP', 'P_MAXSP', 'M_MAXHP', 'M_MAXSP',
 ] as const;
+
+/**
+ * 補正欄位型別 / Compensation field type
+ * 型別別名 / type alias（由 COMP_FIELDS 衍生 / derived from COMP_FIELDS）
+ */
 export type ICompField = typeof COMP_FIELDS[number];
 
 /**
@@ -143,6 +189,11 @@ export type ICompField = typeof COMP_FIELDS[number];
  * 型別別名 / type alias
  */
 export const PRIMARY_STATS = ['str', 'int', 'dex', 'spd', 'luk'] as const;
+
+/**
+ * 基礎六維型別 / Primary base stat type
+ * 型別別名 / type alias（由 PRIMARY_STATS 衍生 / derived from PRIMARY_STATS）
+ */
 export type IPrimaryStat = typeof PRIMARY_STATS[number];
 
 /**

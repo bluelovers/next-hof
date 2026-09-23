@@ -8,12 +8,12 @@ import type { IDataRepository } from '../data/repository';
 import { EnumEquipSlot, EnumWeaponType } from '../types';
 import { parseItem } from './Item';
 
-/** 玩家最大負荷：5 + floor(level/10) + floor(DEX/5) */
+/** 玩家最大負荷：5 + floor(level/10) + floor(DEX/5) / max equipment weight: 5 + floor(level/10) + floor(DEX/5) */
 export function getHandleMax(char: Character): number {
 	return 5 + Math.floor(char.level / 10) + Math.floor(char.DEX / 5);
 }
 
-/** 目前裝備總負荷 */
+/** 目前裝備總負荷 / total weight of currently equipped items */
 export function currentHandle(char: Character, repo: IDataRepository): number {
 	let h = 0;
 	for (const no of Object.values(char.equip)) {
@@ -24,7 +24,15 @@ export function currentHandle(char: Character, repo: IDataRepository): number {
 	return h;
 }
 
-/** 依目前裝備計算 atk/def 與 P_、M_ 補正 */
+/**
+ * 依目前裝備計算 atk/def 與 P_、M_ 補正
+ * Recompute atk/def and P_/M_ bonuses from the current equipment
+ *
+ * 逐欄位累加 atk/def；主手額外寫入 char.WEAPON 供技能武器限制比對；
+ * 補正欄位（COMP_FIELDS）與 P_SUMMON/P_PIERCE 一併累加。
+ * Sums atk/def per slot; MainHand additionally writes char.WEAPON for skill weapon limits;
+ * compensation fields (COMP_FIELDS) plus P_SUMMON/P_PIERCE are accumulated too.
+ */
 export function CalcEquips(char: Character, repo: IDataRepository): void {
 	char.atk = [0, 0];
 	char.def = [0, 0, 0, 0];
@@ -56,10 +64,15 @@ export function CalcEquips(char: Character, repo: IDataRepository): void {
 
 /**
  * 裝備物品。回傳 [是否失敗, 被強制卸下的物品編號陣列]。
+ * Equip an item. Returns [failed, forcibly removed item numbers].
  * 規則（對應 setEquip）：
+ * Rules (mirrors setEquip):
  *  - 雙手武器(dh) 互斥：主手/副手其一為 dh 時，卸下另一側。
+ *    two-handed (dh) exclusivity: when either hand holds a dh item, the other is unequipped.
  *  - 負荷限制：裝備後總 handle 不得超過 getHandleMax。
+ *    weight limit: total handle after equipping must not exceed getHandleMax.
  *  - need（職業需求）僅讀取，不強制檢查（與原始行為一致）。
+ *    need (job requirement) is read but not enforced (matches original behavior).
  */
 export function setEquip(
 	char: Character,

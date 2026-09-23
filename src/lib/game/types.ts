@@ -7,76 +7,156 @@ import type { ICompField } from './character/status-attrs';
 /**
  * 角色類型 / Character type
  * 列舉 / enumeration
+ *
+ * 以 Set<EnumCharType> 存於 Character.types，可同時持有複數類型：
+ * Stored as Set<EnumCharType> on Character.types; a unit may hold several types at once:
+ * 召喚物 = Mon + Summon、工會怪 = Mon + Union（factory 以 add() 疊加）。
+ * summon = Mon + Summon, union monster = Mon + Union (factory stacks them via add()).
+ * 戰鬥統計（CountAlive 等）據此排除召喚物，勝負判定只計算真實角色。
+ * Battle counters (CountAlive etc.) exclude summons based on this; only real chars decide victory.
  */
 export enum EnumCharType {
+	/** 玩家角色 / Player character */
 	Char = 'char',
+	/** 怪物 / Monster */
 	Mon = 'mon',
+	/** 召喚物（疊加於 Mon 之上）/ Summon (stacked on top of Mon) */
 	Summon = 'summon',
+	/** 工會怪（疊加於 Mon 之上）/ Union monster (stacked on top of Mon) */
 	Union = 'union',
 }
 
 /**
  * 裝備欄位 / Equipment slot
  * 列舉 / enumeration
+ *
+ * 作為 Character.equip（Partial<Record>）的鍵；欄位可缺省＝該處未裝備。
+ * Keys of Character.equip (Partial<Record>); a missing key means the slot is empty.
+ * MainHand 與 OffHand 受雙手武器(dh)互斥規則約束（見 equip.ts setEquip）；
+ * MainHand 裝備時會同步寫入 Character.WEAPON 供技能武器限制比對。
+ * MainHand/OffHand are mutually exclusive under two-handed (dh) weapons (see equip.ts setEquip);
+ * equipping MainHand also writes Character.WEAPON for skill weapon-limit checks.
  */
 export enum EnumEquipSlot {
+	/** 主手（武器）/ Main hand (weapon) */
 	MainHand = 'main_hand',
+	/** 副手（盾／左手劍）/ Off hand (shield / main-gauche) */
 	OffHand = 'off_hand',
+	/** 防具 / Armor */
 	Armor = 'armor',
+	/** 道具欄（消耗品）/ Item slot (consumables) */
 	Item = 'item',
 }
 
 /**
  * 武器類型 / Weapon type
  * 列舉 / enumeration
+ *
+ * 同時是「武器分類」與「道具分類」的單一事實來源（值採 PascalCase，與 YAML 來源一致）：
+ * Single source of truth for both weapon classes and item categories (PascalCase values, matching the YAML source):
+ * - IItemDef.type 存放此值；IJobDef.equip 以此值做職業裝備白名單比對（equipAllowed）
+ *   IItemDef.type stores this value; IJobDef.equip is whitelisted against it (equipAllowed)
+ * - ISkillDef.limit 以 Partial<Record<EnumWeaponType, boolean>> 表達武器限制
+ *   ISkillDef.limit expresses weapon restrictions as Partial<Record<EnumWeaponType, boolean>>
+ * 非武器成員（Armor/Cloth/Robe/Item/Material/Other）供道具分類共用，勿視為可持握武器。
+ * Non-weapon members (Armor/Cloth/Robe/Item/Material/Other) exist for item categories; they are not wieldable weapons.
  */
 export enum EnumWeaponType {
+	/** 劍（單手）/ Sword (one-handed) */
 	Sword = 'Sword',
+	/** 匕首 / Dagger */
 	Dagger = 'Dagger',
+	/** 長矛（Pike 類長柄）/ Pike */
 	Pike = 'Pike',
+	/** 手斧 / Hatchet */
 	Hatchet = 'Hatchet',
+	/** 魔杖 / Wand */
 	Wand = 'Wand',
+	/** 錘 / Mace */
 	Mace = 'Mace',
+	/** 雙手劍（通常搭配 dh=true）/ Two-handed sword (usually dh=true) */
 	TwoHandSword = 'TwoHandSword',
+	/** 槍 / Spear */
 	Spear = 'Spear',
+	/** 戰斧 / Axe */
 	Axe = 'Axe',
+	/** 法杖 / Staff */
 	Staff = 'Staff',
+	/** 弓 / Bow */
 	Bow = 'Bow',
+	/** 弩 / Crossbow */
 	CrossBow = 'CrossBow',
+	/** 鞭 / Whip */
 	Whip = 'Whip',
+	/** 盾（副手）/ Shield (off hand) */
 	Shield = 'Shield',
+	/** 左手劍（副手）/ Main-gauche (off hand) */
 	MainGauche = 'MainGauche',
+	/** 書（魔法書）/ Book */
 	Book = 'Book',
+	/** 鎧甲 / Armor */
 	Armor = 'Armor',
+	/** 布甲 / Cloth */
 	Cloth = 'Cloth',
+	/** 法袍 / Robe */
 	Robe = 'Robe',
+	/** 道具 / Item */
 	Item = 'Item',
+	/** 素材 / Material */
 	Material = 'Material',
+	/** 其他 / Other */
 	Other = 'Other',
 }
 
 /**
  * 防禦種類 / Guard kind
  * 列舉 / enumeration
+ *
+ * 決定前排守護者「何時替後排擋傷」（由 guard.ts guardActive() 逐次判定）：
+ * Decides when a front-row guardian intercepts damage for the back row (re-evaluated per hit by guard.ts guardActive()):
+ * - LifeNN：守護者自身 HP% <= NN 時生效（血量越低越常守）
+ *   LifeNN: active while the guardian's own HP% <= N (guards more as HP drops)
+ * - ProbNN：每次攻擊獨立擲骰 NN% 機率生效（需具備 rng，否則視為不發動）
+ *   ProbNN: rolls an independent NN% chance per attack (requires rng; treated as inactive without it)
+ * - Always/Never：恆真／恆假；behavior.guard 省略時預設 Always
+ *   Always/Never: always true / always false; defaults to Always when behavior.guard is absent
  */
 export enum EnumGuardKind {
+	/** 恆常發動 / Always active */
 	Always = 'always',
+	/** HP ≤ 25% 時發動 / Active while HP ≤ 25% */
 	Life25 = 'life25',
+	/** HP ≤ 50% 時發動 / Active while HP ≤ 50% */
 	Life50 = 'life50',
+	/** HP ≤ 75% 時發動 / Active while HP ≤ 75% */
 	Life75 = 'life75',
+	/** 25% 機率發動 / 25% chance to activate */
 	Prob25 = 'prob25',
+	/** 50% 機率發動 / 50% chance to activate */
 	Prob50 = 'prob50',
+	/** 75% 機率發動 / 75% chance to activate */
 	Prob75 = 'prob75',
+	/** 從不發動 / Never active */
 	Never = 'never',
 }
 
 /**
  * 模式項目 / Pattern item
  * 介面 / interface
+ *
+ * AI 行為規則列：buildPattern() 組裝（逃跑／特殊前置 + 角色自身 + 預設收尾），
+ * AI behavior rule row: assembled by buildPattern() (flee/special prelude + own rules + default tail),
+ * 再由 MultiFactJudge() 依序檢查——第一個 judge 成立且通過 quantity 回合門檻者，
+ * then checked in order by MultiFactJudge() — the first row whose judge passes and whose
+ * quantity turn gate is met yields its action.
+ * 其 action 即本回合要施放的技能編號（1000 為預設攻擊）。
  */
 export interface IPatternItem {
+	/** 判定碼（交由 judge.ts DecideJudge 評估）/ judge code (evaluated by judge.ts DecideJudge) */
 	judge: number;
+	/** 回合門檻：0＝恆可觸發，否則需 battle.turn >= quantity / turn gate: 0 = always eligible, else requires battle.turn >= quantity */
 	quantity: number;
+	/** 動作碼＝技能編號（1000 為預設攻擊）/ action code = skill number (1000 is the default attack) */
 	action: number;
 }
 
@@ -84,37 +164,69 @@ export interface IPatternItem {
 /**
  * 行為定義 / Behavior definition
  * 介面 / interface
+ *
+ * 角色／職業的 AI 行為設定（ICharDef.behavior 與 IJobDef.pattern 皆使用本型別）。
+ * AI behavior settings for chars/jobs (used by both ICharDef.behavior and IJobDef.pattern).
  */
 export interface IBehavior {
+	/** 預期站位（資料層保留；開戰時 setBattleVariable 以隨機決定 POSITION）/ intended position (data-layer; setBattleVariable randomizes POSITION at battle start) */
 	position?: EnumPosition;
+	/** 前排守護條件；省略時視為 EnumGuardKind.Always / front-row guard condition; omitted = EnumGuardKind.Always */
 	guard?: EnumGuardKind;
+	/** AI 行動規則列；省略時 buildPattern() 只含前置與預設收尾 / AI action rules; when absent, buildPattern() keeps only the prelude and default tail */
 	pattern?: IPatternItem[];
 }
 
 /**
  * 技能目標類型 / Skill target type
  * 列舉 / enumeration
+ *
+ * 決定「以誰為中心」選取目標（ITargetSpec 第 1 元，Battle.selectTargets 據此分支）：
+ * Determines the camp used as the selection center (ITargetSpec element 1; branches in Battle.selectTargets):
+ * - Enemy／Friend：敵隊／己隊（含召喚物在內的隊伍成員）
+ *   Enemy / Friend: members of the enemy / friendly team (summons included)
+ * - All：不分敵我的全體存活者；Self：僅施法者自己（忽略選取方式）
+ * - All: all living units on both sides; Self: the caster only (method ignored)
  */
 export enum EnumTargetType {
+	/** 敵隊 / Enemy team */
 	Enemy = 'enemy',
+	/** 己隊 / Friendly team */
 	Friend = 'friend',
+	/** 全場（敵我不分）/ Entire field (both teams) */
 	All = 'all',
+	/** 自身 / Self only */
 	Self = 'self',
 }
 
 /**
  * 技能目標方式 / Skill target method
  * 列舉 / enumeration
+ *
+ * 決定「在該陣營內取幾個」（ITargetSpec 第 2 元）：
+ * Determines how many targets are taken within the chosen camp (ITargetSpec element 2):
+ * - Individual：隨機 1 名；Multi：隨機抽 count 名（有放回，可能重複）
+ *   Individual: 1 random pick; Multi: count random picks (with replacement, duplicates possible)
+ * - All：全體存活者（第 3 元 count 被忽略）
+ *   All: every living member (the 3rd element count is ignored)
  */
 export enum EnumTargetMethod {
+	/** 單體（隨機 1 名）/ Single target (1 random pick) */
 	Individual = 'individual',
+	/** 多體（隨機抽 count 名，有放回）/ Multiple targets (count random picks, with replacement) */
 	Multi = 'multi',
+	/** 全體存活者（忽略 count）/ All living members (count ignored) */
 	All = 'all',
 }
 
 /**
  * 技能目標規格 / Skill target specification
  * 型別別名 / type alias
+ *
+ * 三元組 [目標類型, 選取方式, 數量]，直接對應 YAML skill.target 欄位；
+ * Tuple [target type, selection method, count], mapping directly to the YAML skill.target field;
+ * 數量僅在 Multi 時有意義；技能省略 target 時預設 [Enemy, Individual, 1]。
+ * count matters only for Multi; a skill without target defaults to [Enemy, Individual, 1].
  */
 export type ITargetSpec = [EnumTargetType, EnumTargetMethod, number];
 
@@ -127,93 +239,225 @@ export type { IStatusAttr } from './character/status-attrs';
 /**
  * 補正欄位型別（P_* / M_*，單一事實來源由 COMP_FIELDS 衍生）/ Compensation bonus type
  * 型別別名 / type alias
+ *
+ * Partial 表示技能／道具只需宣告實際擁有的補正欄位；
+ * Partial means skills/items only declare the compensation fields they actually have;
+ * ISkillDef 與 IItemDef 皆 extends 本型別，使被動(passive)與裝備加總可共用同一組鍵。
+ * both ISkillDef and IItemDef extend this type so passive and equipment bonuses share one key set.
  */
 export type ICompBonuses = Partial<Record<ICompField, number>>;
 
 /**
  * 特殊能力定義 / Special ability definition
  * 介面 / interface
+ *
+ * Character.SPECIAL 的結構；純數值欄位可經 getSpecial/addSpecial 以字串鍵存取。
+ * Shape of Character.SPECIAL; numeric fields are also reachable by string key via getSpecial/addSpecial.
  */
 export interface ISpecial {
+	/** 中毒抗性 %（getPoison 據此折減施毒機率）/ poison resistance % (getPoison reduces the chance by this) */
 	PoisonResist: number;
+	/** 回復加成（被動技能累加；目前僅儲存，傷害公式尚未讀取）/ heal bonus (accumulated by passives; stored only, not yet read by the heal formula) */
 	HealBonus: number;
+	/** 絕對防禦次數：>0 時消耗一次並使該次傷害歸 0（pierce 可穿透）/ absolute guard charges: consumes one to nullify a hit (pierced by pierce) */
 	Barrier: number;
-	Pierce: [number, number]; // [physical, magic]
+	/** 貫穿值 [物理, 魔法]（索引同 EnumAtkSlot；pierce 技能加算至傷害）/ pierce damage [physical, magic] (indices match EnumAtkSlot; added when skill.pierce is set) */
+	Pierce: [number, number];
+	/** 召喚加成（裝備 P_SUMMON 累加）/ summon bonus (accumulated from equipment P_SUMMON) */
 	Summon: number;
+	/** 不死系標記 / undead flag */
 	Undead: number;
+	/** 每回合 HP 回復 %（autoRegeneration 於行動前套用）/ per-turn HP regen % (applied by autoRegeneration before acting) */
 	HpRegen: number;
+	/** 每回合 SP 回復 %（autoRegeneration 於行動前套用）/ per-turn SP regen % (applied by autoRegeneration before acting) */
 	SpRegen: number;
 }
 
 /**
  * 技能影響能力（參照基礎六維）/ Skill influencing stat
  * 列舉 / enumeration
+ *
+ * 決定傷害公式採用的主要能力（effect.ts calcBasicDamage）：
+ * Selects the primary stat used by the damage formula (effect.ts calcBasicDamage):
+ * - 省略（undefined）或 Str：物理用 STR、魔法用 INT（預設路徑）
+ *   omitted (undefined) or Str: physical uses STR, magic uses INT (default path)
+ * - Dex：無論物理／魔法一律改用 DEX
+ *   Dex: always uses DEX regardless of physical/magic
  */
 export enum EnumInfluence {
+	/** 以 DEX 計算傷害 / compute damage from DEX */
 	Dex = 'dex',
+	/** 預設路徑：物理 STR／魔法 INT / default path: physical STR / magic INT */
 	Str = 'str',
 }
 
 /**
  * 技能優先條件 / Skill priority condition
  * 列舉 / enumeration
+ *
+ * AI 目標選擇的優先判斷（供 judge/pattern 層參考）：
+ * Priority hints for AI target selection (consumed by the judge/pattern layer):
+ * - LowHpRate：優先低 HP 比率目標；Dead：目標已死亡（蘇生類技能）
+ *   LowHpRate: prefer low-HP targets; Dead: target is dead (revive-type skills)
+ * - Summon：優先召喚物；Charge：目標正在詠唱；Back：背擊（優先後排）
+ *   Summon: prefer summons; Charge: target is casting; Back: back attack (prefer the back row)
  */
 export enum EnumSkillPriority {
+	/** 低 HP 比率優先 / prefer low HP rate */
 	LowHpRate = 'LowHpRate',
+	/** 已死亡目標優先（蘇生）/ prefer dead targets (revive) */
 	Dead = 'Dead',
+	/** 召喚物優先 / prefer summons */
 	Summon = 'Summon',
+	/** 詠唱中目標優先 / prefer casting targets */
 	Charge = 'Charge',
+	/** 背擊（後排優先）/ back attack (prefer back row) */
 	Back = 'Back',
 }
 
 /**
  * 技能定義 / Skill definition
  * 介面 / interface
+ *
+ * 對應 YAML skill 資料結構，extends ICompBonuses 以共用 P_* 與 M_* 補正欄位。
+ * Mirrors the YAML skill data structure; extends ICompBonuses to share P_* and M_* bonus fields.
+ *
+ * 欄位消費狀態（本 repo）/ Field consumption status (this repo):
+ * - 戰鬥引擎實際讀取：sp, type, target, pow, inf, charge, support, invalid,
+ *   passive, poison, CurePoison, HpRegen, SpRegen, HealBonus, pierce,
+ *   Up* 與 Down* 與 Plus* 系列
+ *   actually read by the battle engine: sp, type, target, pow, inf, charge, support,
+ *   invalid, passive, poison, CurePoison, HpRegen, SpRegen, HealBonus, pierce,
+ *   and the Up*, Down*, Plus* families
+ * - hit 目前引擎未讀取（資料層保留）
+ *   hit is not read by the engine (kept for the data layer)
+ * - 其餘欄位（delay, stiff, knockback, move, umove, quick, sacrifice, limit, summon,
+ *   revive, SpRecoveryRate, MagicCircle*, priority, learn, exp, img）目前僅供資料層保留
+ *   remaining fields are currently kept in the data layer only
  */
 export interface ISkillDef extends ICompBonuses {
+	/** 技能編號（repository 的索引鍵）/ skill number (repository index key) */
 	no: number;
+	/** 技能名稱 / skill name */
 	name: string;
+	/** 圖示資源路徑 / icon asset path */
 	img?: string;
+	/** 技能說明文字（PHP exp；UI 顯示為 effect）/ description text (PHP exp; shown as effect in UI) */
 	exp?: string;
+	/** SP 消耗；怪物施放時以 ×0.7 折扣檢查（Battle.UseSkill）/ SP cost; monsters pay ×0.7 when checked (Battle.UseSkill) */
 	sp: number;
-	type: 0 | 1; // 0=物理, 1=魔法
+	/**
+	 * 技能類型：0＝物理、1＝魔法
+	 * skill type: 0 = physical, 1 = magic
+	 *
+	 * calcBasicDamage 據此選擇 STR/INT 與 atk/def 的物理／魔法索引。
+	 * calcBasicDamage uses this to pick STR/INT and the physical/magic atk/def slots.
+	 */
+	type: 0 | 1;
+	/** 習得所需技能點（0＝初期即持有）/ skill points to learn (0 = known from the start) */
 	learn?: number;
+	/** 目標規格 [類型, 方式, 數量]；省略時預設 [Enemy, Individual, 1] / target spec [type, method, count]; defaults to [Enemy, Individual, 1] */
 	target?: ITargetSpec;
+	/** 威力倍率 %（支援技能時視為回復倍率）/ power % (interpreted as heal ratio for support skills) */
 	pow?: number;
+	/** 命中率（目前僅資料層保留，引擎未讀取）/ hit rate (data-layer only; not read by the engine) */
 	hit?: number;
-	invalid?: number; // 防禦貫穿（前衛守護無效）
-	support?: number; // 支援魔法（pow 視為回復倍率）
+	/**
+	 * 防禦貫穿（前衛守護無效）
+	 * guard bypass (front-row guardian does not intercept)
+	 *
+	 * 為真時跳過 Defending 攔截，且不被 Barrier 抵消。
+	 * When truthy, skips Defending interception and bypasses Barrier.
+	 */
+	invalid?: number;
+	/**
+	 * 支援魔法（pow 視為回復倍率）
+	 * support magic (pow is treated as the heal ratio)
+	 *
+	 * 為真時走 calcRecoveryValue 回復路線，且不觸發守護。
+	 * When truthy, routes through calcRecoveryValue instead of damage and never triggers guard.
+	 */
+	support?: number;
+	/** AI 目標優先條件（目前僅資料層保留）/ AI target priority hint (data-layer only) */
 	priority?: EnumSkillPriority;
-	charge?: [number, number]; // [詠唱/蓄力, 硬直]
+	/**
+	 * 詠唱/蓄力 [詠唱時間, 硬直]
+	 * charge [cast time, recovery/stiffness]
+	 *
+	 * 只要存在本欄位（陣列恆為真），首回合即設定 expect 進入詠唱、次回合才施放；
+	 * merely having this field (an array is always truthy) makes the first turn set expect
+	 * (charging) and the skill fires on the second turn;
+	 * 期間施放其他技能會被中斷（expect 不符即 return）。
+	 * casting another skill during the charge is rejected (mismatched expect returns early).
+	 */
+	charge?: [number, number];
+	/**
+	 * 行動後硬直 %（目前僅資料層保留，引擎未讀取）/ post-action stiff % (data-layer only; not read by the engine)
+	 */
 	stiff?: number;
+	/** 傷害參照能力（省略＝物理 STR／魔法 INT）/ influencing stat (omitted = physical STR / magic INT) */
 	inf?: EnumInfluence;
+	/** 回復加成（被動技能時由 passive.ts 累加至 SPECIAL.HealBonus）/ heal bonus (passive.ts accumulates it into SPECIAL.HealBonus for passive skills) */
 	HealBonus?: number;
-	// 能力變化 / status effects
+	/**
+	 * 能力變化（statusChanges 依鍵名前綴分派至 UPMAP/DOWNMAP/PLUSMAP）
+	 * status effects (statusChanges dispatches by key prefix to UPMAP/DOWNMAP/PLUSMAP)
+	 *
+	 * 臨時增益 %：作用於使用者（Up* 鍵命中 UPMAP）
+	 * Temporary buff %: applied to the user (Up* keys hit UPMAP)
+	 */
 	UpSTR?: number; UpINT?: number; UpDEX?: number; UpSPD?: number; UpLUK?: number;
 	UpATK?: number; UpMATK?: number; UpDEF?: number; UpMDEF?: number; UpMAXHP?: number; UpMAXSP?: number;
+	/** 臨時減益 %：作用於目標（Down* 鍵命中 DOWNMAP）/ temporary debuff %: applied to the target (Down* keys hit DOWNMAP) */
 	DownSTR?: number; DownINT?: number; DownDEX?: number; DownSPD?: number; DownLUK?: number;
 	DownATK?: number; DownMATK?: number; DownDEF?: number; DownMDEF?: number; DownMAXHP?: number; DownMAXSP?: number;
+	/** 永久加算（無 %）：作用於使用者，僅在 PLUSMAP 有登錄的屬性可生效 / permanent flat bonus (no %): applied to the user; only PLUSMAP-registered stats take effect */
 	PlusSTR?: number; PlusINT?: number; PlusDEX?: number; PlusSPD?: number; PlusLUK?: number;
 	PlusMAXHP?: number; PlusMAXSP?: number;
+	/** 為真時無視 target.def 百分比／定值減傷，並加算 SPECIAL.Pierce（且穿透 Barrier）/ when truthy, ignores target.def percent/flat reduction, adds SPECIAL.Pierce, and bypasses Barrier */
 	pierce?: number;
+	/** 行動延遲 %（目前僅資料層保留）/ action delay % (data-layer only) */
 	delay?: number;
+	/** 擊退率 %（目前僅資料層保留；語意為逼退至後排）/ knockback % (data-layer only; means forcing the target to the back row) */
 	knockback?: number;
+	/** 施毒機率 %（statusChanges 呼叫 getPoison）/ poison chance % (statusChanges calls getPoison) */
 	poison?: number;
+	/** 召喚怪物編號或其陣列 / summon monster number or array of numbers */
 	summon?: number | number[];
+	/** 施放後自身移動方向（目前僅資料層保留，引擎未讀取）/ self movement direction after casting (data-layer only; not read by the engine) */
 	move?: EnumPosition;
+	/** 可使用之武器型別限制（Partial 鍵集合，目前僅資料層保留）/ allowed weapon-type restriction (partial key set; data-layer only) */
 	limit?: Partial<Record<EnumWeaponType, boolean>>;
+	/** 使用後移動方向（目前僅資料層保留）/ post-use movement direction (data-layer only) */
 	umove?: EnumPosition;
+	/** 為真時視為被動技能，由 passive.ts 在戰鬥初始化時累加補正 / truthy = passive skill; passive.ts accumulates its bonuses at battle setup */
 	passive?: number;
+	/** 快速行動標記（目前僅資料層保留）/ quick-action flag (data-layer only) */
 	quick?: number;
+	/** 犧牲比例 %（消耗自身 HP；目前僅資料層保留）/ sacrifice % (costs own HP; data-layer only) */
 	sacrifice?: number;
+	/**
+	 * 解毒標記 / cure-poison flag
+	 *
+	 * 現行條件：CurePoison 為真且目標「非」中毒時才呼叫 getNormal（與解毒語意相反，屬既有實作）。
+	 * Current condition: getNormal is called only when CurePoison is set and the target is NOT poisoned (opposite of cure semantics; as implemented).
+	 */
 	CurePoison?: number;
+	/** 疊加至目標 SPECIAL.HpRegen 的回復 % / regen % accumulated into the target's SPECIAL.HpRegen */
 	HpRegen?: number;
+	/** 疊加至目標 SPECIAL.SpRegen 的回復 % / regen % accumulated into the target's SPECIAL.SpRegen */
 	SpRegen?: number;
+	/** SP 回復倍率（目前僅資料層保留）/ SP recovery rate multiplier (data-layer only) */
 	SpRecoveryRate?: number;
+	/** 增加己方魔方陣數（目前僅資料層保留）/ add to own team's magic circles (data-layer only) */
 	MagicCircleAdd?: number;
+	/** 消除己方魔方陣數（目前僅資料層保留）/ remove own team's magic circles (data-layer only) */
 	MagicCircleDelete?: number;
+	/** 消耗己方魔方陣數（目前僅資料層保留）/ consume own team's magic circles (data-layer only) */
 	MagicCircleDeleteTeam?: number;
+	/** 消除敵方魔方陣數（目前僅資料層保留）/ remove enemy magic circles (data-layer only) */
 	MagicCircleDeleteEnemy?: number;
+	/** 蘇生技能標記（目前僅資料層使用）/ revive skill flag (data layer only) */
 	revive?: number;
 }
 
@@ -222,20 +466,35 @@ export interface ISkillDef extends ICompBonuses {
  * 介面 / interface
  */
 export interface IItemDef extends ICompBonuses {
+	/** 道具編號（repository 索引鍵）/ item number (repository index key) */
 	no: number;
+	/** 道具名稱 / item name */
 	name: string;
+	/** 武器／裝備型別（同時決定可裝備欄位）/ weapon/equipment type (also decides the equip slot) */
 	type: EnumWeaponType;
+	/** 類別細分：WEAPON / ARMOR / ITEM / MATERIAL / OTHER / sub-category: WEAPON / ARMOR / ITEM / MATERIAL / OTHER */
 	type2?: string; // WEAPON / ARMOR / ITEM / MATERIAL / OTHER
+	/** 圖示資源路徑 / icon asset path */
 	img?: string;
+	/** 購入價格（金幣）/ buy price (gold) */
 	buy?: number;
+	/** 賣出價格（金幣）/ sell price (gold) */
 	sell?: number;
+	/** [物理攻, 魔法攻] / [physical atk, magic atk] */
 	atk?: [number, number]; // [物理攻, 魔法攻]
+	/** [物理%減, 物理定值減, 魔法%減, 魔法定值減] / [physical %, physical flat, magic %, magic flat] damage reduction */
 	def?: [number, number, number, number]; // [物理%, 物理-, 魔法%, 魔法-]
+	/** 雙手武器（佔用手部＋副手）/ two-handed weapon (occupies both hand slots) */
 	dh?: boolean; // 雙手武器
+	/** 裝備負荷（參與 Delay 系統運算）/ equipment weight (feeds the delay calculation) */
 	handle?: number; // 負荷
+	/** 習得條件 { 職業編號: 等級 } / learn requirement { job number: level } */
 	need?: Record<number, number>; // { job_no: level }
+	/** 強化／進化後的基礎道具名 / base item name after refinement/evolution */
 	base_name?: string;
+	/** 附加的召喚效果值（SPECIAL.P_SUMMON）/ attached summon bonus (SPECIAL.P_SUMMON) */
 	P_SUMMON?: number;
+	/** 附加的貫穿效果值（SPECIAL.P_PIERCE）/ attached pierce bonus (SPECIAL.P_PIERCE) */
 	P_PIERCE?: number;
 }
 
@@ -244,28 +503,36 @@ export interface IItemDef extends ICompBonuses {
  * 介面 / interface
  */
 export interface IJobDef {
+	/** 職業編號（資料來源可能為字串）/ job number (may arrive as a string in raw data) */
 	no: number | string;
+	/** 職業名稱 / job name */
 	job_name?: string;
+	/** 可裝備的武器／裝備型別 / equippable weapon/armor types */
 	equip?: EnumWeaponType[];
+	/** 成長係數（maxhp/maxsp 及其餘六維的成長率）/ growth coefficients (maxhp/maxsp and the six primary stats) */
 	coe?: { maxhp?: number; maxsp?: number; [k: string]: number | undefined };
+	/** 戰鬥行為樣式；null＝無 AI 模式 / battle behavior pattern; null = no AI pattern */
 	pattern?: IBehavior | null;
+	/** 職業圖示路徑 / job icon path */
 	img?: string;
+	/** 依性別（0/1）區分的名稱與圖示 / per-gender (0/1) name and icon overrides */
 	gender?: Record<number, { img?: string; job_name?: string }>;
+	/** 職業說明資訊 / job description info */
 	info?: { desc?: string };
+	/** 職業階級（數字越小越高階）/ job rank (lower = higher tier) */
 	rank?: number;
 }
 
-/**
- * 角色定義 / Character definition
- * 介面 / interface
- */
 /**
  * 怪物/召喚/工會獎勵 / Monster / summon / union reward
  * 介面 / interface
  */
 export interface IMonReward {
+	/** 金幣獎勵上限（moneyhold：超過此值不再累積）/ gold reward cap (gold stops accumulating past this) */
 	moneyhold?: number;
+	/** 經驗獎勵上限（exphold：超過此值不再累積）/ exp reward cap (exp stops accumulating past this) */
 	exphold?: number;
+	/** 掉落表 { 道具編號: 數量或權重 } / drop table { item number: amount or weight } */
 	itemtable?: Record<number, number>;
 }
 
@@ -274,26 +541,48 @@ export interface IMonReward {
  * 介面 / interface
  */
 export interface ICharCore {
+	/** 單位編號 / unit number */
 	no: number;
+	/** 單位名稱 / unit name */
 	name: string;
+	/** 等級 / level */
 	level: number;
+	/** HP 上限 / max HP */
 	maxhp: number;
+	/** 目前 HP（省略時視為滿血）/ current HP (full HP when omitted) */
 	hp?: number;
+	/** SP 上限 / max SP */
 	maxsp: number;
+	/** 目前 SP（省略時視為滿 SP）/ current SP (full SP when omitted) */
 	sp?: number;
+	/** 力量（物理攻擊主因）/ strength (main physical-attack stat) */
 	str: number;
+	/** 智力（魔法攻擊主因）/ intelligence (main magic-attack stat) */
 	int: number;
+	/** 敏捷（命中／迴避相關）/ dexterity (hit/evasion related) */
 	dex: number;
+	/** 速度（行動順序與 Delay 距離）/ speed (action order and delay distance) */
 	spd: number;
+	/** 幸運 / luck */
 	luk: number;
+	/** 已習得技能編號列表 / learned skill numbers */
 	skill?: number[];
+	/** AI 行為樣式（怪物戰鬥決策用）/ AI behavior pattern (monster battle decisions) */
 	behavior?: IBehavior;
 }
 
+/**
+ * 角色定義 / Character definition
+ * 介面 / interface
+ */
 export interface ICharDef extends ICharCore {
+	/** 當前累積經驗 / accumulated exp */
 	exp?: number;
+	/** 職業編號 / job number */
 	job?: number;
+	/** 各欄位裝備的道具編號 / equipped item number per slot */
 	equip?: Partial<Record<EnumEquipSlot, number>>;
+	/** 擴充資料（非核心欄位原樣保留）/ extra data (non-core fields kept as-is) */
 	data_ex?: Record<string, unknown>;
 }
 
@@ -309,20 +598,61 @@ export interface IMonDef extends ICharCore {
 /**
  * 戰鬥事件類型 / Battle event type
  * 列舉 / enumeration
+ * 實際被 push 的事件：Damage, Heal, Guard, Death, Cast（Battle.UseSkill / applySkill）。
+ * Currently pushed events: Damage, Heal, Guard, Death, Cast (Battle.UseSkill / applySkill).
+ * 其餘成員（Buff, Debuff, Poison, Charge, MagicCircle, Summon, Miss, Info）目前無生產點。
+ * Remaining members (Buff, Debuff, Poison, Charge, MagicCircle, Summon, Miss, Info) have no producer yet.
  */
 export enum EnumBattleEventType {
+	/** 造成傷害 / damage dealt */
 	Damage = 'damage',
+	/** 回復 HP / HP heal */
 	Heal = 'heal',
+	/** 守護攔截（前衛替後衛擋傷）/ guard interception (front row shields back row) */
 	Guard = 'guard',
+	/**
+	 * 增益（Up* 與 Plus* 能力變化）/ buff (Up* and Plus* stat change)
+	 * 目前無生產點 / currently no producer
+	 */
 	Buff = 'buff',
+	/**
+	 * 減益（Down* 能力變化）/ debuff (Down* stat change)
+	 * 目前無生產點 / currently no producer
+	 */
 	Debuff = 'debuff',
+	/**
+	 * 中毒狀態 / poison state
+	 * 目前無生產點 / currently no producer
+	 */
 	Poison = 'poison',
+	/** 死亡 / death */
 	Death = 'death',
+	/** 施放技能 / skill cast */
 	Cast = 'cast',
+	/**
+	 * 詠唱／蓄力開始 / charge (cast time) started
+	 * 目前無生產點 / currently no producer
+	 */
 	Charge = 'charge',
+	/**
+	 * 魔方陣增減 / magic circle change
+	 * 目前無生產點 / currently no producer
+	 */
 	MagicCircle = 'magiccircle',
+	/**
+	 * 召喚 / summon
+	 * 目前無生產點 / currently no producer
+	 */
 	Summon = 'summon',
+	/**
+	 * 未命中 / miss
+	 * 目前無生產點（hit 未進引擎，無 Miss 判定）/ currently no producer (hit is not in the engine, so no Miss branch)
+	 */
 	Miss = 'miss',
+	/**
+	 * 一般資訊訊息 / informational message
+	 * 目前無生產點 / currently no producer
+	 */
 	Info = 'info',
 }
 
@@ -332,11 +662,17 @@ export enum EnumBattleEventType {
  * 介面 / interface
  */
 export interface IBattleEvent {
+	/** 事件類型 / battle event type */
 	type: EnumBattleEventType;
+	/** 行動者名稱 / actor name */
 	actor?: string;
+	/** 目標名稱 / target name */
 	target?: string;
+	/** 關聯技能編號 / related skill number */
 	skill?: number;
+	/** 數值（傷害量／回復量等）/ numeric value (damage/heal amount, etc.) */
 	value?: number;
+	/** 顯示文字（Info 等文字類事件）/ display text (for Info and other text events) */
 	text?: string;
 }
 

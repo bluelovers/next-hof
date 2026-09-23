@@ -52,10 +52,15 @@ export const MAGIC_CIRCLE_MAX = 5;
  * 列舉 / enumeration
  */
 export enum EnumState {
+	/** 存活 / alive */
 	Alive = 0,
+	/** 死亡 / dead */
 	Dead = 1,
+	/** 中毒（CurePoison 判定所用狀態）/ poisoned (state checked by CurePoison) */
 	Poison = 2,
+	/** 二階中毒（目前無任何使用點）/ secondary poison (currently unused anywhere) */
 	Poison2 = 3,
+	/** 一般狀態（未中毒也未死亡）/ normal (neither poisoned nor dead) */
 	Normal = 4,
 }
 
@@ -64,7 +69,9 @@ export enum EnumState {
  * 列舉 / enumeration
  */
 export enum EnumPosition {
+	/** 前衛（可守護後衛）/ front row (can guard the back row) */
 	Front = 'front',
+	/** 後衛（受前衛守護）/ back row (protected by front-row guard) */
 	Back = 'back',
 }
 
@@ -73,7 +80,9 @@ export enum EnumPosition {
  * 列舉 / enumeration
  */
 export enum EnumExpect {
+	/** 蓄力預期（EnumExpect.Charge 目前無使用點）/ expected charge action (EnumExpect.Charge is currently unused) */
 	Charge = 'charge',
+	/** 詠唱預期（Battle.UseSkill 比對，不符則中斷）/ expected cast (compared in Battle.UseSkill; mismatch aborts) */
 	Cast = 'cast',
 }
 

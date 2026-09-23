@@ -99,4 +99,9 @@ export function createSeedRepository(): IDataRepository {
 	return repo;
 }
 
+/**
+ * 範例資料集合（供測試直接引用）/ Seed data exports (for tests to import directly)
+ * 包含職業、技能、角色與怪物定義。
+ * Includes job, skill, character, and monster definitions.
+ */
 export const SEED = { job100, skills, items, char100, mon1000, mon1001 };

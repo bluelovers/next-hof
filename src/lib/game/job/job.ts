@@ -4,14 +4,18 @@
 import { MAX_STATUS } from '../constants';
 import type { IJobDef, EnumWeaponType } from '../types';
 
-/** 判斷職業是否可裝備某武器/防具型別 */
+/**
+ * 判斷職業是否可裝備某武器/防具型別
+ * Whether the job may equip the given weapon/armor type
+ */
 export function equipAllowed(job: IJobDef, itemType: EnumWeaponType): boolean {
 	return !!job.equip?.includes(itemType);
 }
 
 /**
  * 職業 hpsp 公式中 MAXHP 的計算（對應 coe['maxhp'] 項）。
- * new_maxhp = 100 * coe['maxhp'] * (1 + (level-1)/49) * (1 + STR 係數)
+ * MAXHP term of the job hpsp formula (mirrors coe['maxhp']).
+ * new_maxhp = 100 * coe['maxhp'] * (1 + (level-1)/49) * (1 + STR 係數 / STR factor)
  * STR 係數：MAX_STATUS > RevStr ? (div - RevStr^2)/div : RevStr^2/div
  */
 export function coeMaxHp(job: IJobDef, str: number, level: number): number {

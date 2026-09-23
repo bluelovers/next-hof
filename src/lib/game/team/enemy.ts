@@ -17,7 +17,13 @@ const ENEMY_TABLE: Record<number, [number, number]> = {
 	5: [5, 10],
 };
 
-/** 依隊伍人數與 top_level 決定敵人數量 */
+/**
+ * 依隊伍人數與 top_level 決定敵人數量
+ * Decide the enemy count from party size and top_level
+ *
+ * party 夾至 1–5 查表；top_level ≤ 5 取下限，否則在 [min, max] 內隨機。
+ * Clamps party to 1–5 for the table; top_level ≤ 5 takes the minimum, otherwise rolls in [min, max].
+ */
 export function EnemyNumber(party: number, topLevel: number, rng: RNG): number {
 	const p = Math.min(Math.max(party, 1), 5);
 	const [minN, maxN] = ENEMY_TABLE[p];
@@ -28,6 +34,9 @@ export function EnemyNumber(party: number, topLevel: number, rng: RNG): number {
 /**
  * 建立敵方隊伍：從 monsterList 中加權抽取並以 level_fix 調整至 topLevel。
  * monsterList 為 [monsterNo, weight] 陣列。
+ *
+ * Build the enemy party: weighted-picks from monsterList and level_fix-es each to topLevel.
+ * monsterList is an array of [monster number, weight].
  */
 export function EnemyParty(
 	repo: IDataRepository,

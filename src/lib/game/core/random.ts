@@ -9,14 +9,18 @@ import { RNG } from './rng';
 /**
  * 加權隨機項目 / Weighted random entry
  * 型別別名 / type alias
+ *
+ * [value, weight]：value 為選中後回傳的值，weight 為相對權重（>0）。
+ * [value, weight]: value is returned when picked, weight is the relative weight (>0).
  */
 export type IWeightedEntry<T> = [value: T, weight: number];
 
 /**
  * 依權重隨機選擇一個項目。
- * @param entries [value, weight] 陣列（weight > 0）
- * @param rng 可注入的隨機源
- * @returns 選中的 value；空陣列回傳 undefined
+ * Pick one entry at random, weighted by each entry's weight.
+ * @param entries [value, weight] 陣列（weight > 0） / array of [value, weight] (weight > 0)
+ * @param rng 可注入的隨機源 / injectable random source
+ * @returns 選中的 value；空陣列回傳 undefined / the picked value; undefined for an empty array
  */
 export function weightedPick<T>(entries: readonly IWeightedEntry<T>[], rng: RNG): T | undefined {
 	if (entries.length === 0) return undefined;
