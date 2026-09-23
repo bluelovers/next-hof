@@ -1,7 +1,7 @@
 // 物品定義 / Item definition helpers
 // 對應 docs/data/item.md。倉庫回傳的即為 IItemDef（YAML 結構），此處提供正規化與取值。
 
-import type { IItemDef, IWeaponType } from '../types';
+import type { IItemDef, EnumWeaponType } from '../types';
 import type { IDataRepository } from '../data/repository';
 
 
@@ -9,7 +9,7 @@ import type { IDataRepository } from '../data/repository';
  * 原始道具資料 / Raw item data
  * 型別別名 / type alias
  */
-type IRawItem = Partial<IItemDef> & { no: number; name: string; type: IWeaponType };
+type IRawItem = Partial<IItemDef> & { no: number; name: string; type: EnumWeaponType };
 
 /** 正規化原始物品資料，補齊陣列預設值 */
 export function parseItem(raw: IRawItem): IItemDef {

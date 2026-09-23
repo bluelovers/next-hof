@@ -129,26 +129,6 @@ export const { UPMAP, DOWNMAP, PLUSMAP } = buildStatusMaps();
 
 
 /**
- * 基礎六維（建立/等級/戰鬥變數共用）/ Primary base stats (shared by factory, level-fix, battle-variable)
- * 型別別名 / type alias
- */
-export const PRIMARY_STATS = ['str', 'int', 'dex', 'spd', 'luk'] as const;
-export type IPrimaryStat = typeof PRIMARY_STATS[number];
-
-/**
- * 基礎屬性 → 戰鬥屬性 + 補正屬性 對照 / Base stat to battle/compensation mapping
- * 型別別名 / type alias
- */
-export const BASE_STAT_COMP_MAP: Record<IPrimaryStat, { battle: 'STR' | 'INT' | 'DEX' | 'SPD' | 'LUK'; comp: 'P_STR' | 'P_INT' | 'P_DEX' | 'P_SPD' | 'P_LUK' }> = {
-	str: { battle: 'STR', comp: 'P_STR' },
-	int: { battle: 'INT', comp: 'P_INT' },
-	dex: { battle: 'DEX', comp: 'P_DEX' },
-	spd: { battle: 'SPD', comp: 'P_SPD' },
-	luk: { battle: 'LUK', comp: 'P_LUK' },
-};
-
-
-/**
  * 補正欄位（技能/道具共用，單一事實來源）/ Compensation fields (shared by passive & equip)
  * 型別別名 / type alias
  */
@@ -157,3 +137,23 @@ export const COMP_FIELDS = [
 	'P_MAXHP', 'P_MAXSP', 'M_MAXHP', 'M_MAXSP',
 ] as const;
 export type ICompField = typeof COMP_FIELDS[number];
+
+/**
+ * 基礎六維（建立/等級/戰鬥變數共用）/ Primary base stats (shared by factory, level-fix, battle-variable)
+ * 型別別名 / type alias
+ */
+export const PRIMARY_STATS = ['str', 'int', 'dex', 'spd', 'luk'] as const;
+export type IPrimaryStat = typeof PRIMARY_STATS[number];
+
+/**
+ * 基礎屬性 → 戰鬥屬性 + 補正屬性 對照 / Base stat to battle/compensation mapping
+ * 由 PRIMARY_STATS 衍生（battle = 大寫、comp = P_ + 大寫），避免重複列舉名稱。
+ * Derived from PRIMARY_STATS (battle = uppercase, comp = P_ + uppercase) to avoid re-listing names.
+ * 型別別名 / type alias
+ */
+export const BASE_STAT_COMP_MAP = Object.fromEntries(
+	PRIMARY_STATS.map((s) => [s, {
+		battle: s.toUpperCase() as Uppercase<IPrimaryStat>,
+		comp: ('P_' + s.toUpperCase()) as `P_${Uppercase<IPrimaryStat>}`,
+	}]),
+) as Record<IPrimaryStat, { battle: Uppercase<IPrimaryStat>; comp: `P_${Uppercase<IPrimaryStat>}` }>;

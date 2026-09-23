@@ -2,10 +2,10 @@
 // 對應 docs/data/job.md 與 docs/log/battle/03 §2（hpsp 公式）。
 
 import { MAX_STATUS } from '../constants';
-import type { IJobDef, IWeaponType } from '../types';
+import type { IJobDef, EnumWeaponType } from '../types';
 
 /** 判斷職業是否可裝備某武器/防具型別 */
-export function equipAllowed(job: IJobDef, itemType: IWeaponType): boolean {
+export function equipAllowed(job: IJobDef, itemType: EnumWeaponType): boolean {
 	return !!job.equip?.includes(itemType);
 }
 

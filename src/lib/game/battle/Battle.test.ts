@@ -6,6 +6,7 @@ import { Character } from '../character/Character';
 import { createSeedRepository } from '../data/seed-data';
 import { newChar, newMon } from '../character/factory';
 import { Battle } from './Battle';
+import { EnumCharType } from '../types';
 
 const repo = createSeedRepository();
 
@@ -13,11 +14,11 @@ describe('Battle engine (9.1)', () => {
 	it('DelayValue = sqrt(SPD)+DELAY_BASE and SPD 100 acts before SPD 25', () => {
 		const rng = new RNG(1);
 		const c100 = new Character({
-			no: 1, name: 'a', types: ['char'], level: 1,
+			no: 1, name: 'a', types: [EnumCharType.Char], level: 1,
 			str: 10, int: 10, dex: 10, spd: 100, luk: 10, maxhp: 100, maxsp: 50,
 		});
 		const c25 = new Character({
-			no: 2, name: 'b', types: ['char'], level: 1,
+			no: 2, name: 'b', types: [EnumCharType.Char], level: 1,
 			str: 10, int: 10, dex: 10, spd: 25, luk: 10, maxhp: 100, maxsp: 50,
 		});
 		const battle = new Battle([c100], [c25], { repo, rng });
@@ -58,11 +59,11 @@ describe('Battle result (9.4)', () => {
 		const rng = new RNG(2);
 		const repo2 = createSeedRepository();
 		const d1 = new Character({
-			no: 1, name: 'x', types: ['char'], level: 1,
+			no: 1, name: 'x', types: [EnumCharType.Char], level: 1,
 			str: 0, int: 0, dex: 1, spd: 1, luk: 1, maxhp: 1000, maxsp: 50,
 		});
 		const d2 = new Character({
-			no: 2, name: 'y', types: ['char'], level: 1,
+			no: 2, name: 'y', types: [EnumCharType.Char], level: 1,
 			str: 0, int: 0, dex: 1, spd: 1, luk: 1, maxhp: 1000, maxsp: 50,
 		});
 		const battle = new Battle([d1], [d2], { repo: repo2, rng });

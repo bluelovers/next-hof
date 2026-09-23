@@ -2,11 +2,12 @@ import { describe, it, expect } from 'vitest';
 import { RNG } from '../core/rng';
 import { Character } from '../character/Character';
 import { DecideJudge } from './judge';
+import { EnumCharType } from '../types';
 
 describe('AI judge (10.1)', () => {
 	function mk(): Character {
 		return new Character({
-			no: 1, name: 'c', types: ['char'], level: 1,
+			no: 1, name: 'c', types: [EnumCharType.Char], level: 1,
 			str: 10, int: 10, dex: 10, spd: 10, luk: 10, maxhp: 100, maxsp: 50,
 		});
 	}

@@ -1,37 +1,74 @@
 // 共用型別定義 / Shared type definitions
 // 欄位對應 docs/data/{char,job,skill,item,mon}.md 分析的 YAML 結構。
 
-import { EnumState } from './constants';
+import { EnumState, EnumPosition } from './constants';
 import type { ICompField } from './character/status-attrs';
 
 /**
  * 角色類型 / Character type
- * 型別別名 / type alias
+ * 列舉 / enumeration
  */
-export type ICharType = 'char' | 'mon' | 'summon' | 'union';
+export enum EnumCharType {
+	Char = 'char',
+	Mon = 'mon',
+	Summon = 'summon',
+	Union = 'union',
+}
 
 /**
  * 裝備欄位 / Equipment slot
- * 型別別名 / type alias
+ * 列舉 / enumeration
  */
-export type IEquipSlot = 'main_hand' | 'off_hand' | 'armor' | 'item';
+export enum EnumEquipSlot {
+	MainHand = 'main_hand',
+	OffHand = 'off_hand',
+	Armor = 'armor',
+	Item = 'item',
+}
 
 /**
  * 武器類型 / Weapon type
- * 型別別名 / type alias
+ * 列舉 / enumeration
  */
-export type IWeaponType =
-	| 'Sword' | 'Dagger' | 'Pike' | 'Hatchet' | 'Wand' | 'Mace'
-	| 'TwoHandSword' | 'Spear' | 'Axe' | 'Staff' | 'Bow' | 'CrossBow' | 'Whip'
-	| 'Shield' | 'MainGauche' | 'Book' | 'Armor' | 'Cloth' | 'Robe' | 'Item'
-	| 'Material' | 'Other';
+export enum EnumWeaponType {
+	Sword = 'Sword',
+	Dagger = 'Dagger',
+	Pike = 'Pike',
+	Hatchet = 'Hatchet',
+	Wand = 'Wand',
+	Mace = 'Mace',
+	TwoHandSword = 'TwoHandSword',
+	Spear = 'Spear',
+	Axe = 'Axe',
+	Staff = 'Staff',
+	Bow = 'Bow',
+	CrossBow = 'CrossBow',
+	Whip = 'Whip',
+	Shield = 'Shield',
+	MainGauche = 'MainGauche',
+	Book = 'Book',
+	Armor = 'Armor',
+	Cloth = 'Cloth',
+	Robe = 'Robe',
+	Item = 'Item',
+	Material = 'Material',
+	Other = 'Other',
+}
 
 /**
  * 防禦種類 / Guard kind
- * 型別別名 / type alias
+ * 列舉 / enumeration
  */
-export type IGuardKind =
-	| 'always' | 'life25' | 'life50' | 'life75' | 'prob25' | 'prob50' | 'prob75' | 'never';
+export enum EnumGuardKind {
+	Always = 'always',
+	Life25 = 'life25',
+	Life50 = 'life50',
+	Life75 = 'life75',
+	Prob25 = 'prob25',
+	Prob50 = 'prob50',
+	Prob75 = 'prob75',
+	Never = 'never',
+}
 
 /**
  * 模式項目 / Pattern item
@@ -49,28 +86,37 @@ export interface IPatternItem {
  * 介面 / interface
  */
 export interface IBehavior {
-	position?: 'front' | 'back';
-	guard?: IGuardKind;
+	position?: EnumPosition;
+	guard?: EnumGuardKind;
 	pattern?: IPatternItem[];
 }
 
 /**
  * 技能目標類型 / Skill target type
- * 型別別名 / type alias
+ * 列舉 / enumeration
  */
-export type ITargetType = 'enemy' | 'friend' | 'all' | 'self';
+export enum EnumTargetType {
+	Enemy = 'enemy',
+	Friend = 'friend',
+	All = 'all',
+	Self = 'self',
+}
 
 /**
  * 技能目標方式 / Skill target method
- * 型別別名 / type alias
+ * 列舉 / enumeration
  */
-export type ITargetMethod = 'individual' | 'multi' | 'all';
+export enum EnumTargetMethod {
+	Individual = 'individual',
+	Multi = 'multi',
+	All = 'all',
+}
 
 /**
  * 技能目標規格 / Skill target specification
  * 型別別名 / type alias
  */
-export type ITargetSpec = [ITargetType, ITargetMethod, number];
+export type ITargetSpec = [EnumTargetType, EnumTargetMethod, number];
 
 /**
  * 狀態屬性 / Status attribute
@@ -100,6 +146,27 @@ export interface ISpecial {
 }
 
 /**
+ * 技能影響能力（參照基礎六維）/ Skill influencing stat
+ * 列舉 / enumeration
+ */
+export enum EnumInfluence {
+	Dex = 'dex',
+	Str = 'str',
+}
+
+/**
+ * 技能優先條件 / Skill priority condition
+ * 列舉 / enumeration
+ */
+export enum EnumSkillPriority {
+	LowHpRate = 'LowHpRate',
+	Dead = 'Dead',
+	Summon = 'Summon',
+	Charge = 'Charge',
+	Back = 'Back',
+}
+
+/**
  * 技能定義 / Skill definition
  * 介面 / interface
  */
@@ -116,10 +183,10 @@ export interface ISkillDef extends ICompBonuses {
 	hit?: number;
 	invalid?: number; // 防禦貫穿（前衛守護無效）
 	support?: number; // 支援魔法（pow 視為回復倍率）
-	priority?: 'LowHpRate' | 'Dead' | 'Summon' | 'Charge' | 'Back';
+	priority?: EnumSkillPriority;
 	charge?: [number, number]; // [詠唱/蓄力, 硬直]
 	stiff?: number;
-	inf?: 'dex' | 'str';
+	inf?: EnumInfluence;
 	HealBonus?: number;
 	// 能力變化 / status effects
 	UpSTR?: number; UpINT?: number; UpDEX?: number; UpSPD?: number; UpLUK?: number;
@@ -133,9 +200,9 @@ export interface ISkillDef extends ICompBonuses {
 	knockback?: number;
 	poison?: number;
 	summon?: number | number[];
-	move?: 'front' | 'back';
-	limit?: Partial<Record<IWeaponType, boolean>>;
-	umove?: 'front' | 'back';
+	move?: EnumPosition;
+	limit?: Partial<Record<EnumWeaponType, boolean>>;
+	umove?: EnumPosition;
 	passive?: number;
 	quick?: number;
 	sacrifice?: number;
@@ -157,7 +224,7 @@ export interface ISkillDef extends ICompBonuses {
 export interface IItemDef extends ICompBonuses {
 	no: number;
 	name: string;
-	type: IWeaponType;
+	type: EnumWeaponType;
 	type2?: string; // WEAPON / ARMOR / ITEM / MATERIAL / OTHER
 	img?: string;
 	buy?: number;
@@ -179,7 +246,7 @@ export interface IItemDef extends ICompBonuses {
 export interface IJobDef {
 	no: number | string;
 	job_name?: string;
-	equip?: IWeaponType[];
+	equip?: EnumWeaponType[];
 	coe?: { maxhp?: number; maxsp?: number; [k: string]: number | undefined };
 	pattern?: IBehavior | null;
 	img?: string;
@@ -192,11 +259,24 @@ export interface IJobDef {
  * 角色定義 / Character definition
  * 介面 / interface
  */
-export interface ICharDef {
+/**
+ * 怪物/召喚/工會獎勵 / Monster / summon / union reward
+ * 介面 / interface
+ */
+export interface IMonReward {
+	moneyhold?: number;
+	exphold?: number;
+	itemtable?: Record<number, number>;
+}
+
+/**
+ * 戰鬥單位基礎定義（角色/怪物共用）/ Combatant base definition (shared by char & mon)
+ * 介面 / interface
+ */
+export interface ICharCore {
 	no: number;
 	name: string;
 	level: number;
-	exp?: number;
 	maxhp: number;
 	hp?: number;
 	maxsp: number;
@@ -206,10 +286,14 @@ export interface ICharDef {
 	dex: number;
 	spd: number;
 	luk: number;
-	job?: number;
 	skill?: number[];
-	equip?: Partial<Record<IEquipSlot, number>>;
 	behavior?: IBehavior;
+}
+
+export interface ICharDef extends ICharCore {
+	exp?: number;
+	job?: number;
+	equip?: Partial<Record<EnumEquipSlot, number>>;
 	data_ex?: Record<string, unknown>;
 }
 
@@ -217,36 +301,30 @@ export interface ICharDef {
  * 怪物定義 / Monster definition
  * 介面 / interface
  */
-export interface IMonDef {
-	no: number;
-	name: string;
-	level: number;
-	maxhp: number;
-	hp?: number;
-	maxsp: number;
-	sp?: number;
-	str: number;
-	int: number;
-	dex: number;
-	spd: number;
-	luk: number;
-	skill?: number[];
-	behavior?: IBehavior;
-	reward?: {
-		moneyhold?: number;
-		exphold?: number;
-		itemtable?: Record<number, number>;
-	};
+export interface IMonDef extends ICharCore {
+	reward?: IMonReward;
 	isUnion?: boolean;
 }
 
 /**
  * 戰鬥事件類型 / Battle event type
- * 型別別名 / type alias
+ * 列舉 / enumeration
  */
-export type IBattleEventType =
-	| 'damage' | 'heal' | 'guard' | 'buff' | 'debuff' | 'poison'
-	| 'death' | 'cast' | 'charge' | 'magiccircle' | 'summon' | 'miss' | 'info';
+export enum EnumBattleEventType {
+	Damage = 'damage',
+	Heal = 'heal',
+	Guard = 'guard',
+	Buff = 'buff',
+	Debuff = 'debuff',
+	Poison = 'poison',
+	Death = 'death',
+	Cast = 'cast',
+	Charge = 'charge',
+	MagicCircle = 'magiccircle',
+	Summon = 'summon',
+	Miss = 'miss',
+	Info = 'info',
+}
 
 
 /**
@@ -254,7 +332,7 @@ export type IBattleEventType =
  * 介面 / interface
  */
 export interface IBattleEvent {
-	type: IBattleEventType;
+	type: EnumBattleEventType;
 	actor?: string;
 	target?: string;
 	skill?: number;

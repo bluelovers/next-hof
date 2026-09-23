@@ -7,6 +7,7 @@ import type { Character } from '../character/Character';
 import { hpDamage, hpRecover, getPoison, getNormal } from '../character/status';
 import { UPMAP, DOWNMAP, PLUSMAP, EnumAtkSlot, EnumDefSlot } from '../character/status-attrs';
 import type { ISkillDef, IBattleEvent } from '../types';
+import { EnumInfluence, EnumBattleEventType } from '../types';
 import type { RNG } from '../core/rng';
 
 
@@ -23,7 +24,7 @@ export interface ISkillResult {
 /** 物理/魔法基礎傷害計算（對應 CalcBasicDamage） */
 export function calcBasicDamage(skill: ISkillDef, user: Character, target: Character): number {
 	const isMagic = skill.type === 1;
-	const stat = skill.inf === 'dex'
+	const stat = skill.inf === EnumInfluence.Dex
 		? user.DEX
 		: (isMagic ? user.INT : user.STR);
 	const atkIdx = isMagic ? EnumAtkSlot.Mag : EnumAtkSlot.Phys;
@@ -85,7 +86,7 @@ export function applySkill(skill: ISkillDef, user: Character, target: Character,
 	if (skill.support) {
 		const heal = calcRecoveryValue(skill, user);
 		const applied = hpRecover(target, heal);
-		events.push({ type: 'heal', actor: String(user.no), target: String(target.no), skill: skill.no, value: applied });
+		events.push({ type: EnumBattleEventType.Heal, actor: String(user.no), target: String(target.no), skill: skill.no, value: applied });
 		statusChanges(skill, target, user, rng);
 		return { heal: applied, events };
 	}
@@ -95,12 +96,12 @@ export function applySkill(skill: ISkillDef, user: Character, target: Character,
 	// 絕對防禦 Barrier：消耗一次，完全抵擋
 	if (target.SPECIAL.Barrier > 0 && !skill.pierce) {
 		target.SPECIAL.Barrier--;
-		events.push({ type: 'guard', actor: String(target.no), target: String(target.no), text: 'barrier' });
+		events.push({ type: EnumBattleEventType.Guard, actor: String(target.no), target: String(target.no), text: 'barrier' });
 		return { damage: 0, events };
 	}
 
 	const applied = hpDamage(target, dmg);
-	events.push({ type: 'damage', actor: String(user.no), target: String(target.no), skill: skill.no, value: applied });
+	events.push({ type: EnumBattleEventType.Damage, actor: String(user.no), target: String(target.no), skill: skill.no, value: applied });
 	statusChanges(skill, target, user, rng);
 	return { damage: applied, events };
 }

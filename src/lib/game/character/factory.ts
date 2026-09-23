@@ -8,12 +8,13 @@ import { PRIMARY_STATS } from './status-attrs';
 import type { IDataRepository } from '../data/repository';
 import type { RNG } from '../core/rng';
 import type { ICharDef, IMonDef } from '../types';
+import { EnumCharType } from '../types';
 
 export function newChar(def: ICharDef, repo: IDataRepository, rng: RNG): Character {
 	const c = new Character({
 		no: def.no,
 		name: def.name,
-		types: ['char'],
+		types: [EnumCharType.Char],
 		level: def.level,
 		exp: def.exp,
 		str: def.str,
@@ -39,7 +40,7 @@ export function newMon(def: IMonDef, repo: IDataRepository, rng: RNG, strength =
 	const c = new Character({
 		no: def.no,
 		name: def.name,
-		types: ['mon'],
+		types: [EnumCharType.Mon],
 		level: def.level,
 		str: def.str,
 		int: def.int,
@@ -70,12 +71,12 @@ export function newMon(def: IMonDef, repo: IDataRepository, rng: RNG, strength =
 
 export function newMonSummon(def: IMonDef, repo: IDataRepository, rng: RNG, strength = 1): Character {
 	const c = newMon(def, repo, rng, strength);
-	c.types.add('summon');
+	c.types.add(EnumCharType.Summon);
 	return c;
 }
 
 export function newUnion(def: IMonDef, repo: IDataRepository, rng: RNG): Character {
 	const c = newMon(def, repo, rng, 1);
-	c.types.add('union');
+	c.types.add(EnumCharType.Union);
 	return c;
 }

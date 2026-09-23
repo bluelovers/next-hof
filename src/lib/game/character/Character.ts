@@ -4,7 +4,8 @@
 // 不採用 PHP 的多層繼承，保持可序列化與易測試。
 
 import { EnumState, EnumPosition, EnumExpect } from '../constants';
-import type { ICharType, IEquipSlot, IBehavior, ISpecial, IWeaponType } from '../types';
+import type { IBehavior, ISpecial, ICharCore, IMonReward } from '../types';
+import { EnumCharType, EnumEquipSlot, EnumWeaponType } from '../types';
 import type { RNG } from '../core/rng';
 
 
@@ -12,26 +13,12 @@ import type { RNG } from '../core/rng';
  * 角色初始化參數 / Character initialization parameters
  * 介面 / interface
  */
-export interface ICharInit {
-	no: number;
-	name: string;
-	types: ICharType[];
-	level: number;
-	str: number;
-	int: number;
-	dex: number;
-	spd: number;
-	luk: number;
-	maxhp: number;
-	hp?: number;
-	maxsp: number;
-	sp?: number;
+export interface ICharInit extends ICharCore {
+	types: EnumCharType[];
 	exp?: number;
 	job?: number;
-	skill?: number[];
-	equip?: Partial<Record<IEquipSlot, number>>;
-	behavior?: IBehavior;
-	reward?: { moneyhold?: number; exphold?: number; itemtable?: Record<number, number> };
+	equip?: Partial<Record<EnumEquipSlot, number>>;
+	reward?: IMonReward;
 }
 
 export function defaultSpecial(): ISpecial {
@@ -50,7 +37,7 @@ export function defaultSpecial(): ISpecial {
 export class Character {
 	no: number;
 	name: string;
-	types: Set<ICharType>;
+	types: Set<EnumCharType>;
 	uniqid: string;
 	level: number;
 	exp = 0;
@@ -76,14 +63,14 @@ export class Character {
 	MAXHP = 0; HP = 0; MAXSP = 0; SP = 0;
 	atk: [number, number] = [0, 0];
 	def: [number, number, number, number] = [0, 0, 0, 0];
-	WEAPON: IWeaponType | undefined = undefined;
+	WEAPON: EnumWeaponType | undefined = undefined;
 
 	STATE: EnumState = EnumState.Alive;
 	POSITION: EnumPosition = EnumPosition.Front;
 	SPECIAL: ISpecial = defaultSpecial();
 
 	skill: number[] = [];
-	equip: Partial<Record<IEquipSlot, number>> = {};
+	equip: Partial<Record<EnumEquipSlot, number>> = {};
 	behavior?: IBehavior;
 	job?: number;
 	reward?: { moneyhold?: number; exphold?: number; itemtable?: Record<number, number> };
@@ -120,10 +107,10 @@ export class Character {
 		this.reward = init.reward;
 	}
 
-	isChar(): boolean { return this.types.has('char'); }
-	isMon(): boolean { return this.types.has('mon'); }
-	isSummon(): boolean { return this.types.has('summon'); }
-	isUnion(): boolean { return this.types.has('union'); }
+	isChar(): boolean { return this.types.has(EnumCharType.Char); }
+	isMon(): boolean { return this.types.has(EnumCharType.Mon); }
+	isSummon(): boolean { return this.types.has(EnumCharType.Summon); }
+	isUnion(): boolean { return this.types.has(EnumCharType.Union); }
 
 	getSpecial(key: string): number {
 		return (this.SPECIAL as unknown as Record<string, number>)[key] ?? 0;

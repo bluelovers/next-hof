@@ -14,11 +14,12 @@ import { applySkill } from '../skill/effect';
 import { BattleTeam } from '../team/BattleTeam';
 import { Defending } from './guard';
 import { buildPattern, MultiFactJudge } from './pattern';
-import { computeOutcome, BattleResult } from './BattleResult';
+import { computeOutcome, BattleResult, EnumOutcome } from './BattleResult';
 import type { IDataRepository } from '../data/repository';
 import type { RNG } from '../core/rng';
 import type { ITimeService } from '../core/time-service';
 import type { ISkillDef, IBattleEvent } from '../types';
+import { EnumTargetType, EnumTargetMethod, EnumBattleEventType } from '../types';
 
 
 /**
@@ -99,23 +100,23 @@ export class Battle {
 	selectTargets(actor: Character, skill: ISkillDef): Character[] {
 		const enemyTeam = this.enemyTeamOf(actor);
 		const friendTeam = actor.team as BattleTeam;
-		const t = skill.target?.[0] ?? 'enemy';
-		const method = skill.target?.[1] ?? 'individual';
+		const t = skill.target?.[0] ?? EnumTargetType.Enemy;
+		const method = skill.target?.[1] ?? EnumTargetMethod.Individual;
 		const count = skill.target?.[2] ?? 1;
 
-		if (t === 'enemy') {
+		if (t === EnumTargetType.Enemy) {
 			if (method === 'all') return enemyTeam.alive();
-			if (method === 'multi') return enemyTeam.pickList(count, this.rng);
+			if (method === EnumTargetMethod.Multi) return enemyTeam.pickList(count, this.rng);
 			const p = enemyTeam.pick(this.rng);
 			return p ? [p] : [];
 		}
-		if (t === 'friend') {
+		if (t === EnumTargetType.Friend) {
 			if (method === 'all') return friendTeam.alive();
 			if (method === 'multi') return friendTeam.pickList(count, this.rng);
 			const p = friendTeam.pick(this.rng);
 			return p ? [p] : [];
 		}
-		if (t === 'self') return [actor];
+		if (t === EnumTargetType.Self) return [actor];
 		return this.allChars().filter((c) => c.STATE !== EnumState.Dead);
 	}
 
@@ -127,7 +128,7 @@ export class Battle {
 		if (skill.charge && actor.expect === null) {
 			actor.expect = skillNo;
 			actor.expect_type = EnumExpect.Cast;
-			this.log.push({ type: 'cast', actor: String(actor.no), skill: skillNo });
+			this.log.push({ type: EnumBattleEventType.Cast, actor: String(actor.no), skill: skillNo });
 			return;
 		}
 		if (actor.expect !== null && actor.expect !== skillNo) {
@@ -144,7 +145,7 @@ export class Battle {
 		const targets = this.selectTargets(actor, skill);
 		for (const tgt of targets) {
 			let realTarget = tgt;
-			if (!skill.support && !skill.invalid && skill.target?.[0] !== 'all') {
+			if (!skill.support && !skill.invalid && skill.target?.[0] !== EnumTargetType.All) {
 				const guard = Defending(tgt.team as BattleTeam, tgt, skill);
 				if (guard) realTarget = guard;
 			}
@@ -152,7 +153,7 @@ export class Battle {
 			for (const ev of res.events) this.log.push(ev);
 			if (realTarget.HP <= 0 && realTarget.STATE !== EnumState.Dead) {
 				realTarget.STATE = EnumState.Dead;
-				this.log.push({ type: 'death', target: String(realTarget.no) });
+				this.log.push({ type: EnumBattleEventType.Death, target: String(realTarget.no) });
 			}
 		}
 	}
@@ -182,7 +183,7 @@ export class Battle {
 			this.turn++;
 
 			const outcome = computeOutcome(this.teams['0'], this.teams['1']);
-			if (outcome !== 'draw') {
+			if (outcome !== EnumOutcome.Draw) {
 				this.result = new BattleResult(outcome, this.turn, this.extend);
 				break;
 			}
@@ -190,7 +191,7 @@ export class Battle {
 			// 回合上限：超過則延伸，最多 BATTLE_MAX_EXTENDS 次後判平手
 			if (this.turn > BATTLE_MAX_TURNS + this.extend * TURN_EXTENDS) {
 				if (this.extend >= BATTLE_MAX_EXTENDS) {
-					this.result = new BattleResult('draw', this.turn, this.extend);
+					this.result = new BattleResult(EnumOutcome.Draw, this.turn, this.extend);
 					break;
 				}
 				this.extend++;

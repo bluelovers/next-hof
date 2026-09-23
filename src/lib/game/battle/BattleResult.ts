@@ -6,16 +6,20 @@ import type { BattleTeam } from '../team/BattleTeam';
 
 /**
  * 戰鬥結果 / Battle outcome
- * 型別別名 / type alias
+ * 列舉 / enumeration
  */
-export type IOutcome = 'win' | 'lose' | 'draw';
+export enum EnumOutcome {
+	Win = 'win',
+	Lose = 'lose',
+	Draw = 'draw',
+}
 
 export class BattleResult {
-	outcome: IOutcome;
+	outcome: EnumOutcome;
 	turns: number;
 	extend: number;
 
-	constructor(outcome: IOutcome, turns: number, extend: number) {
+	constructor(outcome: EnumOutcome, turns: number, extend: number) {
 		this.outcome = outcome;
 		this.turns = turns;
 		this.extend = extend;
@@ -23,11 +27,11 @@ export class BattleResult {
 }
 
 /** 以 team0 視角判定結果 */
-export function computeOutcome(team0: BattleTeam, team1: BattleTeam): IOutcome {
+export function computeOutcome(team0: BattleTeam, team1: BattleTeam): EnumOutcome {
 	const a0 = team0.CountAlive();
 	const a1 = team1.CountAlive();
-	if (a0 === 0 && a1 === 0) return 'draw';
-	if (a1 === 0) return 'win'; // team0 存活，敵方全滅
-	if (a0 === 0) return 'lose'; // team0 全滅
-	return 'draw'; // 雙方皆存活（超時）
+	if (a0 === 0 && a1 === 0) return EnumOutcome.Draw;
+	if (a1 === 0) return EnumOutcome.Win; // team0 存活，敵方全滅
+	if (a0 === 0) return EnumOutcome.Lose; // team0 全滅
+	return EnumOutcome.Draw; // 雙方皆存活（超時）
 }

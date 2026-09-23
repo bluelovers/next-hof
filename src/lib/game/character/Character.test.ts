@@ -7,6 +7,7 @@ import { newChar, newMon, newMonSummon } from './factory';
 import { levelFix } from './level-fix';
 import { setBattleVariable } from './battle-variable';
 import { getPoison, poisonDamage, consumeBarrier } from './status';
+import { EnumCharType } from '../types';
 
 const repo = createSeedRepository();
 
@@ -67,7 +68,7 @@ describe('status effects (4.4)', () => {
 	it('poison sets state and deals non-lethal damage; barrier blocks one hit', () => {
 		const rng = new RNG(5);
 		const char = new Character({
-			no: 1, name: 't', types: ['char'], level: 1,
+			no: 1, name: 't', types: [EnumCharType.Char], level: 1,
 			str: 10, int: 10, dex: 10, spd: 10, luk: 10, maxhp: 300, maxsp: 50,
 		});
 		char.MAXHP = 300; char.HP = 300; char.rng = rng;

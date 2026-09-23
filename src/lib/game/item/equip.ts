@@ -5,7 +5,7 @@
 import type { Character } from '../character/Character';
 import { COMP_FIELDS, EnumAtkSlot, EnumDefSlot } from '../character/status-attrs';
 import type { IDataRepository } from '../data/repository';
-import type { IEquipSlot, IWeaponType } from '../types';
+import { EnumEquipSlot, EnumWeaponType } from '../types';
 import { parseItem } from './Item';
 
 /** 玩家最大負荷：5 + floor(level/10) + floor(DEX/5) */
@@ -28,12 +28,12 @@ export function currentHandle(char: Character, repo: IDataRepository): number {
 export function CalcEquips(char: Character, repo: IDataRepository): void {
 	char.atk = [0, 0];
 	char.def = [0, 0, 0, 0];
-	for (const slot of Object.keys(char.equip) as IEquipSlot[]) {
+	for (const slot of Object.keys(char.equip) as EnumEquipSlot[]) {
 		const no = char.equip[slot];
 		if (!no) continue;
 		const item = repo.getItem(no);
 		if (!item) continue;
-		if (slot === 'main_hand') char.WEAPON = item.type as IWeaponType;
+		if (slot === EnumEquipSlot.MainHand) char.WEAPON = item.type as EnumWeaponType;
 
 		char.atk[EnumAtkSlot.Phys] += item.atk?.[EnumAtkSlot.Phys] ?? 0;
 		char.atk[EnumAtkSlot.Mag] += item.atk?.[EnumAtkSlot.Mag] ?? 0;
@@ -64,7 +64,7 @@ export function CalcEquips(char: Character, repo: IDataRepository): void {
 export function setEquip(
 	char: Character,
 	repo: IDataRepository,
-	slot: IEquipSlot,
+	slot: EnumEquipSlot,
 	itemNo: number,
 ): [boolean, number[]] {
 	const item = repo.getItem(itemNo);
@@ -73,8 +73,8 @@ export function setEquip(
 	const removed: number[] = [];
 
 	// 雙手互斥
-	if (slot === 'main_hand' || slot === 'off_hand') {
-		const other: IEquipSlot = slot === 'main_hand' ? 'off_hand' : 'main_hand';
+	if (slot === EnumEquipSlot.MainHand || slot === EnumEquipSlot.OffHand) {
+		const other: EnumEquipSlot = slot === EnumEquipSlot.MainHand ? EnumEquipSlot.OffHand : EnumEquipSlot.MainHand;
 		const otherNo = char.equip[other];
 		if (otherNo) {
 			const otherItem = repo.getItem(otherNo);

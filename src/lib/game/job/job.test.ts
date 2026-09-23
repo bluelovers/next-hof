@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createSeedRepository } from '../data/seed-data';
 import { coeMaxHp, equipAllowed } from './job';
+import { EnumWeaponType } from '../types';
 
 describe('job system (5.1)', () => {
 	const repo = createSeedRepository();
@@ -12,7 +13,7 @@ describe('job system (5.1)', () => {
 	});
 
 	it('equipAllowed reflects job.equip list', () => {
-		expect(equipAllowed(job, 'Sword')).toBe(true);
-		expect(equipAllowed(job, 'Bow')).toBe(false);
+		expect(equipAllowed(job, EnumWeaponType.Sword)).toBe(true);
+		expect(equipAllowed(job, EnumWeaponType.Bow)).toBe(false);
 	});
 });
