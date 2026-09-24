@@ -87,13 +87,7 @@ import { IJobData } from '../../game-data/GameDataTypes';
 
 ## 指令執行限制
 
-### 嚴禁使用 npx 執行指令
-
-**禁止透過 `npx` 執行任何指令**（如 `npx tsx ...`、`npx vitest ...`、`npx tsc ...` 等）。
-
-需要執行專案腳本時，請改用下列方式之一：
-- 使用既有的 npm script（例如 `npm run sprite:index`）；
-- 直接呼叫 `node_modules/.bin/` 下的本地二進位（例如 `node_modules/.bin/tsx scripts/xxx.ts`）。
+請參閱 `agent-operation-restrictions` 技能
 
 ---
 
@@ -223,7 +217,7 @@ import { IJobData } from '../../game-data/GameDataTypes';
 - [ ] 檢查父頁面 CSS 是否仍有 `.parent .child` 模式的規則
 - [ ] 確認父頁面 CSS 只保留頁面級樣式（`.page-container`, `h4`, `padding` 等）
 - [ ] 運行 Storybook，確認所有故事**不需要** decorator wrapper 也能正常渲染
-- [ ] 執行 `npm run check:css-deps`（如有）确认無 `../pages/*.css` 導入
+- [ ] 執行 `pnpm run check:css-deps`（如有）确认無 `../pages/*.css` 導入
 
 ### 共享樣式
 - [ ] 若多個元件共享樣式，是否已提取爲 `Base.css`？

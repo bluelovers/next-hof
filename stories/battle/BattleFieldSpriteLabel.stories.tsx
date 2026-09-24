@@ -30,7 +30,8 @@ import {
 } from '../../src/components/battle/BattleFieldSpriteLabel';
 import { BattleFieldSpriteFrame } from '../../src/components/battle/BattleFieldSpriteFrame';
 import type { IBattleSprite } from '../../src/components/battle/types';
-import { EnumTeamSideUI, EnumPosition, EnumSpriteLabelPlacement } from '../../src/components/battle/enums';
+import { EnumTeamSideUI, EnumSpriteLabelPlacement } from '../../src/components/battle/enums';
+import { EnumPosition } from '../../src/lib/game/constants';
 import { getSpriteImageSize } from '../../src/components/battle/spriteImageSizes';
 import {
   groupBattleChars,

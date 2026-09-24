@@ -11,12 +11,12 @@ import {
 	EnumTeamSideClass,
 	EnumUnitStatus,
 	EnumAttributeType,
-	EnumPosition,
 	EnumBattleFieldVAlign,
 	EnumBattleFieldBgScale,
 	EnumActionType,
 	EnumChargeKind,
 } from './enums';
+import { EnumPosition } from '#/lib/game/constants';
 
 /** 隊伍側別（UI 層）/ Team side (UI layer) */
 export type ITeamSide = EnumTeamSideUI;

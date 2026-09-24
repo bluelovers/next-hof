@@ -12,13 +12,13 @@
 import React from 'react';
 import type {
   ISkillData,
-  ISkillTarget,
-  ISkillScope,
   ISkillStatChanges,
   ISkillFlags,
   ISkillCharge,
   ISkillEffects,
 } from './GameDataTypes';
+import { EnumSkillType } from '#/components/battle/enums';
+import { EnumTargetType, EnumTargetMethod } from '#/lib/game/types';
 import './SkillCard.css';
 
 // ==================== Render Props / 子邏輯覆寫 ====================
@@ -28,9 +28,9 @@ export interface ISkillCardRenderProps {
   /** 覆寫整個技能名稱區塊 / Override name section */
   renderName?: (skill: ISkillData) => React.ReactNode;
   /** 覆寫目標顯示 / Override target display */
-  renderTarget?: (target: ISkillTarget) => React.ReactNode;
+  renderTarget?: (target: EnumTargetType) => React.ReactNode;
   /** 覆寫範圍顯示 / Override scope display */
-  renderScope?: (scope: ISkillScope) => React.ReactNode;
+  renderScope?: (scope: EnumTargetMethod) => React.ReactNode;
   /** 覆寫消費區塊 / Override cost section */
   renderCost?: (skill: ISkillData) => React.ReactNode;
   /** 覆寫威力區塊 / Override power section */
@@ -61,16 +61,16 @@ export interface ISkillCardProps extends ISkillCardRenderProps {
  * 根據目標類型取得 CSS 類別（與 PHP 頁面 dmg / recover / support 一致）
  * Get CSS class based on target type (matches PHP dmg / recover / support)
  */
-function targetClass(target: ISkillTarget): string {
+function targetClass(target: EnumTargetType): string {
   switch (target) {
     case 'enemy': return 'dmg';
     case 'friend': return 'recover';
     case 'self': return 'support';
     case 'all': return 'support';
-    // 防禦性預設：EnumTargetType 為 lib re-export 別名，TS 在 isolatedModules
-    // 下無法對 re-export 列舉做 switch 窮盡推論，故顯式補 default。
-    // Defensive default: EnumTargetType is a lib re-export alias; TS cannot
-    // prove switch exhaustiveness for re-exported enums under isolatedModules.
+    // 防禦性預設：EnumTargetType 現直接自 #/lib/game/types 匯入，TS 可推論窮盡，
+    // 此 default 僅作最後防線。
+    // Defensive default: EnumTargetType is now imported directly from #/lib/game/types,
+    // so TS can prove exhaustiveness; this default is just a final safety net.
     default: return 'support';
   }
 }
@@ -79,7 +79,7 @@ function targetClass(target: ISkillTarget): string {
  * 根據範圍取得 CSS 類別（與 PHP 頁面 spdmg / charge 一致）
  * Get CSS class based on scope (matches PHP spdmg / charge)
  */
-function scopeClass(scope: ISkillScope): string {
+function scopeClass(scope: EnumTargetMethod): string {
   switch (scope) {
     case 'multi': return 'spdmg';
     case 'all': return 'charge';
@@ -110,7 +110,7 @@ function DefaultNameRenderer({ skill }: { skill: ISkillData }) {
  * 預設目標渲染 / Default target renderer
  * 對應 PHP: target[0] — charge/dmg/recover/support
  */
-function DefaultTargetRenderer({ target }: { target: ISkillTarget }) {
+function DefaultTargetRenderer({ target }: { target: EnumTargetType }) {
   return <span className={targetClass(target)}>{target}</span>;
 }
 
@@ -118,7 +118,7 @@ function DefaultTargetRenderer({ target }: { target: ISkillTarget }) {
  * 預設範圍渲染 / Default scope renderer
  * 對應 PHP: target[1] — charge/recover/spdmg
  */
-function DefaultScopeRenderer({ scope }: { scope: ISkillScope }) {
+function DefaultScopeRenderer({ scope }: { scope: EnumTargetMethod }) {
   return <span className={scopeClass(scope)}>{scope}</span>;
 }
 
@@ -166,7 +166,7 @@ function DefaultPowerRenderer({ skill }: { skill: ISkillData }) {
  */
 function DefaultFlagsRenderer({ flags }: { flags: ISkillFlags }) {
   const tags: React.ReactNode[] = [];
-  if (flags.skillType === 'magic') {
+  if (flags.skillType === EnumSkillType.Magic) {
     tags.push(<span key="magic" className="spdmg">Magic</span>);
   }
   if (flags.isQuick) {

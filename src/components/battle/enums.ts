@@ -1,12 +1,12 @@
 // Battle UI enums — UI/rendering-layer enums only.
-// 領域列舉（position / target / scope / priority / move dir）自 #/lib/game 單一來源 re-export，
-// 以避免重覆定義並確保可追蹤性（traceability）。其餘為 battle scene 渲染層專用
-// （sprite / layout / CSS class / 顯示分類），無對應 domain 概念，保留於此。
+// 本檔只包含 battle scene 渲染層專用 enum（sprite / layout / CSS class / 顯示分類），
+// 無對應 domain 概念。Domain enum（EnumPosition / EnumTargetType 等）由各消費者
+// 直接從 #/lib/game 匯入，不在這裡 re-export，以免混淆原始來源。
 //
-// Battle UI enums — UI/rendering-layer enums only. Domain enums are re-exported
-// from #/lib/game (single source of truth) for traceability; the rest are scene
-// rendering concerns (sprite/layout/CSS class/display categories) with no domain
-// equivalent and therefore legitimately live in the UI layer.
+// Battle UI enums — UI/rendering-layer enums only. This file holds only scene
+// rendering enums (sprite/layout/CSS class/display categories) with no domain
+// equivalent. Domain enums are imported directly from #/lib/game by their
+// consumers and are NEVER re-exported here, to keep the original source unambiguous.
 
 /** 隊伍側別（UI 顯示層：left/right）/ Team side (UI display layer) */
 export enum EnumTeamSideUI {
@@ -102,36 +102,6 @@ export enum EnumSpriteImageDir {
 	Other = 'other',
 }
 
-/**
- * 技能狀態類型（顯示用；領域單一來源為 lib STATUS_ATTR_KEYS / IStatusAttr）
- * Stat name (display; SSoT = lib STATUS_ATTR_KEYS / IStatusAttr).
- */
-export enum EnumStatName {
-	Maxhp = 'MAXHP',
-	Maxsp = 'MAXSP',
-	Str = 'STR',
-	Int = 'INT',
-	Dex = 'DEX',
-	Spd = 'SPD',
-	Luk = 'LUK',
-	Atk = 'ATK',
-	Matk = 'MATK',
-	Def = 'DEF',
-	Mdef = 'MDEF',
-}
-
-/**
- * 能力值名稱（顯示用；領域單一來源為 lib PRIMARY_STATS / IPrimaryStat）
- * Ability stat names (display; SSoT = lib PRIMARY_STATS / IPrimaryStat).
- */
-export enum EnumAbilityStatName {
-	Str = 'STR',
-	Int = 'INT',
-	Dex = 'DEX',
-	Spd = 'SPD',
-	Luk = 'LUK',
-}
-
 /** 精靈顯示模式（UI-only）/ Sprite display variant (UI-only) */
 export enum EnumSpriteVariant {
 	Boxed = 'boxed',
@@ -153,23 +123,4 @@ export enum EnumShowcasePhase {
 	Result = 'result',
 }
 
-// ==================== 領域列舉：自 lib/game 單一來源 re-export ====================
-// Domain enums: re-exported from lib/game (single source of truth) for traceability.
-// 元件仍可由 './enums' 匯入這些名稱，但定義已集中於 lib/game，避免重覆定義。
-// Components may still import these names from './enums', but the definitions now
-// live solely in lib/game, eliminating duplicate definitions.
 
-/** 站位 / Position — SSoT: #/lib/game/constants EnumPosition */
-export { EnumPosition } from '#/lib/game/constants';
-
-/** 技能優先條件 / Skill priority — SSoT: #/lib/game/types EnumSkillPriority */
-export { EnumSkillPriority } from '#/lib/game/types';
-
-/** 技能目標類型 / Skill target type — SSoT: #/lib/game/types EnumTargetType */
-export { EnumTargetType as EnumSkillTarget } from '#/lib/game/types';
-
-/** 技能範圍 / Skill scope — SSoT: #/lib/game/types EnumTargetMethod */
-export { EnumTargetMethod as EnumSkillScope } from '#/lib/game/types';
-
-/** 移動方向 / Move direction — SSoT: #/lib/game/constants EnumPosition */
-export { EnumPosition as EnumSkillMoveDir } from '#/lib/game/constants';

@@ -10,9 +10,9 @@ import { SPRITE_PLACEHOLDER_URL } from './sprite-map';
 import {
 	EnumTeamSideUI,
 	EnumUnitStatus,
-	EnumPosition,
 	EnumActionType,
 } from '#/components/battle/enums';
+import { EnumPosition } from '#/lib/game/constants';
 import {
 	DEFAULT_ALLY_TEAM_NAME,
 	DEFAULT_ENEMY_TEAM_NAME,

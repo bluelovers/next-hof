@@ -6,46 +6,27 @@
  * Category reference: PHP skill.detail.php + docs/data/skill.md
  */
 
+import { EnumSkillType } from '../battle/enums';
+import type {
+	IStatusAttr,
+	IPrimaryStat,
+} from '#/lib/game/character/status-attrs';
 import {
-	EnumSkillTarget,
-	EnumSkillScope,
-	EnumSkillType,
+	EnumTargetType,
+	EnumTargetMethod,
 	EnumSkillPriority,
-	EnumSkillMoveDir,
-	EnumStatName,
-	EnumAbilityStatName,
-} from '../battle/enums';
-
-// ==================== 基本枚舉 / Basic Enums ====================
-
-/** 技能目標類型 / Skill target type */
-export type ISkillTarget = EnumSkillTarget;
-
-/** 技能範圍 / Skill scope */
-export type ISkillScope = EnumSkillScope;
-
-/** 技能類型 / Skill type (damage formula) */
-export type ISkillType = EnumSkillType;
-
-/** 目標優先選擇 / Target priority */
-export type ISkillPriority = EnumSkillPriority;
-
-/** 移動方向 / Move direction */
-export type ISkillMoveDir = EnumSkillMoveDir;
+} from '#/lib/game/types';
+import { EnumPosition } from '#/lib/game/constants';
 
 // ==================== 子類型 / Sub-types ====================
 
 /**
- * 屬性名稱（含 HP/SP）/ Stat names (including HP/SP)
- * 對應 PHP Up-Star / Down-Star 系列欄位
- */
-export type IStatName = EnumStatName;
-
-/**
  * 能力值名稱（不含 HP/SP）/ Ability stat names (excluding HP/SP)
  * 對應 PHP Plus* 系列欄位
+ * 由 lib 單一來源 PRIMARY_STATS 經顯示層轉大寫 derive，可追溯、非獨立來源。
+ * Derived (uppercased) from lib's single source PRIMARY_STATS; traceable, not an independent source.
  */
-export type IAbilityStatName = EnumAbilityStatName;
+export type IAbilityStatName = Uppercase<IPrimaryStat>;
 
 // ==================== 分類介面 / Categorized Interfaces ====================
 
@@ -68,9 +49,9 @@ export interface ISkillCost {
  */
 export interface ISkillStatChanges {
   /** 臨時增益 % / Temporary buff percentages */
-  upStats?: Partial<Record<IStatName, number>>;
+  upStats?: Partial<Record<IStatusAttr, number>>;
   /** 臨時減益 % / Temporary debuff percentages */
-  downStats?: Partial<Record<IStatName, number>>;
+  downStats?: Partial<Record<IStatusAttr, number>>;
   /** 永久加算（無%）/ Permanent flat bonuses (no %) */
   plusStats?: Partial<Record<IAbilityStatName, number>>;
 }
@@ -81,7 +62,7 @@ export interface ISkillStatChanges {
  */
 export interface ISkillFlags {
   /** 技能類型 / Skill damage type */
-  skillType?: ISkillType;
+  skillType?: EnumSkillType;
   /** 防禦貫穿（穿透前衛守護）/ Guard bypass */
   isInvalid?: boolean;
   /** 可先行動（召喚後立即行動）/ Quick action after summon */
@@ -91,7 +72,7 @@ export interface ISkillFlags {
   /** 支援魔法（不觸發守護，pow 改為回復）/ Support magic */
   isSupport?: boolean;
   /** 目標優先選擇 / Target priority */
-  priority?: ISkillPriority;
+  priority?: EnumSkillPriority;
   /** 解毒 / Cure poison */
   curePoison?: boolean;
 }
@@ -130,9 +111,9 @@ export interface ISkillEffects {
   /** 召喚怪物編號 / Summon monster ID(s) */
   summon?: number | number[];
   /** 使用者隊列移動 / User position move */
-  move?: ISkillMoveDir;
+  move?: EnumPosition;
   /** 使用者使用後移動 / User post-skill move */
-  userMove?: ISkillMoveDir;
+  userMove?: EnumPosition;
   /** 防禦貫穿額外傷害 / Pierce damage (ignores DEF/MDEF) */
   pierce?: number;
   /** 魔方陣增加 / Magic circle add */
@@ -173,9 +154,9 @@ export interface ISkillData
 
   // ---------- 目標與範圍 / Target & scope ----------
   /** 目標 / Target */
-  target: ISkillTarget;
+  target: EnumTargetType;
   /** 範圍 / Scope */
-  scope: ISkillScope;
+  scope: EnumTargetMethod;
   /** 攻擊/作用次數 / Hit count (PHP: target[2]) */
   hits?: number;
 

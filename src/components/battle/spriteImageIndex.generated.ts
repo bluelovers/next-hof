@@ -13,8 +13,8 @@
  * Fixed logic (types / default / lookup) lives in the hand-written, non-generated
  * spriteImageSizes.ts.
  *
- * 重建：npm run sprite:index
- * 單檔補充：npm run sprite:index -- --append image/char/xxx.png
+ * 重建：pnpm run sprite:index
+ * 單檔補充：pnpm run sprite:index -- --append image/char/xxx.png
  *
  * 對照 PHP：CopyRow() 中 getimagesize() 讀取圖檔尺寸用於中心對齊
  * Mirrors PHP CopyRow(): getimagesize() reads size for centering.
