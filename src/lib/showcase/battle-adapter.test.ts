@@ -5,12 +5,14 @@ import { RNG } from '#/lib/game/core/rng';
 import { createSeedRepository, SEED } from '#/lib/game/data/seed-data';
 import { newChar, newMon } from '#/lib/game/character/factory';
 import { EnumBattleEventType } from '#/lib/game/types';
-import type { IBattleEvent } from '#/lib/game/types';
+import type { IBattleEvent, ISkillDef } from '#/lib/game/types';
+import type { IDataRepository } from '#/lib/game/data/repository';
 import { SPRITE_PLACEHOLDER_URL } from './sprite-map';
 import {
 	EnumTeamSideUI,
 	EnumUnitStatus,
 	EnumActionType,
+	EnumMagicCircleKind,
 } from '#/components/battle/enums';
 import { EnumPosition } from '#/lib/game/constants';
 import {
@@ -205,6 +207,59 @@ describe('3.3 mapBattleEvent', () => {
 			{ name: 'GoblinAxe', level: 10, imageUrl: '/image/char/mon_053.png' },
 		]);
 		expect(action.message).toContain('joined to the team');
+	});
+
+	// 魔方陣事件：種類由技能定義中哪個 MagicCircle* 欄位決定，數量優先取 event.value
+	// Magic-circle events: the kind comes from whichever MagicCircle* field the skill
+	// definition carries, and the amount prefers `value` on the event
+	const withSkill = (skill: Partial<ISkillDef>): IDataRepository =>
+		Object.assign(Object.create(repo), { getSkill: () => skill as ISkillDef });
+
+	it('magic circle event maps to a record whose kind follows the skill definition', () => {
+		const draw = mapBattleEvent(
+			{ type: EnumBattleEventType.MagicCircle, actor: '100', skill: 3410, value: 1 },
+			lookup,
+			withSkill({ no: 3410, name: 'MagicCircle', MagicCircleAdd: 1 }),
+		);
+		expect(draw.type).toBe(EnumActionType.MagicCircle);
+		expect(draw.source).toBe('Warrior');
+		expect(draw.side).toBe(EnumTeamSideUI.Right);
+		expect(draw.magicCircle?.kind).toBe(EnumMagicCircleKind.Draw);
+		expect(draw.magicCircle?.amount).toBe(1);
+		expect(draw.message).toBe('Warrior draw MagicCircle x1');
+
+		// 數量缺省時取技能定義的對應欄位（PHP 亦以 $skill[...] 印出數量）
+		// When `value` is absent the matching skill field supplies the amount (PHP prints the
+		// amount from $skill[...] as well)
+		const erase = mapBattleEvent(
+			{ type: EnumBattleEventType.MagicCircle, actor: '100', skill: 3420 },
+			lookup,
+			withSkill({ no: 3420, name: 'CircleErase', MagicCircleDeleteEnemy: 1 }),
+		);
+		expect(erase.magicCircle?.kind).toBe(EnumMagicCircleKind.EraseEnemy);
+		expect(erase.magicCircle?.amount).toBe(1);
+		expect(erase.message).toBe('Warrior erased enemy MagicCircle x1');
+
+		const use = mapBattleEvent(
+			{ type: EnumBattleEventType.MagicCircle, actor: '100', skill: 2501 },
+			lookup,
+			withSkill({ no: 2501, name: 'SummonLeviathan', MagicCircleDeleteTeam: 4 }),
+		);
+		expect(use.magicCircle?.kind).toBe(EnumMagicCircleKind.Use);
+		expect(use.magicCircle?.amount).toBe(4);
+		expect(use.message).toBe('Warrior use MagicCircle x4');
+	});
+
+	it('magic circle event without a MagicCircle skill field falls back to draw', () => {
+		const action = mapBattleEvent(
+			{ type: EnumBattleEventType.MagicCircle, actor: '100', value: 2 },
+			lookup,
+			repo,
+		);
+		expect(action.type).toBe(EnumActionType.MagicCircle);
+		expect(action.magicCircle?.kind).toBe(EnumMagicCircleKind.Draw);
+		expect(action.magicCircle?.amount).toBe(2);
+		expect(action.message).toBe('Warrior draw MagicCircle x2');
 	});
 
 	it('a real battle produces N actions for N events, in order, with actor/target names', () => {

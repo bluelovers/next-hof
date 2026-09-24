@@ -14,6 +14,7 @@ import {
   battleOverData,
   casualtyData,
   defaultBattleData,
+  magicCircleData,
   midBattleData,
   summonData,
 } from '../../fixture/battleDisplayData';
@@ -125,6 +126,26 @@ export const WithSummon: Story = {
           '木乃伊不在開場入場列，第二段快照起才出現在 HP/SP 狀態與戰場上。\n' +
           'Mage1 casts GraveYard (skill 2464, summon 3): the log entry shows the caster, the skill and each mummy\'s "joined to the team / enter the Battlefield", ' +
           'while the mummies stay out of the opening entrance rows and appear in the HP/SP status and on the field from the second snapshot onward.',
+      },
+    },
+  },
+};
+
+/** 魔方陣紀錄 / Magic-circle records */
+export const WithMagicCircle: Story = {
+  args: {
+    data: magicCircleData,
+    showHpBars: true,
+    showSpBars: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '魔方陣相關紀錄：draw（描繪己方，support 色）／erased enemy（消除敵方，dmg 色）／use（消耗代價，charge 色）／failed!（魔方陣不足，dmg 色），' +
+          '文案與配色取自原始日誌字串。\n' +
+          'Magic-circle records: draw (own circles, support colour) / erased enemy (enemy circles, dmg colour) / use (skill cost, charge colour) / ' +
+          'failed! (not enough circles, dmg colour), with the copy and colours taken verbatim from the original log.',
       },
     },
   },

@@ -74,9 +74,31 @@ export enum EnumActionType {
 	Enter = 'enter',
 	/** 召喚（施放者＋被召喚單位清單）/ summon (caster + summoned-unit list) */
 	Summon = 'summon',
+	/** 魔方陣紀錄（施放者＋魔方陣數量）/ magic-circle record (caster + circle amount) */
+	MagicCircle = 'magiccircle',
 	Casting = 'casting',
 	Down = 'down',
 	Result = 'result',
+}
+
+/**
+ * 魔方陣紀錄種類（對應原始日誌的四種輸出）
+ * Magic-circle record kind (mirrors the four outputs of the original log)
+ *
+ * 來源：HOF/Class/Skill/Effect.php 的「draw／erased enemy」與
+ * HOF/Class/Battle/Skill.php 的「use／failed!」。
+ * Sources: "draw" / "erased enemy" from HOF/Class/Skill/Effect.php and
+ * "use" / "failed!" from HOF/Class/Battle/Skill.php.
+ */
+export enum EnumMagicCircleKind {
+	/** 描繪己方魔方陣（draw MagicCircle xN）/ draw own magic circles */
+	Draw = 'draw',
+	/** 消除敵方魔方陣（erased enemy MagicCircle xN）/ erase enemy magic circles */
+	EraseEnemy = 'eraseEnemy',
+	/** 消耗己方魔方陣作為技能代價（use MagicCircle xN）/ consume own magic circles as skill cost */
+	Use = 'use',
+	/** 魔方陣不足而失敗（failed!）/ failed for lack of magic circles */
+	Fail = 'fail',
 }
 
 /**

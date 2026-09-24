@@ -27,13 +27,21 @@ import type {
   IBattleSnapshotDisplayUnit,
   IBattleSprite,
   IBattleUnit,
+  IMagicCircleRecord,
   ISkillIcon,
 } from '#/components/battle/types';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
 import type { IBattlePositionChar } from '#/components/battle/computeSpritePositions';
 import { computeBattleSpritePositions, groupBattleChars } from '#/components/battle/computeSpritePositions';
 import { getSpriteImageSize } from '#/components/battle/spriteImageSizes';
-import { EnumActionType, EnumAttributeType, EnumTeamSideUI, EnumUnitStatus } from '#/components/battle/enums';
+import {
+  EnumActionType,
+  EnumAttributeType,
+  EnumMagicCircleKind,
+  EnumTeamSideUI,
+  EnumUnitStatus,
+} from '#/components/battle/enums';
+import { buildMagicCircleMessage } from '#/components/battle/battleUtils';
 import { EnumPosition } from '#/lib/game/constants';
 
 // ==================== 常數 / Constants ====================
@@ -63,6 +71,10 @@ const FIELD_SIZE = { width: SPRITE_LAYOUT_WIDTH, height: SPRITE_LAYOUT_HEIGHT };
 const SKILL_FATAL_STAB: ISkillIcon = { name: 'FatalStab', iconUrl: '/image/icon/skill/skill_074z.png' };
 const SKILL_ATTACK: ISkillIcon = { name: 'Attack', iconUrl: '/image/icon/skill/skill_042.png' };
 const SKILL_GRAVEYARD: ISkillIcon = { name: 'GraveYard', iconUrl: '/image/icon/skill/skill_028.png' };
+const SKILL_MAGIC_CIRCLE: ISkillIcon = { name: 'MagicCircle', iconUrl: '/image/icon/skill/ms_01.png' };
+const SKILL_DOUBLE_MAGIC_CIRCLE: ISkillIcon = { name: 'DoubleMagicCircle', iconUrl: '/image/icon/skill/ms_01.png' };
+const SKILL_CIRCLE_ERASE: ISkillIcon = { name: 'CircleErase', iconUrl: '/image/icon/skill/ms_02.png' };
+const SKILL_SUMMON_LEVIATHAN: ISkillIcon = { name: 'SummonLeviathan', iconUrl: '/image/icon/skill/skill_029.png' };
 
 /** 戰鬥結果（預設與戰鬥結束共用）/ Battle result (shared by Default and BattleOver) */
 const BATTLE_RESULT: IBattleResult = {
@@ -299,6 +311,33 @@ function downAction(source: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction 
   };
 }
 
+/**
+ * 魔方陣紀錄（文案與配色皆由 battleUtils 的單一事實來源導出）
+ * Magic-circle record (both copy and colour derive from the single source in battleUtils)
+ *
+ * 種類決定「draw／erased enemy／use／failed」文案與顏色，數量決定「 xN」尾碼。
+ * The kind decides the draw / erased enemy / use / failed copy and colour, and the amount
+ * decides the trailing " xN".
+ */
+function magicCircleAction(
+  source: IShowcaseUnit,
+  skill: ISkillIcon,
+  kind: EnumMagicCircleKind,
+  amount: number | undefined,
+  side: EnumTeamSideUI
+): IBattleAction {
+  const magicCircle: IMagicCircleRecord = { kind, amount };
+  return {
+    type: EnumActionType.MagicCircle,
+    source: source.name,
+    skill,
+    magicCircle,
+    message: buildMagicCircleMessage(source.name, magicCircle),
+    side,
+    attribute: EnumAttributeType.Normal,
+  };
+}
+
 // ==================== 行動日誌 / Action logs ====================
 
 /**
@@ -367,6 +406,40 @@ const summonActions: IBattleAction[] = [
   },
   attackAction(summonedUnits[0], EnumTeamSideUI.Right),
   damageAction(summonedUnits[0], summonGoblinAxe, 89, '213 > 124', EnumTeamSideUI.Right),
+];
+
+// ==================== 魔方陣紀錄日誌 / Magic-circle record log ====================
+
+/**
+ * 魔方陣紀錄日誌：四種種類各示範一次
+ * Magic-circle record log: one demonstration of each of the four kinds
+ *
+ * 每組皆為「技能行 → 魔方陣紀錄行」，與原始日誌的列印順序一致
+ * （Skill.php 先印技能行，再印成本行；Effect.php 的 draw／erased enemy 為獨立行）。
+ * Each pair is skill line → magic-circle record line, matching the original log's print
+ * order (Skill.php prints the skill line before the cost line; Effect.php's draw /
+ * erased enemy are their own lines).
+ */
+const magicCircleActions: IBattleAction[] = [
+  // ---- 描繪己方魔方陣（skill 3410，魔法陣+1）/ draw one own magic circle ----
+  skillAction(mage1, SKILL_MAGIC_CIRCLE, EnumTeamSideUI.Right),
+  magicCircleAction(mage1, SKILL_MAGIC_CIRCLE, EnumMagicCircleKind.Draw, 1, EnumTeamSideUI.Right),
+
+  // ---- 描繪己方魔方陣（skill 3411，魔法陣+2）/ draw two own magic circles ----
+  skillAction(mage1, SKILL_DOUBLE_MAGIC_CIRCLE, EnumTeamSideUI.Right),
+  magicCircleAction(mage1, SKILL_DOUBLE_MAGIC_CIRCLE, EnumMagicCircleKind.Draw, 2, EnumTeamSideUI.Right),
+
+  // ---- 消除敵方魔方陣（skill 3420，相手魔法陣-1）/ erase one enemy magic circle ----
+  skillAction(hero1, SKILL_CIRCLE_ERASE, EnumTeamSideUI.Right),
+  magicCircleAction(hero1, SKILL_CIRCLE_ERASE, EnumMagicCircleKind.EraseEnemy, 1, EnumTeamSideUI.Right),
+
+  // ---- 消耗己方魔方陣作為代價（skill 2501，消費 4）/ spend four circles as skill cost ----
+  skillAction(hero1, SKILL_SUMMON_LEVIATHAN, EnumTeamSideUI.Right),
+  magicCircleAction(hero1, SKILL_SUMMON_LEVIATHAN, EnumMagicCircleKind.Use, 4, EnumTeamSideUI.Right),
+
+  // ---- 魔方陣不足而失敗（無名稱、無數量）/ failed for lack of circles (no name, no amount) ----
+  skillAction(hero1, SKILL_SUMMON_LEVIATHAN, EnumTeamSideUI.Right),
+  magicCircleAction(hero1, SKILL_SUMMON_LEVIATHAN, EnumMagicCircleKind.Fail, undefined, EnumTeamSideUI.Right),
 ];
 
 // ==================== 召喚快照 / Summon snapshots ====================
@@ -502,4 +575,10 @@ export const battleOverData: IBattleDisplayData = createBattleData(defaultUnits,
   leftUnits: battleOverLeftUnits(),
   rightUnits: defeatedRightUnits(),
   actions: battleActions.slice(15),
+});
+
+/** 魔方陣紀錄（四種種類各一次、無結果畫面）/ Magic-circle records (each kind once, no result panel) */
+export const magicCircleData: IBattleDisplayData = createBattleData(defaultUnits, {
+  actions: magicCircleActions,
+  result: undefined,
 });

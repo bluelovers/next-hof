@@ -2,8 +2,8 @@
  * 戰鬥行動組件
  * Battle action component
  *
- * 顯示單一技能/攻擊/行動的日誌條目（含召喚 Summon）
- * Displays a single skill/attack/action log entry (summon included)
+ * 顯示單一技能/攻擊/行動的日誌條目（含召喚 Summon 與魔方陣 MagicCircle）
+ * Displays a single skill/attack/action log entry (summon and magic circle included)
  */
 import React from 'react';
 import type { IBattleAction } from './types';
@@ -11,8 +11,14 @@ import './BattleAction.css';
 import '#/components/shared/SharedBase.css';
 import { SkillIcon } from '#/components/shared/SkillIcon';
 import { CharacterSprite } from '#/components/characters/CharacterSprite';
-import { EnumSpriteVariant } from './enums';
-import { getAttrClass, getValueChangeClass, getEnterBattlefieldText } from './battleUtils';
+import { EnumSpriteVariant, EnumMagicCircleKind } from './enums';
+import {
+  getAttrClass,
+  getValueChangeClass,
+  getEnterBattlefieldText,
+  MAGIC_CIRCLE_PHRASE,
+  getMagicCircleClass,
+} from './battleUtils';
 
 /** 戰鬥行動屬性 / Battle action props */
 export interface IBattleActionProps {
@@ -106,6 +112,37 @@ const SummonMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
 };
 
 /**
+ * 魔方陣紀錄訊息（單一事實來源）
+ * Magic-circle record message (single source of truth)
+ *
+ * 文案取自 MAGIC_CIRCLE_PHRASE、配色取自 getMagicCircleClass，與轉接層共用同一份
+ * 原始日誌字串；名稱加粗（對應 PHP 的 $char->Name('bold')）。
+ * Copy comes from MAGIC_CIRCLE_PHRASE and the colour from getMagicCircleClass, sharing one
+ * set of original log strings with the adapter layer; the name is bolded to mirror PHP's
+ * $char->Name('bold').
+ *
+ * Fail 種類在原始日誌中沒有施放者名稱、也沒有數量，故只輸出文案本身。
+ * The Fail kind has neither a caster name nor an amount in the original log, so only the
+ * copy itself is emitted.
+ */
+const MagicCircleMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
+  const kind = action.magicCircle?.kind ?? EnumMagicCircleKind.Draw;
+  const amount = action.magicCircle?.amount;
+  const withName = kind !== EnumMagicCircleKind.Fail;
+  return (
+    <span className={getMagicCircleClass(kind)}>
+      {withName && action.source && (
+        <>
+          <span className="bold">{action.source}</span>{' '}
+        </>
+      )}
+      {MAGIC_CIRCLE_PHRASE[kind]}
+      {withName && amount !== undefined && ` x${amount}`}
+    </span>
+  );
+};
+
+/**
  * 傷害/治療訊息（單一事實來源）
  * Damage/heal message (single source of truth)
  */
@@ -168,6 +205,8 @@ function renderActionContent(action: IBattleAction): React.ReactNode {
       return <EnterMessage action={action} />;
     case 'summon':
       return <SummonMessage action={action} />;
+    case 'magiccircle':
+      return <MagicCircleMessage action={action} />;
     case 'skill':
     case 'attack':
       return <SkillMessage action={action} />;

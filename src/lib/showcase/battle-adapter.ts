@@ -15,9 +15,9 @@ import { RNG } from '#/lib/game/core/rng';
 import { createSeedRepository } from '#/lib/game/data/seed-data';
 import type { IDataRepository } from '#/lib/game/data/repository';
 import { EnumBattleEventType, EnumSkillDamageType } from '#/lib/game/types';
-import type { IBattleEvent, IBattleSnapshot } from '#/lib/game/types';
+import type { IBattleEvent, IBattleSnapshot, ISkillDef } from '#/lib/game/types';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
-import { EnumTeamSideUI, EnumChargeKind, EnumUnitStatus, EnumActionType, EnumAttributeType } from '#/components/battle/enums';
+import { EnumTeamSideUI, EnumChargeKind, EnumUnitStatus, EnumActionType, EnumAttributeType, EnumMagicCircleKind } from '#/components/battle/enums';
 import type {
 	IBattleAction,
 	IBattleDisplayData,
@@ -27,10 +27,12 @@ import type {
 	IBattleTeam,
 	IBattleUnit,
 	IBattleSnapshotDisplay,
+	IMagicCircleRecord,
 	ISummonedUnit,
 	ITeamFinalStats,
 	ITeamSide,
 } from '#/components/battle/types';
+import { buildMagicCircleMessage } from '#/components/battle/battleUtils';
 import {
 	computeBattleSpritePositions,
 	groupBattleChars,
@@ -215,13 +217,48 @@ function resolveRef(key: string | undefined, lookup: IUnitLookup): IResolvedRef 
 }
 
 /**
+ * 由技能定義判定魔方陣事件的種類（對應 PHP 的分支順序）
+ * Decide a magic-circle event's kind from the skill definition (mirrors PHP's branch order)
+ *
+ * PHP 依序檢查 $skill["MagicCircleAdd"]、$skill["MagicCircleDeleteEnemy"]、
+ * $skill["MagicCircleDeleteTeam"]；技能未帶任一欄位時退回 draw（由呼叫端以 value 補數量）。
+ * PHP checks $skill["MagicCircleAdd"], $skill["MagicCircleDeleteEnemy"] then
+ * $skill["MagicCircleDeleteTeam"]; when the skill carries none of them it falls back to
+ * draw (the caller fills in the amount from `value`).
+ *
+ * Fail 無法由技能定義推得（它是成本檢查失敗），需待引擎實作後另行提供。
+ * Fail cannot be derived from the skill definition (it is a cost-check failure) and awaits
+ * an engine-side producer.
+ */
+function resolveMagicCircleKind(def?: ISkillDef): EnumMagicCircleKind {
+	if (def?.MagicCircleAdd) return EnumMagicCircleKind.Draw;
+	if (def?.MagicCircleDeleteEnemy) return EnumMagicCircleKind.EraseEnemy;
+	if (def?.MagicCircleDeleteTeam) return EnumMagicCircleKind.Use;
+	return EnumMagicCircleKind.Draw;
+}
+
+/** 該種類在技能定義中的魔方陣數量（無則 undefined）/ That kind's amount in the skill definition (undefined when absent) */
+function magicCircleAmount(def: ISkillDef | undefined, kind: EnumMagicCircleKind): number | undefined {
+	switch (kind) {
+		case EnumMagicCircleKind.EraseEnemy:
+			return def?.MagicCircleDeleteEnemy;
+		case EnumMagicCircleKind.Use:
+			return def?.MagicCircleDeleteTeam;
+		default:
+			return def?.MagicCircleAdd;
+	}
+}
+
+/**
  * 事件轉接：IBattleEvent → IBattleAction（任務 3.3）
  * Event adapter: IBattleEvent → IBattleAction (task 3.3)
  *
- * 對應：Act→skill、Cast→casting、Damage→damage、Heal→heal、Guard→protect、Death→down、Summon→summon，
- * 未知型別以 type 'result' + message 文字 fallback，確保 N 事件 → N 條日誌。
+ * 對應：Act→skill、Cast→casting、Damage→damage、Heal→heal、Guard→protect、Death→down、
+ * Summon→summon、MagicCircle→magiccircle，未知型別以 type 'result' + message 文字 fallback，
+ * 確保 N 事件 → N 條日誌。
  * Mapping: Act→skill, Cast→casting, Damage→damage, Heal→heal, Guard→protect, Death→down,
- * Summon→summon; unknown types fall back to type 'result' + a message so N events → N entries.
+ * Summon→summon, MagicCircle→magiccircle; unknown types fall back to type 'result' + a
+ * message so N events → N entries.
  */
 export function mapBattleEvent(
 	ev: IBattleEvent,
@@ -356,6 +393,33 @@ export function mapBattleEvent(
 				skill: skillName ? { name: skillName } : undefined,
 				summoned,
 				message: target.name ? `${target.name} joined to the team.` : `${actor.name ?? ''} summon.`,
+				side,
+				attribute: EnumAttributeType.Normal,
+			};
+		}
+		case EnumBattleEventType.MagicCircle: {
+			// 魔方陣事件契約（引擎目前尚無生產點，見 #/lib/game/types 的 EnumBattleEventType.MagicCircle）：
+			//   skill＝施放的技能編號，用以判定是哪一種 MagicCircle* 效果（同 PHP 依 $skill[...] 分支）；
+			//   value＝變更數量，缺省時取技能定義的對應欄位值。
+			// 配色不經 attribute：由紀錄種類經 getMagicCircleClass 決定（單一事實來源）。
+			// Magic-circle event contract (the engine has no producer yet; see
+			// EnumBattleEventType.MagicCircle in #/lib/game/types): skill = the cast skill no,
+			// used to decide which MagicCircle* effect fired (PHP branches on $skill[...] the
+			// same way); value = the amount, falling back to the matching skill-definition
+			// field. The colour does not travel on `attribute`: it comes from the record kind
+			// via getMagicCircleClass (single source of truth).
+			const kind = resolveMagicCircleKind(skillDef);
+			const magicCircle: IMagicCircleRecord = {
+				kind,
+				amount: ev.value ?? magicCircleAmount(skillDef, kind),
+			};
+			return {
+				type: EnumActionType.MagicCircle,
+				source: actor.name,
+				target: target.name,
+				skill: skillName ? { name: skillName } : undefined,
+				magicCircle,
+				message: buildMagicCircleMessage(actor.name, magicCircle),
 				side,
 				attribute: EnumAttributeType.Normal,
 			};

@@ -7,7 +7,7 @@
  * Centralizes percentage math, bar colors, and status/attribute → CSS class mappings
  * so BattleUnit and BattleAction share one implementation instead of diverging.
  */
-import { EnumUnitStatus, EnumAttributeType, EnumTeamSideUI, EnumTeamSideClass, EnumActionType } from './enums';
+import { EnumUnitStatus, EnumAttributeType, EnumTeamSideUI, EnumTeamSideClass, EnumActionType, EnumMagicCircleKind } from './enums';
 import { TEAM_SIDE_CLASS } from './types';
 import { computeSpriteFlipped } from './spriteFlip';
 import { corpseSpecOf } from '#/lib/game/battle/corpse-policy';
@@ -18,6 +18,7 @@ import type {
   IBattleSnapshotDisplayUnit,
   IBattleSprite,
   IBattleUnit,
+  IMagicCircleRecord,
 } from './types';
 
 /** 條狀顏色高閾值（> 此值為高血量色） / Bar high threshold */
@@ -143,6 +144,64 @@ export function getValueChangeClass(type?: EnumActionType): string {
   if (type === EnumActionType.Damage || type === EnumActionType.Down) return 'dmg';
   if (type === EnumActionType.Heal) return 'recover';
   return '';
+}
+
+/**
+ * 魔方陣紀錄文案（原始日誌字串；單一事實來源）
+ * Magic-circle record copy (original log strings; single source of truth)
+ *
+ * 逐字對應 PHP：draw／erased enemy（Skill/Effect.php）、use／failed!（Battle/Skill.php）。
+ * Word-for-word from PHP: draw / erased enemy (Skill/Effect.php) and use / failed!
+ * (Battle/Skill.php).
+ */
+export const MAGIC_CIRCLE_PHRASE: Record<EnumMagicCircleKind, string> = {
+  [EnumMagicCircleKind.Draw]: 'draw MagicCircle',
+  [EnumMagicCircleKind.EraseEnemy]: 'erased enemy MagicCircle',
+  [EnumMagicCircleKind.Use]: 'use MagicCircle',
+  [EnumMagicCircleKind.Fail]: "failed!(MagicCircle isn't enough)",
+};
+
+/**
+ * 依魔方陣紀錄種類取得 CSS 類別（單一事實來源）
+ * Get the CSS class from a magic-circle record kind (single source of truth)
+ *
+ * 對應原始日誌的 span class：draw→support、erased enemy→dmg、use→charge、failed→dmg。
+ * Mirrors the original log's span class: draw → support, erased enemy → dmg,
+ * use → charge, failed → dmg.
+ *
+ * @param kind - 紀錄種類（缺省視為 draw）/ Record kind (defaults to draw)
+ * @returns CSS class 字串 / CSS class string
+ */
+export function getMagicCircleClass(kind?: EnumMagicCircleKind): string {
+  switch (kind) {
+    case EnumMagicCircleKind.EraseEnemy:
+    case EnumMagicCircleKind.Fail:
+      return 'dmg';
+    case EnumMagicCircleKind.Use:
+      return 'charge';
+    case EnumMagicCircleKind.Draw:
+    default:
+      return 'support';
+  }
+}
+
+/**
+ * 組出魔方陣紀錄的純文字訊息（單一事實來源）
+ * Build the plain-text magic-circle record message (single source of truth)
+ *
+ * 與元件渲染共用同一份文案；Fail 沒有名稱也沒有數量。
+ * Shares its copy with the component renderer; Fail carries neither name nor amount.
+ *
+ * @param source - 施放者名稱 / Caster name
+ * @param record - 魔方陣紀錄 / Magic-circle record
+ * @returns 訊息文字 / Message text
+ */
+export function buildMagicCircleMessage(source?: string, record?: IMagicCircleRecord): string {
+  const kind = record?.kind ?? EnumMagicCircleKind.Draw;
+  const phrase = MAGIC_CIRCLE_PHRASE[kind];
+  if (kind === EnumMagicCircleKind.Fail) return phrase;
+  const amount = record?.amount !== undefined ? ` x${record.amount}` : '';
+  return `${source ?? ''} ${phrase}${amount}`.trim();
 }
 
 /**

@@ -15,6 +15,7 @@ import {
 	EnumBattleFieldBgScale,
 	EnumActionType,
 	EnumChargeKind,
+	EnumMagicCircleKind,
 } from './enums';
 import { EnumPosition } from '#/lib/game/constants';
 import type { ICorpsePolicyField } from '#/lib/game/battle/corpse-policy';
@@ -204,6 +205,23 @@ export interface ISummonedUnit {
 	imageUrl?: string;
 }
 
+/**
+ * 魔方陣紀錄（type＝MagicCircle 時的結構化欄位）
+ * Magic-circle record (the structured field used when type = MagicCircle)
+ *
+ * 種類決定文案與配色（draw／erased enemy／use／failed），數量決定「 xN」尾碼；
+ * 種類為 Fail 時不顯示施放者名稱與數量。
+ * The kind decides the copy and the colour (draw / erased enemy / use / failed) and the
+ * amount decides the " xN" suffix; for the Fail kind neither the caster name nor the
+ * amount is shown.
+ */
+export interface IMagicCircleRecord {
+	/** 紀錄種類 / Record kind */
+	kind: EnumMagicCircleKind;
+	/** 魔方陣數量（Fail 不顯示）/ Magic-circle amount (not shown for Fail) */
+	amount?: number;
+}
+
 /** 戰鬥動作 / Battle action */
 export interface IBattleAction {
 	/** 動作類型 / Action type */
@@ -232,6 +250,8 @@ export interface IBattleAction {
 	hpAfter?: number;
 	/** 被召喚單位清單（type＝Summon 時使用）/ Summoned units (used when type = Summon) */
 	summoned?: ISummonedUnit[];
+	/** 魔方陣紀錄（type＝MagicCircle 時使用）/ Magic-circle record (used when type = MagicCircle) */
+	magicCircle?: IMagicCircleRecord;
 }
 
 /** 戰鬥結果 / Battle result */
