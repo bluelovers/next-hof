@@ -9,6 +9,8 @@
  */
 import { EnumUnitStatus, EnumAttributeType, EnumTeamSideUI, EnumTeamSideClass, EnumActionType } from './enums';
 import { TEAM_SIDE_CLASS } from './types';
+import { computeSpriteFlipped } from './spriteFlip';
+import { corpseSpecOf } from '#/lib/game/battle/corpse-policy';
 import type {
   IBattleAction,
   IBattleSegment,
@@ -307,6 +309,23 @@ function corpseUrlFor(imageUrl: string): string {
 }
 
 /**
+ * 併合精靈與屍體規格的 CSS class（去除空白段後以空白連接）
+ * Join the sprite's and the corpse spec's CSS class names (blank segments dropped)
+ *
+ * @param base - 精靈既有 class / the sprite's own class
+ * @param extra - 屍體規格附加的 class / extra class from the corpse spec
+ * @returns 併合後的 class（兩者皆空時為 undefined，避免多餘空白）
+ * the joined class (undefined when both are empty, to avoid stray whitespace)
+ */
+function joinClassNames(base?: string, extra?: string): string | undefined {
+  const joined = [base, extra]
+    .map((part) => part?.trim())
+    .filter((part) => part)
+    .join(' ');
+  return joined || undefined;
+}
+
+/**
  * 依快照解析某一段要顯示的戰場精靈（單一事實來源）
  * Resolve the battlefield sprites to show for one segment from its snapshot
  * (single source of truth)
@@ -318,10 +337,15 @@ function corpseUrlFor(imageUrl: string): string {
  *
  * - 中途加入（召喚）：此快照尚未出現的 unitUid 不顯示；一旦出現在快照就開始顯示。
  *   Joins (summon): a unitUid absent from the snapshot is hidden; it appears once present.
- * - 死亡：依單位政策呈現——`corpse` 為真時改用屍體圖（mon_145）留在場上；
+ * - 死亡：依單位政策呈現——`corpse` 為真時改用屍體圖（SPRITE_CORPSE_URL）留在場上；
  *   `!corpse`（含未設定）時直接消失（不留屍體）。
+ *   `corpse` 寫成物件時為「留下屍體」並可指定屍體圖路徑、附加 CSS class 與 inline style
+ *   （見 ICorpseSpec）；未指定圖路徑時仍依原圖目錄自動挑選。
  *   Death: follows the unit's policy — when `corpse` is truthy the unit stays as a corpse
- *   (mon_145); when `!corpse` (including unset) it vanishes (no corpse).
+ *   (SPRITE_CORPSE_URL); when `!corpse` (including unset) it vanishes (no corpse). An object-valued
+ *   `corpse` still means "leave a corpse" and additionally picks the corpse image path, an
+ *   extra CSS class and an inline style (see ICorpseSpec); with no image path given the
+ *   original image's directory still decides the corpse asset.
  * - 復活：快照中 dead=false 即恢復原圖（同一 unitUid）。
  *   Revive: once the snapshot shows dead=false the original image returns (same unitUid).
  * - 型態變化：快照提供 `imageUrl` 時以外觀覆寫呈現。
@@ -356,7 +380,32 @@ export function resolveSegmentSprites(
         // No corpse (corpse falsy, including unset): vanish on death
         if (!unit.corpse) return undefined;
         const baseImage = unit.imageUrl ?? sprite.imageUrl;
-        return { ...sprite, imageUrl: corpseUrlFor(baseImage), name: unit.name };
+        // 物件規格（可為空物件）→ 可指定屍體圖／class／style；布林 → 走預設屍體圖
+        // Object spec (may be empty) → may choose the corpse image/class/style; boolean → default corpse asset
+        const spec = corpseSpecOf(unit.corpse);
+        // 未指定圖路徑（或只有空白）＝沿用自動挑圖與原朝向；指定路徑則原樣採用
+        // No path (or a blank one) = auto-pick the asset and keep the original facing;
+        // a given path is used verbatim
+        const customImage = spec?.imageUrl?.trim();
+        const corpseImage = customImage || corpseUrlFor(baseImage);
+        // 自訂屍體圖會換掉圖檔目錄，故以「新圖 + 隊伍側」重新推導朝向，
+        // 維持兩隊皆面向場地中心（未指定圖時沿用原精靈朝向，行為不變）
+        // A custom corpse image changes the image directory, so re-derive facing from
+        // "new image + team side" to keep both teams facing the centre; without one the
+        // sprite keeps its original facing (unchanged behaviour)
+        const flipped = customImage
+          ? computeSpriteFlipped(corpseImage, unit.side, { flipped: sprite.flipped })
+          : sprite.flipped;
+        return {
+          ...sprite,
+          imageUrl: corpseImage,
+          flipped,
+          name: unit.name,
+          className: spec?.className
+            ? joinClassNames(sprite.className, spec.className)
+            : sprite.className,
+          style: spec?.style ? { ...sprite.style, ...spec.style } : sprite.style,
+        };
       }
       // 存活（含復活）；型態變化以外觀覆寫呈現
       // Alive (incl. revived); a form change is expressed via the appearance override

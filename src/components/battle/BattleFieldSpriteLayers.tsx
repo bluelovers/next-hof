@@ -63,7 +63,13 @@ function buildSpriteLayers(
   const { sprites, width, height, showLabels, style } = props;
 
   return sprites.map((sprite, index) => {
-    const flipClass = sprite.flipped ? ' flip-h' : '';
+    const flipClass = sprite.flipped ? 'flip-h' : '';
+    // 精靈自身的 className（例如屍體規格附加的 class）與 battle-sprite 併存，不互相覆蓋
+    // The sprite's own className (e.g. from a corpse spec) coexists with battle-sprite
+    // instead of replacing it
+    const layerClass = ['battle-sprite', flipClass, sprite.className?.trim()]
+      .filter(Boolean)
+      .join(' ');
 
     const layerStyle: CSSProperties = {
       width,
@@ -91,7 +97,7 @@ function buildSpriteLayers(
     return (
       <div
         key={sprite.unitUid ?? index}
-        className={`battle-sprite${flipClass}`}
+        className={layerClass}
         id={sprite.unitUid}
         style={mergedStyle}
       >

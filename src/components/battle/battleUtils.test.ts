@@ -210,4 +210,81 @@ describe('resolveSegmentSprites', () => {
 		const snap = snapshot(0, [unit('u1', false, { imageUrl: '/image/char/mon_053.png' })]);
 		expect(resolveSegmentSprites(sprites, snap)[0].imageUrl).toBe('/image/char/mon_053.png');
 	});
+
+	it('uses a custom corpse image from the object spec (verbatim path)', () => {
+		const sprites = [sprite('u1', '/image/char/mon_052.png')];
+		const snap = snapshot(0, [
+			unit('u1', true, { corpse: { imageUrl: '/image/char/mon_146.png' } }),
+		]);
+		expect(resolveSegmentSprites(sprites, snap)[0].imageUrl).toBe('/image/char/mon_146.png');
+	});
+
+	it('falls back to the directory-based corpse image when the spec path is blank', () => {
+		const sprites = [{ ...sprite('u1', '/image/char_rev/mon_018.png'), flipped: true }];
+		const snap = snapshot(0, [unit('u1', true, { corpse: { imageUrl: '   ' } })]);
+		const out = resolveSegmentSprites(sprites, snap)[0];
+		expect(out.imageUrl).toBe(SPRITE_CORPSE_URL_REV);
+		// 空白路徑＝未指定，故沿用原精靈朝向（不重新推導）
+		// A blank path counts as unspecified, so the original facing is kept (no re-derivation)
+		expect(out.flipped).toBe(true);
+	});
+
+	it('treats an empty object spec as leave-corpse with the default appearance', () => {
+		const sprites = [sprite('u1', '/image/char/mon_052.png')];
+		const snap = snapshot(0, [unit('u1', true, { corpse: {} })]);
+		const out = resolveSegmentSprites(sprites, snap);
+		expect(out).toHaveLength(1);
+		expect(out[0].imageUrl).toBe(SPRITE_CORPSE_URL);
+		expect(out[0].className).toBeUndefined();
+		expect(out[0].style).toBeUndefined();
+	});
+
+	it('appends the spec className and merges the spec style onto the corpse layer', () => {
+		const sprites = [
+			{ ...sprite('u1'), className: 'on-field', style: { opacity: 1, filter: 'none' } },
+		];
+		const snap = snapshot(0, [
+			unit('u1', true, { corpse: { className: 'corpse-frost', style: { opacity: 0.6 } } }),
+		]);
+		const out = resolveSegmentSprites(sprites, snap)[0];
+		// class 併存而非取代；style 同名屬性由 spec 覆寫、其餘保留
+		// Classes coexist (not replaced); same-named style keys come from the spec, the rest stay
+		expect(out.className).toBe('on-field corpse-frost');
+		expect(out.style).toEqual({ opacity: 0.6, filter: 'none' });
+	});
+
+	it('keeps the original facing for the default (boolean) corpse image', () => {
+		const sprites = [{ ...sprite('u1', '/image/char/mon_052.png'), flipped: true }];
+		const snap = snapshot(0, [unit('u1', true)]);
+		expect(resolveSegmentSprites(sprites, snap)[0].flipped).toBe(true);
+	});
+
+	it('re-derives facing from a custom corpse image plus the team side', () => {
+		// char 圖 + 左隊 → 不翻轉（原精靈 char_rev + 左隊本來是翻轉的）
+		// char image + left team → no flip (the original char_rev + left sprite was flipped)
+		const onLeft = [{ ...sprite('u1', '/image/char_rev/mon_018.png'), flipped: true }];
+		const leftSnap = snapshot(0, [
+			unit('u1', true, { corpse: { imageUrl: '/image/char/mon_146.png' } }),
+		]);
+		expect(resolveSegmentSprites(onLeft, leftSnap)[0].flipped).toBe(false);
+
+		// char 圖 + 右隊 → 翻轉（維持面向場地中心）
+		// char image + right team → flipped (keeps facing the centre)
+		const onRight = [{ ...sprite('u2', '/image/char_rev/mon_018.png'), flipped: false }];
+		const rightSnap = snapshot(0, [
+			unit('u2', true, {
+				side: EnumTeamSideUI.Right,
+				corpse: { imageUrl: '/image/char/mon_146.png' },
+			}),
+		]);
+		expect(resolveSegmentSprites(onRight, rightSnap)[0].flipped).toBe(true);
+	});
+
+	it('keeps the explicit flip for a custom image outside char / char_rev', () => {
+		const sprites = [{ ...sprite('u1', '/image/char/mon_052.png'), flipped: true }];
+		const snap = snapshot(0, [
+			unit('u1', true, { corpse: { imageUrl: '/image/other/tomb.png' } }),
+		]);
+		expect(resolveSegmentSprites(sprites, snap)[0].flipped).toBe(true);
+	});
 });

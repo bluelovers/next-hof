@@ -5,6 +5,7 @@
 
 import { EnumState, EnumPosition, EnumExpect } from '../constants';
 import type { IBehavior, ISpecial, ICharCore, IMonReward } from '../types';
+import type { ICorpsePolicy } from '../battle/corpse-policy';
 import { EnumCharType, EnumEquipSlot, EnumWeaponType } from '../types';
 import type { RNG } from '../core/rng';
 
@@ -140,10 +141,11 @@ export class Character {
 	/** 怪物獎勵定義 / monster reward definition */
 	reward?: { moneyhold?: number; exphold?: number; itemtable?: Record<number, number> };
 	/**
-	 * 死亡後是否留下屍體（false＝消失；未提供＝預設留下）
-	 * Whether this unit leaves a corpse on death (false = vanish; omitted = leave one)
+	 * 死亡後是否留下屍體（角色級政策：false＝消失；物件＝指定圖／class／style；省略＝往上繼承）
+	 * Whether this unit leaves a corpse on death (character-level policy: false = vanish;
+	 * object = custom image/class/style; omitted = inherit upward)
 	 */
-	corpse?: boolean;
+	corpse?: ICorpsePolicy;
 
 	// 戰鬥執行期狀態 / runtime
 	/** 行動延遲值（越小越先行動；死亡設為 Infinity）/ action delay (smaller acts first; Infinity when dead) */

@@ -166,4 +166,36 @@ describe('corpse policy inheritance (battle > team > character)', () => {
 		const byId2 = new Map(battle2.snapshots[0].units.map((u) => [u.unitUid, u]));
 		expect([...byId2.values()].every((u) => u.corpse === false)).toBe(true);
 	});
+
+	it('carries an object corpse spec (image / class / style) into the snapshot', () => {
+		const rng = new RNG(6);
+		const strong = { ...repo.getCharBase(100)!, str: 5000 };
+		const spec = {
+			imageUrl: '/image/char/mon_146.png',
+			className: 'corpse-frost',
+			style: { opacity: 0.5 },
+		};
+		// 角色級物件規格：整包勝出，不與戰鬥級物件做欄位合併
+		// Character-level object spec: wins as a whole, no field merging with the battle level
+		const decorated = newChar({ ...strong, corpse: spec }, repo, rng);
+		// 角色級未設定：繼承戰鬥級物件
+		// Character level unset: inherits the battle-level object
+		const inherits = newChar(strong, repo, rng);
+		const enemy = newMon(repo.getMon(1000)!, repo, rng);
+
+		const battle = new Battle([decorated, inherits], [enemy], {
+			repo,
+			rng,
+			corpse: { className: 'battle-wide' },
+			teamCorpse: { [EnumTeamSide.Team1]: false },
+		});
+		battle.run();
+
+		const byId = new Map(battle.snapshots[0].units.map((u) => [u.unitUid, u]));
+		expect(byId.get(decorated.unitUid)!.corpse).toEqual(spec);
+		expect(byId.get(inherits.unitUid)!.corpse).toEqual({ className: 'battle-wide' });
+		// 隊伍級 false 否決戰鬥級物件（仍以 falsy 判定）
+		// Team-level false vetoes the battle-level object (still judged falsy)
+		expect(byId.get(enemy.unitUid)!.corpse).toBe(false);
+	});
 });

@@ -17,7 +17,7 @@ import { Defending } from './guard';
 import { buildPattern, MultiFactJudge } from './pattern';
 import { computeOutcome, BattleResult, EnumOutcome } from './BattleResult';
 import { EnumJudgeCode } from './judge-codes';
-import { resolveCorpsePolicy } from './corpse-policy';
+import { resolveCorpsePolicy, type ICorpsePolicy } from './corpse-policy';
 import type { IDataRepository } from '../data/repository';
 import type { RNG } from '../core/rng';
 import type { ITimeService } from '../core/time-service';
@@ -37,17 +37,18 @@ export interface IBattleConfig {
 	/** 虛擬時間服務（省略時不啟用時間相關功能）/ virtual time service (time features disabled when omitted) */
 	time?: ITimeService;
 	/**
-	 * 戰鬥級屍體政策（全場預設；省略＝不留屍體）。
+	 * 戰鬥級屍體政策（全場預設；省略＝不留屍體）。可為布林或物件規格（圖／class／style）。
 	 * 逐級繼承：角色級 > 隊伍級 > 戰鬥級；這裡是最外層預設。
-	 * Battle-level corpse policy (battle-wide default; omitted = no corpse).
+	 * Battle-level corpse policy (battle-wide default; omitted = no corpse). Either a boolean or
+	 * an object spec (image/class/style).
 	 * Inheritance: character > team > battle; this is the outermost default.
 	 */
-	corpse?: boolean;
+	corpse?: ICorpsePolicy;
 	/**
 	 * 隊伍級屍體政策覆寫（某側未提供＝沿用戰鬥級）。
 	 * Team-level corpse policy overrides (an omitted side inherits the battle-level value).
 	 */
-	teamCorpse?: Partial<Record<EnumTeamSide, boolean>>;
+	teamCorpse?: Partial<Record<EnumTeamSide, ICorpsePolicy>>;
 }
 
 export class Battle {
@@ -71,10 +72,10 @@ export class Battle {
 	actions = 0;
 	/** 最後一次快照時的 actions 值 / actions value at last snapshot */
 	private lastSnapshotActions = -1;
-	/** 戰鬥級屍體政策（已解析的預設；false＝不留屍體）/ battle-level corpse policy (resolved default) */
-	corpse = false;
+	/** 戰鬥級屍體政策（已解析的預設；false＝不留屍體，物件＝留屍體並帶規格）/ battle-level corpse policy (resolved default; false = no corpse, object = leave a corpse with a spec) */
+	corpse: ICorpsePolicy = false;
 	/** 隊伍級屍體政策覆寫 / team-level corpse overrides */
-	teamCorpse: Partial<Record<EnumTeamSide, boolean>> = {};
+	teamCorpse: Partial<Record<EnumTeamSide, ICorpsePolicy>> = {};
 	/** 快照列表（每 10 actions 一張戰場圖＋HP/SP）/ snapshots (one battlefield + HP/SP per 10 actions) */
 	snapshots: IBattleSnapshot[] = [];
 
@@ -250,11 +251,13 @@ export class Battle {
 	}
 
 	/**
-	 * 逐級解析某單位的屍體政策：角色級 > 隊伍級 > 戰鬥級；皆未設定＝false（不留屍體）
+	 * 逐級解析某單位的屍體政策：角色級 > 隊伍級 > 戰鬥級；皆未設定＝false（不留屍體）。
+	 * 回傳布林或物件規格（物件＝留下屍體並指定圖／class／style）。
 	 * Resolve a unit's corpse policy level by level: character > team > battle;
-	 * when none is set the result is false (no corpse).
+	 * when none is set the result is false (no corpse). Returns a boolean or an object
+	 * spec (object = leave a corpse carrying image/class/style).
 	 */
-	private resolveCorpse(c: Character): boolean {
+	private resolveCorpse(c: Character): ICorpsePolicy {
 		const team = c.team as BattleTeam | null;
 		const teamSide = team?.side;
 		return resolveCorpsePolicy(

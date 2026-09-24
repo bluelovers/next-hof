@@ -17,6 +17,7 @@ import {
 	EnumChargeKind,
 } from './enums';
 import { EnumPosition } from '#/lib/game/constants';
+import type { ICorpsePolicy } from '#/lib/game/battle/corpse-policy';
 
 /** 隊伍側別（UI 層）/ Team side (UI layer) */
 export type ITeamSide = EnumTeamSideUI;
@@ -106,6 +107,12 @@ export interface IBattleSprite {
 	imageSize?: ISpriteImageSize;
 	/** 角色名稱 / Character name */
 	name?: string;
+	/**
+	 * 附加到精靈圖層的 CSS class（與元件本身的基礎 class 併存，兩者不會互相取代）
+	 * Extra CSS class on the sprite layer (kept alongside the component's base class;
+	 * neither replaces the other)
+	 */
+	className?: string;
 	/** 精靈圖層自訂樣式（可複寫或追加） / Custom sprite layer style */
 	style?: CSSProperties;
 	/** 名稱標籤自訂樣式（可複寫或追加） / Custom name label style */
@@ -283,12 +290,15 @@ export interface IBattleSnapshotDisplayUnit {
 	 */
 	imageUrl?: string;
 	/**
-	 * 已解析的屍體政策（true＝留下屍體；falsy＝死亡即消失）。
+	 * 已解析的屍體政策（`true`／物件＝留下屍體；falsy＝死亡即消失）。
+	 * 物件形式還可指定屍體圖路徑、CSS class 與 inline style（見 ICorpseSpec）。
 	 * 由引擎逐級繼承（角色 > 隊伍 > 戰鬥級）後帶出，顯示層一律以 `!corpse` 判定。
-	 * Resolved corpse policy (true = leave a corpse; falsy = vanish). Produced by the engine
-	 * after character > team > battle inheritance; the display layer always checks `!corpse`.
+	 * Resolved corpse policy (`true`/object = leave a corpse; falsy = vanish on death). The object
+	 * form additionally chooses the corpse image path, CSS class and inline style (see ICorpseSpec).
+	 * Produced by the engine after character > team > battle inheritance; the display layer always
+	 * checks `!corpse`.
 	 */
-	corpse?: boolean;
+	corpse?: ICorpsePolicy;
 	hp: number;
 	maxHp: number;
 	sp: number;

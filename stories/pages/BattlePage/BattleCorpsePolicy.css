@@ -1,0 +1,32 @@
+/**
+ * BattleCorpsePolicy 示範樣式
+ * BattleCorpsePolicy demo styles
+ *
+ * 物件規格的 corpseClassName 控制項只會把 class 名稱掛上屍體圖層，樣式本身必須先在
+ * CSS 定義才看得到效果；故在此（故事層）建立展示用類別，避免把故事專屬樣式塞進元件 CSS。
+ * The corpseClassName control only puts a class name on the corpse layer; its CSS must
+ * already exist to be visible. The demo class therefore lives here (story layer) instead
+ * of being stuffed into the component's own CSS.
+ */
+
+/*
+ * 屍體淡出效果（corpseClassName 控制項的預設值 corpse-ghost）。
+ *
+ * 為什麼刻意只寫單一 class、不寫成 `.battle-sprite.corpse-ghost`：
+ * `.battle-sprite` 屬於 BattleFieldSpriteLayers 元件，其 class 名與視覺規則的單一事實
+ * 來源在元件自己的 CSS／TSX；故事層引用它會形成第二份知識（元件改名即靜默失效），
+ * 也違反「父層 CSS 不得定義子元件樣式」的規則。
+ * 並刻意選用元件從未設定的 opacity：與元件的 filter／transform 完全不衝突，
+ * 因此不必比專一性、也不用管樣式表載入順序，控制項永遠穩定可見。
+ *
+ * Why only a single class (never `.battle-sprite.corpse-ghost`): `.battle-sprite` belongs to
+ * the BattleFieldSpriteLayers component — its class name and visual rules are owned by that
+ * component's CSS/TSX. Referencing it here would create a second copy of that knowledge
+ * (silently breaking on a rename) and would violate "a parent stylesheet must not define
+ * child-component styles". `opacity` is deliberately chosen because the component never
+ * sets it: it cannot collide with the component's filter/transform, so no specificity
+ * contest and no dependence on stylesheet load order — the control stays reliably visible.
+ */
+.corpse-ghost {
+  opacity: 0.55;
+}

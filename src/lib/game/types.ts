@@ -3,6 +3,7 @@
 
 import { EnumState, EnumPosition, EnumTeamSide } from './constants';
 import type { ICompField } from './character/status-attrs';
+import type { ICorpsePolicy } from './battle/corpse-policy';
 
 /**
  * 角色類型 / Character type
@@ -591,13 +592,15 @@ export interface ICharCore {
 	unitUid?: string;
 	/**
 	 * 死亡後是否留下屍體（角色級政策）。
-	 * `true`＝留下屍體；`false`＝死亡即消失；省略＝往上繼承（隊伍級 → 戰鬥級 → 預設 false）。
+	 * `true`／物件＝留下屍體（物件可指定屍體圖、CSS class、style）；`false`＝死亡即消失；
+	 * 省略＝往上繼承（隊伍級 → 戰鬥級 → 預設 false）。
 	 * 一律以 falsy 判定（`!corpse`），因此「未設定」語意上就是不留下屍體，不會出現 undefined 卻視為 true 的混亂。
 	 * Whether this unit leaves a corpse on death (character-level policy).
-	 * `true` = leave a corpse; `false` = vanish; omitted = inherit upward (team → battle → default false).
+	 * `true`/object = leave a corpse (the object form chooses the corpse image, CSS class and
+	 * style); `false` = vanish; omitted = inherit upward (team → battle → default false).
 	 * Always evaluated as falsy (`!corpse`), so "unset" never implicitly means true.
 	 */
-	corpse?: boolean;
+	corpse?: ICorpsePolicy;
 	/** 單位名稱 / unit name */
 	name: string;
 	/** 等級 / level */
@@ -743,10 +746,12 @@ export interface IBattleSnapshotUnit {
 	/** 戰鬥單位實例唯一識別碼（Character.unitUid；個體追蹤用）/ unit instance uid (for per-instance tracking) */
 	unitUid: string;
 	/**
-	 * 已解析的屍體政策（角色 > 隊伍 > 戰鬥級繼承後的結果；false＝不留下屍體）
-	 * Resolved corpse policy (after character > team > battle inheritance; false = no corpse)
+	 * 已解析的屍體政策（角色 > 隊伍 > 戰鬥級繼承後的結果；false＝不留下屍體，
+	 * 物件＝留下屍體並帶有圖／class／style 規格）
+	 * Resolved corpse policy (after character > team > battle inheritance; false = no corpse,
+	 * object = leave a corpse carrying image/class/style spec)
 	 */
-	corpse: boolean;
+	corpse: ICorpsePolicy;
 	/** 單位編號 String(char.no)（物種／定義編號）/ unit number as string (species / definition id) */
 	no: string;
 	/** 名稱 / name */
