@@ -242,11 +242,21 @@ export interface IBattleDisplayData {
 	/** 戰鬥結果 / Battle result */
 	result?: IBattleResult;
 	/** 快照列表（每 10 actions 一張戰場圖＋HP/SP）/ snapshots */
-	snapshots?: IBattleSnapshot[];
+	snapshots?: IBattleSnapshotDisplay[];
 }
 
-/** 快照單位（顯示側）/ Snapshot unit (display side) */
-export interface IBattleSnapshotUnit {
+/**
+ * 快照單位（顯示側）
+ * Snapshot unit (display side).
+ *
+ * 注意：此為「展示側」DTO，與引擎領域型別 #/lib/game/types 的 IBattleSnapshotUnit
+ * 形狀不同（此處使用 EnumTeamSideUI / EnumUnitStatus 等 UI 列舉）。命名加 Display
+ * 後綴以避免與領域型別撞名，確保單一事實來源與可追蹤性。
+ * NOTE: this is a display-side DTO whose shape differs from the engine domain type
+ * IBattleSnapshotUnit in #/lib/game/types (it uses UI enums like EnumTeamSideUI /
+ * EnumUnitStatus). The Display suffix avoids colliding with the domain type.
+ */
+export interface IBattleSnapshotDisplayUnit {
 	/** 單位名稱 / name */
 	name: string;
 	/** 顯示側別 / display side */
@@ -264,8 +274,8 @@ export interface IBattleSnapshotUnit {
 }
 
 /** 戰鬥快照（顯示側）/ Battle snapshot (display side) */
-export interface IBattleSnapshot {
+export interface IBattleSnapshotDisplay {
 	/** 對應 actions 的索引位置 / index into actions */
 	at: number;
-	units: IBattleSnapshotUnit[];
+	units: IBattleSnapshotDisplayUnit[];
 }

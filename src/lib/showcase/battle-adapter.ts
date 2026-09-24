@@ -25,7 +25,7 @@ import type {
 	IBattleSprite,
 	IBattleTeam,
 	IBattleUnit,
-	IBattleSnapshot as IBattleSnapshotDisplay,
+	IBattleSnapshotDisplay,
 	ITeamFinalStats,
 	ITeamSide,
 } from '#/components/battle/types';
