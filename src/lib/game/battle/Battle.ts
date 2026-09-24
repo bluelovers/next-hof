@@ -17,6 +17,7 @@ import { Defending } from './guard';
 import { buildPattern, MultiFactJudge } from './pattern';
 import { computeOutcome, BattleResult, EnumOutcome } from './BattleResult';
 import { EnumJudgeCode } from './judge-codes';
+import { resolveCorpsePolicy } from './corpse-policy';
 import type { IDataRepository } from '../data/repository';
 import type { RNG } from '../core/rng';
 import type { ITimeService } from '../core/time-service';
@@ -256,7 +257,11 @@ export class Battle {
 	private resolveCorpse(c: Character): boolean {
 		const team = c.team as BattleTeam | null;
 		const teamSide = team?.side;
-		return c.corpse ?? (teamSide !== undefined ? this.teamCorpse[teamSide] : undefined) ?? this.corpse;
+		return resolveCorpsePolicy(
+			c.corpse,
+			teamSide !== undefined ? this.teamCorpse[teamSide] : undefined,
+			this.corpse,
+		);
 	}
 
 	/** 建立目前快照單位列表 / Build current snapshot unit list */
