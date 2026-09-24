@@ -19,6 +19,7 @@ import { EnumCharType } from '../types';
 export function newChar(def: ICharDef, repo: IDataRepository, rng: RNG): Character {
 	const c = new Character({
 		no: def.no,
+		unitUid: def.unitUid,
 		name: def.name,
 		types: [EnumCharType.Char],
 		level: def.level,
@@ -36,6 +37,7 @@ export function newChar(def: ICharDef, repo: IDataRepository, rng: RNG): Charact
 		skill: def.skill,
 		equip: def.equip,
 		behavior: def.behavior,
+		corpse: def.corpse,
 	});
 	c.rng = rng;
 	setBattleVariable(c, repo, rng);
@@ -52,6 +54,7 @@ export function newChar(def: ICharDef, repo: IDataRepository, rng: RNG): Charact
 export function newMon(def: IMonDef, repo: IDataRepository, rng: RNG, strength = 1): Character {
 	const c = new Character({
 		no: def.no,
+		unitUid: def.unitUid,
 		name: def.name,
 		types: [EnumCharType.Mon],
 		level: def.level,
@@ -67,6 +70,7 @@ export function newMon(def: IMonDef, repo: IDataRepository, rng: RNG, strength =
 		skill: def.skill,
 		behavior: def.behavior,
 		reward: def.reward,
+		corpse: def.corpse,
 	});
 	c.rng = rng;
 	if (strength && strength !== 1) {

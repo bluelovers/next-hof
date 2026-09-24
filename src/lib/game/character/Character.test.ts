@@ -25,6 +25,35 @@ describe('Character factory (4.1)', () => {
 	});
 });
 
+describe('instance identity (unitUid)', () => {
+	const base = {
+		name: 'x',
+		types: [EnumCharType.Mon],
+		level: 1,
+		str: 1, int: 1, dex: 1, spd: 1, luk: 1,
+		maxhp: 100, maxsp: 10,
+	};
+
+	it('honours a provider-supplied unitUid', () => {
+		const c = new Character({ ...base, no: 1000, unitUid: 'mon-instance-7' });
+		expect(c.unitUid).toBe('mon-instance-7');
+	});
+
+	it('generates distinct unitUids for same-no individuals', () => {
+		const a = new Character({ ...base, no: 1000 });
+		const b = new Character({ ...base, no: 1000 });
+		expect(a.unitUid).not.toBe(b.unitUid);
+		expect(a.unitUid.length).toBeGreaterThan(0);
+	});
+
+	it('carries the per-unit corpse policy', () => {
+		expect(new Character({ ...base, no: 1000, corpse: true }).corpse).toBe(true);
+		expect(new Character({ ...base, no: 1000, corpse: false }).corpse).toBe(false);
+		// 未提供時保留 undefined（往上繼承：隊伍級 → 戰鬥級 → 最終未設定＝不留屍體）
+		expect(new Character({ ...base, no: 1000 }).corpse).toBeUndefined();
+	});
+});
+
 describe('level_fix (4.2)', () => {
 	it('scales monster base attributes by ceil(base * newLevel/oldLevel)', () => {
 		const rng = new RNG(2);

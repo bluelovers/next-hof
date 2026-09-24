@@ -1,6 +1,13 @@
 // 範例資料 / Representative seed data
 // 欄位對應 docs/data/*.md 分析的 YAML 結構。數值僅作為系統運作範例，
 // 非完整遊戲設定/數值平衡（留待 YAML 匯入變更）。
+//
+// 屍體政策三級示範（角色級在此檔設定；隊伍級／戰鬥級見 showcase battle 設定）：
+// - 戰鬥級：runShowcaseBattle 設 corpse: true（我方預設留屍體）
+// - 隊伍級：runShowcaseBattle 設 teamCorpse { Team1: false }（敵方預設不留）
+// - 角色級：本檔個別 def 的 corpse（覆寫上層），如下方的 Priest / DarkElfHunter / Slime
+// Corpse-policy 3-level demo (character level set here; team/battle levels in the showcase
+// battle config): battle-level corpse:true, team-level Team1:false, and per-def overrides below.
 
 import { EnumWeaponType, EnumTargetType, EnumTargetMethod, EnumEquipSlot, EnumGuardKind, type ISkillDef, type IItemDef, type IJobDef, type ICharDef, type IMonDef } from '../types';
 import { EnumPosition } from '../constants';
@@ -140,6 +147,9 @@ const char104: ICharDef = {
 	no: 104, name: 'Priest', level: 2, maxhp: 240, hp: 240, maxsp: 80, sp: 80,
 	str: 5, int: 12, dex: 6, spd: 5, luk: 5, job: 100, skill: [1000, 3000],
 	equip: { [EnumEquipSlot.Armor]: 5000 },
+	// 角色級屍體政策：祭司倒下不留屍體（覆寫戰鬥級預設）
+	// Character-level corpse policy: the Priest leaves no corpse (overrides the battle-level default)
+	corpse: false,
 	behavior: {
 		position: EnumPosition.Back, guard: EnumGuardKind.Never,
 		// EnumJudgeCode.LowHp40：自身 HP ≤ 40% 時治療，否則普攻
@@ -176,6 +186,9 @@ const mon1001: IMonDef = {
 	no: 1001, name: 'DarkElfHunter', level: 39, maxhp: 580, hp: 580, maxsp: 80, sp: 80,
 	str: 60, int: 50, dex: 40, spd: 35, luk: 10, skill: [2000],
 	reward: { moneyhold: 200, exphold: 120, itemtable: {} },
+	// 角色級屍體政策：暗精靈獵手仍留屍體（覆寫隊伍級 Team1:false）
+	// Character-level corpse policy: the DarkElfHunter still leaves a corpse (overrides team-level Team1:false)
+	corpse: true,
 	behavior: { position: EnumPosition.Back, guard: EnumGuardKind.Never, pattern: [{ judge: EnumJudgeCode.DefaultAttack, quantity: 0, action: 2000 }] },
 };
 
@@ -184,6 +197,9 @@ const mon1002: IMonDef = {
 	no: 1002, name: 'Slime', level: 1, maxhp: 60, hp: 60, maxsp: 5, sp: 5,
 	str: 8, int: 1, dex: 5, spd: 4, luk: 1, skill: [1000],
 	reward: { moneyhold: 10, exphold: 5, itemtable: {} },
+	// 角色級屍體政策：史萊姆溶解，不留屍體
+	// Character-level corpse policy: the Slime dissolves, leaving no corpse
+	corpse: false,
 	behavior: { position: EnumPosition.Front, guard: EnumGuardKind.Never, pattern: [{ judge: EnumJudgeCode.DefaultAttack, quantity: 0, action: EnumJudgeCode.DefaultAttack }] },
 };
 

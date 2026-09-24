@@ -57,8 +57,11 @@ export interface IBattleUnit {
 	maxSp: number;
 	/** 單位狀態 / Unit status */
 	status?: EnumUnitStatus;
-	/** 角色 Sprite ID (用於顯示圖示) / Character sprite ID */
-	spriteId?: string;
+	/**
+	 * 戰鬥單位實例唯一識別碼（Character.unitUid；用於關聯戰場精靈）
+	 * Battle-unit instance uid (Character.unitUid; links to the battlefield sprite)
+	 */
+	unitUid?: string;
 	/** 隊伍側 / Team side */
 	side: EnumTeamSideUI;
 	/** 速度（決定行動順序）/ speed (action order) */
@@ -81,13 +84,16 @@ export interface IBattleTeam {
 
 /** 戰場精靈 / Battlefield sprite */
 export interface IBattleSprite {
-	/** 角色 ID（同時作為 DOM id 用於定位/選取） / Character ID (also used as DOM id for targeting) */
-	id?: string;
 	/**
-	 * 單位編號（引擎 char no 字串；與快照單位比對用，同名怪物可共享）
-	 * Unit number (engine char no string; used to match snapshot units; shared by same-name monsters)
+	 * 戰鬥單位實例唯一識別碼（Character.unitUid；同時作為 DOM id 用於定位/選取）
+	 * Battle-unit instance uid (Character.unitUid; also used as the DOM id for
+	 * targeting/selection).
+	 *
+	 * 與快照單位的 `unitUid` 相同，兩者以此精確對應到「同一個單位個體」。
+	 * Matches a snapshot unit's `unitUid`, so sprites and snapshot units map to the exact
+	 * same unit individual (never by species `no`).
 	 */
-	unitNo?: string;
+	unitUid?: string;
 	/** 精靈圖片路徑 / Sprite image path */
 	imageUrl: string;
 	/** X 軸位置 / X position */
@@ -262,12 +268,27 @@ export interface IBattleDisplayData {
  * EnumUnitStatus). The Display suffix avoids colliding with the domain type.
  */
 export interface IBattleSnapshotDisplayUnit {
-	/** 單位編號（引擎 char no 字串；與精靈 unitNo 比對用）/ unit no (engine char no string; matched against sprite unitNo) */
-	id?: string;
+	/**
+	 * 戰鬥單位實例唯一識別碼（對應精靈的 `unitUid`，即 Character.unitUid）
+	 * Battle-unit instance uid (matches a sprite's `unitUid`, i.e. Character.unitUid)
+	 */
+	unitUid?: string;
 	/** 單位名稱 / name */
 	name: string;
 	/** 顯示側別 / display side */
 	side: EnumTeamSideUI;
+	/**
+	 * 外觀覆寫（型態變化等；未提供時沿用精靈自身圖檔）
+	 * Appearance override (e.g. form change; when absent the sprite's own image is used)
+	 */
+	imageUrl?: string;
+	/**
+	 * 已解析的屍體政策（true＝留下屍體；falsy＝死亡即消失）。
+	 * 由引擎逐級繼承（角色 > 隊伍 > 戰鬥級）後帶出，顯示層一律以 `!corpse` 判定。
+	 * Resolved corpse policy (true = leave a corpse; falsy = vanish). Produced by the engine
+	 * after character > team > battle inheritance; the display layer always checks `!corpse`.
+	 */
+	corpse?: boolean;
 	hp: number;
 	maxHp: number;
 	sp: number;

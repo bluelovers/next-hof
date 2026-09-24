@@ -30,14 +30,14 @@ export interface ISpriteLabelComputeInput {
   imageSize?: ISpriteImageSize;
   /** 標籤演算法：角色上方 / 下方（缺省 below） / Placement (default below) */
   placement?: EnumSpriteLabelPlacement;
-  /** 精靈 id（用於對應 entries） / Sprite id (for matching entries) */
-  id?: string;
+  /** 戰鬥單位實例 uid（用於對應 entries）/ Battle-unit instance uid (for matching entries) */
+  unitUid?: string;
 }
 
 /** 暫存結果項目 / Cached result entry */
 export interface ISpriteLabelEntry {
-  /** 對應精靈 id / Matching sprite id */
-  id: string;
+  /** 對應的戰鬥單位實例 uid / Matching battle-unit instance uid */
+  unitUid: string;
   /** 標籤最終矩形（frame 座標） / Final label rect (frame coords) */
   rect: IRect;
   /** 標籤最終位置結果 / Final label position result */
@@ -83,7 +83,7 @@ export function useSpriteLabelRegistry(
         occupied,
       });
       occupied.push(pos.rect);
-      return { id: s.id ?? String(i), rect: pos.rect, pos };
+      return { unitUid: s.unitUid ?? String(i), rect: pos.rect, pos };
     });
   }, [sprites, frameSize.width, frameSize.height]);
 

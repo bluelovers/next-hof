@@ -90,9 +90,9 @@ function buildSpriteLayers(
 
     return (
       <div
-        key={sprite.id ?? index}
+        key={sprite.unitUid ?? index}
         className={`battle-sprite${flipClass}`}
-        id={sprite.id}
+        id={sprite.unitUid}
         style={mergedStyle}
       >
         {showLabels && sprite.name && (
@@ -137,7 +137,7 @@ export const BattleFieldSpriteLayers: React.FC<IBattleFieldSpriteLayersProps> = 
         y: s.y,
         imageSize: s.imageSize,
         placement: s.placement,
-        id: s.id ?? String(i),
+        unitUid: s.unitUid ?? String(i),
       })),
     [sprites],
   );

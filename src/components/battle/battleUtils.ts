@@ -294,40 +294,75 @@ export function segmentUnitsForSide(
 }
 
 /**
- * 依快照移除「已全數陣亡」單位的精靈（單一事實來源）
- * Filter out sprites whose unit is fully dead in the snapshot (single source of truth)
- *
- * 由於引擎快照只帶 char no（同名怪物共享同一 no），無法辨識個別實例，因此採保守規則：
- * 只有當某個 unitNo 的所有快照實例皆為 dead 時，才移除該 unitNo 的精靈；只要還有任一
- * 存活實例，就保留該 no 的所有精靈（避免誤刪存活者）。
- * Engine snapshots only carry a char no (same-name monsters share one no), so individual
- * instances cannot be told apart. The rule is therefore conservative: remove a unitNo's
- * sprites only when every snapshot instance of that no is dead; if any instance is alive,
- * all sprites for that no are kept (avoids wrongly hiding a survivor).
- *
- * 無 snapshot 或無精靈比對資料時原樣回傳。
- * Returns the input unchanged when there is no snapshot or no matching data.
- *
- * @param sprites - 全部戰場精靈 / all battlefield sprites
- * @param snapshot - 該段起始快照（可省略）/ segment-start snapshot (optional)
- * @returns 該段要顯示的精靈 / sprites to show for the segment
+ * 屍體精靈圖（死亡後留下屍體；依原圖目錄選擇正向／鏡像版本）
+ * Corpse sprite (left behind on death; picks the forward / mirrored asset by the
+ * original image's directory so facing stays consistent).
  */
-export function filterSpritesBySnapshot(
+export const SPRITE_CORPSE_URL = '/image/char/mon_145.png';
+export const SPRITE_CORPSE_URL_REV = '/image/char_rev/mon_145.png';
+
+/** 依原精靈圖所屬目錄選擇對應的屍體圖 / Pick the corpse asset matching the original image's directory */
+function corpseUrlFor(imageUrl: string): string {
+  return imageUrl.includes('/char_rev/') ? SPRITE_CORPSE_URL_REV : SPRITE_CORPSE_URL;
+}
+
+/**
+ * 依快照解析某一段要顯示的戰場精靈（單一事實來源）
+ * Resolve the battlefield sprites to show for one segment from its snapshot
+ * (single source of truth)
+ *
+ * 以「戰鬥單位實例 unitUid」精確比對（sprite.unitUid ↔ snapshotUnit.unitUid），
+ * 完全不以物種 `no` 判定，因此可正確處理真實遊戲的各種情況：
+ * Matches by battle-unit instance unitUid (sprite.unitUid ↔ snapshotUnit.unitUid) and never
+ * by species `no`, so it handles the real-game cases correctly:
+ *
+ * - 中途加入（召喚）：此快照尚未出現的 unitUid 不顯示；一旦出現在快照就開始顯示。
+ *   Joins (summon): a unitUid absent from the snapshot is hidden; it appears once present.
+ * - 死亡：依單位政策呈現——`corpse` 為真時改用屍體圖（mon_145）留在場上；
+ *   `!corpse`（含未設定）時直接消失（不留屍體）。
+ *   Death: follows the unit's policy — when `corpse` is truthy the unit stays as a corpse
+ *   (mon_145); when `!corpse` (including unset) it vanishes (no corpse).
+ * - 復活：快照中 dead=false 即恢復原圖（同一 unitUid）。
+ *   Revive: once the snapshot shows dead=false the original image returns (same unitUid).
+ * - 型態變化：快照提供 `imageUrl` 時以外觀覆寫呈現。
+ *   Form change: when the snapshot supplies `imageUrl`, that appearance override is used.
+ *
+ * 無 snapshot（退化為單段）時原樣回傳。
+ * Returns the input unchanged when there is no snapshot (single-segment fallback).
+ *
+ * @param sprites - 全部戰場精靈（含中途加入者）/ all battlefield sprites (including later joins)
+ * @param snapshot - 該段對應快照（可省略）/ the segment's snapshot (optional)
+ * @returns 該段要顯示的精靈（保留原圖層順序）/ sprites to show, preserving layer order
+ */
+export function resolveSegmentSprites(
   sprites: IBattleSprite[],
   snapshot?: IBattleSnapshotDisplay
 ): IBattleSprite[] {
   if (!snapshot) return sprites;
 
-  const aliveNos = new Set<string>();
-  const deadNos = new Set<string>();
+  const unitById = new Map<string, IBattleSnapshotDisplayUnit>();
   for (const unit of snapshot.units) {
-    if (!unit.id) continue;
-    (unit.dead ? deadNos : aliveNos).add(unit.id);
+    if (unit.unitUid) unitById.set(unit.unitUid, unit);
   }
-  if (deadNos.size === 0) return sprites;
 
-  const removed = new Set([...deadNos].filter((no) => !aliveNos.has(no)));
-  if (removed.size === 0) return sprites;
-
-  return sprites.filter((sprite) => !(sprite.unitNo && removed.has(sprite.unitNo)));
+  return sprites
+    .map((sprite) => {
+      const unit = sprite.unitUid ? unitById.get(sprite.unitUid) : undefined;
+      // 此快照中不存在（尚未加入／已離場）→ 不顯示
+      // Not present at this moment (not yet joined / already gone) → hidden
+      if (!unit) return undefined;
+      if (unit.dead) {
+        // 不留屍體（corpse 為 falsy，含未設定）：死亡即消失
+        // No corpse (corpse falsy, including unset): vanish on death
+        if (!unit.corpse) return undefined;
+        const baseImage = unit.imageUrl ?? sprite.imageUrl;
+        return { ...sprite, imageUrl: corpseUrlFor(baseImage), name: unit.name };
+      }
+      // 存活（含復活）；型態變化以外觀覆寫呈現
+      // Alive (incl. revived); a form change is expressed via the appearance override
+      return unit.imageUrl
+        ? { ...sprite, imageUrl: unit.imageUrl, name: unit.name }
+        : sprite;
+    })
+    .filter((sprite): sprite is IBattleSprite => sprite !== undefined);
 }

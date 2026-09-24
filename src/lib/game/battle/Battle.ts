@@ -35,6 +35,18 @@ export interface IBattleConfig {
 	rng: RNG;
 	/** 虛擬時間服務（省略時不啟用時間相關功能）/ virtual time service (time features disabled when omitted) */
 	time?: ITimeService;
+	/**
+	 * 戰鬥級屍體政策（全場預設；省略＝不留屍體）。
+	 * 逐級繼承：角色級 > 隊伍級 > 戰鬥級；這裡是最外層預設。
+	 * Battle-level corpse policy (battle-wide default; omitted = no corpse).
+	 * Inheritance: character > team > battle; this is the outermost default.
+	 */
+	corpse?: boolean;
+	/**
+	 * 隊伍級屍體政策覆寫（某側未提供＝沿用戰鬥級）。
+	 * Team-level corpse policy overrides (an omitted side inherits the battle-level value).
+	 */
+	teamCorpse?: Partial<Record<EnumTeamSide, boolean>>;
 }
 
 export class Battle {
@@ -58,6 +70,10 @@ export class Battle {
 	actions = 0;
 	/** 最後一次快照時的 actions 值 / actions value at last snapshot */
 	private lastSnapshotActions = -1;
+	/** 戰鬥級屍體政策（已解析的預設；false＝不留屍體）/ battle-level corpse policy (resolved default) */
+	corpse = false;
+	/** 隊伍級屍體政策覆寫 / team-level corpse overrides */
+	teamCorpse: Partial<Record<EnumTeamSide, boolean>> = {};
 	/** 快照列表（每 10 actions 一張戰場圖＋HP/SP）/ snapshots (one battlefield + HP/SP per 10 actions) */
 	snapshots: IBattleSnapshot[] = [];
 
@@ -71,6 +87,8 @@ export class Battle {
 		this.repo = cfg.repo;
 		this.rng = cfg.rng;
 		this.time = cfg.time ?? null;
+		this.corpse = cfg.corpse ?? false;
+		this.teamCorpse = cfg.teamCorpse ?? {};
 		this.teams = { [EnumTeamSide.Team0]: new BattleTeam(EnumTeamSide.Team0), [EnumTeamSide.Team1]: new BattleTeam(EnumTeamSide.Team1) };
 		for (const c of team0) this.teams[EnumTeamSide.Team0].add(c);
 		for (const c of team1) this.teams[EnumTeamSide.Team1].add(c);
@@ -230,12 +248,27 @@ export class Battle {
 		this.actions++;
 	}
 
+	/**
+	 * 逐級解析某單位的屍體政策：角色級 > 隊伍級 > 戰鬥級；皆未設定＝false（不留屍體）
+	 * Resolve a unit's corpse policy level by level: character > team > battle;
+	 * when none is set the result is false (no corpse).
+	 */
+	private resolveCorpse(c: Character): boolean {
+		const team = c.team as BattleTeam | null;
+		const teamSide = team?.side;
+		return c.corpse ?? (teamSide !== undefined ? this.teamCorpse[teamSide] : undefined) ?? this.corpse;
+	}
+
 	/** 建立目前快照單位列表 / Build current snapshot unit list */
 	private snapshotUnits(): IBattleSnapshot['units'] {
 		return this.allChars().map((c) => ({
+			unitUid: c.unitUid,
+			corpse: this.resolveCorpse(c),
 			no: charIdToString(c.no),
 			name: c.name,
-			team: c.team as EnumTeamSide,
+			// c.team 是 BattleTeam 反向參照，需取其 side 才是 Team0/Team1 列舉
+			// c.team is a BattleTeam back-reference; take its `side` for the Team0/Team1 enum
+			team: (c.team as BattleTeam).side,
 			hp: c.HP,
 			maxHp: c.MAXHP,
 			sp: c.SP,

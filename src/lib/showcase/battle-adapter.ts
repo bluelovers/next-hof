@@ -11,7 +11,6 @@ import { Battle } from '#/lib/game/battle/Battle';
 import { EnumOutcome } from '#/lib/game/battle/BattleResult';
 import { newChar, newMon } from '#/lib/game/character/factory';
 import type { Character } from '#/lib/game/character/Character';
-import { charIdToString } from '#/lib/game/character/Character';
 import { RNG } from '#/lib/game/core/rng';
 import { createSeedRepository } from '#/lib/game/data/seed-data';
 import type { IDataRepository } from '#/lib/game/data/repository';
@@ -142,7 +141,7 @@ export function toBattleUnit(c: Character, side: ITeamSide): IBattleUnit {
 		sp: Math.max(0, c.SP),
 		maxSp: c.MAXSP,
 		status: c.STATE === EnumState.Dead ? EnumUnitStatus.Down : c.expect !== null ? EnumUnitStatus.Casting : EnumUnitStatus.Alive,
-		spriteId: c.uniqid,
+		unitUid: c.unitUid,
 		side,
 		spd: c.SPD,
 		position: c.POSITION === EnumPosition.Back ? EnumPosition.Back : EnumPosition.Front,
@@ -418,8 +417,7 @@ export function buildPositionRoster(
 	enemies: readonly Character[],
 ): IBattlePositionChar[] {
 	const toEntry = (c: Character, side: ITeamSide, imageUrl: string): IBattlePositionChar => ({
-		id: c.uniqid,
-		unitNo: charIdToString(c.no),
+		unitUid: c.unitUid,
 		name: c.name,
 		imageUrl,
 		imageSize: getSpriteImageSize(imageUrl),
@@ -447,13 +445,18 @@ export function buildSprites(
 	});
 }
 
-/** 從快照轉換為展示側快照 / Convert engine snapshot to display snapshot */
-function toSnapshotDisplay(snap: IBattleSnapshot, lookup: IUnitLookup, repo?: IDataRepository): IBattleSnapshotDisplay {
+/**
+ * 從快照轉換為展示側快照 / Convert engine snapshot to display snapshot
+ *
+ * 側別直接取自引擎快照的 `team`（不再經由 no → lookup 推導）；單位以實例 uid 識別。
+ * Side comes straight from the engine snapshot's `team` (no more no → lookup); units are
+ * identified by their instance uid.
+ */
+function toSnapshotDisplay(snap: IBattleSnapshot, repo?: IDataRepository): IBattleSnapshotDisplay {
 	return {
 		at: snap.at,
 		units: snap.units.map((u) => {
-			const info = lookup.get(Number(u.no));
-			const side = info?.side ?? (u.team === EnumTeamSide.Team1 ? EnumTeamSideUI.Left : EnumTeamSideUI.Right);
+			const side = u.team === EnumTeamSide.Team1 ? EnumTeamSideUI.Left : EnumTeamSideUI.Right;
 			const dead = u.dead;
 			// 依 skill.type 決定 (charging)/(casting)
 			let chargeKind: EnumChargeKind | undefined;
@@ -462,9 +465,10 @@ function toSnapshotDisplay(snap: IBattleSnapshot, lookup: IUnitLookup, repo?: ID
 				if (sk) chargeKind = sk.type === 0 ? EnumChargeKind.Charging : EnumChargeKind.Casting;
 			}
 			return {
-				id: u.no,
+				unitUid: u.unitUid,
 				name: u.name,
 				side,
+				corpse: u.corpse,
 				hp: u.hp,
 				maxHp: u.maxHp,
 				sp: u.sp,
@@ -498,36 +502,53 @@ export function runShowcaseBattle(input: IShowcaseBattleInput): IShowcaseBattleO
 	const rng = new RNG(input.seed ?? DEFAULT_SHOWCASE_SEED);
 	const { allies, enemies } = buildShowcaseTeams(input.charNos, input.monNos, repo, rng);
 
-	const battle = new Battle(allies, enemies, { repo, rng });
+	// 屍體政策三級示範（詳見 seed-data.ts）：
+	// - 戰鬥級：corpse:true → 全場預設留屍體（我方 Team0）
+	// - 隊伍級：teamCorpse Team1:false → 敵方預設不留屍體
+	// - 角色級：seed def 的 corpse（Priest:false、DarkElfHunter:true、Slime:false）覆寫上層
+	// Corpse-policy 3-level demo (see seed-data.ts): battle-level corpse:true,
+	// team-level Team1:false, character-level overrides via def.corpse.
+	const battle = new Battle(allies, enemies, {
+		repo,
+		rng,
+		corpse: true,
+		teamCorpse: { [EnumTeamSide.Team1]: false },
+	});
 	const engineResult = battle.run();
 
 	const allyTeamName = input.allyTeamName ?? DEFAULT_ALLY_TEAM_NAME;
 	const enemyTeamName = input.enemyTeamName ?? DEFAULT_ENEMY_TEAM_NAME;
 
-	const lookup = buildUnitLookup(allies, enemies);
-	const snapshots: IBattleSnapshotDisplay[] = battle.snapshots.map((s) => toSnapshotDisplay(s, lookup, repo));
+	// 以「戰鬥結束後的隊伍成員」為準（含中途加入的召喚物），而非開戰前的初始陣列
+	// Use the post-battle team members (summons that joined mid-battle included),
+	// not just the initial pre-battle arrays.
+	const finalAllies = battle.teams[EnumTeamSide.Team0].members;
+	const finalEnemies = battle.teams[EnumTeamSide.Team1].members;
+
+	const lookup = buildUnitLookup(finalAllies, finalEnemies);
+	const snapshots: IBattleSnapshotDisplay[] = battle.snapshots.map((s) => toSnapshotDisplay(s, repo));
 
 	const data: IBattleDisplayData = {
 		title: input.title ?? DEFAULT_SHOWCASE_TITLE,
 		time: input.time,
 		// 側別對齊原版：左=敵方，右=我方
 		// Side matches original: left=enemies, right=allies
-		leftTeam: buildTeam(enemyTeamName, enemies, EnumTeamSideUI.Left),
-		rightTeam: buildTeam(allyTeamName, allies, EnumTeamSideUI.Right),
+		leftTeam: buildTeam(enemyTeamName, finalEnemies, EnumTeamSideUI.Left),
+		rightTeam: buildTeam(allyTeamName, finalAllies, EnumTeamSideUI.Right),
 		battlefield: {
 			backgroundImageUrl: SHOWCASE_BATTLEFIELD_BG,
 			backgroundType: 'grass',
 			width: SPRITE_LAYOUT_WIDTH,
 			height: SPRITE_LAYOUT_HEIGHT,
 		},
-		sprites: buildSprites(allies, enemies),
+		sprites: buildSprites(finalAllies, finalEnemies),
 		actions: battle.log.map((ev) => mapBattleEvent(ev, lookup, repo)),
 		result: buildResultData({
 			outcome: engineResult.outcome,
 			allyTeamName,
 			enemyTeamName,
-			enemyMembers: enemies,
-			allyMembers: allies,
+			enemyMembers: finalEnemies,
+			allyMembers: finalAllies,
 			events: battle.log,
 			lookup,
 		}),

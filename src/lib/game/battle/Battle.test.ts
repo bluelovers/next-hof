@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { RNG } from '../core/rng';
-import { EnumState } from '../constants';
+import { EnumState, EnumTeamSide } from '../constants';
 import { FakeTimeService } from '../core/time-service';
 import { Character } from '../character/Character';
 import { createSeedRepository } from '../data/seed-data';
@@ -100,5 +100,70 @@ describe('Integration 2v2 (11.1)', () => {
 		const res2 = battle2.run();
 		expect(res2.outcome).toBe(res.outcome);
 		expect(battle2.log.length).toBe(battle.log.length);
+	});
+});
+
+describe('corpse policy inheritance (battle > team > character)', () => {
+	it('snapshot units carry the correct team side (Team0 / Team1)', () => {
+		const rng = new RNG(5);
+		const ally = newChar({ ...repo.getCharBase(100)!, str: 5000 }, repo, rng);
+		const enemy = newMon(repo.getMon(1000)!, repo, rng);
+		const battle = new Battle([ally], [enemy], { repo, rng });
+		battle.run();
+
+		const byId = new Map(battle.snapshots[0].units.map((u) => [u.unitUid, u]));
+		// c.team 是 BattleTeam 物件；快照必須取其 side，而非整個物件
+		expect(byId.get(ally.unitUid)!.team).toBe(EnumTeamSide.Team0);
+		expect(byId.get(enemy.unitUid)!.team).toBe(EnumTeamSide.Team1);
+	});
+
+	it('resolves character > battle and defaults to no corpse', () => {
+		const rng = new RNG(3);
+		const strong = { ...repo.getCharBase(100)!, str: 5000 };
+		// 角色級 true：即使戰鬥級 false 仍留屍體
+		const keeps = newChar({ ...strong, corpse: true }, repo, rng);
+		// 角色級未設定：繼承戰鬥級（true）
+		const inherits = newChar(strong, repo, rng);
+		// 角色級 false：即使戰鬥級 true 也不留屍體
+		const vanishes = newMon({ ...repo.getMon(1000)!, corpse: false }, repo, rng);
+
+		const battle = new Battle([keeps, inherits], [vanishes], {
+			repo,
+			rng,
+			corpse: true,
+		});
+		battle.run();
+
+		const byId = new Map(battle.snapshots[0].units.map((u) => [u.unitUid, u]));
+		expect(byId.get(keeps.unitUid)!.corpse).toBe(true);
+		expect(byId.get(inherits.unitUid)!.corpse).toBe(true);
+		expect(byId.get(vanishes.unitUid)!.corpse).toBe(false);
+	});
+
+	it('team-level overrides battle-level; unset battle-level defaults to false', () => {
+		const rng = new RNG(4);
+		const strong = { ...repo.getCharBase(100)!, str: 5000 };
+		const ally = newChar(strong, repo, rng);
+		const enemy = newMon(repo.getMon(1000)!, repo, rng);
+		const bare = newMon(repo.getMon(1000)!, repo, rng);
+
+		const battle = new Battle([ally], [enemy], {
+			repo,
+			rng,
+			// 戰鬥級未設定（＝false）
+			teamCorpse: { [EnumTeamSide.Team0]: true }, // 隊伍級 true 覆寫
+		});
+		battle.run();
+
+		// 另建一場：確認完全未設定時預設不留屍體
+		const battle2 = new Battle([newChar(strong, repo, rng)], [bare], { repo, rng });
+		battle2.run();
+
+		const byId = new Map(battle.snapshots[0].units.map((u) => [u.unitUid, u]));
+		expect(byId.get(ally.unitUid)!.corpse).toBe(true); // team-level true
+		expect(byId.get(enemy.unitUid)!.corpse).toBe(false); // battle-level default false
+
+		const byId2 = new Map(battle2.snapshots[0].units.map((u) => [u.unitUid, u]));
+		expect([...byId2.values()].every((u) => u.corpse === false)).toBe(true);
 	});
 });

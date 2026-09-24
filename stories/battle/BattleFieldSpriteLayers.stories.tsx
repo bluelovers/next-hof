@@ -62,7 +62,7 @@ export const StyleOverride: Story = {
     style: { outline: '1px solid rgba(90,160,255,0.6)' },
     sprites: [
       {
-        id: 'mon_052',
+        unitUid: 'mon_052',
         imageUrl: '/image/char/mon_052.png',
         x: 164,
         y: 16,
@@ -74,7 +74,7 @@ export const StyleOverride: Story = {
         labelStyle: { color: '#ffd166', fontSize: 13 },
       },
       {
-        id: 'mon_018',
+        unitUid: 'mon_018',
         imageUrl: '/image/char_rev/mon_018.png',
         x: 352,
         y: 14,

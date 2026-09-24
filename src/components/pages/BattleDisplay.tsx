@@ -32,7 +32,7 @@ import {
   getEnterBattlefieldText,
   splitActionsBySnapshots,
   segmentUnitsForSide,
-  filterSpritesBySnapshot,
+  resolveSegmentSprites,
 } from '#/components/battle/battleUtils';
 import './BattleDisplay.css';
 import '#/components/shared/SharedBase.css';
@@ -127,7 +127,7 @@ export const BattleDisplay: React.FC<IBattleDisplayProps> = ({
         {segments.map((segment) => {
           const leftUnits = segmentUnitsForSide(segment, EnumTeamSideUI.Left, leftTeam.units);
           const rightUnits = segmentUnitsForSide(segment, EnumTeamSideUI.Right, rightTeam.units);
-          const segmentSprites = filterSpritesBySnapshot(sprites, segment.snapshot);
+          const segmentSprites = resolveSegmentSprites(sprites, segment.snapshot);
           const hasPrev = segment.index > 0;
           const hasNext = segment.index < segments.length - 1;
 

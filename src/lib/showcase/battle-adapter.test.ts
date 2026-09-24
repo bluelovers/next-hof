@@ -94,7 +94,7 @@ describe('3.2 buildTeam / toBattleUnit', () => {
 			expect(u.sp).toBeGreaterThanOrEqual(0);
 			expect(u.sp).toBeLessThanOrEqual(u.maxSp);
 			expect([EnumUnitStatus.Alive, EnumUnitStatus.Down, EnumUnitStatus.Casting]).toContain(u.status);
-			expect(u.spriteId).toBeTruthy();
+			expect(u.unitUid).toBeTruthy();
 			expect(u.spd).toBeGreaterThan(0);
 			expect([EnumPosition.Front, EnumPosition.Back]).toContain(u.position);
 		}
@@ -370,9 +370,9 @@ describe('3.5 buildSprites / buildPositionRoster', () => {
 		const sprites = run.data.sprites;
 
 		expect(sprites).toHaveLength(units.length);
-		const spriteIds = sprites.map((s) => s.id);
-		expect(new Set(spriteIds).size).toBe(units.length);
-		expect(spriteIds.sort()).toEqual(units.map((u) => u.spriteId).sort());
+		const spriteUids = sprites.map((s) => s.unitUid);
+		expect(new Set(spriteUids).size).toBe(units.length);
+		expect(spriteUids.sort()).toEqual(units.map((u) => u.unitUid).sort());
 
 		for (const s of sprites) {
 			expect(s.imageUrl).toMatch(/^\/image\/char\//);
@@ -381,9 +381,9 @@ describe('3.5 buildSprites / buildPositionRoster', () => {
 	});
 
 	it('right(ally) team sprites are flipped, left(enemy) team unflipped', () => {
-		const leftIds = new Set(run.data.leftTeam.units.map((u) => u.spriteId));
+		const leftIds = new Set(run.data.leftTeam.units.map((u) => u.unitUid));
 		for (const s of run.data.sprites) {
-			if (leftIds.has(s.id)) {
+			if (leftIds.has(s.unitUid)) {
 				// 敵方(EnumTeamSideUI.Left)使用 char/ 圖(預設朝右) → 不翻轉（面向場地中心的右側）
 				expect(s.flipped).toBe(false);
 			} else {

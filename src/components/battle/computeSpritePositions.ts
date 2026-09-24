@@ -18,10 +18,8 @@ import { getSpriteImageDir, computeSpriteFlipped, useFlipPositioning } from './s
 
 /** 角色輸入（含圖像尺寸與站位） / Character input (with image size and battle position) */
 export interface IBattlePositionChar {
-  /** 角色 ID / Character ID */
-  id: string;
-  /** 單位編號（引擎 char no 字串；供精靈與快照比對）/ Unit no (engine char no string; for sprite/snapshot matching) */
-  unitNo?: string;
+  /** 戰鬥單位實例 uid（Character.unitUid）/ Battle-unit instance uid */
+  unitUid: string;
   /** 角色名稱 / Character name */
   name?: string;
   /** 精靈圖片路徑 / Sprite image path */
@@ -159,8 +157,7 @@ function computeRowPositions(
     );
 
     return {
-      id: char.id,
-      unitNo: char.unitNo,
+      unitUid: char.unitUid,
       name: char.name,
       imageUrl: char.imageUrl,
       x,

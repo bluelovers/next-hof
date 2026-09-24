@@ -7,10 +7,17 @@ import {
 	splitActionsBySnapshots,
 	snapshotUnitToBattleUnit,
 	segmentUnitsForSide,
-	filterSpritesBySnapshot,
+	resolveSegmentSprites,
+	SPRITE_CORPSE_URL,
+	SPRITE_CORPSE_URL_REV,
 } from './battleUtils';
 import { EnumActionType, EnumTeamSideUI, EnumUnitStatus, EnumChargeKind } from './enums';
-import type { IBattleAction, IBattleSnapshotDisplay, IBattleSprite } from './types';
+import type {
+	IBattleAction,
+	IBattleSnapshotDisplay,
+	IBattleSnapshotDisplayUnit,
+	IBattleSprite,
+} from './types';
 
 /** 建立最小可用行動 / Build a minimal action */
 function action(message: string, side?: EnumTeamSideUI): IBattleAction {
@@ -111,40 +118,96 @@ describe('segmentUnitsForSide', () => {
 	});
 });
 
-describe('filterSpritesBySnapshot', () => {
+describe('resolveSegmentSprites', () => {
 	/** 建立最小精靈 / Build a minimal sprite */
-	function sprite(id: string, unitNo: string): IBattleSprite {
-		return { id, unitNo, imageUrl: `/image/char/${id}.png`, x: 0, y: 0 };
+	function sprite(id: string, imageUrl = `/image/char/${id}.png`): IBattleSprite {
+		return { unitUid: id, imageUrl, x: 0, y: 0 };
 	}
 
-	const left = { name: 'Goblin', side: EnumTeamSideUI.Left, hp: 0, maxHp: 100, sp: 0, maxSp: 10 };
+	/** 建立最小快照單位 / Build a minimal snapshot unit */
+	function unit(
+		id: string,
+		dead: boolean,
+		extra?: Partial<IBattleSnapshotDisplayUnit>,
+	): IBattleSnapshotDisplayUnit {
+		return {
+			unitUid: id,
+			name: `unit-${id}`,
+			side: EnumTeamSideUI.Left,
+			hp: dead ? 0 : 1,
+			maxHp: 1,
+			sp: 0,
+			maxSp: 0,
+			dead,
+			// 預設留屍體；個別測試可覆寫為 false / 省略來驗證不留屍體
+			// Leaves a corpse by default; individual tests override to false / omit to vanish
+			corpse: true,
+			...extra,
+		};
+	}
 
 	it('returns the same sprites when no snapshot is given', () => {
-		const sprites = [sprite('a', '1000')];
-		expect(filterSpritesBySnapshot(sprites)).toBe(sprites);
+		const sprites = [sprite('u1')];
+		expect(resolveSegmentSprites(sprites)).toBe(sprites);
 	});
 
-	it('removes sprites whose unitNo is dead in every instance', () => {
-		const sprites = [sprite('a', '1000'), sprite('b', '1001')];
-		const snap = snapshot(0, [
-			{ ...left, id: '1000', dead: true },
-			{ ...left, id: '1001', dead: false },
-		]);
-		expect(filterSpritesBySnapshot(sprites, snap).map((s) => s.unitNo)).toEqual(['1001']);
+	it('keeps living units with their own image', () => {
+		const sprites = [sprite('u1', '/image/char/mon_052.png')];
+		const snap = snapshot(0, [unit('u1', false)]);
+		expect(resolveSegmentSprites(sprites, snap)[0].imageUrl).toBe('/image/char/mon_052.png');
 	});
 
-	it('keeps all sprites of a unitNo when at least one instance is alive', () => {
-		const sprites = [sprite('a', '1002'), sprite('b', '1002')];
-		const snap = snapshot(0, [
-			{ ...left, id: '1002', dead: true },
-			{ ...left, id: '1002', dead: false },
-		]);
-		expect(filterSpritesBySnapshot(sprites, snap)).toHaveLength(2);
+	it('replaces a dead unit with the corpse image (forward directory)', () => {
+		const sprites = [sprite('u1', '/image/char/mon_052.png')];
+		const snap = snapshot(0, [unit('u1', true)]);
+		expect(resolveSegmentSprites(sprites, snap)[0].imageUrl).toBe(SPRITE_CORPSE_URL);
 	});
 
-	it('keeps sprites without a unitNo', () => {
-		const sprites = [{ imageUrl: '/image/x.png', x: 0, y: 0 } as IBattleSprite];
-		const snap = snapshot(0, [{ ...left, id: '1000', dead: true }]);
-		expect(filterSpritesBySnapshot(sprites, snap)).toHaveLength(1);
+	it('uses the mirrored corpse for char_rev sprites', () => {
+		const sprites = [sprite('u1', '/image/char_rev/mon_018.png')];
+		const snap = snapshot(0, [unit('u1', true)]);
+		expect(resolveSegmentSprites(sprites, snap)[0].imageUrl).toBe(SPRITE_CORPSE_URL_REV);
+	});
+
+	it('vanishes a dead unit when its policy is corpse:false', () => {
+		const sprites = [sprite('u1'), sprite('u2')];
+		const snap = snapshot(0, [unit('u1', true, { corpse: false }), unit('u2', true)]);
+		// u1 vanishes (no corpse); u2 stays as a corpse
+		expect(resolveSegmentSprites(sprites, snap).map((s) => s.unitUid)).toEqual(['u2']);
+	});
+
+	it('treats an unset corpse policy as falsy (vanish), never as leave-corpse', () => {
+		const sprites = [sprite('u1')];
+		const unset: IBattleSnapshotDisplayUnit = {
+			unitUid: 'u1',
+			name: 'unit-u1',
+			side: EnumTeamSideUI.Left,
+			hp: 0,
+			maxHp: 1,
+			sp: 0,
+			maxSp: 0,
+			dead: true,
+		};
+		expect(resolveSegmentSprites(sprites, snapshot(0, [unset]))).toHaveLength(0);
+	});
+
+	it('hides units absent from the snapshot (not yet joined / already gone)', () => {
+		const sprites = [sprite('u1'), sprite('u2')];
+		const snap = snapshot(0, [unit('u1', false)]);
+		expect(resolveSegmentSprites(sprites, snap).map((s) => s.unitUid)).toEqual(['u1']);
+	});
+
+	it('restores the original image after a revive (same uid)', () => {
+		const sprites = [sprite('u1', '/image/char/mon_052.png')];
+		const deadSnap = snapshot(0, [unit('u1', true)]);
+		const revivedSnap = snapshot(1, [unit('u1', false)]);
+		expect(resolveSegmentSprites(sprites, deadSnap)[0].imageUrl).toBe(SPRITE_CORPSE_URL);
+		expect(resolveSegmentSprites(sprites, revivedSnap)[0].imageUrl).toBe('/image/char/mon_052.png');
+	});
+
+	it('applies a form-change appearance override from the snapshot', () => {
+		const sprites = [sprite('u1', '/image/char/mon_052.png')];
+		const snap = snapshot(0, [unit('u1', false, { imageUrl: '/image/char/mon_053.png' })]);
+		expect(resolveSegmentSprites(sprites, snap)[0].imageUrl).toBe('/image/char/mon_053.png');
 	});
 });

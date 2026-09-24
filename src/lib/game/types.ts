@@ -576,6 +576,28 @@ export interface IMonReward {
 export interface ICharCore {
 	/** 單位編號 / unit number */
 	no: number;
+	/**
+	 * 戰鬥單位實例唯一識別碼（資料提供者可指定；未提供時由 Character 自動產生）
+	 * Battle-unit instance uid (a data provider may supply one; otherwise Character generates it).
+	 *
+	 * 與 `no`（物種／定義編號）不同：同一 `no` 可有多個個體（同名怪物），`unitUid` 用來識別
+	 * 「這一個」單位個體，召喚（新加入）、復活、型態變化等跨時間的追蹤都以此為準。
+	 * 命名刻意帶上 `unit`，以免與 item／map 等其他實體的 id 混淆。
+	 * Distinct from `no` (species / definition id): one `no` may have several individuals
+	 * (same-name monsters). `unitUid` identifies *this* unit individual and is the key for
+	 * tracking it across summon (joining later), revive, and form changes. The `unit`
+	 * prefix is deliberate so it cannot be mistaken for an item/map id.
+	 */
+	unitUid?: string;
+	/**
+	 * 死亡後是否留下屍體（角色級政策）。
+	 * `true`＝留下屍體；`false`＝死亡即消失；省略＝往上繼承（隊伍級 → 戰鬥級 → 預設 false）。
+	 * 一律以 falsy 判定（`!corpse`），因此「未設定」語意上就是不留下屍體，不會出現 undefined 卻視為 true 的混亂。
+	 * Whether this unit leaves a corpse on death (character-level policy).
+	 * `true` = leave a corpse; `false` = vanish; omitted = inherit upward (team → battle → default false).
+	 * Always evaluated as falsy (`!corpse`), so "unset" never implicitly means true.
+	 */
+	corpse?: boolean;
 	/** 單位名稱 / unit name */
 	name: string;
 	/** 等級 / level */
@@ -718,7 +740,14 @@ export type { EnumState };
 
 /** 快照單位資料（戰場狀態某一刻的切面）/ Snapshot unit data (a moment's field state) */
 export interface IBattleSnapshotUnit {
-	/** 單位編號 String(char.no) / unit number as string */
+	/** 戰鬥單位實例唯一識別碼（Character.unitUid；個體追蹤用）/ unit instance uid (for per-instance tracking) */
+	unitUid: string;
+	/**
+	 * 已解析的屍體政策（角色 > 隊伍 > 戰鬥級繼承後的結果；false＝不留下屍體）
+	 * Resolved corpse policy (after character > team > battle inheritance; false = no corpse)
+	 */
+	corpse: boolean;
+	/** 單位編號 String(char.no)（物種／定義編號）/ unit number as string (species / definition id) */
 	no: string;
 	/** 名稱 / name */
 	name: string;

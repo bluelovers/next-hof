@@ -53,12 +53,25 @@ export function defaultSpecial(): ISpecial {
 }
 
 /**
- * 由初始化參數建立唯一識別字串 / Build a unique identifier string from init parameters
- * 使用陣列 join 取代字串聯合，確保格式一致。
- * Uses array join instead of string concatenation to ensure consistent format.
+ * 建立戰鬥單位實例唯一識別碼 / Build a battle-unit instance uid
+ *
+ * 優先採用呼叫方（資料提供者）提供的 unitUid；否則以 `crypto.randomUUID()` 產生，
+ * 在不支援的環境（非安全上下文）退化為「計數器 + 亂數」後綴，確保同一程序內不重複。
+ * Prefers a caller/provider-supplied unitUid; otherwise generates one via
+ * `crypto.randomUUID()`, degrading to a counter + random suffix where unavailable
+ * (non-secure contexts) while still guaranteeing uniqueness within the process.
+ *
+ * `types`/`no` 僅作為可讀前綴（除錯用），不參與唯一性判定。
+ * `types`/`no` are only a readable prefix for debugging and do not affect uniqueness.
  */
-export function buildUniqid(types: EnumCharType[], no: number): string {
-	return [types.join('-'), no, Math.random().toString(36).slice(2, 8)].join('-');
+let unitUidCounter = 0;
+export function buildUnitUid(types: EnumCharType[], no: number, provided?: string): string {
+	if (provided) return provided;
+	const prefix = `${types.join('-')}-${no}-`;
+	const cryptoObj = (globalThis as { crypto?: { randomUUID?: () => string } }).crypto;
+	if (cryptoObj?.randomUUID) return prefix + cryptoObj.randomUUID();
+	unitUidCounter += 1;
+	return `${prefix}${unitUidCounter.toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
 export class Character {
@@ -68,8 +81,14 @@ export class Character {
 	name: string;
 	/** 類型集合（char/mon/summon/union）/ type tags (char/mon/summon/union) */
 	types: Set<EnumCharType>;
-	/** 唯一識別字串（類型-編號-隨機尾碼）/ unique id (types-no-random suffix) */
-	uniqid: string;
+	/**
+	 * 戰鬥單位實例唯一識別碼（個體追蹤；同一 `no` 可有多個 unitUid）。
+	 * 這是「這一個單位個體」的身份，非物種／定義編號，也不是任何 item／map id。
+	 * Battle-unit instance uid (per-instance tracking; one `no` may have several
+	 * unitUids). This is *this* unit individual's identity — not a species/definition id,
+	 * and not any item/map id.
+	 */
+	unitUid: string;
 	/** 等級 / level */
 	level: number;
 	/** 當前累積經驗 / accumulated exp */
@@ -120,6 +139,11 @@ export class Character {
 	job?: number;
 	/** 怪物獎勵定義 / monster reward definition */
 	reward?: { moneyhold?: number; exphold?: number; itemtable?: Record<number, number> };
+	/**
+	 * 死亡後是否留下屍體（false＝消失；未提供＝預設留下）
+	 * Whether this unit leaves a corpse on death (false = vanish; omitted = leave one)
+	 */
+	corpse?: boolean;
 
 	// 戰鬥執行期狀態 / runtime
 	/** 行動延遲值（越小越先行動；死亡設為 Infinity）/ action delay (smaller acts first; Infinity when dead) */
@@ -139,14 +163,15 @@ export class Character {
 
 	/**
 	 * 由初始化參數建立角色 / Build a character from its init parameters
-	 * hp/sp 省略時以 maxhp/maxsp 補齊；types 轉為 Set 並產生 uniqid。
-	 * hp/sp default to maxhp/maxsp; types become a Set and uniqid is generated.
+	 * hp/sp 省略時以 maxhp/maxsp 補齊；types 轉為 Set 並建立實例 unitUid（可由 init.unitUid 覆寫）。
+	 * hp/sp default to maxhp/maxsp; types become a Set and an instance unitUid is built
+	 * (overridable via init.unitUid).
 	 */
 	constructor(init: ICharInit) {
 		this.no = init.no;
 		this.name = init.name;
 		this.types = new Set(init.types);
-		this.uniqid = buildUniqid(init.types, init.no);
+		this.unitUid = buildUnitUid(init.types, init.no, init.unitUid);
 		this.level = init.level;
 		this.exp = init.exp ?? 0;
 		this.str = init.str;
@@ -163,6 +188,7 @@ export class Character {
 		this.equip = init.equip ?? {};
 		this.behavior = init.behavior;
 		this.reward = init.reward;
+		this.corpse = init.corpse;
 	}
 
 	/** 將角色編號轉為字串（供事件日誌使用）/ Convert character number to string (for event logging) */
