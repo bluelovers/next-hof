@@ -241,12 +241,22 @@ export interface ITeamFinalStats {
 	totalMaxHp?: number;
 }
 
+/**
+ * 顯示時間字串（展示頁戰鬥時間的語意化字串型別）
+ * Display time string (semantic string alias for the showcase battle time field).
+ *
+ * 語意：僅供展示層呈現的時間文字，引擎與轉接層不解析其內容，故不加格式約束。
+ * Semantics: display-only time text; neither the engine nor the adapter parses it,
+ * so no format constraint is imposed.
+ */
+export type IDisplayTimeString = string;
+
 /** BattleDisplay 完整資料 / Complete battle display data */
 export interface IBattleDisplayData {
 	/** 戰鬥標題 / Battle title */
 	title?: string;
 	/** 戰鬥時間 / Battle time */
-	time?: string;
+	time?: IDisplayTimeString;
 	/** 左側隊伍 / Left team */
 	leftTeam: IBattleTeam;
 	/** 右側隊伍 / Right team */

@@ -77,12 +77,12 @@ describe('Battle result (9.4)', () => {
 describe('Integration 2v2 (11.1)', () => {
 	it('fixed seed yields a deterministic winner and a structured event log', () => {
 		const rng = new RNG(12345);
-		const time = new FakeTimeService();
+		const timeService = new FakeTimeService();
 		const p1 = newChar({ ...repo.getCharBase(100)!, str: 200 }, repo, rng);
 		const p2 = newChar({ ...repo.getCharBase(100)!, str: 200 }, repo, rng);
 		const m1 = newMon(repo.getMon(1000)!, repo, rng);
 		const m2 = newMon(repo.getMon(1000)!, repo, rng);
-		const battle = new Battle([p1, p2], [m1, m2], { repo, rng, time });
+		const battle = new Battle([p1, p2], [m1, m2], { repo, rng, timeService });
 		const res = battle.run();
 
 		expect(res.outcome).not.toBe(EnumOutcome.Draw);
@@ -91,12 +91,12 @@ describe('Integration 2v2 (11.1)', () => {
 
 		// 確定性：相同 seed 重跑得到相同結果與日誌長度
 		const rng2 = new RNG(12345);
-		const time2 = new FakeTimeService();
+		const timeService2 = new FakeTimeService();
 		const p1b = newChar({ ...repo.getCharBase(100)!, str: 200 }, repo, rng2);
 		const p2b = newChar({ ...repo.getCharBase(100)!, str: 200 }, repo, rng2);
 		const m1b = newMon(repo.getMon(1000)!, repo, rng2);
 		const m2b = newMon(repo.getMon(1000)!, repo, rng2);
-		const battle2 = new Battle([p1b, p2b], [m1b, m2b], { repo, rng: rng2, time: time2 });
+		const battle2 = new Battle([p1b, p2b], [m1b, m2b], { repo, rng: rng2, timeService: timeService2 });
 		const res2 = battle2.run();
 		expect(res2.outcome).toBe(res.outcome);
 		expect(battle2.log.length).toBe(battle.log.length);

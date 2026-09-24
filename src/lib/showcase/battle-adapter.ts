@@ -21,6 +21,7 @@ import { EnumTeamSideUI, EnumChargeKind, EnumUnitStatus, EnumActionType, EnumAtt
 import type {
 	IBattleAction,
 	IBattleDisplayData,
+	IDisplayTimeString,
 	IBattleResult,
 	IBattleSprite,
 	IBattleTeam,
@@ -84,7 +85,7 @@ export interface IShowcaseBattleInput {
 	/** 標題（預設 DEFAULT_SHOWCASE_TITLE）/ title (default DEFAULT_SHOWCASE_TITLE) */
 	title?: string;
 	/** 顯示時間字串（可省略）/ optional display time string */
-	time?: string;
+	time?: IDisplayTimeString;
 }
 
 /**

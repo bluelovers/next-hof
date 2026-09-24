@@ -34,8 +34,15 @@ export interface IBattleConfig {
 	repo: IDataRepository;
 	/** 可注入的隨機源 / injectable random source */
 	rng: RNG;
-	/** 虛擬時間服務（省略時不啟用時間相關功能）/ virtual time service (time features disabled when omitted) */
-	time?: ITimeService;
+	/**
+	 * 虛擬時間服務（省略時不啟用時間相關功能）/ virtual time service (time features disabled when omitted)
+	 *
+	 * 命名 `timeService` 而非 `time`，以明確區別展示層同名的 time 時間字串
+	 * （IShowcaseBattleInput／IBattleDisplayData 的 `time?: IDisplayTimeString`）。
+	 * Named `timeService` (not `time`) to distinguish it from the same-named display-side
+	 * time string (`time?: IDisplayTimeString` on IShowcaseBattleInput / IBattleDisplayData).
+	 */
+	timeService?: ITimeService;
 	/**
 	 * 戰鬥級屍體政策（全場預設；省略＝不留屍體）。可為布林或物件規格（圖／class／style）。
 	 * 逐級繼承：角色級 > 隊伍級 > 戰鬥級；這裡是最外層預設。
@@ -56,8 +63,8 @@ export class Battle {
 	repo: IDataRepository;
 	/** 隨機源 / random source */
 	rng: RNG;
-	/** 時間服務（可為 null）/ time service (may be null) */
-	time: ITimeService | null;
+	/** 時間服務（可為 null；來自 IBattleConfig.timeService）/ time service (may be null; from IBattleConfig.timeService) */
+	timeService?: ITimeService;
 	/** 雙方隊伍（鍵 EnumTeamSide.Team0／EnumTeamSide.Team1）/ both teams */
 	teams: Record<EnumTeamSide, BattleTeam>;
 	/** 當前回合數 / current turn counter */
@@ -73,7 +80,7 @@ export class Battle {
 	/** 最後一次快照時的 actions 值 / actions value at last snapshot */
 	private lastSnapshotActions = -1;
 	/** 戰鬥級屍體政策（已解析的預設；false＝不留屍體，物件＝留屍體並帶規格）/ battle-level corpse policy (resolved default; false = no corpse, object = leave a corpse with a spec) */
-	corpse: ICorpsePolicy = false;
+	corpse?: ICorpsePolicy;
 	/** 隊伍級屍體政策覆寫 / team-level corpse overrides */
 	teamCorpse: Partial<Record<EnumTeamSide, ICorpsePolicy>> = {};
 	/** 快照列表（每 10 actions 一張戰場圖＋HP/SP）/ snapshots (one battlefield + HP/SP per 10 actions) */
@@ -88,8 +95,8 @@ export class Battle {
 	constructor(team0: Character[], team1: Character[], cfg: IBattleConfig) {
 		this.repo = cfg.repo;
 		this.rng = cfg.rng;
-		this.time = cfg.time ?? null;
-		this.corpse = cfg.corpse ?? false;
+		this.timeService = cfg.timeService;
+		this.corpse = cfg.corpse;
 		this.teamCorpse = cfg.teamCorpse ?? {};
 		this.teams = { [EnumTeamSide.Team0]: new BattleTeam(EnumTeamSide.Team0), [EnumTeamSide.Team1]: new BattleTeam(EnumTeamSide.Team1) };
 		for (const c of team0) this.teams[EnumTeamSide.Team0].add(c);
