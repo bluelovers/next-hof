@@ -46,7 +46,7 @@ export const AutoPositioned: Story = {
   args: {
     sprites: sampleSpritesAuto,
     config: createSampleConfig('grass'),
-    showLabels: true,
+    showSpriteLabels: true,
   },
 };
 
@@ -61,7 +61,7 @@ export const WithMagicCircle: Story = {
       ...createSampleConfig('grass'),
       magicCircles: sampleMagicCircles,
     },
-    showLabels: true,
+    showSpriteLabels: true,
   },
 };
 
@@ -70,6 +70,6 @@ export const HandTuned: Story = {
   args: {
     sprites: sampleSprites,
     config: createSampleConfig('grass'),
-    showLabels: true,
+    showSpriteLabels: true,
   },
 };

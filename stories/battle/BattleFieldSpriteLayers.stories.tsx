@@ -29,7 +29,7 @@ const meta: Meta<typeof BattleFieldSpriteLayers> = {
     sprites: sampleSprites,
     index: 0,
     ...sampleFieldSize,
-    showLabels: true,
+    showSpriteLabels: true,
   },
   // 提供與精靈框同尺寸的相對定位舞台，使絕對定位的精靈圖層有正確的原點
   // Provide a relatively-positioned stage matching the sprite frame size so the
@@ -51,13 +51,13 @@ export const Default: Story = {};
 
 /** 不顯示名稱標籤 / No name labels */
 export const NoLabels: Story = {
-  args: { showLabels: false },
+  args: { showSpriteLabels: false },
 };
 
 /** 樣式覆寫示範：元件 style 套用至所有圖層，單體精靈 style/labelStyle 各自覆寫 / Style override demo */
 export const StyleOverride: Story = {
   args: {
-    showLabels: true,
+    showSpriteLabels: true,
     // 元件層級 style：所有精靈圖層套用藍色邊框 / Component-level style: blue outline on every layer
     style: { outline: '1px solid rgba(90,160,255,0.6)' },
     sprites: [

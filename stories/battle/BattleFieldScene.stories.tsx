@@ -32,7 +32,7 @@ export const DefaultBattle: Story = {
   args: {
     sprites: sampleSprites,
     config: createSampleConfig('grass'),
-    showLabels: true,
+    showSpriteLabels: true,
   },
 };
 
@@ -41,7 +41,7 @@ export const EnemiesOnly: Story = {
   args: {
     sprites: sampleEnemySprites,
     config: createSampleConfig('cave'),
-    showLabels: true,
+    showSpriteLabels: true,
   },
 };
 
@@ -50,7 +50,7 @@ export const AlliesOnly: Story = {
   args: {
     sprites: sampleAllySprites,
     config: createSampleConfig('grass01'),
-    showLabels: true,
+    showSpriteLabels: true,
   },
 };
 
@@ -59,7 +59,7 @@ export const SnowBattlefield: Story = {
   args: {
     sprites: sampleSprites,
     config: createSampleConfig('snow'),
-    showLabels: true,
+    showSpriteLabels: true,
   },
 };
 
@@ -68,7 +68,7 @@ export const DesertBattlefield: Story = {
   args: {
     sprites: sampleSprites,
     config: createSampleConfig('sand'),
-    showLabels: true,
+    showSpriteLabels: true,
   },
 };
 
@@ -76,7 +76,7 @@ export const DesertBattlefield: Story = {
 export const NoLabels: Story = {
   args: {
     ...DefaultBattle.args,
-    showLabels: false,
+    showSpriteLabels: false,
   } as any,
 };
 
@@ -94,7 +94,7 @@ export const MixedCharRevTeam: Story = {
   args: {
     sprites: sampleSpritesMixed,
     config: createSampleConfig('grass'),
-    showLabels: true,
+    showSpriteLabels: true,
   },
 };
 
@@ -112,6 +112,6 @@ export const FlatRosterGrouped: Story = {
   args: {
     sprites: sampleSpritesFlat,
     config: createSampleConfig('grass'),
-    showLabels: true,
+    showSpriteLabels: true,
   },
 };

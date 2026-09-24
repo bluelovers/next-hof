@@ -18,6 +18,7 @@ import {
 } from './enums';
 import { EnumPosition } from '#/lib/game/constants';
 import type { ICorpsePolicyField } from '#/lib/game/battle/corpse-policy';
+import type { IBattleUnitVitals, IUnitList } from '#/lib/game/types';
 
 /** 隊伍側別（UI 層）/ Team side (UI layer) */
 export type ITeamSide = EnumTeamSideUI;
@@ -42,29 +43,28 @@ export type IUnitStatus = EnumUnitStatus;
 /** 屬性數值類型 / Attribute value type */
 export type IAttributeType = EnumAttributeType;
 
+/**
+ * 顯示側單位共用欄位（共用組 3：隊伍側＋顯示狀態）
+ * Display-side unit shared fields (group 3: team side + display status)
+ *
+ * 由展示層 IBattleUnit 與 IBattleSnapshotDisplayUnit 共同繼承，欄位只宣告一次。
+ * 引擎層使用 team（EnumTeamSide）與 dead，名稱與列舉皆不同，故不納入本組、
+ * 也就不需要任何轉換。
+ * Inherited by the display's IBattleUnit and IBattleSnapshotDisplayUnit so each field is
+ * declared once. The engine layer uses team (EnumTeamSide) and dead instead — different
+ * name and enum — so they stay out of this group and no conversion is required.
+ */
+export interface IBattleDisplayUnitFields {
+	/** 隊伍側（UI 顯示層 left/right）/ team side (UI display layer: left/right) */
+	side: EnumTeamSideUI;
+	/** 顯示狀態（down＝倒下、casting＝詠唱；缺省＝存活）/ display status (down/casting; absent = alive) */
+	status?: EnumUnitStatus;
+}
+
 /** 戰鬥單位 / Battle unit */
-export interface IBattleUnit {
-	/** 單位名稱 / Unit name */
-	name: string;
+export interface IBattleUnit extends IBattleUnitVitals, IBattleDisplayUnitFields {
 	/** 等級 / Level */
 	level: number;
-	/** 當前 HP / Current HP */
-	hp: number;
-	/** 最大 HP / Max HP */
-	maxHp: number;
-	/** 當前 SP / Current SP */
-	sp: number;
-	/** 最大 SP / Max SP */
-	maxSp: number;
-	/** 單位狀態 / Unit status */
-	status?: EnumUnitStatus;
-	/**
-	 * 戰鬥單位實例唯一識別碼（Character.unitUuid；用於關聯戰場精靈）
-	 * Battle-unit instance uid (Character.unitUuid; links to the battlefield sprite)
-	 */
-	unitUuid?: string;
-	/** 隊伍側 / Team side */
-	side: EnumTeamSideUI;
 	/** 速度（決定行動順序）/ speed (action order) */
 	spd?: number;
 	/** 站位：前衛 / 後衛 / position: front / back */
@@ -72,11 +72,9 @@ export interface IBattleUnit {
 }
 
 /** 隊伍資訊 / Team info */
-export interface IBattleTeam {
+export interface IBattleTeam extends IUnitList<IBattleUnit> {
 	/** 隊伍名稱 / Team name */
 	name: string;
-	/** 單位列表 / Unit list */
-	units: IBattleUnit[];
 	/** 隊伍圖示 / Team icon */
 	icon?: string;
 	/** 隊伍側 / Team side */
@@ -285,6 +283,35 @@ export interface IBattleDisplayData extends IBattleDisplayMeta {
 	snapshots?: IBattleSnapshotDisplay[];
 }
 
+/* ==================== 顯示開關共用 props / Shared display-toggle props ==================== */
+
+/**
+ * HP／SP 條顯示開關（共用組 A：BattleDisplay 與其子組件只繼承、不重複宣告）
+ * HP/SP bar toggles (group A: BattleDisplay and its children extend this instead of
+ * redeclaring the fields)
+ */
+export interface IBattleBarToggleOptions {
+	/** 是否顯示 HP 條 / Whether to show HP bars */
+	showHpBars?: boolean;
+	/** 是否顯示 SP 條 / Whether to show SP bars */
+	showSpBars?: boolean;
+}
+
+/**
+ * 戰場名稱標籤顯示開關（共用組 B：BattleDisplay 與 BattleField* 圖層鏈共用）
+ * Sprite name-label toggle (group B: shared by BattleDisplay and the BattleField* layer chain)
+ */
+export interface IBattleSpriteLabelOptions {
+	/** 是否顯示名稱標籤 / Whether to show name labels on sprites */
+	showSpriteLabels?: boolean;
+}
+
+/**
+ * 戰鬥畫面顯示開關總集（＝共用組 A ＋ B）
+ * Combined battle display toggles (group A + group B)
+ */
+export interface IBattleDisplayOptions extends IBattleBarToggleOptions, IBattleSpriteLabelOptions {}
+
 /**
  * 快照單位（顯示側）
  * Snapshot unit (display side).
@@ -296,38 +323,23 @@ export interface IBattleDisplayData extends IBattleDisplayMeta {
  * IBattleSnapshotUnit in #/lib/game/types (it uses UI enums like EnumTeamSideUI /
  * EnumUnitStatus). The Display suffix avoids colliding with the domain type.
  */
-export interface IBattleSnapshotDisplayUnit extends ICorpsePolicyField {
-	/**
-	 * 戰鬥單位實例唯一識別碼（對應精靈的 `unitUuid`，即 Character.unitUuid）
-	 * Battle-unit instance uid (matches a sprite's `unitUuid`, i.e. Character.unitUuid)
-	 */
-	unitUuid?: string;
-	/** 單位名稱 / name */
-	name: string;
-	/** 顯示側別 / display side */
-	side: EnumTeamSideUI;
+export interface IBattleSnapshotDisplayUnit
+	extends ICorpsePolicyField, IBattleUnitVitals, IBattleDisplayUnitFields {
 	/**
 	 * 外觀覆寫（型態變化等；未提供時沿用精靈自身圖檔）
 	 * Appearance override (e.g. form change; when absent the sprite's own image is used)
 	 */
 	imageUrl?: string;
-	hp: number;
-	maxHp: number;
-	sp: number;
-	maxSp: number;
 	/** 是否倒下 / whether down */
 	dead: boolean;
-	/** 狀態（倒下為 down）/ status */
-	status?: EnumUnitStatus;
 	/** 蓄力/詠唱種類（無則 undefined）/ charge/cast kind */
 	chargeKind?: EnumChargeKind;
 }
 
 /** 戰鬥快照（顯示側）/ Battle snapshot (display side) */
-export interface IBattleSnapshotDisplay {
+export interface IBattleSnapshotDisplay extends IUnitList<IBattleSnapshotDisplayUnit> {
 	/** 對應 actions 的索引位置 / index into actions */
 	at: number;
-	units: IBattleSnapshotDisplayUnit[];
 }
 
 /**

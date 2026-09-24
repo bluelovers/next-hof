@@ -2,8 +2,8 @@
  * 戰場精靈名稱標籤組件
  * Battlefield sprite name label component
  *
- * 由 BattleFieldSpriteLayers 中的 showLabels 邏輯抽離而來
- * Extracted from the showLabels logic in BattleFieldSpriteLayers
+ * 由 BattleFieldSpriteLayers 中的 showSpriteLabels 邏輯抽離而來
+ * Extracted from the showSpriteLabels logic in BattleFieldSpriteLayers
  *
  * 標籤位置由 labelPosition.ts 的 computeSpriteLabelPosition() 這個「純邏輯工具」自動計算，
  * 組件本身不呼叫任何 IO（例如 getSpriteImageSize 讀圖檔），所需圖像尺寸

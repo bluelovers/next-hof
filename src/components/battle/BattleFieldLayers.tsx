@@ -18,6 +18,7 @@ import type {
   IBattleFieldBgSize,
   IBattleFieldVAlign,
   IBattleFieldBgScale,
+  IBattleSpriteLabelOptions,
 } from './types';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from './types';
 import type { ISpriteImageSize } from './spriteImageSizes';
@@ -25,8 +26,8 @@ import { BattleFieldSpriteFrame } from './BattleFieldSpriteFrame';
 import { BattleFieldMagicCircle } from './BattleFieldMagicCircle';
 import { EnumBattleFieldBgScale, EnumBattleFieldVAlign } from '#/components/battle/enums';
 
-/** 戰場圖層屬性 / Battlefield layers props */
-export interface IBattleFieldLayersProps {
+/** 戰場圖層屬性（標籤開關共用 IBattleSpriteLabelOptions）/ Battlefield layers props (label toggle from the shared IBattleSpriteLabelOptions) */
+export interface IBattleFieldLayersProps extends IBattleSpriteLabelOptions {
   /** 精靈列表 / Sprite list */
   sprites: IBattleSprite[];
   /** 戰場配置 / Battlefield config */
@@ -35,8 +36,6 @@ export interface IBattleFieldLayersProps {
   width?: number;
   /** 角色排版高度（選填，預設 200） / Sprite layout height (optional, default 200) */
   height?: number;
-  /** 是否顯示名稱標籤 / Whether to show name labels */
-  showLabels?: boolean;
   /** 背景尺寸（獨立於角色排版，選填寬或高其一或全部） / Background size, optional */
   bgSize?: IBattleFieldBgSize;
   /** 角色精靈框垂直對齊方式（預設 bottom） / Sprite frame vertical alignment (default bottom) */
@@ -99,7 +98,7 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
   config,
   width: rawWidth,
   height: rawHeight,
-  showLabels,
+  showSpriteLabels,
   bgSize,
   valign = EnumBattleFieldVAlign.Bottom,
   style,
@@ -147,7 +146,7 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
         sprites={sprites}
         width={width}
         height={height}
-        showLabels={showLabels}
+        showSpriteLabels={showSpriteLabels}
         valign={valign}
       />
     </div>

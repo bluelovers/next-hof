@@ -13,18 +13,16 @@
  * paging navigation is owned by the parent (BattleDisplay segments).
  */
 import React from 'react';
-import type { IBattleSprite, IBattleFieldConfig } from './types';
+import type { IBattleSprite, IBattleFieldConfig, IBattleSpriteLabelOptions } from './types';
 import { BattleFieldLayers } from './BattleFieldLayers';
 import './BattleFieldScene.css';
 
-/** 戰場畫面屬性 / Battlefield scene props */
-export interface IBattleFieldSceneProps {
+/** 戰場畫面屬性（標籤開關共用 IBattleSpriteLabelOptions）/ Battlefield scene props (label toggle from the shared IBattleSpriteLabelOptions) */
+export interface IBattleFieldSceneProps extends IBattleSpriteLabelOptions {
   /** 精靈列表 / Sprite list */
   sprites: IBattleSprite[];
   /** 戰場配置 / Battlefield config */
   config: IBattleFieldConfig;
-  /** 是否顯示名稱標籤 / Whether to show name labels */
-  showLabels?: boolean;
 }
 
 /**
@@ -41,7 +39,7 @@ export interface IBattleFieldSceneProps {
 export const BattleFieldScene: React.FC<IBattleFieldSceneProps> = ({
   sprites,
   config,
-  showLabels,
+  showSpriteLabels,
 }) => {
   return (
     <div className="btl-img">
@@ -52,7 +50,7 @@ export const BattleFieldScene: React.FC<IBattleFieldSceneProps> = ({
           config={config}
           width={config.width}
           height={config.height}
-          showLabels={showLabels}
+          showSpriteLabels={showSpriteLabels}
           bgSize={config.bgSize}
         />
       </div>

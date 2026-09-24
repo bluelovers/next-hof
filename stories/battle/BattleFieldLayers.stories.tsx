@@ -40,7 +40,7 @@ const meta: Meta<typeof BattleFieldLayers> = {
     sprites: sampleSprites,
     config: createSampleConfig('grass'),
     ...sampleFieldSize,
-    showLabels: true,
+    showSpriteLabels: true,
     valign: EnumBattleFieldVAlign.Bottom,
   },
   // 外層舞台，方便觀察背景尺寸與角色框的相對位置

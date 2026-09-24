@@ -21,7 +21,7 @@
  * degrades to a single segment.
  */
 import React from 'react';
-import type { IBattleDisplayData } from '#/components/battle/types';
+import type { IBattleDisplayData, IBattleDisplayOptions } from '#/components/battle/types';
 import { BattleDisplayHeader } from '#/components/battle/BattleDisplayHeader';
 import { BattleTeamRow } from '#/components/battle/BattleTeamRow';
 import { BattleUnitEntrance } from '#/components/battle/BattleUnitEntrance';
@@ -31,16 +31,10 @@ import { splitActionsBySnapshots } from '#/components/battle/battleUtils';
 import './BattleDisplay.css';
 import '#/components/shared/SharedBase.css';
 
-/** 戰鬥顯示屬性 / Battle display props */
-export interface IBattleDisplayProps {
+/** 戰鬥顯示屬性（顯示開關共用 IBattleDisplayOptions，單一事實來源）/ Battle display props (toggles come from the shared IBattleDisplayOptions) */
+export interface IBattleDisplayProps extends IBattleDisplayOptions {
   /** 戰鬥資料 / Battle data */
   data: IBattleDisplayData;
-  /** 是否顯示名稱標籤 / Whether to show name labels on sprites */
-  showSpriteLabels?: boolean;
-  /** 是否顯示 HP 條 / Whether to show HP bars */
-  showHpBars?: boolean;
-  /** 是否顯示 SP 條 / Whether to show SP bars */
-  showSpBars?: boolean;
 }
 
 /**

@@ -22,13 +22,13 @@
  */
 import React, { useMemo } from 'react';
 import type { CSSProperties } from 'react';
-import type { IBattleSprite } from './types';
+import type { IBattleSprite, IBattleSpriteLabelOptions } from './types';
 import { BattleFieldSpriteLabel } from './BattleFieldSpriteLabel';
 import { useSpriteLabelRegistry, type ISpriteLabelRegistry, type ISpriteLabelComputeInput } from './useSpriteLabelRegistry';
 import './BattleFieldSpriteLayers.css';
 
-/** 戰場精靈圖層屬性 / Battlefield sprite layers props */
-export interface IBattleFieldSpriteLayersProps {
+/** 戰場精靈圖層屬性（標籤開關共用 IBattleSpriteLabelOptions）/ Battlefield sprite layers props (label toggle from the shared IBattleSpriteLabelOptions) */
+export interface IBattleFieldSpriteLayersProps extends IBattleSpriteLabelOptions {
   /** 精靈列表 / Sprite list */
   sprites: IBattleSprite[];
   /**
@@ -40,8 +40,6 @@ export interface IBattleFieldSpriteLayersProps {
   width: number;
   /** 畫布高度 / Canvas height */
   height: number;
-  /** 是否顯示名稱標籤 / Whether to show name labels */
-  showLabels?: boolean;
   /** 自訂樣式（可複寫或追加至每個精靈圖層） / Custom style (override or append to every sprite layer) */
   style?: CSSProperties;
 }
@@ -60,7 +58,7 @@ function buildSpriteLayers(
   props: IBattleFieldSpriteLayersProps,
   registry: ISpriteLabelRegistry,
 ): React.ReactNode[] {
-  const { sprites, width, height, showLabels, style } = props;
+  const { sprites, width, height, showSpriteLabels, style } = props;
 
   return sprites.map((sprite, index) => {
     const flipClass = sprite.flipped ? 'flip-h' : '';
@@ -101,7 +99,7 @@ function buildSpriteLayers(
         id={sprite.unitUuid}
         style={mergedStyle}
       >
-        {showLabels && sprite.name && (
+        {showSpriteLabels && sprite.name && (
           <BattleFieldSpriteLabel
             name={sprite.name}
             x={sprite.x}

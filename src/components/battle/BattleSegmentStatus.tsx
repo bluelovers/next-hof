@@ -12,32 +12,26 @@
  * Source: the status row + renderUnits() of src/components/pages/BattleDisplay.tsx
  */
 import React from 'react';
-import type { IBattleUnit } from './types';
+import type { IBattleUnit, IBattleBarToggleOptions } from './types';
 import { BattleUnit } from './BattleUnit';
 import { EnumTeamSideUI } from './enums';
 import { getSideClass } from './battleUtils';
 import './BattleSegmentStatus.css';
 import '#/components/shared/SharedBase.css';
 
-/** 分段 HP/SP 狀態屬性 / Per-segment HP/SP status props */
-export interface IBattleSegmentStatusProps {
+/** 分段 HP/SP 狀態屬性（開關共用 IBattleBarToggleOptions）/ Per-segment HP/SP status props (toggles from the shared IBattleBarToggleOptions) */
+export interface IBattleSegmentStatusProps extends IBattleBarToggleOptions {
   /** 左隊單位（該段起始狀態）/ Left-team units (segment start state) */
   leftUnits: IBattleUnit[];
   /** 右隊單位（該段起始狀態）/ Right-team units (segment start state) */
   rightUnits: IBattleUnit[];
-  /** 是否顯示 HP 條 / Whether to show HP bars */
-  showHpBars: boolean;
-  /** 是否顯示 SP 條 / Whether to show SP bars */
-  showSpBars: boolean;
 }
 
 /** 單一側別的單位狀態欄（單一事實來源）/ One side's unit-status column (single source of truth) */
 const SideStatus: React.FC<{
   side: EnumTeamSideUI;
   units: IBattleUnit[];
-  showHpBars: boolean;
-  showSpBars: boolean;
-}> = ({ side, units, showHpBars, showSpBars }) => (
+} & IBattleBarToggleOptions> = ({ side, units, showHpBars, showSpBars }) => (
   <div className={`battle-side ${getSideClass(side)} break`}>
     {units.map((unit, i) => (
       <div className="battle-side-unit" key={`${unit.name}-${i}`}>

@@ -12,20 +12,18 @@
  */
 import React from 'react';
 import type { CSSProperties } from 'react';
-import type { IBattleSprite, IBattleFieldVAlign } from './types';
+import type { IBattleSprite, IBattleFieldVAlign, IBattleSpriteLabelOptions } from './types';
 import { BattleFieldSpriteLayers } from './BattleFieldSpriteLayers';
 import './BattleFieldSpriteFrame.css';
 
-/** 戰場精靈排版框屬性 / Battlefield sprite layout frame props */
-export interface IBattleFieldSpriteFrameProps {
+/** 戰場精靈排版框屬性（標籤開關共用 IBattleSpriteLabelOptions）/ Battlefield sprite layout frame props (label toggle from the shared IBattleSpriteLabelOptions) */
+export interface IBattleFieldSpriteFrameProps extends IBattleSpriteLabelOptions {
   /** 精靈列表 / Sprite list */
   sprites: IBattleSprite[];
   /** 排版框寬度（角色排版尺寸） / Frame width (sprite layout size) */
   width: number;
   /** 排版框高度（角色排版尺寸） / Frame height (sprite layout size) */
   height: number;
-  /** 是否顯示名稱標籤 / Whether to show name labels */
-  showLabels?: boolean;
   /** 垂直對齊方式（預設 bottom） / Vertical alignment (default bottom) */
   valign?: IBattleFieldVAlign;
   /** 自訂樣式（可複寫或追加） / Custom style (override or append) */
@@ -48,7 +46,7 @@ export const BattleFieldSpriteFrame: React.FC<IBattleFieldSpriteFrameProps> = ({
   sprites,
   width,
   height,
-  showLabels,
+  showSpriteLabels,
   valign,
   style,
 }) => {
@@ -62,7 +60,7 @@ export const BattleFieldSpriteFrame: React.FC<IBattleFieldSpriteFrameProps> = ({
         index={0}
         width={width}
         height={height}
-        showLabels={showLabels}
+        showSpriteLabels={showSpriteLabels}
       />
     </div>
   );

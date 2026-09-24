@@ -846,9 +846,70 @@ export interface IBattleEvent {
 
 export type { EnumState };
 
+/**
+ * 單位共用核心欄位（共用組 1：識別碼＋名稱＋HP/SP）
+ * Shared unit core fields (group 1: uid + name + HP/SP)
+ *
+ * 由引擎層 IBattleSnapshotUnit 與展示層 IBattleUnit／IBattleSnapshotDisplayUnit 共同繼承，
+ * 這些完全同名同型的欄位只在這裡宣告一次（單一事實來源）。
+ * 不相容的欄位不納入本組、仍由各層自行宣告——
+ * 例如引擎的 team（EnumTeamSide）vs 顯示層的 side（EnumTeamSideUI）、
+ * 引擎的 dead vs 顯示層的 status、level/no/expectSkill 等——
+ * 因此不需要任何轉換函式，也不會因强行統一而改變既有行為。
+ * Inherited by the engine's IBattleSnapshotUnit and the display's IBattleUnit /
+ * IBattleSnapshotDisplayUnit, so these identically named, identically typed fields are
+ * declared exactly once (single source of truth). Incompatible fields are deliberately
+ * left declared on each layer — e.g. the engine's team (EnumTeamSide) vs the display's
+ * side (EnumTeamSideUI), the engine's dead vs the display's status, level/no/expectSkill —
+ * so no conversion function is needed and no existing behaviour changes.
+ */
+export interface IBattleUnitVitals {
+	/**
+	 * 戰鬥單位實例唯一識別碼（Character.unitUuid）
+	 * Battle-unit instance uid (Character.unitUuid)
+	 *
+	 * 展示層用來關聯戰場精靈與快照單位（sprite.unitUuid ↔ snapshot unitUuid）；
+	 * 引擎層 IBattleSnapshotUnit 將其收窄為必填（個體追蹤用）。
+	 * The display layer links battlefield sprites and snapshot units
+	 * (sprite.unitUuid ↔ snapshot unitUuid); the engine's IBattleSnapshotUnit narrows it
+	 * to required (per-instance tracking).
+	 */
+	unitUuid?: string;
+	/** 名稱 / name */
+	name: string;
+	/** 目前 HP / current HP */
+	hp: number;
+	/** HP 上限 / max HP */
+	maxHp: number;
+	/** 目前 SP / current SP */
+	sp: number;
+	/** SP 上限 / max SP */
+	maxSp: number;
+}
+
+/**
+ * 單位列表容器（共用組 2：units 欄位）
+ * Unit list container (group 2: the `units` field)
+ *
+ * 由引擎層 IBattleSnapshot 與展示層 IBattleTeam／IBattleSnapshotDisplay 共同繼承，
+ * `units` 宣告只維護一份，元素型別以型別參數依各層指定。
+ * Inherited by the engine's IBattleSnapshot and the display's IBattleTeam /
+ * IBattleSnapshotDisplay so the `units` declaration is maintained once, with the element
+ * type supplied per layer as a type parameter.
+ */
+export interface IUnitList<TUnit> {
+	/** 單位列表（元素型別依層別而定）/ unit list (element type varies by layer) */
+	units: TUnit[];
+}
+
 /** 快照單位資料（戰場狀態某一刻的切面）/ Snapshot unit data (a moment's field state) */
-export interface IBattleSnapshotUnit extends ICorpsePolicyField {
-	/** 戰鬥單位實例唯一識別碼（Character.unitUid；個體追蹤用）/ unit instance uid (for per-instance tracking) */
+export interface IBattleSnapshotUnit extends ICorpsePolicyField, IBattleUnitVitals {
+	/**
+	 * 戰鬥單位實例唯一識別碼（Character.unitUuid；個體追蹤用）/ unit instance uid (for per-instance tracking)
+	 *
+	 * 承接 IBattleUnitVitals.unitUuid 並收窄為必填。
+	 * Inherits IBattleUnitVitals.unitUuid and narrows it to required.
+	 */
 	unitUuid: string;
 	/**
 	 * 繼承 ICorpsePolicyField.corpse 並收窄為必填：引擎保證已完成
@@ -860,18 +921,8 @@ export interface IBattleSnapshotUnit extends ICorpsePolicyField {
 	corpse: ICorpsePolicy;
 	/** 單位編號 String(char.no)（物種／定義編號）/ unit number as string (species / definition id) */
 	no: string;
-	/** 名稱 / name */
-	name: string;
 	/** 隊伍側別 / team */
 	team: EnumTeamSide;
-	/** 目前 HP / current HP */
-	hp: number;
-	/** HP 上限 / max HP */
-	maxHp: number;
-	/** 目前 SP / current SP */
-	sp: number;
-	/** SP 上限 / max SP */
-	maxSp: number;
 	/** 是否已死亡 / whether this unit is dead */
 	dead: boolean;
 	/** 當前正在蓄力/詠唱的技號（無則 null）/ skill being charged/cast, null otherwise */
@@ -879,8 +930,7 @@ export interface IBattleSnapshotUnit extends ICorpsePolicyField {
 }
 
 /** 戰鬥快照（每 10 次行動插入，記錄戰場圖與 HP/SP）/ Battle snapshot (one per 10 actions) */
-export interface IBattleSnapshot {
+export interface IBattleSnapshot extends IUnitList<IBattleSnapshotUnit> {
 	/** 插入時的 log.length / log length at insertion time */
 	at: number;
-	units: IBattleSnapshotUnit[];
 }

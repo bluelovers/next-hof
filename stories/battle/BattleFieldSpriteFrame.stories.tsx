@@ -34,7 +34,7 @@ const meta: Meta<typeof BattleFieldSpriteFrame> = {
   args: {
     sprites: sampleSprites,
     ...sampleFieldSize,
-    showLabels: true,
+    showSpriteLabels: true,
     valign: EnumBattleFieldVAlign.Bottom,
   },
   // 模擬放大後的背景舞台（640×360），框（480×200）在其中依 valign 定位

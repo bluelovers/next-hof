@@ -14,6 +14,7 @@
 import React from 'react';
 import type {
   IBattleFieldConfig,
+  IBattleDisplayOptions,
   IBattleSegment,
   IBattleSprite,
   IBattleTeam,
@@ -26,8 +27,8 @@ import { EnumTeamSideUI } from './enums';
 import { segmentUnitsForSide, resolveSegmentSprites } from './battleUtils';
 import './BattleSegment.css';
 
-/** 戰鬥分段屬性 / Battle segment props */
-export interface IBattleSegmentProps {
+/** 戰鬥分段屬性（顯示開關共用 IBattleDisplayOptions）/ Battle segment props (toggles come from the shared IBattleDisplayOptions) */
+export interface IBattleSegmentProps extends IBattleDisplayOptions {
   /** 分段資料（快照＋該段行動）/ Segment data (snapshot + its actions) */
   segment: IBattleSegment;
   /** 分段總數（用於導覽與 aria 標籤）/ Total segments (for navigation and the aria label) */
@@ -40,12 +41,6 @@ export interface IBattleSegmentProps {
   battlefield: IBattleFieldConfig;
   /** 全部戰場精靈（由分段依快照過濾）/ All battlefield sprites (filtered per snapshot) */
   sprites: IBattleSprite[];
-  /** 是否顯示名稱標籤 / Whether to show name labels on sprites */
-  showSpriteLabels?: boolean;
-  /** 是否顯示 HP 條 / Whether to show HP bars */
-  showHpBars: boolean;
-  /** 是否顯示 SP 條 / Whether to show SP bars */
-  showSpBars: boolean;
 }
 
 /**
@@ -78,7 +73,7 @@ export const BattleSegment: React.FC<IBattleSegmentProps> = ({
         <BattleFieldScene
           sprites={segmentSprites}
           config={battlefield}
-          showLabels={showSpriteLabels}
+          showSpriteLabels={showSpriteLabels}
         />
       </div>
 
