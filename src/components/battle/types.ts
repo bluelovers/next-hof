@@ -17,7 +17,7 @@ import {
 	EnumChargeKind,
 } from './enums';
 import { EnumPosition } from '#/lib/game/constants';
-import type { ICorpsePolicy } from '#/lib/game/battle/corpse-policy';
+import type { ICorpsePolicyField } from '#/lib/game/battle/corpse-policy';
 
 /** 隊伍側別（UI 層）/ Team side (UI layer) */
 export type ITeamSide = EnumTeamSideUI;
@@ -251,12 +251,24 @@ export interface ITeamFinalStats {
  */
 export type IDisplayTimeString = string;
 
-/** BattleDisplay 完整資料 / Complete battle display data */
-export interface IBattleDisplayData {
+/**
+ * 展示中繼資料共用形狀（標題＋顯示時間）
+ * Shared display metadata (title + display time)
+ *
+ * 供 IBattleDisplayData 與 IShowcaseBattleInput 以 extends 共用，
+ * 同名同型欄位只定義一次，避免各自定義漂移。
+ * Shared by IBattleDisplayData and IShowcaseBattleInput via extends so the same-named,
+ * same-typed fields are defined once instead of drifting apart.
+ */
+export interface IBattleDisplayMeta {
 	/** 戰鬥標題 / Battle title */
 	title?: string;
 	/** 戰鬥時間 / Battle time */
 	time?: IDisplayTimeString;
+}
+
+/** BattleDisplay 完整資料 / Complete battle display data */
+export interface IBattleDisplayData extends IBattleDisplayMeta {
 	/** 左側隊伍 / Left team */
 	leftTeam: IBattleTeam;
 	/** 右側隊伍 / Right team */
@@ -284,7 +296,7 @@ export interface IBattleDisplayData {
  * IBattleSnapshotUnit in #/lib/game/types (it uses UI enums like EnumTeamSideUI /
  * EnumUnitStatus). The Display suffix avoids colliding with the domain type.
  */
-export interface IBattleSnapshotDisplayUnit {
+export interface IBattleSnapshotDisplayUnit extends ICorpsePolicyField {
 	/**
 	 * 戰鬥單位實例唯一識別碼（對應精靈的 `unitUuid`，即 Character.unitUuid）
 	 * Battle-unit instance uid (matches a sprite's `unitUuid`, i.e. Character.unitUuid)
@@ -299,16 +311,6 @@ export interface IBattleSnapshotDisplayUnit {
 	 * Appearance override (e.g. form change; when absent the sprite's own image is used)
 	 */
 	imageUrl?: string;
-	/**
-	 * 已解析的屍體政策（`true`／物件＝留下屍體；falsy＝死亡即消失）。
-	 * 物件形式還可指定屍體圖路徑、CSS class 與 inline style（見 ICorpseSpec）。
-	 * 由引擎逐級繼承（角色 > 隊伍 > 戰鬥級）後帶出，顯示層一律以 `!corpse` 判定。
-	 * Resolved corpse policy (`true`/object = leave a corpse; falsy = vanish on death). The object
-	 * form additionally chooses the corpse image path, CSS class and inline style (see ICorpseSpec).
-	 * Produced by the engine after character > team > battle inheritance; the display layer always
-	 * checks `!corpse`.
-	 */
-	corpse?: ICorpsePolicy;
 	hp: number;
 	maxHp: number;
 	sp: number;

@@ -75,7 +75,7 @@ export function buildUnitUid(types: EnumCharType[], no: number, provided?: strin
 	return `${prefix}${unitUidCounter.toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-export class Character {
+export class Character implements ICharCore {
 	/** 單位編號 / unit number */
 	no: number;
 	/** 單位名稱 / unit name */

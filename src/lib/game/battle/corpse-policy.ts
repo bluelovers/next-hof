@@ -70,6 +70,50 @@ export interface ICorpseSpec {
 export type ICorpsePolicy = boolean | ICorpseSpec;
 
 /**
+ * 屍體政策欄位的共用形狀（`corpse` 欄位的單一事實來源）
+ * Shared shape of the corpse-policy field (single source of truth for the `corpse` field)
+ *
+ * 所有帶 `corpse` 欄位的介面一律以 `extends` 繼承本型別，不再各自定義；
+ * 完整欄位語意寫在下方「欄位自身」的 JSDoc，使繼承方在 IDE 悬停時仍取得有效說明。
+ * Every interface carrying a `corpse` field extends this type instead of redefining it.
+ * The full field semantics live in the field's own JSDoc below, so inheriting sites still
+ * surface an effective description on IDE hover.
+ *
+ * 使用方 / Consumers:
+ * - `ICharCore`（角色級輸入）、`IBattleConfig`（戰鬥級最外層預設）
+ * - `IBattleSnapshotUnit`（解析結果，繼承後收窄為必填）
+ * - `IBattleSnapshotDisplayUnit`（顯示側，沿襲解析結果）
+ * - `Character` 以 `implements ICharCore` 間接受到本欄位約束
+ * - `ICharCore` (character-level input), `IBattleConfig` (battle-level outermost default)
+ * - `IBattleSnapshotUnit` (resolved result, narrowed to required after extends)
+ * - `IBattleSnapshotDisplayUnit` (display side, carries the resolved value)
+ * - `Character` is constrained via `implements ICharCore`
+ */
+export interface ICorpsePolicyField {
+	/**
+	 * 死亡後是否留下屍體 / Whether this unit leaves a corpse on death
+	 *
+	 * `true`／物件＝留下屍體（物件可指定屍體圖、CSS class、style；見 ICorpseSpec）；
+	 * `false`＝死亡即消失；省略＝未設定。一律以 falsy 判定（`!corpse`），
+	 * 因此「未設定」語意上就是不留下屍體，不會被誤認為 true。
+	 * `true`/object = leave a corpse (the object form chooses the corpse image, CSS class
+	 * and style; see ICorpseSpec); `false` = vanish; omitted = unset.
+	 * Always evaluated as falsy (`!corpse`), so "unset" is never mistaken for true.
+	 *
+	 * 各層語意 / Per-layer meaning:
+	 * - `ICharCore`：角色級；省略＝往上繼承（隊伍級 → 戰鬥級 → 預設 false）/
+	 *   character level; omitted = inherit upward (team → battle → default false)
+	 * - `IBattleConfig`：戰鬥級最外層預設；省略＝不留屍體 /
+	 *   battle-level outermost default; omitted = no corpse
+	 * - `IBattleSnapshotUnit`：收窄為必填＝三級繼承解析後的結果 /
+	 *   narrowed to required = result after the three-level inheritance
+	 * - `IBattleSnapshotDisplayUnit`：顯示側沿襲解析結果，顯示層一律以 `!corpse` 判定 /
+	 *   display side carries the resolved value; the display layer always checks `!corpse`
+	 */
+	corpse?: ICorpsePolicy;
+}
+
+/**
  * 逐級解析屍體政策 / Resolve the corpse policy level by level
  *
  * 繼承順序「角色級 → 隊伍級 → 戰鬥級」以 `??` 串接，因此較具體的一整個值勝出：

@@ -3,7 +3,7 @@
 
 import { EnumState, EnumPosition, EnumTeamSide } from './constants';
 import type { ICompField, IStatusAttr } from './character/status-attrs';
-import type { ICorpsePolicy } from './battle/corpse-policy';
+import type { ICorpsePolicy, ICorpsePolicyField } from './battle/corpse-policy';
 
 /**
  * 角色類型 / Character type
@@ -684,7 +684,7 @@ export interface IMonReward {
  * 戰鬥單位基礎定義（角色/怪物共用）/ Combatant base definition (shared by char & mon)
  * 介面 / interface
  */
-export interface ICharCore {
+export interface ICharCore extends ICorpsePolicyField {
 	/** 單位編號 / unit number */
 	no: number;
 	/**
@@ -700,17 +700,6 @@ export interface ICharCore {
 	 * prefix is deliberate so it cannot be mistaken for an item/map id.
 	 */
 	unitUuid?: string;
-	/**
-	 * 死亡後是否留下屍體（角色級政策）。
-	 * `true`／物件＝留下屍體（物件可指定屍體圖、CSS class、style）；`false`＝死亡即消失；
-	 * 省略＝往上繼承（隊伍級 → 戰鬥級 → 預設 false）。
-	 * 一律以 falsy 判定（`!corpse`），因此「未設定」語意上就是不留下屍體，不會出現 undefined 卻視為 true 的混亂。
-	 * Whether this unit leaves a corpse on death (character-level policy).
-	 * `true`/object = leave a corpse (the object form chooses the corpse image, CSS class and
-	 * style); `false` = vanish; omitted = inherit upward (team → battle → default false).
-	 * Always evaluated as falsy (`!corpse`), so "unset" never implicitly means true.
-	 */
-	corpse?: ICorpsePolicy;
 	/** 單位名稱 / unit name */
 	name: string;
 	/** 等級 / level */
@@ -858,14 +847,15 @@ export interface IBattleEvent {
 export type { EnumState };
 
 /** 快照單位資料（戰場狀態某一刻的切面）/ Snapshot unit data (a moment's field state) */
-export interface IBattleSnapshotUnit {
+export interface IBattleSnapshotUnit extends ICorpsePolicyField {
 	/** 戰鬥單位實例唯一識別碼（Character.unitUid；個體追蹤用）/ unit instance uid (for per-instance tracking) */
 	unitUuid: string;
 	/**
-	 * 已解析的屍體政策（角色 > 隊伍 > 戰鬥級繼承後的結果；false＝不留下屍體，
-	 * 物件＝留下屍體並帶有圖／class／style 規格）
-	 * Resolved corpse policy (after character > team > battle inheritance; false = no corpse,
-	 * object = leave a corpse carrying image/class/style spec)
+	 * 繼承 ICorpsePolicyField.corpse 並收窄為必填：引擎保證已完成
+	 * 角色 > 隊伍 > 戰鬥級繼承解析（false＝不留下屍體，物件＝帶圖／class／style 規格）。
+	 * Inherits ICorpsePolicyField.corpse and narrows it to required: the engine guarantees the
+	 * character > team > battle inheritance has been resolved (false = no corpse, object =
+	 * corpse carrying image/class/style spec).
 	 */
 	corpse: ICorpsePolicy;
 	/** 單位編號 String(char.no)（物種／定義編號）/ unit number as string (species / definition id) */

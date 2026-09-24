@@ -21,7 +21,7 @@ import { EnumTeamSideUI, EnumChargeKind, EnumUnitStatus, EnumActionType, EnumAtt
 import type {
 	IBattleAction,
 	IBattleDisplayData,
-	IDisplayTimeString,
+	IBattleDisplayMeta,
 	IBattleResult,
 	IBattleSprite,
 	IBattleTeam,
@@ -70,8 +70,13 @@ export interface IUnitLookup extends ReadonlyMap<number, IUnitRef> {}
 /**
  * 轉接層輸入：我方角色 def no、敵方怪物 def no、固定種子與隊名
  * Adapter input: ally char def nos, enemy mon def nos, seed, and team names
+ *
+ * `title`／`time` 欄位繼承自 IBattleDisplayMeta（與 IBattleDisplayData 共用定義）；
+ * `title` 省略時由 runShowcaseBattle 以 DEFAULT_SHOWCASE_TITLE 補。
+ * `title` / `time` inherit IBattleDisplayMeta (shared definition with IBattleDisplayData);
+ * when `title` is omitted, runShowcaseBattle falls back to DEFAULT_SHOWCASE_TITLE.
  */
-export interface IShowcaseBattleInput {
+export interface IShowcaseBattleInput extends IBattleDisplayMeta {
 	/** 我方角色 def no（1–MAX_CHAR 人，順序即隊伍順序）/ ally char def nos (1–MAX_CHAR) */
 	charNos: readonly number[];
 	/** 敵方怪物 def no（來自 encounter 選項）/ enemy monster def nos (from encounter) */
@@ -82,10 +87,6 @@ export interface IShowcaseBattleInput {
 	allyTeamName?: string;
 	/** 敵方隊名（預設 DEFAULT_ENEMY_TEAM_NAME）/ enemy team name */
 	enemyTeamName?: string;
-	/** 標題（預設 DEFAULT_SHOWCASE_TITLE）/ title (default DEFAULT_SHOWCASE_TITLE) */
-	title?: string;
-	/** 顯示時間字串（可省略）/ optional display time string */
-	time?: IDisplayTimeString;
 }
 
 /**

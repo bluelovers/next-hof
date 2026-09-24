@@ -17,7 +17,7 @@ import { Defending } from './guard';
 import { buildPattern, MultiFactJudge } from './pattern';
 import { computeOutcome, BattleResult, EnumOutcome } from './BattleResult';
 import { EnumJudgeCode } from './judge-codes';
-import { resolveCorpsePolicy, type ICorpsePolicy } from './corpse-policy';
+import { resolveCorpsePolicy, type ICorpsePolicy, type ICorpsePolicyField } from './corpse-policy';
 import type { IDataRepository } from '../data/repository';
 import type { RNG } from '../core/rng';
 import type { ITimeService } from '../core/time-service';
@@ -29,7 +29,7 @@ import { EnumTargetType, EnumTargetMethod, EnumBattleEventType } from '../types'
  * 戰鬥配置 / Battle configuration
  * 介面 / interface
  */
-export interface IBattleConfig {
+export interface IBattleConfig extends ICorpsePolicyField {
 	/** 資料儲存庫（技能/職業/物品/怪物/角色）/ data repository (skills/jobs/items/mons/chars) */
 	repo: IDataRepository;
 	/** 可注入的隨機源 / injectable random source */
@@ -44,26 +44,18 @@ export interface IBattleConfig {
 	 */
 	timeService?: ITimeService;
 	/**
-	 * 戰鬥級屍體政策（全場預設；省略＝不留屍體）。可為布林或物件規格（圖／class／style）。
-	 * 逐級繼承：角色級 > 隊伍級 > 戰鬥級；這裡是最外層預設。
-	 * Battle-level corpse policy (battle-wide default; omitted = no corpse). Either a boolean or
-	 * an object spec (image/class/style).
-	 * Inheritance: character > team > battle; this is the outermost default.
-	 */
-	corpse?: ICorpsePolicy;
-	/**
 	 * 隊伍級屍體政策覆寫（某側未提供＝沿用戰鬥級）。
 	 * Team-level corpse policy overrides (an omitted side inherits the battle-level value).
 	 */
 	teamCorpse?: Partial<Record<EnumTeamSide, ICorpsePolicy>>;
 }
 
-export class Battle {
+export class Battle implements IBattleConfig {
 	/** 資料儲存庫 / data repository */
 	repo: IDataRepository;
 	/** 隨機源 / random source */
 	rng: RNG;
-	/** 時間服務（可為 null；來自 IBattleConfig.timeService）/ time service (may be null; from IBattleConfig.timeService) */
+	/** 時間服務（來自 IBattleConfig.timeService；省略＝未注入）/ time service (from IBattleConfig.timeService; omitted when not injected) */
 	timeService?: ITimeService;
 	/** 雙方隊伍（鍵 EnumTeamSide.Team0／EnumTeamSide.Team1）/ both teams */
 	teams: Record<EnumTeamSide, BattleTeam>;
