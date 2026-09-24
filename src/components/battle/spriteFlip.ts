@@ -13,8 +13,8 @@
  * This file deliberately depends only on ./types (not on computeBattleSpritePositions)
  * so it can be imported and unit-tested in isolation.
  */
-import type { ITeamSide } from './types';
-import type { ISpriteImageDir } from './spriteDirs';
+import type { EnumTeamSideUI } from './enums';
+import type { EnumSpriteImageDir } from './enums';
 
 /**
  * 嚴格判斷圖檔目錄
@@ -36,15 +36,15 @@ import type { ISpriteImageDir } from './spriteDirs';
  *   - /image/land/bg_grass.png      → 'other'（背景圖，不應翻轉）
  *   - /image/char_special/mon.png   → 'other'（名稱相似但非 char）
  */
-export function getSpriteImageDir(imageUrl: string): ISpriteImageDir {
+export function getSpriteImageDir(imageUrl: string): EnumSpriteImageDir {
   // 先去掉 query / hash，再取第一層資料夾名稱（/image/<資料夾>/...）
   // Strip query/hash, then take the first folder name (/image/<folder>/...).
   const clean = imageUrl.split('?')[0].split('#')[0];
   const m = clean.match(/^\/image\/([^/]+)\//);
   const dir = m ? m[1] : null;
-  if (dir === 'char_rev') return 'char_rev';
-  if (dir === 'char') return 'char';
-  return 'other';
+  if (dir === 'char_rev') return EnumSpriteImageDir.CharRev;
+  if (dir === 'char') return EnumSpriteImageDir.Char;
+  return EnumSpriteImageDir.Other;
 }
 
 /** 計算翻轉時的選項 / Options for flip computation */
@@ -53,9 +53,9 @@ export interface IComputeSpriteFlippedOptions {
    * 明確指定的翻轉值（優先於自動推導）
    * Explicit flipped value (takes priority over auto-derivation)
    *
-   * 當目錄為 'other'（自定義 / 額外圖檔）而無法判斷朝向時使用；
+   * 當目錄為 other（自定義 / 額外圖檔）而無法判斷朝向時使用；
    * 未提供則回退為不翻轉（安全預設，不臆測朝向）
-   * Used when the directory is 'other' (custom / extra image) and facing cannot be
+   * Used when the directory is other (custom / extra image) and facing cannot be
    * inferred; falls back to no flip (safe default, never guesses facing).
    */
   flipped?: boolean;
@@ -77,16 +77,16 @@ export interface IComputeSpriteFlippedOptions {
  */
 export function computeSpriteFlipped(
   imageUrl: string,
-  side: ITeamSide,
+  side: EnumTeamSideUI,
   options?: IComputeSpriteFlippedOptions
 ): boolean {
   const dir = getSpriteImageDir(imageUrl);
   switch (dir) {
-    case 'char':
-      return side === 'right';
-    case 'char_rev':
-      return side === 'left';
-    case 'other':
+    case EnumSpriteImageDir.Char:
+      return side === EnumTeamSideUI.Right;
+    case EnumSpriteImageDir.CharRev:
+      return side === EnumTeamSideUI.Left;
+    case EnumSpriteImageDir.Other:
     default:
       return options?.flipped ?? false;
   }
@@ -107,10 +107,10 @@ export function computeSpriteFlipped(
  */
 export function useFlipPositioning(
   imageUrl: string,
-  side: ITeamSide
+  side: EnumTeamSideUI
 ): boolean {
   const dir = getSpriteImageDir(imageUrl);
-  if (dir === 'char') return side === 'right';
-  if (dir === 'char_rev') return side === 'left';
+  if (dir === EnumSpriteImageDir.Char) return side === EnumTeamSideUI.Right;
+  if (dir === EnumSpriteImageDir.CharRev) return side === EnumTeamSideUI.Left;
   return false;
 }

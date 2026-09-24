@@ -2,12 +2,12 @@
  * 戰鬥顯示工具函式（單一事實來源）
  * Battle display utilities (single source of truth)
  *
- * 集中維護百分比計算、條狀顏色與狀態/屬性→CSS class 的對應邏輯，
+ * 集中維護百分比計算、條狀顏色與狀與狀態/屬性→CSS class 的對應邏輯，
  * 供 BattleUnit 與 BattleAction 共用，避免各自實作導致行為漂移。
  * Centralizes percentage math, bar colors, and status/attribute → CSS class mappings
  * so BattleUnit and BattleAction share one implementation instead of diverging.
  */
-import type { IUnitStatus, IAttributeType, ITeamSide, ITeamSideClass, IActionType } from './types';
+import { EnumUnitStatus, EnumAttributeType, EnumTeamSideUI, EnumTeamSideClass, EnumActionType } from './enums';
 import { TEAM_SIDE_CLASS } from './types';
 
 /** 條狀顏色高閾值（> 此值為高血量色） / Bar high threshold */
@@ -60,11 +60,11 @@ export function getSpBarColor(pct: number): string {
  * 依單位狀態取得 CSS 類別
  * Get CSS class from unit status
  */
-export function getStatusClass(status?: IUnitStatus): string {
+export function getStatusClass(status?: EnumUnitStatus): string {
   switch (status) {
-    case 'down':
+    case EnumUnitStatus.Down:
       return 'dmg';
-    case 'casting':
+    case EnumUnitStatus.Casting:
       return 'charge';
     default:
       return '';
@@ -75,15 +75,15 @@ export function getStatusClass(status?: IUnitStatus): string {
  * 依屬性類型取得 CSS 類別
  * Get CSS class from attribute type
  */
-export function getAttrClass(attr?: IAttributeType): string {
+export function getAttrClass(attr?: EnumAttributeType): string {
   switch (attr) {
-    case 'dmg':
+    case EnumAttributeType.Dmg:
       return 'dmg';
-    case 'recover':
+    case EnumAttributeType.Recover:
       return 'recover';
-    case 'support':
+    case EnumAttributeType.Support:
       return 'support';
-    case 'charge':
+    case EnumAttributeType.Charge:
       return 'charge';
     default:
       return '';
@@ -97,7 +97,7 @@ export function getAttrClass(attr?: IAttributeType): string {
  * @param side - 隊伍側 / Team side
  * @returns CSS class 字串 / CSS class string
  */
-export function getSideClass(side: ITeamSide): ITeamSideClass {
+export function getSideClass(side: EnumTeamSideUI): EnumTeamSideClass {
   return TEAM_SIDE_CLASS[side];
 }
 
@@ -113,10 +113,10 @@ export function getSideClass(side: ITeamSide): ITeamSideClass {
  * @returns CSS class 字串 / CSS class string
  */
 export function getStateTextClass(
-  status?: IUnitStatus,
-  fallback: 'recover' | 'support' = 'recover'
+  status?: EnumUnitStatus,
+  fallback: EnumAttributeType = EnumAttributeType.Recover
 ): string {
-  return status === 'down' ? 'dmg' : fallback;
+  return status === EnumUnitStatus.Down ? 'dmg' : fallback;
 }
 
 /**
@@ -129,9 +129,9 @@ export function getStateTextClass(
  * @param type - 行動類型 / Action type
  * @returns CSS class 字串 / CSS class string
  */
-export function getValueChangeClass(type?: IActionType): string {
-  if (type === 'damage' || type === 'down') return 'dmg';
-  if (type === 'heal') return 'recover';
+export function getValueChangeClass(type?: EnumActionType): string {
+  if (type === EnumActionType.Damage || type === EnumActionType.Down) return 'dmg';
+  if (type === EnumActionType.Heal) return 'recover';
   return '';
 }
 

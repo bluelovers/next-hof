@@ -30,6 +30,7 @@ import {
 } from '../../src/components/battle/BattleFieldSpriteLabel';
 import { BattleFieldSpriteFrame } from '../../src/components/battle/BattleFieldSpriteFrame';
 import type { IBattleSprite } from '../../src/components/battle/types';
+import { EnumTeamSideUI, EnumPosition, EnumSpriteLabelPlacement } from '../../src/components/battle/enums';
 import { getSpriteImageSize } from '../../src/components/battle/spriteImageSizes';
 import {
   groupBattleChars,
@@ -46,9 +47,9 @@ interface IStoryRosterChar {
   /** 精靈圖片路徑 / Sprite image path */
   imageUrl: string;
   /** 站位：前衛 / 後衛 / Position: front / back */
-  position: 'front' | 'back';
+  position: EnumPosition;
   /** 隊伍側：左 / 右 / Team side: left / right */
-  side: 'left' | 'right';
+  side: EnumTeamSideUI;
 }
 
 /** 真實戰場尺寸（480×200），frame 尺寸由此而來（單一事實來源，不在故事中魔術指定） / Real battlefield size (480×200); frame size derives from this (SoT, no magic number here) */
@@ -98,24 +99,24 @@ const heroLeft = {
   id: 'mon_018',
   name: 'Hero1',
   imageUrl: '/image/char/mon_018.png',
-  position: 'back' as const,
-  side: 'left' as const,
+  position: EnumPosition.Back,
+  side: EnumTeamSideUI.Left,
 };
 /** 右隊 char_rev（直接定位於右側，flipped:false） / Right team char_rev (directly on the right, not flipped) */
 const mageRight = {
   id: 'mon_018b',
   name: 'Mage1',
   imageUrl: '/image/char_rev/mon_018.png',
-  position: 'front' as const,
-  side: 'right' as const,
+  position: EnumPosition.Front,
+  side: EnumTeamSideUI.Right,
 };
 /** 右隊 char（由邏輯推導為 flipped:true，標籤會反向抵消鏡像） / Right team char (logic derives flipped:true; label cancels the mirror) */
 const goblinRight = {
   id: 'mon_052',
   name: 'Goblin',
   imageUrl: '/image/char/mon_052.png',
-  position: 'front' as const,
-  side: 'right' as const,
+  position: EnumPosition.Front,
+  side: EnumTeamSideUI.Right,
 };
 
 const meta: Meta<typeof BattleFieldSpriteLabel> = {
@@ -145,7 +146,7 @@ const meta: Meta<typeof BattleFieldSpriteLabel> = {
   ],
   args: {
     name: 'Demo',
-    placement: 'below',
+    placement: EnumSpriteLabelPlacement.Below,
   },
 };
 
@@ -154,25 +155,25 @@ type Story = StoryObj<typeof BattleFieldSpriteLabel>;
 
 /** 預設標籤（左隊角色，角色下方） / Default label (left-team character, below) */
 export const Default: Story = {
-  args: { name: 'Hero1', placement: 'below' },
+  args: { name: 'Hero1', placement: EnumSpriteLabelPlacement.Below },
   render: makeRender(heroLeft),
 };
 
 /** 左側角色（x 由左隊定位邏輯得出） / Left-side character (x from left-team positioning) */
 export const LeftSideCharacter: Story = {
-  args: { name: 'Hero1', placement: 'below' },
+  args: { name: 'Hero1', placement: EnumSpriteLabelPlacement.Below },
   render: makeRender(heroLeft),
 };
 
 /** 右側角色（右隊 char_rev 直接定位於右側） / Right-side character (right-team char_rev placed directly on the right) */
 export const RightSideCharacter: Story = {
-  args: { name: 'Mage1', placement: 'below' },
+  args: { name: 'Mage1', placement: EnumSpriteLabelPlacement.Below },
   render: makeRender(mageRight),
 };
 
 /** 翻轉角色（右隊 char，flipped 由邏輯推導為 true；標籤反向抵消鏡像保持正向） / Flipped character (right-team char; flipped auto-derived true, label cancels mirror) */
 export const FlippedCharacter: Story = {
-  args: { name: 'Goblin', placement: 'below' },
+  args: { name: 'Goblin', placement: EnumSpriteLabelPlacement.Below },
   render: makeRender(goblinRight),
 };
 
@@ -180,7 +181,7 @@ export const FlippedCharacter: Story = {
 export const OverrideStyle: Story = {
   args: {
     name: 'Hero1',
-    placement: 'below',
+    placement: EnumSpriteLabelPlacement.Below,
     style: { color: '#ff6b6b', fontSize: 16, textShadow: '0 0 6px #000' },
   },
   render: makeRender(heroLeft),
@@ -188,12 +189,12 @@ export const OverrideStyle: Story = {
 
 /** 演算法 1：標籤置於角色上方 / Algorithm 1: label above the character */
 export const AboveCharacter: Story = {
-  args: { name: 'Hero1', placement: 'above' },
+  args: { name: 'Hero1', placement: EnumSpriteLabelPlacement.Above },
   render: makeRender(heroLeft),
 };
 
 /** 演算法 2：標籤置於角色下方 / Algorithm 2: label below the character */
 export const BelowCharacter: Story = {
-  args: { name: 'Hero1', placement: 'below' },
+  args: { name: 'Hero1', placement: EnumSpriteLabelPlacement.Below },
   render: makeRender(heroLeft),
 };

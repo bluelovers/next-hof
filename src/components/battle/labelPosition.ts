@@ -22,6 +22,7 @@
  * This module imports no CSS, so it can be unit-tested in isolation.
  */
 import type { ISpriteImageSize } from './spriteImageSizes';
+import { EnumSpriteLabelPlacement } from './enums';
 
 /** 精靈圖層（角色）矩形（frame 座標系） / Sprite-layer (character) rectangle (frame coordinate space) */
 export interface IRect {
@@ -36,7 +37,7 @@ export interface IRect {
 }
 
 /** 標籤演算法：角色上方 / 下方 / Label placement: above / below the character */
-export type ISpriteLabelPlacement = 'above' | 'below';
+export type ISpriteLabelPlacement = EnumSpriteLabelPlacement;
 
 /** 標籤位置計算輸入 / Label position computation input */
 export interface ISpriteLabelPositionInput {
@@ -114,7 +115,7 @@ export function computeLabelTop(
   labelSize: ISpriteImageSize,
   gap: number,
 ): number {
-  return placement === 'above'
+  return placement === EnumSpriteLabelPlacement.Above
     ? y - gap - labelSize.height
     : y + imageSize.height + gap;
 }
@@ -132,7 +133,7 @@ export function labelFitsInFrame(
   labelSize: ISpriteImageSize,
   frameSize: ISpriteImageSize,
 ): boolean {
-  return placement === 'above'
+  return placement === EnumSpriteLabelPlacement.Above
     ? top >= 0
     : top + labelSize.height <= frameSize.height - FRAME_BOTTOM_MARGIN;
 }
@@ -158,7 +159,7 @@ export function clampLabelToBoundary(
   frameSize: ISpriteImageSize,
 ): { top: number; height: number } {
   const top0 = computeLabelTop(placement, y, imageSize, labelSize, gap);
-  if (placement === 'above') {
+  if (placement === EnumSpriteLabelPlacement.Above) {
     const bandBottom = Math.max(0, y - gap);
     if (top0 < 0) {
       // 高於邊界 → 貼齊頂緣並縮減高度 / Above boundary → pin to top, shrink height.
@@ -285,12 +286,12 @@ export function computeSpriteLabelPosition(input: ISpriteLabelPositionInput): IS
     const rect0: IRect = { left, top, width, height };
     if (occupied.some((o) => rectsOverlap(rect0, o))) {
       const end =
-        placement === 'above'
+        placement === EnumSpriteLabelPlacement.Above
           ? 0
           : Math.max(0, frameSize.height - FRAME_BOTTOM_MARGIN - height);
-      const step = placement === 'above' ? -1 : 1;
+      const step = placement === EnumSpriteLabelPlacement.Above ? -1 : 1;
       let found = false;
-      for (let t = top; placement === 'above' ? t >= end : t <= end; t += step) {
+      for (let t = top; placement === EnumSpriteLabelPlacement.Above ? t >= end : t <= end; t += step) {
         const cand: IRect = { left, top: Math.round(t), width, height };
         if (!occupied.some((o) => rectsOverlap(cand, o))) {
           top = Math.round(t);
@@ -299,9 +300,9 @@ export function computeSpriteLabelPosition(input: ISpriteLabelPositionInput): IS
         }
       }
       if (!found) {
-        const bandTop = placement === 'above' ? 0 : y + imageSize.height + gap;
+        const bandTop = placement === EnumSpriteLabelPlacement.Above ? 0 : y + imageSize.height + gap;
         const bandBottom =
-          placement === 'above'
+          placement === EnumSpriteLabelPlacement.Above
             ? Math.max(0, y - gap)
             : Math.max(0, frameSize.height - FRAME_BOTTOM_MARGIN);
         const gapInfo = largestFreeGap(occupied, bandTop, bandBottom, left, width);

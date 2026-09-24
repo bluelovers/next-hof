@@ -14,7 +14,7 @@ import {
   type IBattlePositionChar,
   type ITeamBattleChars,
 } from '../../src/components/battle/computeSpritePositions';
-import { getSpriteImageSize } from '../../src/components/battle/spriteImageSizes';
+import { EnumTeamSideUI, EnumPosition } from '../../src/components/battle/enums';
 
 /** 共用敵方精靈樣本 / Shared enemy sprite samples */
 export const sampleEnemySprites: IBattleSprite[] = [
@@ -104,9 +104,9 @@ interface IRosterChar {
   /** 精靈圖片路徑 / Sprite image path */
   imageUrl: string;
   /** 站位：前衛 / 後衛 / Position: front / back */
-  position: 'front' | 'back';
+  position: EnumPosition;
   /** 隊伍側：左 / 右 / Team side: left / right */
-  side: 'left' | 'right';
+  side: EnumTeamSideUI;
 }
 
 /** 名冊隊伍 / Roster team */
@@ -133,20 +133,20 @@ interface IRosterTeam {
 const demoRoster: { left: IRosterTeam; right: IRosterTeam } = {
   left: {
     back: [
-      { id: 'mon_018', name: 'Hero1', imageUrl: '/image/char/mon_018.png', position: 'back', side: 'left' },
+      { id: 'mon_018', name: 'Hero1', imageUrl: '/image/char/mon_018.png', position: EnumPosition.Back, side: EnumTeamSideUI.Left },
     ],
     front: [
-      { id: 'mon_014', name: 'Mage1', imageUrl: '/image/char/mon_014.png', position: 'front', side: 'left' },
-      { id: 'mon_079', name: 'Priest1', imageUrl: '/image/char/mon_079.png', position: 'front', side: 'left' },
+      { id: 'mon_014', name: 'Mage1', imageUrl: '/image/char/mon_014.png', position: EnumPosition.Front, side: EnumTeamSideUI.Left },
+      { id: 'mon_079', name: 'Priest1', imageUrl: '/image/char/mon_079.png', position: EnumPosition.Front, side: EnumTeamSideUI.Left },
     ],
   },
   right: {
     back: [
-      { id: 'mon_052a', name: 'GoblinWarrior(A)', imageUrl: '/image/char/mon_052.png', position: 'back', side: 'right' },
+      { id: 'mon_052a', name: 'GoblinWarrior(A)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Back, side: EnumTeamSideUI.Right },
     ],
     front: [
-      { id: 'mon_052b', name: 'GoblinWarrior(B)', imageUrl: '/image/char/mon_052.png', position: 'front', side: 'right' },
-      { id: 'mon_053', name: 'GoblinAxe', imageUrl: '/image/char/mon_053.png', position: 'front', side: 'right' },
+      { id: 'mon_052b', name: 'GoblinWarrior(B)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
+      { id: 'mon_053', name: 'GoblinAxe', imageUrl: '/image/char/mon_053.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
     ],
   },
 };
@@ -199,13 +199,13 @@ const mixedRoster: { left: IRosterTeam; right: IRosterTeam } = {
   left: { front: [], back: [] },
   right: {
     back: [
-      { id: 'mon_190', name: 'mon_190(char_rev)', imageUrl: '/image/char_rev/mon_190.png', position: 'back', side: 'right' },
-      { id: 'mon_170', name: 'mon_170(char_rev)', imageUrl: '/image/char/mon_170.png', position: 'back', side: 'right' },
+      { id: 'mon_190', name: 'mon_190(char_rev)', imageUrl: '/image/char_rev/mon_190.png', position: EnumPosition.Back, side: EnumTeamSideUI.Right },
+      { id: 'mon_170', name: 'mon_170(char_rev)', imageUrl: '/image/char/mon_170.png', position: EnumPosition.Back, side: EnumTeamSideUI.Right },
     ],
     front: [
-      { id: 'mon_052', name: 'Goblin(char)', imageUrl: '/image/char/mon_052.png', position: 'front', side: 'right' },
-      { id: 'mon_018', name: 'Hero(char_rev)', imageUrl: '/image/char_rev/mon_018.png', position: 'front', side: 'right' },
-      { id: 'mon_079', name: 'Priest(char_rev)', imageUrl: '/image/char_rev/mon_079.png', position: 'front', side: 'right' },
+      { id: 'mon_052', name: 'Goblin(char)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
+      { id: 'mon_018', name: 'Hero(char_rev)', imageUrl: '/image/char_rev/mon_018.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
+      { id: 'mon_079', name: 'Priest(char_rev)', imageUrl: '/image/char_rev/mon_079.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
     ],
   },
 };
@@ -241,12 +241,12 @@ export function createMixedSampleSprites(
  * by side / position, with no manual front/back nesting.
  */
 const flatRosterSample: IRosterChar[] = [
-  { id: 'mon_018', name: 'Hero1', imageUrl: '/image/char/mon_018.png', position: 'back', side: 'left' },
-  { id: 'mon_014', name: 'Mage1', imageUrl: '/image/char/mon_014.png', position: 'front', side: 'left' },
-  { id: 'mon_079', name: 'Priest1', imageUrl: '/image/char/mon_079.png', position: 'front', side: 'left' },
-  { id: 'mon_052a', name: 'GoblinWarrior(A)', imageUrl: '/image/char/mon_052.png', position: 'back', side: 'right' },
-  { id: 'mon_052b', name: 'GoblinWarrior(B)', imageUrl: '/image/char/mon_052.png', position: 'front', side: 'right' },
-  { id: 'mon_053', name: 'GoblinAxe', imageUrl: '/image/char/mon_053.png', position: 'front', side: 'right' },
+  { id: 'mon_018', name: 'Hero1', imageUrl: '/image/char/mon_018.png', position: EnumPosition.Back, side: EnumTeamSideUI.Left },
+  { id: 'mon_014', name: 'Mage1', imageUrl: '/image/char/mon_014.png', position: EnumPosition.Front, side: EnumTeamSideUI.Left },
+  { id: 'mon_079', name: 'Priest1', imageUrl: '/image/char/mon_079.png', position: EnumPosition.Front, side: EnumTeamSideUI.Left },
+  { id: 'mon_052a', name: 'GoblinWarrior(A)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Back, side: EnumTeamSideUI.Right },
+  { id: 'mon_052b', name: 'GoblinWarrior(B)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
+  { id: 'mon_053', name: 'GoblinAxe', imageUrl: '/image/char/mon_053.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
 ];
 
 /** 將扁平名冊補上真實圖像尺寸，轉為 groupBattleChars 所需的 IBattlePositionChar[] */

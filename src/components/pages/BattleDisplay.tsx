@@ -19,6 +19,7 @@ import { BattleFieldScene } from '#/components/battle/BattleFieldScene';
 import { BattleUnit } from '#/components/battle/BattleUnit';
 import { BattleLog } from '#/components/battle/BattleLog';
 import { BattleResult } from '#/components/battle/BattleResult';
+import { EnumTeamSideUI } from '#/components/battle/enums';
 import { getSideClass, getEnterBattlefieldText } from '#/components/battle/battleUtils';
 import type { ITeamSide } from '#/components/battle/types';
 import './BattleDisplay.css';
@@ -65,30 +66,30 @@ export const BattleDisplay: React.FC<IBattleDisplayProps> = ({
             <BattleTeamInfo
               name={leftTeam.name}
               units={leftTeam.units}
-              sideClass={getSideClass('left')}
+              sideClass={getSideClass(EnumTeamSideUI.Left)}
             />
             <BattleTeamInfo
               name={rightTeam.name}
               units={rightTeam.units}
-              sideClass={getSideClass('right')}
+              sideClass={getSideClass(EnumTeamSideUI.Right)}
             />
           </tr>
 
           {/* Row 2: 單位入場 / Unit entrance */}
           {leftTeam.units.map((unit, i) => (
             <tr key={`enter-left-${i}`}>
-              <td className={getSideClass('left')}>
+              <td className={getSideClass(EnumTeamSideUI.Left)}>
                 <span className="result">
                   <span className="bold">{unit.name}</span> {getEnterBattlefieldText(unit.level)}
                 </span>
               </td>
-              <td className={getSideClass('right')}>&nbsp;</td>
+              <td className={getSideClass(EnumTeamSideUI.Right)}>&nbsp;</td>
             </tr>
           ))}
           {rightTeam.units.map((unit, i) => (
             <tr key={`enter-right-${i}`}>
-              <td className={getSideClass('left')}>&nbsp;</td>
-              <td className={getSideClass('right')}>
+              <td className={getSideClass(EnumTeamSideUI.Left)}>&nbsp;</td>
+              <td className={getSideClass(EnumTeamSideUI.Right)}>
                 <span className="result">
                   <span className="bold">{unit.name}</span> {getEnterBattlefieldText(unit.level)}
                 </span>
@@ -106,13 +107,13 @@ export const BattleDisplay: React.FC<IBattleDisplayProps> = ({
           {/* Row 4: HP/SP 狀態 / HP/SP status */}
           <tr>
             {/* 左側隊伍狀態 / Left team status */}
-            <td className={`${getSideClass('left')} break`}>
+            <td className={`${getSideClass(EnumTeamSideUI.Left)} break`}>
               <table style={{ width: '100%' }}>
                 <tbody>
                   <tr>
                     <td style={{ width: '50%' }}>
                       {/* 左欄隊員 (從原始頁面來看，部分在左半部) */}
-                      {renderUnitColumn(leftTeam.units, 'left', showHpBars, showSpBars)}
+                      {renderUnitColumn(leftTeam.units, EnumTeamSideUI.Left, showHpBars, showSpBars)}
                     </td>
                     <td style={{ width: '50%' }}>
                       {/* 右半部留空或放更多單位 */}
@@ -123,7 +124,7 @@ export const BattleDisplay: React.FC<IBattleDisplayProps> = ({
             </td>
 
             {/* 右側隊伍狀態 / Right team status */}
-            <td className={`${getSideClass('right')} break`}>
+            <td className={`${getSideClass(EnumTeamSideUI.Right)} break`}>
               <table style={{ width: '100%' }}>
                 <tbody>
                   <tr>

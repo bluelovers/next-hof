@@ -6,7 +6,7 @@
 // 側別慣例（與原版頁面一致）：敵方＝左隊 'left'、我方＝右隊 'right'。
 // Side convention (matches the original page): enemies = left team 'left', allies = right team 'right'.
 
-import { EnumState, EnumPosition, MAX_CHAR } from '#/lib/game/constants';
+import { EnumState, EnumPosition, EnumTeamSide, MAX_CHAR } from '#/lib/game/constants';
 import { Battle } from '#/lib/game/battle/Battle';
 import { EnumOutcome } from '#/lib/game/battle/BattleResult';
 import { newChar, newMon } from '#/lib/game/character/factory';
@@ -17,6 +17,7 @@ import type { IDataRepository } from '#/lib/game/data/repository';
 import { EnumBattleEventType } from '#/lib/game/types';
 import type { IBattleEvent, IBattleSnapshot } from '#/lib/game/types';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
+import { EnumTeamSideUI, EnumChargeKind, EnumUnitStatus, EnumActionType, EnumAttributeType } from '#/components/battle/enums';
 import type {
 	IBattleAction,
 	IBattleDisplayData,
@@ -139,11 +140,11 @@ export function toBattleUnit(c: Character, side: ITeamSide): IBattleUnit {
 		maxHp: c.MAXHP,
 		sp: Math.max(0, c.SP),
 		maxSp: c.MAXSP,
-		status: c.STATE === EnumState.Dead ? 'down' : c.expect !== null ? 'casting' : 'alive',
+		status: c.STATE === EnumState.Dead ? EnumUnitStatus.Down : c.expect !== null ? EnumUnitStatus.Casting : EnumUnitStatus.Alive,
 		spriteId: c.uniqid,
 		side,
 		spd: c.SPD,
-		position: c.POSITION === EnumPosition.Back ? 'back' : 'front',
+		position: c.POSITION === EnumPosition.Back ? EnumPosition.Back : EnumPosition.Front,
 	};
 }
 
@@ -171,8 +172,8 @@ export function buildUnitLookup(
 	enemies: readonly Character[],
 ): IUnitLookup {
 	const lookup = new Map<number, IUnitRef>();
-	for (const c of allies) lookup.set(c.no, { name: c.name, side: 'right' });
-	for (const c of enemies) lookup.set(c.no, { name: c.name, side: 'left' });
+	for (const c of allies) lookup.set(c.no, { name: c.name, side: EnumTeamSideUI.Right });
+	for (const c of enemies) lookup.set(c.no, { name: c.name, side: EnumTeamSideUI.Left });
 	return lookup;
 }
 
@@ -217,28 +218,24 @@ export function mapBattleEvent(
 
 	switch (ev.type) {
 		case EnumBattleEventType.Act: {
-			// 對齊 PHP：技能 div 由 UseSkill 印出（act 為實際施放）
-			// Mirrors PHP: the skill div is printed by UseSkill (act = actual cast)
 			return {
-				type: 'skill',
+				type: EnumActionType.Skill,
 				source: actor.name,
 				target: target.name,
 				skill: skillName ? { name: skillName } : undefined,
 				message: skillName ? `${actor.name} ${skillName}` : actor.name ?? '',
 				side,
-				attribute: 'normal',
+				attribute: EnumAttributeType.Normal,
 			};
 		}
 		case EnumBattleEventType.Cast: {
-			// 依 skill.type 決定文案：0→start charging.、1→start casting.
-			// Charge text by skill.type: 0→start charging., 1→start casting.
-			const verb = skillDef?.type === 0 ? 'charging' : 'casting';
+			const verb = skillDef?.type === 0 ? EnumChargeKind.Charging : EnumChargeKind.Casting;
 			return {
-				type: 'casting',
+				type: EnumActionType.Casting,
 				source: actor.name,
 				message: `start ${verb}.`,
 				side,
-				attribute: 'charge',
+				attribute: EnumAttributeType.Charge,
 				castType: verb,
 				skill: skillName ? { name: skillName } : undefined,
 			};
@@ -253,14 +250,14 @@ export function mapBattleEvent(
 						: undefined;
 			const message = target.name ? `${value} Damage to ${target.name}` : `${value} Damage`;
 			return {
-				type: 'damage',
+				type: EnumActionType.Damage,
 				source: actor.name,
 				target: target.name,
 				value,
 				valueChange,
 				message,
 				side,
-				attribute: 'dmg',
+				attribute: EnumAttributeType.Dmg,
 				hpBefore: ev.hpBefore,
 				hpAfter: ev.hpAfter,
 				skill: skillName ? { name: skillName } : undefined,
@@ -272,19 +269,18 @@ export function mapBattleEvent(
 				ev.hpBefore !== undefined && ev.hpAfter !== undefined
 					? `${ev.hpBefore} > ${ev.hpAfter}`
 					: undefined;
-			// PHP: <b>target</b> <span class="recover">Recovered <b>N HP</b></span>(a > b)
 			const message = target.name
 				? `${target.name} Recovered ${value} HP`
 				: `${value} Heal`;
 			return {
-				type: 'heal',
+				type: EnumActionType.Heal,
 				source: actor.name,
 				target: target.name,
 				value,
 				valueChange,
 				message,
 				side,
-				attribute: 'recover',
+				attribute: EnumAttributeType.Recover,
 				hpBefore: ev.hpBefore,
 				hpAfter: ev.hpAfter,
 				skill: skillName ? { name: skillName } : undefined,
@@ -296,23 +292,23 @@ export function mapBattleEvent(
 					? `${actor.name} protected ${target.name}!`
 					: `${actor.name ?? 'Unknown'} blocked the attack with barrier!`;
 			return {
-				type: 'protect',
+				type: EnumActionType.Protect,
 				source: actor.name,
 				target: target.name,
 				message,
 				side,
-				attribute: 'support',
+				attribute: EnumAttributeType.Support,
 			};
 		}
 		case EnumBattleEventType.Death: {
 			const name = target.name ?? 'Unknown';
 			return {
-				type: 'down',
+				type: EnumActionType.Down,
 				source: name,
 				target: target.name,
 				message: `${name} down.`,
 				side: target.side,
-				attribute: 'dmg',
+				attribute: EnumAttributeType.Dmg,
 			};
 		}
 		default: {
@@ -320,12 +316,12 @@ export function mapBattleEvent(
 				ev.text ??
 				`${actor.name ?? ''} ${ev.type}${target.name ? ` ${target.name}` : ''}`.trim();
 			return {
-				type: 'result',
+				type: EnumActionType.Result,
 				source: actor.name,
 				target: target.name,
 				message,
 				side,
-				attribute: 'normal',
+				attribute: EnumAttributeType.Normal,
 			};
 		}
 	}
@@ -394,16 +390,16 @@ export function buildResultData(input: IResultDataInput): IBattleResult {
 				: '';
 	const winnerSide =
 		outcome === EnumOutcome.Win
-			? 'right'
+			? EnumTeamSideUI.Right
 			: outcome === EnumOutcome.Lose
-				? 'left'
+				? EnumTeamSideUI.Left
 				: undefined;
 	return {
 		winner,
 		winnerSide,
 		isDraw,
-		leftTeam: buildTeamStats(enemyMembers, 'left', input.events, input.lookup),
-		rightTeam: buildTeamStats(allyMembers, 'right', input.events, input.lookup),
+		leftTeam: buildTeamStats(enemyMembers, EnumTeamSideUI.Left, input.events, input.lookup),
+		rightTeam: buildTeamStats(allyMembers, EnumTeamSideUI.Right, input.events, input.lookup),
 	};
 }
 
@@ -425,12 +421,12 @@ export function buildPositionRoster(
 		name: c.name,
 		imageUrl,
 		imageSize: getSpriteImageSize(imageUrl),
-		position: c.POSITION === EnumPosition.Back ? 'back' : 'front',
+		position: c.POSITION === EnumPosition.Back ? EnumPosition.Back : EnumPosition.Front,
 		side,
 	});
 	return [
-		...enemies.map((c) => toEntry(c, 'left', getMonSpriteUrl(c.no))),
-		...allies.map((c) => toEntry(c, 'right', getCharSpriteUrl(c.no))),
+		...enemies.map((c) => toEntry(c, EnumTeamSideUI.Left, getMonSpriteUrl(c.no))),
+		...allies.map((c) => toEntry(c, EnumTeamSideUI.Right, getCharSpriteUrl(c.no))),
 	];
 }
 
@@ -455,13 +451,13 @@ function toSnapshotDisplay(snap: IBattleSnapshot, lookup: IUnitLookup, repo?: ID
 		at: snap.at,
 		units: snap.units.map((u) => {
 			const info = lookup.get(Number(u.no));
-			const side = info?.side ?? (u.team === '1' ? 'left' : 'right');
+			const side = info?.side ?? (u.team === EnumTeamSide.Team1 ? EnumTeamSideUI.Left : EnumTeamSideUI.Right);
 			const dead = u.dead;
 			// 依 skill.type 決定 (charging)/(casting)
-			let chargeKind: 'charging' | 'casting' | undefined;
+			let chargeKind: EnumChargeKind | undefined;
 			if (u.expectSkill !== null && u.expectSkill !== undefined && repo) {
 				const sk = repo.getSkill(u.expectSkill);
-				if (sk) chargeKind = sk.type === 0 ? 'charging' : 'casting';
+				if (sk) chargeKind = sk.type === 0 ? EnumChargeKind.Charging : EnumChargeKind.Casting;
 			}
 			return {
 				name: u.name,
@@ -471,7 +467,7 @@ function toSnapshotDisplay(snap: IBattleSnapshot, lookup: IUnitLookup, repo?: ID
 				sp: u.sp,
 				maxSp: u.maxSp,
 				dead,
-				status: dead ? 'down' : undefined,
+				status: dead ? EnumUnitStatus.Down : undefined,
 				chargeKind,
 			};
 		}),
@@ -513,8 +509,8 @@ export function runShowcaseBattle(input: IShowcaseBattleInput): IShowcaseBattleO
 		time: input.time,
 		// 側別對齊原版：左=敵方，右=我方
 		// Side matches original: left=enemies, right=allies
-		leftTeam: buildTeam(enemyTeamName, enemies, 'left'),
-		rightTeam: buildTeam(allyTeamName, allies, 'right'),
+		leftTeam: buildTeam(enemyTeamName, enemies, EnumTeamSideUI.Left),
+		rightTeam: buildTeam(allyTeamName, allies, EnumTeamSideUI.Right),
 		battlefield: {
 			backgroundImageUrl: SHOWCASE_BATTLEFIELD_BG,
 			backgroundType: 'grass',

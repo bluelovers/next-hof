@@ -9,13 +9,14 @@
  * - avatar：純圖片（無 frame），供外層自行包裝連結/底座
  */
 import React from 'react';
+import { EnumSpriteVariant, EnumSpriteSize } from '#/components/battle/enums';
 import './CharacterSprite.css';
 
 /** 顯示模式 / Display variant */
-export type ISpriteVariant = 'boxed' | 'raw' | 'original' | 'avatar';
+export type ISpriteVariant = EnumSpriteVariant;
 
 /** 精靈尺寸 / Sprite size */
-export type ISpriteSize = 'small' | 'normal' | 'large';
+export type ISpriteSize = EnumSpriteSize;
 
 /** 單個精靈屬性 / Single sprite props */
 export interface ICharacterSpriteProps {
@@ -43,8 +44,8 @@ export interface ICharacterSpriteProps {
  */
 export const CharacterSprite: React.FC<ICharacterSpriteProps> = ({
   url,
-  variant = 'boxed',
-  size = 'normal',
+  variant = EnumSpriteVariant.Boxed,
+  size = EnumSpriteSize.Normal,
   background = true,
   border = true,
   alt = '',
@@ -52,7 +53,7 @@ export const CharacterSprite: React.FC<ICharacterSpriteProps> = ({
   className = '',
 }) => {
   // avatar / original — 直接用 <img>，無 frame
-  if (variant === 'avatar' || variant === 'original') {
+  if (variant === EnumSpriteVariant.Avatar || variant === EnumSpriteVariant.Original) {
     return (
       <img
         src={url}
@@ -67,7 +68,7 @@ export const CharacterSprite: React.FC<ICharacterSpriteProps> = ({
   const classes = [
     'character-sprite',
     `character-sprite--${variant}`,
-    size !== 'normal' ? `character-sprite--${size}` : '',
+    size !== EnumSpriteSize.Normal ? `character-sprite--${size}` : '',
     !background ? 'character-sprite--no-bg' : '',
     !border ? 'character-sprite--no-border' : '',
     className,

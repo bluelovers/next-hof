@@ -30,11 +30,12 @@ import {
 } from '#/lib/showcase/battle-adapter';
 import type { IShowcaseBattleOutcome } from '#/lib/showcase/battle-adapter';
 import { DEFAULT_ENCOUNTER, getEncounter } from '#/lib/showcase/encounters';
+import { EnumShowcasePhase } from '#/components/battle/enums';
 import './ShowcasePage.css';
 import '#/components/shared/SharedBase.css';
 
 /** 頁面流程階段 / Page flow phase */
-type IShowcasePhase = 'setup' | 'result';
+export type IShowcasePhase = EnumShowcasePhase;
 
 /**
  * ShowcasePage 組隊與戰鬥展示頁主元件
@@ -46,7 +47,7 @@ export const ShowcasePage: React.FC = () => {
   /** 已選編選 id / selected encounter id */
   const [encounterId, setEncounterId] = useState<string>(DEFAULT_ENCOUNTER.id);
   /** 流程階段 / flow phase */
-  const [phase, setPhase] = useState<IShowcasePhase>('setup');
+  const [phase, setPhase] = useState<EnumShowcasePhase>(EnumShowcasePhase.Setup);
   /** 已完成的戰鬥資料 / completed battle data */
   const [battle, setBattle] = useState<IShowcaseBattleOutcome | null>(null);
   /** 錯誤提示（開戰失敗時顯示）/ error message (shown when a battle fails) */
@@ -87,7 +88,7 @@ export const ShowcasePage: React.FC = () => {
       });
       setBattle(outcome);
       setError(null);
-      setPhase('result');
+      setPhase(EnumShowcasePhase.Result);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     }
@@ -100,7 +101,7 @@ export const ShowcasePage: React.FC = () => {
   const handleReset = (): void => {
     setBattle(null);
     setError(null);
-    setPhase('setup');
+    setPhase(EnumShowcasePhase.Setup);
   };
 
   const emptyParty = selected.length === 0;
@@ -115,7 +116,7 @@ export const ShowcasePage: React.FC = () => {
         </p>
       </header>
 
-      {phase === 'setup' || !battle ? (
+      {phase === EnumShowcasePhase.Setup || !battle ? (
         <section className="showcase-setup" aria-label="battle setup">
           <PartySelect selected={selected} onToggle={handleToggle} />
           <EncounterSelect selectedId={encounterId} onChange={setEncounterId} />

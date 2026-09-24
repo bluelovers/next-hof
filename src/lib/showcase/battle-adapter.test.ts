@@ -8,6 +8,12 @@ import { EnumBattleEventType } from '#/lib/game/types';
 import type { IBattleEvent } from '#/lib/game/types';
 import { SPRITE_PLACEHOLDER_URL } from './sprite-map';
 import {
+	EnumTeamSideUI,
+	EnumUnitStatus,
+	EnumPosition,
+	EnumActionType,
+} from '#/components/battle/enums';
+import {
 	DEFAULT_ALLY_TEAM_NAME,
 	DEFAULT_ENEMY_TEAM_NAME,
 	buildPositionRoster,
@@ -52,20 +58,19 @@ describe('3.1 runShowcaseBattle', () => {
 
 // ==================== 3.2 單位/隊伍轉接 ====================
 // Task 3.2: unit/team adapter
-// 側別已翻轉：敵方＝左隊 'left'、我方＝右隊 'right'
-// Side flipped: enemies = left 'left', allies = right 'right'
+// 側別已翻轉：敵方＝左隊 EnumTeamSideUI.Left、我方＝右隊 EnumTeamSideUI.Right
 describe('3.2 buildTeam / toBattleUnit', () => {
 	const run = runShowcaseBattle({ charNos: [100, 102], monNos: [1000, 1002], seed: 11 });
 
 	it('maps party and encounter into left/right teams with correct sizes', () => {
 		const { leftTeam, rightTeam } = run.data;
 		// left = enemies, right = allies
-		expect(leftTeam.side).toBe('left');
-		expect(rightTeam.side).toBe('right');
+		expect(leftTeam.side).toBe(EnumTeamSideUI.Left);
+		expect(rightTeam.side).toBe(EnumTeamSideUI.Right);
 		expect(leftTeam.units).toHaveLength(2);
 		expect(rightTeam.units).toHaveLength(2);
-		expect(leftTeam.units.every((u) => u.side === 'left')).toBe(true);
-		expect(rightTeam.units.every((u) => u.side === 'right')).toBe(true);
+		expect(leftTeam.units.every((u) => u.side === EnumTeamSideUI.Left)).toBe(true);
+		expect(rightTeam.units.every((u) => u.side === EnumTeamSideUI.Right)).toBe(true);
 	});
 
 	it('keeps name/level and HP/SP caps from seed definitions', () => {
@@ -88,10 +93,10 @@ describe('3.2 buildTeam / toBattleUnit', () => {
 			expect(u.hp).toBeLessThanOrEqual(u.maxHp);
 			expect(u.sp).toBeGreaterThanOrEqual(0);
 			expect(u.sp).toBeLessThanOrEqual(u.maxSp);
-			expect(['alive', 'down', 'casting']).toContain(u.status);
+			expect([EnumUnitStatus.Alive, EnumUnitStatus.Down, EnumUnitStatus.Casting]).toContain(u.status);
 			expect(u.spriteId).toBeTruthy();
 			expect(u.spd).toBeGreaterThan(0);
-			expect(['front', 'back']).toContain(u.position);
+			expect([EnumPosition.Front, EnumPosition.Back]).toContain(u.position);
 		}
 	});
 
@@ -102,8 +107,8 @@ describe('3.2 buildTeam / toBattleUnit', () => {
 		dead.STATE = EnumState.Dead;
 		dead.HP = -20;
 
-		const team = buildTeam('T', [dead], 'left');
-		expect(team.units[0].status).toBe('down');
+		const team = buildTeam('T', [dead], EnumTeamSideUI.Left);
+		expect(team.units[0].status).toBe(EnumUnitStatus.Down);
 		expect(team.units[0].hp).toBe(0);
 		expect(team.units[0].maxHp).toBe(SEED.char100.maxhp);
 	});
@@ -111,11 +116,11 @@ describe('3.2 buildTeam / toBattleUnit', () => {
 
 // ==================== 3.3 事件 → 日誌轉接 ====================
 // Task 3.3: event → action adapter
-// 側別翻轉後：100(我方)=right, 1000(敵方)=left
+// 側別翻轉後：100(我方)=EnumTeamSideUI.Right, 1000(敵方)=EnumTeamSideUI.Left
 describe('3.3 mapBattleEvent', () => {
-	const lookup: IUnitLookup = new Map<number, { name: string; side: 'left' | 'right' }>([
-		[100, { name: 'Warrior', side: 'right' }],
-		[1000, { name: 'GoblinAxe', side: 'left' }],
+	const lookup: IUnitLookup = new Map<number, { name: string; side: EnumTeamSideUI }>([
+		[100, { name: 'Warrior', side: EnumTeamSideUI.Right }],
+		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left }],
 	]);
 	const repo = createSeedRepository();
 
@@ -133,52 +138,52 @@ describe('3.3 mapBattleEvent', () => {
 
 		expect(actions).toHaveLength(events.length);
 		expect(actions.map((a) => a.type)).toEqual([
-			'skill',
-			'casting',
-			'damage',
-			'heal',
-			'protect',
-			'down',
-			'result',
+			EnumActionType.Skill,
+			EnumActionType.Casting,
+			EnumActionType.Damage,
+			EnumActionType.Heal,
+			EnumActionType.Protect,
+			EnumActionType.Down,
+			EnumActionType.Result,
 		]);
 
 		// Act → skill
-		expect(actions[0].type).toBe('skill');
+		expect(actions[0].type).toBe(EnumActionType.Skill);
 		expect(actions[0].source).toBe('Warrior');
 
 		// Cast 依 skill.type 決定文案（seed skill 2000 預設 casting）
-		expect(actions[1].type).toBe('casting');
+		expect(actions[1].type).toBe(EnumActionType.Casting);
 		expect(actions[1].source).toBe('Warrior');
 		expect(actions[1].message).toMatch(/^start (charging|casting)\.$/);
 
 		// Damage valueChange 格式 hpBefore > hpAfter
-		expect(actions[2].type).toBe('damage');
+		expect(actions[2].type).toBe(EnumActionType.Damage);
 		expect(actions[2].source).toBe('Warrior');
 		expect(actions[2].target).toBe('GoblinAxe');
 		expect(actions[2].value).toBe(42);
 		expect(actions[2].valueChange).toBe('200 > 158');
-		expect(actions[2].side).toBe('right');
+		expect(actions[2].side).toBe(EnumTeamSideUI.Right);
 
 		// Heal 沿用 valueChange
-		expect(actions[3].type).toBe('heal');
+		expect(actions[3].type).toBe(EnumActionType.Heal);
 		expect(actions[3].valueChange).toBe('158 > 168');
 
 		// Guard（Barrier，actor === target）→ protect
 		expect(actions[4].message).toContain('barrier');
-		expect(actions[4].side).toBe('left');
+		expect(actions[4].side).toBe(EnumTeamSideUI.Left);
 
 		// Death → down，來源＝倒下者，側別＝目標側
 		expect(actions[5].source).toBe('GoblinAxe');
-		expect(actions[5].side).toBe('left');
+		expect(actions[5].side).toBe(EnumTeamSideUI.Left);
 
-		// 未知型別 → type 'result'
-		expect(actions[6].type).toBe('result');
+		// 未知型別 → type result
+		expect(actions[6].type).toBe(EnumActionType.Result);
 		expect(actions[6].message).toBe('poisoned');
 	});
 
 	it('unknown type without text falls back to a message containing the type', () => {
 		const action = mapBattleEvent({ type: EnumBattleEventType.Info }, lookup, repo);
-		expect(action.type).toBe('result');
+		expect(action.type).toBe(EnumActionType.Result);
 		expect(action.message).toContain(EnumBattleEventType.Info);
 	});
 
@@ -196,24 +201,24 @@ describe('3.3 mapBattleEvent', () => {
 		events.forEach((ev, i) => {
 			const action = data.actions[i];
 			if (ev.type === EnumBattleEventType.Act) {
-				expect(action.type).toBe('skill');
+				expect(action.type).toBe(EnumActionType.Skill);
 				expect(names.has(action.source!)).toBe(true);
 			} else if (ev.type === EnumBattleEventType.Damage) {
-				expect(action.type).toBe('damage');
+				expect(action.type).toBe(EnumActionType.Damage);
 				expect(names.has(action.source!)).toBe(true);
 				expect(names.has(action.target!)).toBe(true);
 			} else if (ev.type === EnumBattleEventType.Heal) {
-				expect(action.type).toBe('heal');
+				expect(action.type).toBe(EnumActionType.Heal);
 			} else if (ev.type === EnumBattleEventType.Death) {
-				expect(action.type).toBe('down');
+				expect(action.type).toBe(EnumActionType.Down);
 				expect(names.has(action.source!)).toBe(true);
 			} else if (ev.type === EnumBattleEventType.Cast) {
-				expect(action.type).toBe('casting');
+				expect(action.type).toBe(EnumActionType.Casting);
 				expect(names.has(action.source!)).toBe(true);
 			} else if (ev.type === EnumBattleEventType.Guard) {
-				expect(action.type).toBe('protect');
+				expect(action.type).toBe(EnumActionType.Protect);
 			} else {
-				expect(action.type).toBe('result');
+				expect(action.type).toBe(EnumActionType.Result);
 				expect(action.message).toBeTruthy();
 			}
 		});
@@ -223,7 +228,7 @@ describe('3.3 mapBattleEvent', () => {
 			.filter((e) => e.type === EnumBattleEventType.Damage)
 			.map((e) => e.value);
 		const actDamage = data.actions
-			.filter((a) => a.type === 'damage')
+			.filter((a) => a.type === EnumActionType.Damage)
 			.map((a) => a.value);
 		expect(actDamage).toEqual(evDamage);
 		expect(evDamage.length).toBeGreaterThan(0);
@@ -234,7 +239,7 @@ describe('3.3 mapBattleEvent', () => {
 // Task 3.4: result adapter
 // 側別翻轉後：leftTeam = 敵方, rightTeam = 我方
 describe('3.4 buildResultData', () => {
-	it('win branch: ally wipeout names the ally team, winnerSide=right', () => {
+	it('win branch: ally wipeout names the ally team, winnerSide=EnumTeamSideUI.Right', () => {
 		const run = runShowcaseBattle({
 			charNos: [100, 101, 105],
 			monNos: [1002],
@@ -245,7 +250,7 @@ describe('3.4 buildResultData', () => {
 
 		const result = run.data.result!;
 		expect(result.winner).toBe('My Party');
-		expect(result.winnerSide).toBe('right');
+		expect(result.winnerSide).toBe(EnumTeamSideUI.Right);
 		expect(result.isDraw).toBe(false);
 		// leftTeam = enemies
 		expect(result.leftTeam.totalUnits).toBe(1);
@@ -257,7 +262,7 @@ describe('3.4 buildResultData', () => {
 		expect(result.rightTeam.totalMaxHp).toBeGreaterThan(0);
 	});
 
-	it('lose branch: our wipeout names the enemy team, winnerSide=left', () => {
+	it('lose branch: our wipeout names the enemy team, winnerSide=EnumTeamSideUI.Left', () => {
 		const run = runShowcaseBattle({
 			charNos: [104],
 			monNos: [1001],
@@ -268,7 +273,7 @@ describe('3.4 buildResultData', () => {
 
 		const result = run.data.result!;
 		expect(result.winner).toBe('Dark Force');
-		expect(result.winnerSide).toBe('left');
+		expect(result.winnerSide).toBe(EnumTeamSideUI.Left);
 		expect(result.isDraw).toBe(false);
 		expect(result.leftTeam.alive).toBe(0);
 		expect(result.rightTeam.alive).toBeGreaterThan(0);
@@ -335,7 +340,7 @@ describe('3.4 buildResultData', () => {
 
 // ==================== 3.5 精靈轉接 ====================
 // Task 3.5: sprite adapter
-// 名冊以敵方(left)在前、我方(right)在後
+// 名冊以敵方(EnumTeamSideUI.Left)在前、我方(EnumTeamSideUI.Right)在後
 describe('3.5 buildSprites / buildPositionRoster', () => {
 	const charNos = [100, 104];
 	const monNos = [1000, 1002, 1001];
@@ -347,13 +352,13 @@ describe('3.5 buildSprites / buildPositionRoster', () => {
 
 	it('roster lists enemies(left) first then allies(right) with a real image', () => {
 		expect(roster).toHaveLength(charNos.length + monNos.length);
-		// 前半為敵方(left)，後半為我方(right)
-		expect(roster.filter((r) => r.side === 'left')).toHaveLength(monNos.length);
-		expect(roster.filter((r) => r.side === 'right')).toHaveLength(charNos.length);
+		// 前半為敵方(EnumTeamSideUI.Left)，後半為我方(EnumTeamSideUI.Right)
+		expect(roster.filter((r) => r.side === EnumTeamSideUI.Left)).toHaveLength(monNos.length);
+		expect(roster.filter((r) => r.side === EnumTeamSideUI.Right)).toHaveLength(charNos.length);
 		for (const r of roster) {
 			expect(r.imageUrl).toMatch(/^\/image\/char\//);
 			expect(r.imageUrl).not.toBe(SPRITE_PLACEHOLDER_URL);
-			expect(r.position === 'front' || r.position === 'back').toBe(true);
+			expect([EnumPosition.Front, EnumPosition.Back]).toContain(r.position);
 			expect(r.imageSize.width).toBeGreaterThan(0);
 			expect(r.imageSize.height).toBeGreaterThan(0);
 		}
@@ -378,10 +383,10 @@ describe('3.5 buildSprites / buildPositionRoster', () => {
 		const leftIds = new Set(run.data.leftTeam.units.map((u) => u.spriteId));
 		for (const s of run.data.sprites) {
 			if (leftIds.has(s.id)) {
-				// 敵方(left)使用 char/ 圖(預設朝右) → 不翻轉（面向場地中心的右側）
+				// 敵方(EnumTeamSideUI.Left)使用 char/ 圖(預設朝右) → 不翻轉（面向場地中心的右側）
 				expect(s.flipped).toBe(false);
 			} else {
-				// 我方(right)使用 char/ 圖(預設朝右) → 翻轉朝左
+				// 我方(EnumTeamSideUI.Right)使用 char/ 圖(預設朝右) → 翻轉朝左
 				expect(s.flipped).toBe(true);
 			}
 		}

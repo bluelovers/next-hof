@@ -6,22 +6,32 @@
  * Category reference: PHP skill.detail.php + docs/data/skill.md
  */
 
+import {
+	EnumSkillTarget,
+	EnumSkillScope,
+	EnumSkillType,
+	EnumSkillPriority,
+	EnumSkillMoveDir,
+	EnumStatName,
+	EnumAbilityStatName,
+} from '../battle/enums';
+
 // ==================== 基本枚舉 / Basic Enums ====================
 
 /** 技能目標類型 / Skill target type */
-export type ISkillTarget = 'enemy' | 'friend' | 'self';
+export type ISkillTarget = EnumSkillTarget;
 
 /** 技能範圍 / Skill scope */
-export type ISkillScope = 'normal' | 'multi' | 'all';
+export type ISkillScope = EnumSkillScope;
 
 /** 技能類型 / Skill type (damage formula) */
-export type ISkillType = 'physical' | 'magic';
+export type ISkillType = EnumSkillType;
 
 /** 目標優先選擇 / Target priority */
-export type ISkillPriority = 'LowHpRate' | 'Dead' | 'Summon' | 'Charge' | 'Back';
+export type ISkillPriority = EnumSkillPriority;
 
 /** 移動方向 / Move direction */
-export type ISkillMoveDir = 'front' | 'back';
+export type ISkillMoveDir = EnumSkillMoveDir;
 
 // ==================== 子類型 / Sub-types ====================
 
@@ -29,16 +39,13 @@ export type ISkillMoveDir = 'front' | 'back';
  * 屬性名稱（含 HP/SP）/ Stat names (including HP/SP)
  * 對應 PHP Up-Star / Down-Star 系列欄位
  */
-export type IStatName =
-  | 'MAXHP' | 'MAXSP'
-  | 'STR' | 'INT' | 'DEX' | 'SPD' | 'LUK'
-  | 'ATK' | 'MATK' | 'DEF' | 'MDEF';
+export type IStatName = EnumStatName;
 
 /**
  * 能力值名稱（不含 HP/SP）/ Ability stat names (excluding HP/SP)
  * 對應 PHP Plus* 系列欄位
  */
-export type IAbilityStatName = 'STR' | 'INT' | 'DEX' | 'SPD' | 'LUK';
+export type IAbilityStatName = EnumAbilityStatName;
 
 // ==================== 分類介面 / Categorized Interfaces ====================
 

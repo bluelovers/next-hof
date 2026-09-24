@@ -14,8 +14,10 @@
  * '/' + dir + '/' inside the generated data file (spriteImageIndex.generated.ts).
  */
 
+import { EnumSpriteImageDir } from './enums';
+
 /** 精靈圖所在資料夾 / Sprite image directories */
-export const SPRITE_DIRS = ['char', 'char_rev', 'other'] as const;
+export const SPRITE_DIRS = [EnumSpriteImageDir.Char, EnumSpriteImageDir.CharRev, EnumSpriteImageDir.Other] as const;
 
 /** 精靈圖目錄型別 / Sprite image directory type */
-export type ISpriteImageDir = typeof SPRITE_DIRS[number];
+export type ISpriteImageDir = EnumSpriteImageDir;

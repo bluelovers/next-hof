@@ -15,10 +15,10 @@ import type { ISpriteImageSize } from './spriteImageSizes';
 import {
   computeSpriteLabelPosition,
   DEFAULT_IMAGE_SIZE,
-  type ISpriteLabelPlacement,
   type ISpriteLabelPositionResult,
   type IRect,
 } from './labelPosition';
+import { EnumSpriteLabelPlacement } from './enums';
 
 /** 單一精靈的標籤運算輸入 / Per-sprite label compute input */
 export interface ISpriteLabelComputeInput {
@@ -29,7 +29,7 @@ export interface ISpriteLabelComputeInput {
   /** 角色圖像尺寸（缺省用 DEFAULT_IMAGE_SIZE） / Character image size (defaults to DEFAULT_IMAGE_SIZE) */
   imageSize?: ISpriteImageSize;
   /** 標籤演算法：角色上方 / 下方（缺省 below） / Placement (default below) */
-  placement?: ISpriteLabelPlacement;
+  placement?: EnumSpriteLabelPlacement;
   /** 精靈 id（用於對應 entries） / Sprite id (for matching entries) */
   id?: string;
 }
@@ -78,7 +78,7 @@ export function useSpriteLabelRegistry(
         x: s.x,
         y: s.y,
         imageSize,
-        placement: s.placement ?? 'below',
+        placement: s.placement ?? EnumSpriteLabelPlacement.Below,
         frameSize,
         occupied,
       });

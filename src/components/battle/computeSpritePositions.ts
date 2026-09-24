@@ -10,8 +10,9 @@
  * Computes each character sprite's background-position (x, y) and flip flag
  * from the battlefield size and the front/back row distribution of each team.
  */
-import type { IBattleSprite, ITeamSide, IBattleSidePair } from './types';
+import type { IBattleSprite, IBattleSidePair } from './types';
 import type { ISpriteImageSize } from './spriteImageSizes';
+import { EnumPosition, EnumTeamSideUI } from './enums';
 import { getSpriteImageDir, computeSpriteFlipped, useFlipPositioning } from './spriteFlip';
 
 /** 角色輸入（含圖像尺寸與站位） / Character input (with image size and battle position) */
@@ -31,7 +32,7 @@ export interface IBattlePositionChar {
    * 由 groupBattleChars() 依此欄位將扁平名冊自動分類至 front / back 列
    * Used by groupBattleChars() to auto-classify a flat roster into the front / back rows.
    */
-  position: 'front' | 'back';
+  position: EnumPosition;
   /**
    * 隊伍側：左 / 右
    * Team side: left / right
@@ -39,7 +40,7 @@ export interface IBattlePositionChar {
    * 由 groupBattleChars() 依此欄位將扁平名冊自動分類至 left / right 隊
    * Used by groupBattleChars() to auto-classify a flat roster into the left / right teams.
    */
-  side: ITeamSide;
+  side: EnumTeamSideUI;
 }
 
 /** 單一隊伍的前/後衛角色 / One team's front/back characters */
@@ -86,8 +87,8 @@ export interface IComputeSpritePositionsOptions {
 function computeRowPositions(
   chars: IBattlePositionChar[],
   options: IComputeSpritePositionsOptions,
-  position: 'front' | 'back',
-  side: ITeamSide
+  position: EnumPosition,
+  side: EnumTeamSideUI
 ): IBattleSprite[] {
   const { width, height, cellCount = 6 } = options;
   // 手動覆寫：呼叫端明確傳入 flip 時沿用舊定位模式；否則依圖檔目錄自動推導
@@ -114,7 +115,7 @@ function computeRowPositions(
 
     // direction：翻轉定位模式下兩隊皆 0；非翻轉定位模式右隊為 1
     // direction: flip positioning → 0 for both; non-flip → 1 for right team
-    const direction = spriteFlipMode ? 0 : side === 'right' ? 1 : 0;
+    const direction = spriteFlipMode ? 0 : side === EnumTeamSideUI.Right ? 1 : 0;
 
     // 列基準 x（column index）：
     // 翻轉定位模式：前衛=2、後衛=1（右隊靠 flipped 鏡像到右側）
@@ -123,10 +124,10 @@ function computeRowPositions(
     // flip positioning: front=2, back=1 (right team mirrored via flipped)
     // non-flip positioning: left front=2/back=1; right front=4/back=5 (directly on right)
     const columnIndex = spriteFlipMode
-      ? position === 'back' ? 1 : 2
-      : side === 'left'
-        ? position === 'back' ? 1 : 2
-        : position === 'back' ? 5 : 4;
+      ? position === EnumPosition.Back ? 1 : 2
+      : side === EnumTeamSideUI.Left
+        ? position === EnumPosition.Back ? 1 : 2
+        : position === EnumPosition.Back ? 5 : 4;
 
     // 對應 PHP：axis_x += (direction ? -cell/2 : +cell/2)；axis_y += -cell/2（兩分支皆同）
     // Mirrors PHP: axis_x += (direction ? -cell/2 : +cell/2); axis_y += -cell/2 (both branches)
@@ -150,7 +151,7 @@ function computeRowPositions(
     // from the image directory + team side.
     const flipped = (
       explicitFlip !== undefined
-        ? side === 'right' ? explicitFlip : false
+        ? side === EnumTeamSideUI.Right ? explicitFlip : false
         : computeSpriteFlipped(char.imageUrl, side)
     );
 
@@ -199,8 +200,8 @@ export function groupBattleChars(
   const left: ITeamBattleChars = { front: [...(teams?.left?.front ?? [])], back: [...(teams?.left?.back ?? [])] };
   const right: ITeamBattleChars = { front: [...(teams?.right?.front ?? [])], back: [...(teams?.right?.back ?? [])] };
   for (const c of chars) {
-    const team = c.side === 'right' ? right : left;
-    (c.position === 'back' ? team.back : team.front).push(c);
+    const team = c.side === EnumTeamSideUI.Right ? right : left;
+    (c.position === EnumPosition.Back ? team.back : team.front).push(c);
   }
   return { left, right };
 }
@@ -218,10 +219,10 @@ export function computeBattleSpritePositions(
   options: IComputeSpritePositionsOptions
 ): IBattleSprite[] {
   const result: IBattleSprite[] = [
-    ...computeRowPositions(input.left.back, options, 'back', 'left'),
-    ...computeRowPositions(input.left.front, options, 'front', 'left'),
-    ...computeRowPositions(input.right.back, options, 'back', 'right'),
-    ...computeRowPositions(input.right.front, options, 'front', 'right'),
+    ...computeRowPositions(input.left.back, options, EnumPosition.Back, EnumTeamSideUI.Left),
+    ...computeRowPositions(input.left.front, options, EnumPosition.Front, EnumTeamSideUI.Left),
+    ...computeRowPositions(input.right.back, options, EnumPosition.Back, EnumTeamSideUI.Right),
+    ...computeRowPositions(input.right.front, options, EnumPosition.Front, EnumTeamSideUI.Right),
   ];
 
   return result;

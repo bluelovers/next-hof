@@ -8,6 +8,7 @@
  * Supports two-column layout (left team vs right team)
  */
 import React from 'react';
+import { EnumTeamSideUI } from './enums';
 import type { IBattleAction, ITeamSide } from './types';
 import { BattleAction } from './BattleAction';
 import { getSideClass } from './battleUtils';
@@ -36,9 +37,9 @@ function splitBySide(actions: IBattleAction[]): IColumnEntry[] {
   let current: IColumnEntry = { left: [], right: [] };
 
   for (const action of actions) {
-    if (action.side === 'left') {
+    if (action.side === EnumTeamSideUI.Left) {
       current.left.push(action);
-    } else if (action.side === 'right') {
+    } else if (action.side === EnumTeamSideUI.Right) {
       current.right.push(action);
     } else {
       // 無指定隊伍側，放入左欄
