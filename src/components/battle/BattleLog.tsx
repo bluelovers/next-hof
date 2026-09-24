@@ -2,53 +2,30 @@
  * 戰鬥日誌組件
  * Battle log component
  *
- * 顯示所有戰鬥行動的日誌列表
- * 支援分欄顯示（左側隊伍 vs 右側隊伍）
- * Displays a list of all battle actions
- * Supports two-column layout (left team vs right team)
+ * 依原始行動順序（時間序）逐列輸出：每列僅有一個行動，並置於其所屬隊伍的欄位
+ * （左隊 → 左欄、右隊 → 右欄），另一欄留空以維持欄位對齊。
+ * Emits one row per action in the original (chronological) order: each row holds exactly
+ * one action placed in its own team's column (left team → left column, right team →
+ * right column), with the other column left empty to keep the columns aligned.
+ *
+ * 如此既保留「哪一隊行動」的資訊，也讓由上而下的閱讀順序反映戰鬥時間先後
+ * （不再把左右行動並列而失去時序）。
+ * This keeps side attribution while the top-to-bottom order reflects battle time
+ * (no more side-by-side pairing that loses chronological order).
  */
 import React from 'react';
 import { EnumTeamSideUI } from './enums';
-import type { IBattleAction, ITeamSide } from './types';
+import type { IBattleAction } from './types';
 import { BattleAction } from './BattleAction';
 import { getSideClass } from './battleUtils';
 import '#/components/shared/SharedBase.css';
 
 /** 戰鬥日誌屬性 / Battle log props */
 export interface IBattleLogProps {
-  /** 行動列表 / Action list */
+  /** 行動列表（依時間序）/ Action list (chronological order) */
   actions: IBattleAction[];
   /** 是否使用雙欄布局 / Whether to use two-column layout */
   twoColumn?: boolean;
-}
-
-/** 分欄日誌條目 / Column log entry */
-interface IColumnEntry {
-  left: IBattleAction[];
-  right: IBattleAction[];
-}
-
-/**
- * 將行動分為左右兩欄
- * Split actions into left and right columns
- */
-function splitBySide(actions: IBattleAction[]): IColumnEntry[] {
-  const entries: IColumnEntry[] = [];
-  let current: IColumnEntry = { left: [], right: [] };
-
-  for (const action of actions) {
-    if (action.side === EnumTeamSideUI.Left) {
-      current.left.push(action);
-    } else if (action.side === EnumTeamSideUI.Right) {
-      current.right.push(action);
-    } else {
-      // 無指定隊伍側，放入左欄
-      current.left.push(action);
-    }
-  }
-
-  entries.push(current);
-  return entries;
 }
 
 /**
@@ -59,44 +36,38 @@ export const BattleLog: React.FC<IBattleLogProps> = ({
   actions,
   twoColumn = true,
 }) => {
+  // 單欄模式：每個行動獨立一列（維持時間序）
+  // Single-column mode: one row per action (keeps chronological order)
   if (!twoColumn) {
     return (
-      <tr>
-        <td colSpan={2}>
-          {actions.map((action, index) => (
-            <BattleAction key={index} action={action} />
-          ))}
-        </td>
-      </tr>
+      <>
+        {actions.map((action, index) => (
+          <tr key={index}>
+            <td colSpan={2} className="break">
+              <BattleAction action={action} />
+            </td>
+          </tr>
+        ))}
+      </>
     );
   }
 
-  const entries = splitBySide(actions);
-
   return (
     <>
-      {entries.map((entry, rowIndex) => {
-        const maxLen = Math.max(entry.left.length, entry.right.length);
-        if (maxLen === 0) return null;
-
-        const rows: Array<{ left?: IBattleAction; right?: IBattleAction }> = [];
-        for (let i = 0; i < maxLen; i++) {
-          rows.push({
-            left: entry.left[i],
-            right: entry.right[i],
-          });
-        }
-
-        return rows.map((row, colIndex) => (
-          <tr key={`${rowIndex}-${colIndex}`}>
+      {actions.map((action, index) => {
+        // 未指定側別時歸左欄（沿用既有行為）
+        // Actions without a side fall back to the left column (prior behaviour)
+        const isRight = action.side === EnumTeamSideUI.Right;
+        return (
+          <tr key={index}>
             <td className={`${getSideClass(EnumTeamSideUI.Left)} break`}>
-              {row.left && <BattleAction action={row.left} />}
+              {isRight ? '\u00a0' : <BattleAction action={action} />}
             </td>
             <td className={`${getSideClass(EnumTeamSideUI.Right)} break`}>
-              {row.right && <BattleAction action={row.right} />}
+              {isRight ? <BattleAction action={action} /> : '\u00a0'}
             </td>
           </tr>
-        ));
+        );
       })}
     </>
   );
