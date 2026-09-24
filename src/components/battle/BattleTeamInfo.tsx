@@ -6,7 +6,8 @@
  * Displays team name, total level, average level, total HP
  */
 import React from 'react';
-import type { IBattleUnit, ITeamSideClass } from './types';
+import type { IBattleUnit } from './types';
+import { EnumTeamSideClass } from './enums';
 import { calcTotalLevel, calcTotalHp } from './battleUtils';
 import './BattleTeamInfo.css';
 import '#/components/shared/SharedBase.css';

@@ -66,6 +66,12 @@ function targetClass(target: ISkillTarget): string {
     case 'enemy': return 'dmg';
     case 'friend': return 'recover';
     case 'self': return 'support';
+    case 'all': return 'support';
+    // 防禦性預設：EnumTargetType 為 lib re-export 別名，TS 在 isolatedModules
+    // 下無法對 re-export 列舉做 switch 窮盡推論，故顯式補 default。
+    // Defensive default: EnumTargetType is a lib re-export alias; TS cannot
+    // prove switch exhaustiveness for re-exported enums under isolatedModules.
+    default: return 'support';
   }
 }
 

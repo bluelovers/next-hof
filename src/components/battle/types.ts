@@ -4,9 +4,9 @@
  */
 import type { CSSProperties } from 'react';
 import type { ITSRequireAtLeastOne } from 'ts-type';
-import type { EnumSpriteLabelPlacement } from './labelPosition';
+import type { EnumSpriteLabelPlacement } from './enums';
 import type { ISpriteImageSize } from './spriteImageSizes';
-import type {
+import {
 	EnumTeamSideUI,
 	EnumTeamSideClass,
 	EnumUnitStatus,

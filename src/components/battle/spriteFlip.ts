@@ -13,8 +13,7 @@
  * This file deliberately depends only on ./types (not on computeBattleSpritePositions)
  * so it can be imported and unit-tested in isolation.
  */
-import type { EnumTeamSideUI } from './enums';
-import type { EnumSpriteImageDir } from './enums';
+import { EnumTeamSideUI, EnumSpriteImageDir } from './enums';
 
 /**
  * 嚴格判斷圖檔目錄
