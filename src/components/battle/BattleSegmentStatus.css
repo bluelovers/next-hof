@@ -1,0 +1,44 @@
+/**
+ * BattleSegmentStatus 元件樣式
+ * BattleSegmentStatus component styles
+ *
+ * 原始來源：BattleDisplay.css 的 .battle-row--status（＝通用 .battle-row ＋ 對齊）、
+ *           第 100-107 行、第 159-167 行
+ * Source: BattleDisplay.css .battle-row--status (generic .battle-row + alignment),
+ *         lines 100-107, 159-167
+ *
+ * 左右兩欄各 50%，頂部對齊；窄螢幕改為上下堆疊。
+ * Two 50% columns aligned to the top; they stack vertically on narrow screens.
+ */
+
+.battle-segment-status {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.battle-side {
+  flex: 1 1 50%;
+  min-width: 0;
+  padding: 4px 10px 6px;
+}
+
+.battle-side-unit {
+  padding: 1px 0;
+}
+
+/* ==================== 窄螢幕 / Narrow screens ==================== */
+
+@media (max-width: 640px) {
+  /* 狀態：兩隊上下堆疊 / Status: stack both sides */
+  .battle-side {
+    flex-basis: 100%;
+  }
+
+  /* 堆疊後不需要欄位分隔線（作用域限本元件，不依賴父頁面 CSS）
+     No column divider once stacked (scoped to this component; no parent-page CSS) */
+  .battle-side.ttd1 {
+    border-left: none;
+  }
+}

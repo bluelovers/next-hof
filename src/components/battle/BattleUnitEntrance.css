@@ -1,0 +1,46 @@
+/**
+ * BattleUnitEntrance 元件樣式
+ * BattleUnitEntrance component styles
+ *
+ * 原始來源：BattleDisplay.css 第 66-81 行＋ 第 149-156、165-167 行
+ * Source: BattleDisplay.css lines 66-81 + 149-156, 165-167
+ *
+ * 每列兩個等寬欄位（各 50%），窄螢幕改為單欄並隱藏空白欄。
+ * Each row holds two equal cells (50% each); on narrow screens it becomes one column
+ * and the empty cell is hidden.
+ */
+
+.battle-enter {
+  width: 100%;
+}
+
+.enter-row {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.enter-cell {
+  flex: 1 1 50%;
+  min-width: 0;
+  padding: 3px;
+}
+
+/* ==================== 窄螢幕 / Narrow screens ==================== */
+
+@media (max-width: 640px) {
+  /* 入場：僅顯示有內容的一側 / Entrance: show only the populated side */
+  .enter-row {
+    flex-direction: column;
+  }
+
+  .enter-cell:empty {
+    display: none;
+  }
+
+  /* 堆疊後不需要欄位分隔線（作用域限本元件，不依賴父頁面 CSS）
+     No column divider once stacked (scoped to this component; no parent-page CSS) */
+  .enter-cell.ttd1 {
+    border-left: none;
+  }
+}

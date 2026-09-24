@@ -1,0 +1,40 @@
+/**
+ * BattleSegmentNav 元件樣式
+ * BattleSegmentNav component styles
+ *
+ * 原始來源：BattleDisplay.css 第 110-139 行
+ * Source: BattleDisplay.css lines 110-139
+ *
+ * 導覽列靠右排列，停用狀態（無前後段）以 dim 色示意且不回饋 hover。
+ * The nav is right-aligned; disabled ends (no prev/next) use the dim colour and
+ * do not react to hover.
+ */
+
+.battle-segment-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 2px 10px 6px;
+}
+
+.battle-segment-link {
+  color: var(--color-text-secondary);
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.battle-segment-link:hover {
+  color: var(--color-text-hover);
+  text-decoration: underline;
+}
+
+.battle-segment-link--disabled {
+  color: var(--color-text-dim);
+  cursor: default;
+}
+
+.battle-segment-counter {
+  color: var(--color-text-dim);
+  font-size: 80%;
+}

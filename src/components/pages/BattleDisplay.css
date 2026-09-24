@@ -2,14 +2,16 @@
  * BattleDisplay 主組件樣式
  * BattleDisplay main component styles
  *
- * 包含 wrapper 容器、標題、響應式分段版面
- * Contains wrapper container, title, and responsive segmented layout
+ * 僅保留頁面級樣式（容器、內容區、窄螢幕邊框）；
+ * 子元件版面已全部獨立至各自的 CSS 文件（BattleDisplayHeader／BattleTeamRow／
+ * BattleUnitEntrance／BattleSegment／BattleSegmentStatus／BattleSegmentNav）。
+ * Page-level styles only (container, content area, narrow-screen borders); every
+ * sub-component's layout now lives in its own CSS file (BattleDisplayHeader /
+ * BattleTeamRow / BattleUnitEntrance / BattleSegment / BattleSegmentStatus /
+ * BattleSegmentNav).
  *
- * 版面已由 table 改為 flex/div 響應式結構（支援現代瀏覽器與手機）
- * Layout moved from table to a responsive flex/div structure (modern browsers + mobile)
- *
- * 注意：子元件樣式已獨立至各自的 CSS 文件
- * Note: Sub-component styles have been moved to their respective CSS files
+ * 布局為響應式 div（支援現代瀏覽器與手機）
+ * Layout is responsive divs (modern browsers + mobile)
  */
 
 /* ==================== 主容器 / Main Container ==================== */
@@ -34,108 +36,10 @@
   box-sizing: border-box;
 }
 
-/* ==================== 標題 / Header ==================== */
-
-.battle-header {
-  padding: 15px 0;
-  width: 100%;
-  text-align: center;
-}
-
-.battle-title {
-  margin: 0;
-}
-
-.battle-time {
-  padding-top: 4px;
-}
-
 /* ==================== 內容容器 / Content ==================== */
 
 .battle-content {
   width: 100%;
-}
-
-/* 通用列 / generic row */
-.battle-row {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-}
-
-/* ==================== 單位入場 / Unit Entrance ==================== */
-
-.battle-enter {
-  width: 100%;
-}
-
-.enter-row {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-}
-
-.enter-cell {
-  flex: 1 1 50%;
-  min-width: 0;
-  padding: 3px;
-}
-
-/* ==================== 分段 / Segment ==================== */
-
-.battle-segment {
-  width: 100%;
-}
-
-.battle-row--scene {
-  display: block;
-}
-
-/* ==================== HP/SP 狀態 / HP/SP Status ==================== */
-
-.battle-row--status {
-  align-items: flex-start;
-}
-
-.battle-side {
-  flex: 1 1 50%;
-  min-width: 0;
-  padding: 4px 10px 6px;
-}
-
-.battle-side-unit {
-  padding: 1px 0;
-}
-
-/* ==================== 分段導覽 / Segment Navigation ==================== */
-
-.battle-segment-nav {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 2px 10px 6px;
-}
-
-.battle-segment-link {
-  color: var(--color-text-secondary);
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.battle-segment-link:hover {
-  color: var(--color-text-hover);
-  text-decoration: underline;
-}
-
-.battle-segment-link--disabled {
-  color: var(--color-text-dim);
-  cursor: default;
-}
-
-.battle-segment-counter {
-  color: var(--color-text-dim);
-  font-size: 80%;
 }
 
 /* ==================== 窄螢幕 / Narrow screens ==================== */
@@ -144,25 +48,5 @@
   .battle-display {
     border-left: none;
     border-right: none;
-  }
-
-  /* 入場：僅顯示有內容的一側 / Entrance: show only the populated side */
-  .enter-row {
-    flex-direction: column;
-  }
-
-  .enter-cell:empty {
-    display: none;
-  }
-
-  /* 狀態：兩隊上下堆疊 / Status: stack both sides */
-  .battle-side {
-    flex-basis: 100%;
-  }
-
-  /* 堆疊後不需要欄位分隔線（隊伍資訊／入場／狀態皆適用）
-     No column divider once stacked (team info / entrance / status) */
-  .battle-display .ttd1 {
-    border-left: none;
   }
 }

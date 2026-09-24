@@ -1,0 +1,24 @@
+/**
+ * BattleDisplayHeader 元件樣式
+ * BattleDisplayHeader component styles
+ *
+ * 原始來源：BattleDisplay.css 第 39-51 行
+ * Source: BattleDisplay.css lines 39-51
+ *
+ * 標題列置中並以 .break（SharedBase.css）帶出底部分隔線。
+ * The header is centred and uses .break (SharedBase.css) for its bottom divider.
+ */
+
+.battle-header {
+  padding: 15px 0;
+  width: 100%;
+  text-align: center;
+}
+
+.battle-title {
+  margin: 0;
+}
+
+.battle-time {
+  padding-top: 4px;
+}

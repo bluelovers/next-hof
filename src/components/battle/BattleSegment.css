@@ -1,0 +1,27 @@
+/**
+ * BattleSegment 元件樣式
+ * BattleSegment component styles
+ *
+ * 原始來源：BattleDisplay.css 第 84-92 行、通用 .battle-row（scene／log 列）
+ * Source: BattleDisplay.css lines 84-92 + the generic .battle-row (scene/log rows)
+ *
+ * 分段本身為直向堆疊的區塊：戰場（block）→ 狀態列 → 日誌列 → 導覽列。
+ * A segment stacks vertically: scene (block) → status row → log row → nav row.
+ */
+
+.battle-segment {
+  width: 100%;
+}
+
+/* 戰場畫面：區塊排版 / Battlefield scene: block layout */
+.battle-segment-scene {
+  display: block;
+  width: 100%;
+}
+
+/* 行動日誌列：flex 以維持與狀態列一致的列行為 / Log row: flex, consistent with the status row */
+.battle-segment-log {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}

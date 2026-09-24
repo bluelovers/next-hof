@@ -82,6 +82,12 @@ import { IJobData } from '../../game-data/GameDataTypes';
 | BattleResult | `src/components/battle/BattleResult` |
 | GameDataTypes | `src/components/GameDataPage/GameDataTypes` |
 | BattleDisplay/types | `src/components/battle/types` |
+| BattleDisplayHeader | `src/components/battle/BattleDisplayHeader` |
+| BattleTeamRow | `src/components/battle/BattleTeamRow` |
+| BattleUnitEntrance | `src/components/battle/BattleUnitEntrance` |
+| BattleSegment | `src/components/battle/BattleSegment` |
+| BattleSegmentStatus | `src/components/battle/BattleSegmentStatus` |
+| BattleSegmentNav | `src/components/battle/BattleSegmentNav` |
 
 ---
 
