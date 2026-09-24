@@ -14,6 +14,7 @@ import { EnumTeamSideUI } from '#/components/battle/enums';
 import { EnumAttributeType } from '#/components/battle/enums';
 import { EnumUnitStatus } from '#/components/battle/enums';
 import { EnumActionType } from '#/components/battle/enums';
+import { runShowcaseBattle } from '#/lib/showcase/battle-adapter';
 
 const meta: Meta<typeof BattleDisplay> = {
   title: 'Pages/BattlePage/BattleDisplay',
@@ -457,6 +458,45 @@ export const BattleOver: Story = {
       description: {
         story:
           '戰鬥結束後的結果畫面，包含最終統計數據。\nPost-battle result screen with final statistics.',
+      },
+    },
+  },
+};
+
+// ==================== 快照分段 + 屍體政策三級示範 / Snapshot segments + 3-level corpse policy ====================
+
+/**
+ * 以真實引擎資料驅動（runShowcaseBattle），示範：
+ * 1. 快照分段：日誌依 snapshots 切成多段，可用每段右下的 `<<` / `>>` 導覽。
+ * 2. 屍體政策三級繼承（詳見 seed-data.ts / battle-adapter.ts）：
+ *    - 戰鬥級 corpse:true → 我方預設留屍體（例：Warrior 倒下成 mon_145）
+ *    - 隊伍級 Team1:false → 敵方預設不留屍體（例：Slime 倒下直接消失）
+ *    - 角色級 def.corpse → 覆寫上層（例：DarkElfHunter corpse:true 仍留屍體；Priest corpse:false 不留）
+ * Driven by real engine data (runShowcaseBattle): shows snapshot segment navigation and
+ * the battle > team > character corpse-policy inheritance in action.
+ */
+const corpsePolicyOutcome = runShowcaseBattle({
+  charNos: [100, 101, 102, 103, 104],
+  monNos: [1001, 1001, 1002],
+  seed: 1,
+});
+
+export const SnapshotSegmentsAndCorpsePolicy: Story = {
+  args: {
+    data: corpsePolicyOutcome.data,
+    showSpriteLabels: true,
+    showHpBars: true,
+    showSpBars: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '快照分段 + 屍體政策三級示範：戰鬥級 corpse:true、隊伍級 Team1:false、角色級 def.corpse 覆寫。' +
+          '向後翻頁（每段右下 `>>`）可看到 Warrior / DarkElfHunter 留下屍體（mon_145），' +
+          '而 Slime 直接消失。\nSnapshot segments + 3-level corpse policy demo: battle-level true, ' +
+          'team-level Team1 false, character-level overrides. Page forward with each segment\'s `>>` ' +
+          'to see Warrior / DarkElfHunter left as corpses while the Slime vanishes.',
       },
     },
   },
