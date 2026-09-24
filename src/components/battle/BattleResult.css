@@ -5,8 +5,8 @@
  * 原始來源：BattleDisplay.css 第 243-268 行
  * Source: BattleDisplay.css lines 243-268
  *
- * 注意：分隔線樣式 .break 和 .break-top 已移至 SharedBase.css（多元件共用）
- * Note: Divider styles .break and .break-top moved to SharedBase.css (shared across components)
+ * 注意：分隔線樣式 .divider-bottom 和 .divider-top 已移至 SharedBase.css（多元件共用）
+ * Note: Divider styles .divider-bottom and .divider-top moved to SharedBase.css (shared across components)
  *
  * 響應式：兩隊統計以 flex 排版，容器過窄時自動堆疊。
  * Responsive: team stats use flex and stack automatically when too narrow.

@@ -2,10 +2,10 @@
  * 共享工具樣式（單一事實來源）
  * Shared utility styles (single source of truth)
  *
- * 跨頁面 / 跨元件共用的工具 class（bold、result、ttd*、break、charge…），
+ * 跨頁面 / 跨元件共用的工具 class（bold、result、ttd*、divider*、charge…），
  * 統一集中於此基底檔，供 Battle 子元件與各頁面以 `#/` 別名直接匯入，
  * 避免元件反向依賴父頁面 CSS（AGENTS.md：禁止導入 ../pages/XXX.css）。
- * Cross-cutting utility classes (bold, result, ttd*, break, charge, …) live
+ * Cross-cutting utility classes (bold, result, ttd*, divider*, charge, …) live
  * here as one base file, imported directly via the `#/` alias by both Battle
  * sub-components and pages, so components no longer depend on parent-page CSS.
  */
@@ -82,11 +82,15 @@
   padding-left: 10px;
 }
 
-.break {
+/* 區塊的水平分隔線（底／頂）。名稱刻意避開 CSS 的 break 屬性，
+   以免被誤讀為斷行／分頁語意。
+   Horizontal block divider (bottom / top). Deliberately avoids the CSS break
+   property so the name cannot be misread as a line/column break. */
+.divider-bottom {
   border-bottom: 1px solid var(--color-border-dark);
 }
 
-.break-top {
+.divider-top {
   border-top: 1px solid var(--color-border-dark);
 }
 

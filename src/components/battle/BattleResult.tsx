@@ -94,7 +94,7 @@ export const BattleResult: React.FC<IBattleResultProps> = ({
 
   return (
     <div className="battle-result">
-      <div className="result-title-row break break-top">
+      <div className="result-title-row divider-bottom divider-top">
         <div className={titleClass}>{titleText}</div>
       </div>
       <div className="result-stats-row">

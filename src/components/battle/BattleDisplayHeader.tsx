@@ -29,7 +29,7 @@ export const BattleDisplayHeader: React.FC<IBattleDisplayHeaderProps> = ({ title
   if (!title) return null;
 
   return (
-    <header className="battle-header break">
+    <header className="battle-header divider-bottom">
       <h2 className="battle-title">{title}</h2>
       {time && (
         <div className="battle-time">

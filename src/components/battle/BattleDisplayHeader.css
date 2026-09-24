@@ -5,8 +5,8 @@
  * 原始來源：BattleDisplay.css 第 39-51 行
  * Source: BattleDisplay.css lines 39-51
  *
- * 標題列置中並以 .break（SharedBase.css）帶出底部分隔線。
- * The header is centred and uses .break (SharedBase.css) for its bottom divider.
+ * 標題列置中並以 .divider-bottom（SharedBase.css）帶出底部分隔線。
+ * The header is centred and uses .divider-bottom (SharedBase.css) for its bottom divider.
  */
 
 .battle-header {

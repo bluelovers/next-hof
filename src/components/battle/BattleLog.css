@@ -12,11 +12,11 @@
   width: 100%;
 }
 
-/* 刻意不畫水平框線：.log-row 不套用共用的 .break（SharedBase.css），
+/* 刻意不畫水平框線：.log-row 不套用共用的 .divider-bottom（SharedBase.css），
    .action-entry 亦不設 border-bottom（見 BattleAction.css），
    避免逐列橫線切碎紀錄的閱讀節奏。
-   Deliberately draws no horizontal rules: .log-row skips the shared .break utility
-   (SharedBase.css) and .action-entry carries no border-bottom (see BattleAction.css),
+   Deliberately draws no horizontal rules: .log-row skips the shared .divider-bottom
+   utility (SharedBase.css) and .action-entry carries no border-bottom (see BattleAction.css),
    so per-row lines do not chop the log into visual fragments. */
 .log-row {
   display: flex;

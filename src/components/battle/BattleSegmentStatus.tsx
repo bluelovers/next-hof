@@ -6,13 +6,15 @@
  * 左右兩欄的隊伍精靈（leftSprite／rightSprite，未給時取該側首個帶精靈的單位）
  * 與每個單位的精靈（IBattleUnit.sprite）皆由開關控制：
  * showTeamSprite／showUnitSprites（資料缺省時不輸出）。
- * 單位列渲染為此檔內的 SideStatus（單一事實來源），避免左右兩側各自實作而漂移。
+ * 單位列渲染為此檔內的 SideStatus → SideUnit（單一事實來源），避免左右兩側各自實作而漂移；
+ * 單位名稱只由 BattleUnit 輸出一次，不在此重複渲染。
  * Shows the left/right units' status (name + HP/SP bars) at the segment's starting
  * point, side by side. Both the per-side team sprite (leftSprite / rightSprite; falls
  * back to the first sprite-carrying unit of that side when omitted) and each unit's own
  * sprite (IBattleUnit.sprite) are gated by the showTeamSprite / showUnitSprites toggles
  * (nothing renders when the data is absent). The unit list is rendered by the local
- * SideStatus component (single source of truth) so the two sides cannot drift apart.
+ * SideStatus -> SideUnit components (single source of truth) so the two sides cannot
+ * drift apart, and the unit name is emitted exactly once by BattleUnit.
  *
  * 原始來源：src/components/pages/BattleDisplay.tsx 的 Row「狀態」＋ renderUnits()
  * Source: the status row + renderUnits() of src/components/pages/BattleDisplay.tsx
@@ -46,6 +48,40 @@ export interface IBattleSegmentStatusProps
   rightSprite?: ICharacterSpriteProps;
 }
 
+/**
+ * 單一單位列（SideStatus 的子元件，宣告於同一檔案，不另開檔）
+ * One unit row (a child component of SideStatus, declared in this same file)
+ *
+ * 單位的「名稱＋HP/SP」一律交給 BattleUnit 輸出，此處不再重複渲染 unit.name，
+ * 避免名稱顯示兩次（單一事實來源）。
+ * The unit's "name + HP/SP" is rendered solely by BattleUnit; unit.name is never
+ * emitted again here, so the name cannot show up twice (single source of truth).
+ */
+const SideUnit: React.FC<{
+  /** 單位資料 / Unit data */
+  unit: IBattleUnit;
+} & IBattleBarToggleOptions &
+  IBattleSpriteToggleOptions> = ({ unit, showHpBars, showSpBars, showUnitSprites }) => {
+  // 單位精靈僅在 showUnitSprites 開啟時輸出 / Unit sprites render only when showUnitSprites is on
+  const unitSprite = showUnitSprites ? unit.sprite : undefined;
+
+  return (
+    <div className={`battle-side-unit${unitSprite ? ' battle-side-unit--sprite' : ''}`}>
+      {unitSprite && (
+        <div className="battle-side-unit-sprite">
+          {/* 預設 Small；呼叫端可用 unit.sprite.size 覆寫 / Default Small; callers can override via unit.sprite.size */}
+          <CharacterSprite size={EnumSpriteSize.Small} {...unitSprite} />
+        </div>
+      )}
+      <div className="battle-side-unit-body">
+        <div className="hpsp">
+          <BattleUnit unit={unit} showHpBar={showHpBars} showSpBar={showSpBars} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 /** 單一側別的單位狀態欄（單一事實來源）/ One side's unit-status column (single source of truth) */
 const SideStatus: React.FC<{
   side: EnumTeamSideUI;
@@ -67,37 +103,23 @@ const SideStatus: React.FC<{
   const sideSprite = showTeamSprite ? (teamSprite ?? units.find((u) => u.sprite)?.sprite) : undefined;
 
   return (
-    // 刻意不套用共用的 .break：HP/SP 狀態欄底部不畫水平框線（見 SharedBase.css）
-    // Deliberately skips the shared .break utility: no horizontal rule under the HP/SP status column (see SharedBase.css)
+    // 刻意不套用共用的 .divider-bottom：HP/SP 狀態欄底部不畫水平框線（見 SharedBase.css）
+    // Deliberately skips the shared .divider-bottom utility: no horizontal rule under the HP/SP status column (see SharedBase.css)
     <div className={`battle-side ${getSideClass(side)}`}>
       {sideSprite && (
         <div className="battle-side-sprite">
           <CharacterSprite {...sideSprite} />
         </div>
       )}
-      {units.map((unit, i) => {
-        // 單位精靈僅在 showUnitSprites 開啟時輸出 / Unit sprites render only when showUnitSprites is on
-        const unitSprite = showUnitSprites ? unit.sprite : undefined;
-        return (
-          <div
-            className={`battle-side-unit${unitSprite ? ' battle-side-unit--sprite' : ''}`}
-            key={`${unit.name}-${i}`}
-          >
-            {unitSprite && (
-              <div className="battle-side-unit-sprite">
-                {/* 預設 Small；呼叫端可用 unit.sprite.size 覆寫 / Default Small; callers can override via unit.sprite.size */}
-                <CharacterSprite size={EnumSpriteSize.Small} {...unitSprite} />
-              </div>
-            )}
-            <div className="battle-side-unit-body">
-              <div className="bold">{unit.name}</div>
-              <div className="hpsp">
-                <BattleUnit unit={unit} showHpBar={showHpBars} showSpBar={showSpBars} />
-              </div>
-            </div>
-          </div>
-        );
-      })}
+      {units.map((unit, i) => (
+        <SideUnit
+          key={`${unit.name}-${i}`}
+          unit={unit}
+          showHpBars={showHpBars}
+          showSpBars={showSpBars}
+          showUnitSprites={showUnitSprites}
+        />
+      ))}
     </div>
   );
 };
