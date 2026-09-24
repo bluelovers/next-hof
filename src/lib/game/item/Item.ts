@@ -1,11 +1,11 @@
 // 物品定義 / Item definition helpers
 // 對應 docs/data/item.md。倉庫回傳的即為 IItemDef（YAML 結構），此處提供正規化與取值。
 
-import type { IItemDef, EnumWeaponType } from '../types';
+import { EnumItemCategory, type IItemDef, type EnumWeaponType } from '../types';
 import type { IDataRepository } from '../data/repository';
 
-/** 道具類別預設值 / Default item category */
-export const ITEM_TYPE_DEFAULT = 'ITEM' as const;
+/** 道具類別預設值（EnumItemCategory.Item）/ Default item category (EnumItemCategory.Item) */
+export const ITEM_TYPE_DEFAULT = EnumItemCategory.Item;
 
 /**
  * 原始道具資料 / Raw item data

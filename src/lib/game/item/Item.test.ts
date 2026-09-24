@@ -4,7 +4,7 @@ import { createSeedRepository } from '../data/seed-data';
 import { InMemoryRepository } from '../data/repository';
 import { getItem } from './Item';
 import { setEquip, CalcEquips, getHandleMax } from './equip';
-import { EnumWeaponType, EnumCharType, EnumEquipSlot } from '../types';
+import { EnumWeaponType, EnumCharType, EnumEquipSlot, EnumItemCategory } from '../types';
 
 describe('Item definition (7.1)', () => {
 	const repo = createSeedRepository();
@@ -26,10 +26,10 @@ describe('Item definition (7.1)', () => {
 describe('Equip system (7.2)', () => {
 	it('dh main-hand unequips off-hand; handle overflow fails', () => {
 		const r = new InMemoryRepository();
-		r.addItem({ no: 1000, name: 'ShortSword', type: EnumWeaponType.Sword, type2: 'WEAPON', atk: [10, 0], def: [0, 0, 0, 0], handle: 1, need: {} });
-		r.addItem({ no: 3000, name: 'WoodShield', type: EnumWeaponType.Shield, type2: 'ARMOR', atk: [0, 0], def: [5, 5, 0, 0], handle: 1, need: {} });
-		r.addItem({ no: 9000, name: 'BigSword', type: EnumWeaponType.TwoHandSword, type2: 'WEAPON', atk: [50, 0], def: [0, 0, 0, 0], dh: true, handle: 3, need: {} });
-		r.addItem({ no: 9999, name: 'Heavy', type: EnumWeaponType.Armor, type2: 'ARMOR', atk: [0, 0], def: [0, 0, 0, 0], handle: 10, need: {} });
+		r.addItem({ no: 1000, name: 'ShortSword', type: EnumWeaponType.Sword, type2: EnumItemCategory.Weapon, atk: [10, 0], def: [0, 0, 0, 0], handle: 1, need: {} });
+		r.addItem({ no: 3000, name: 'WoodShield', type: EnumWeaponType.Shield, type2: EnumItemCategory.Armor, atk: [0, 0], def: [5, 5, 0, 0], handle: 1, need: {} });
+		r.addItem({ no: 9000, name: 'BigSword', type: EnumWeaponType.TwoHandSword, type2: EnumItemCategory.Weapon, atk: [50, 0], def: [0, 0, 0, 0], dh: true, handle: 3, need: {} });
+		r.addItem({ no: 9999, name: 'Heavy', type: EnumWeaponType.Armor, type2: EnumItemCategory.Armor, atk: [0, 0], def: [0, 0, 0, 0], handle: 10, need: {} });
 
 		const char = new Character({
 			no: 1, name: 'c', types: [EnumCharType.Char], level: 1,

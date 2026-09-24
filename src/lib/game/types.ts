@@ -558,16 +558,27 @@ export interface ISkillDef extends ICompBonuses, ISkillUpFields, ISkillDownField
 
 /**
  * 道具類別細分 / Item sub-category
- * 型別別名 / type alias
+ * 列舉 / enumeration
  *
- * 對應 YAML item.type2 的有限集合：WEAPON / ARMOR / ITEM / MATERIAL / OTHER。
- * Mirrors the closed set of YAML item.type2 values: WEAPON / ARMOR / ITEM / MATERIAL / OTHER.
- * 以聯合型別（非 Enum）表示：值來自外部 YAML 資料層，聯合型別保留字面字串直接賦值
- * （Item.ts ITEM_TYPE_DEFAULT、seed-data、測試皆以字面值寫入），同時提供拼寫檢查。
- * A union (not an enum): the values come from the external YAML data layer; the union keeps
- * literal assignment working (ITEM_TYPE_DEFAULT, seed data, tests) while still catching typos.
+ * 對應 YAML item.type2 的有限集合（成員值與 YAML 來源一致，全大寫）：
+ * Mirrors the closed set of YAML item.type2 values (member values match the YAML source, uppercase):
+ * Weapon=WEAPON、Armor=ARMOR、Item=ITEM、Material=MATERIAL、Other=OTHER。
+ *
+ * 作為 IItemDef.type2 的型別；Item.ts 的 ITEM_TYPE_DEFAULT 指向 Item 成員作為預設值。
+ * Type of IItemDef.type2; Item.ts's ITEM_TYPE_DEFAULT points at the Item member as the default.
  */
-export type IItemCategory = 'WEAPON' | 'ARMOR' | 'ITEM' | 'MATERIAL' | 'OTHER';
+export enum EnumItemCategory {
+	/** 武器 / Weapon */
+	Weapon = 'WEAPON',
+	/** 防具 / Armor */
+	Armor = 'ARMOR',
+	/** 道具 / Item */
+	Item = 'ITEM',
+	/** 素材 / Material */
+	Material = 'MATERIAL',
+	/** 其他 / Other */
+	Other = 'OTHER',
+}
 
 /**
  * 道具定義 / Item definition
@@ -580,8 +591,8 @@ export interface IItemDef extends ICompBonuses {
 	name: string;
 	/** 武器／裝備型別（同時決定可裝備欄位）/ weapon/equipment type (also decides the equip slot) */
 	type: EnumWeaponType;
-	/** 類別細分（WEAPON / ARMOR / ITEM / MATERIAL / OTHER，見 IItemCategory）/ sub-category (see IItemCategory) */
-	type2?: IItemCategory;
+	/** 類別細分（Weapon/Armor/Item/Material/Other，見 EnumItemCategory）/ sub-category (see EnumItemCategory) */
+	type2?: EnumItemCategory;
 	/** 圖示資源路徑 / icon asset path */
 	img?: string;
 	/** 購入價格（金幣）/ buy price (gold) */

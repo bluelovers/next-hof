@@ -9,7 +9,7 @@
 // Corpse-policy 3-level demo (character level set here; team/battle levels in the showcase
 // battle config): battle-level corpse:true, team-level Team1:false, and per-def overrides below.
 
-import { EnumWeaponType, EnumTargetType, EnumTargetMethod, EnumEquipSlot, EnumGuardKind, EnumSkillDamageType, EnumGender, type ISkillDef, type IItemDef, type IJobDef, type ICharDef, type IMonDef } from '../types';
+import { EnumWeaponType, EnumTargetType, EnumTargetMethod, EnumEquipSlot, EnumGuardKind, EnumSkillDamageType, EnumGender, EnumItemCategory, type ISkillDef, type IItemDef, type IJobDef, type ICharDef, type IMonDef } from '../types';
 import { EnumPosition } from '../constants';
 import { EnumJudgeCode } from '../battle/judge-codes';
 import { InMemoryRepository, type IDataRepository } from './repository';
@@ -74,15 +74,15 @@ const skills: ISkillDef[] = [
 // 物品 / Items
 const items: IItemDef[] = [
 	{
-		no: 1000, name: 'ShortSword', type: EnumWeaponType.Sword, type2: 'WEAPON', img: 'we_sword026',
+		no: 1000, name: 'ShortSword', type: EnumWeaponType.Sword, type2: EnumItemCategory.Weapon, img: 'we_sword026',
 		buy: 500, atk: [10, 0], def: [0, 0, 0, 0], handle: 1, need: { 6001: 4 }, base_name: 'ShortSword',
 	},
 	{
-		no: 3000, name: 'WoodShield', type: EnumWeaponType.Shield, type2: 'ARMOR', img: 'we_shield001',
+		no: 3000, name: 'WoodShield', type: EnumWeaponType.Shield, type2: EnumItemCategory.Armor, img: 'we_shield001',
 		buy: 200, atk: [0, 0], def: [5, 5, 0, 0], handle: 1, need: { 6001: 1, 6020: 4 }, base_name: 'WoodShield',
 	},
 	{
-		no: 5000, name: 'ClothArmor', type: EnumWeaponType.Armor, type2: 'ARMOR', img: 'ar_cloth001',
+		no: 5000, name: 'ClothArmor', type: EnumWeaponType.Armor, type2: EnumItemCategory.Armor, img: 'ar_cloth001',
 		buy: 300, atk: [0, 0], def: [3, 0, 3, 0], handle: 2, need: {}, base_name: 'ClothArmor',
 	},
 ];
