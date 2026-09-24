@@ -27,6 +27,7 @@ import type {
 	IBattleTeam,
 	IBattleUnit,
 	IBattleSnapshotDisplay,
+	ISummonedUnit,
 	ITeamFinalStats,
 	ITeamSide,
 } from '#/components/battle/types';
@@ -217,10 +218,10 @@ function resolveRef(key: string | undefined, lookup: IUnitLookup): IResolvedRef 
  * 事件轉接：IBattleEvent → IBattleAction（任務 3.3）
  * Event adapter: IBattleEvent → IBattleAction (task 3.3)
  *
- * 對應：Act→skill、Cast→casting、Damage→damage、Heal→heal、Guard→protect、Death→down，
+ * 對應：Act→skill、Cast→casting、Damage→damage、Heal→heal、Guard→protect、Death→down、Summon→summon，
  * 未知型別以 type 'result' + message 文字 fallback，確保 N 事件 → N 條日誌。
- * Mapping: Act→skill, Cast→casting, Damage→damage, Heal→heal, Guard→protect, Death→down;
- * unknown types fall back to type 'result' + a message so N events → N entries.
+ * Mapping: Act→skill, Cast→casting, Damage→damage, Heal→heal, Guard→protect, Death→down,
+ * Summon→summon; unknown types fall back to type 'result' + a message so N events → N entries.
  */
 export function mapBattleEvent(
 	ev: IBattleEvent,
@@ -327,6 +328,36 @@ export function mapBattleEvent(
 				message: `${name} down.`,
 				side: target.side,
 				attribute: EnumAttributeType.Dmg,
+			};
+		}
+		case EnumBattleEventType.Summon: {
+			// 召喚事件契約（引擎目前尚無生產點，見 #/lib/game/types 的 EnumBattleEventType.Summon）：
+			// target＝被召喚單位的 def no、value＝其等級；圖片依 def no 查 sprite-map 怪物表。
+			// Summon event contract (the engine has no producer yet; see EnumBattleEventType.Summon in
+			// #/lib/game/types): target = the summoned unit's def no, value = its level; the image comes
+			// from sprite-map's monster table by that def no.
+			const rawNo = ev.target !== undefined ? Number(ev.target) : undefined;
+			const summonedNo = rawNo !== undefined && !Number.isNaN(rawNo) ? rawNo : undefined;
+			const summoned: ISummonedUnit[] = target.name
+				? [
+						{
+							name: target.name,
+							level: ev.value,
+							imageUrl: summonedNo !== undefined && repo?.getMon(summonedNo)
+								? getMonSpriteUrl(summonedNo)
+								: undefined,
+						},
+					]
+				: [];
+			return {
+				type: EnumActionType.Summon,
+				source: actor.name,
+				target: target.name,
+				skill: skillName ? { name: skillName } : undefined,
+				summoned,
+				message: target.name ? `${target.name} joined to the team.` : `${actor.name ?? ''} summon.`,
+				side,
+				attribute: EnumAttributeType.Normal,
 			};
 		}
 		default: {

@@ -72,6 +72,8 @@ export enum EnumActionType {
 	Heal = 'heal',
 	Protect = 'protect',
 	Enter = 'enter',
+	/** 召喚（施放者＋被召喚單位清單）/ summon (caster + summoned-unit list) */
+	Summon = 'summon',
 	Casting = 'casting',
 	Down = 'down',
 	Result = 'result',

@@ -185,6 +185,25 @@ export interface ISkillIcon {
 	iconUrl?: string;
 }
 
+/**
+ * 被召喚單位（召喚日誌條目用）
+ * Summoned unit (for a summon log entry)
+ *
+ * 對應原始戰鬥日誌的「圖像 名稱 joined to the team. 名稱 Lv.N enter the Battlefield.」，
+ * level 缺省時省略「Lv.N」、imageUrl 缺省時省略圖像。
+ * Mirrors the original battle log's "image name joined to the team. name Lv.N enter the
+ * Battlefield."; when `level` is absent the "Lv.N" is dropped, and when `imageUrl` is
+ * absent the image is dropped.
+ */
+export interface ISummonedUnit {
+	/** 單位名稱 / unit name */
+	name: string;
+	/** 單位等級（缺省時不顯示 Lv.N）/ unit level (no "Lv.N" when absent) */
+	level?: number;
+	/** 單位精靈圖 URL（原始日誌在名稱前顯示單位圖）/ unit sprite image URL (the original log shows it before the name) */
+	imageUrl?: string;
+}
+
 /** 戰鬥動作 / Battle action */
 export interface IBattleAction {
 	/** 動作類型 / Action type */
@@ -211,6 +230,8 @@ export interface IBattleAction {
 	hpBefore?: number;
 	/** 傷害後 HP（Damage/Heal 時）/ HP after */
 	hpAfter?: number;
+	/** 被召喚單位清單（type＝Summon 時使用）/ Summoned units (used when type = Summon) */
+	summoned?: ISummonedUnit[];
 }
 
 /** 戰鬥結果 / Battle result */
@@ -354,6 +375,11 @@ export interface IBattleSnapshotDisplayUnit
 	 * Appearance override (e.g. form change; when absent the sprite's own image is used)
 	 */
 	imageUrl?: string;
+	/**
+	 * 單位等級（上游快照未提供時缺省；顯示層缺省時以 0 呈現）
+	 * Unit level (absent when the upstream snapshot omits it; the display layer renders 0 when absent)
+	 */
+	level?: number;
 	/** 是否倒下 / whether down */
 	dead: boolean;
 	/** 蓄力/詠唱種類（無則 undefined）/ charge/cast kind */

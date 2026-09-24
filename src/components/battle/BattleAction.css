@@ -40,3 +40,24 @@
 .delay-indicator {
   font-size: 80%;
 }
+
+/* ==================== 召喚 / Summon ==================== */
+
+/* 被召喚單位列：圖像（選填）＋「joined to the team／enter the Battlefield」文字
+   Summoned-unit row: image (optional) + "joined to the team / enter the Battlefield" text */
+.summoned-unit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0 2px 12px;
+}
+
+/* 被召喚單位圖像：固定 32×32（avatar 模式由外層給尺寸），保持比例置中
+   Summoned-unit image: fixed 32×32 (the avatar variant takes its size from the outer layer), ratio kept and centred */
+.summoned-unit-sprite {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  vertical-align: middle;
+}

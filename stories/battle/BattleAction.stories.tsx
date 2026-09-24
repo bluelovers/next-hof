@@ -92,6 +92,24 @@ export const UnitEntrance: Story = {
   } as StoryArgs,
 };
 
+/** 召喚：GraveYard 召喚 3 隻木乃伊 / Summon: GraveYard summons 3 mummies */
+export const SummonAction: Story = {
+  args: {
+    action: {
+      type: 'summon',
+      source: 'Mage1',
+      skill: { name: 'GraveYard', iconUrl: '/image/icon/skill/skill_028.png' },
+      summoned: [
+        { name: 'Mummy', level: 10, imageUrl: '/image/char/mon_146.png' },
+        { name: 'MummyPrisoner', level: 10, imageUrl: '/image/char/mon_146r.png' },
+        { name: 'Mummy', level: 10, imageUrl: '/image/char/mon_146.png' },
+      ],
+      message: 'Mage1 GraveYard: Mummy joined to the team.',
+      attribute: 'normal',
+    },
+  } as StoryArgs,
+};
+
 /** 詠唱 / Casting */
 export const CastingAction: Story = {
   args: {

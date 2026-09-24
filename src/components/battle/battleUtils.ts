@@ -249,8 +249,9 @@ export function splitActionsBySnapshots(
  * 快照單位 → 顯示用 IBattleUnit（單一事實來源）
  * Snapshot unit → display IBattleUnit (single source of truth)
  *
- * level 於快照資料中不存在，顯示層不使用故固定為 0。
- * `level` is absent from snapshots and unused by the display layer, so it is fixed at 0.
+ * level 於引擎快照資料中不存在（顯示側選填），缺省時固定為 0。
+ * `level` does not exist in the engine snapshot (optional on the display side) and is
+ * fixed at 0 when absent.
  */
 export function snapshotUnitToBattleUnit(unit: IBattleSnapshotDisplayUnit): IBattleUnit {
   const status = unit.dead
@@ -260,7 +261,7 @@ export function snapshotUnitToBattleUnit(unit: IBattleSnapshotDisplayUnit): IBat
       : EnumUnitStatus.Alive;
   return {
     name: unit.name,
-    level: 0,
+    level: unit.level ?? 0,
     hp: unit.hp,
     maxHp: unit.maxHp,
     sp: unit.sp,

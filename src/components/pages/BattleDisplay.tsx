@@ -27,7 +27,8 @@ import { BattleTeamRow } from '#/components/battle/BattleTeamRow';
 import { BattleUnitEntrance } from '#/components/battle/BattleUnitEntrance';
 import { BattleSegment } from '#/components/battle/BattleSegment';
 import { BattleResult } from '#/components/battle/BattleResult';
-import { splitActionsBySnapshots } from '#/components/battle/battleUtils';
+import { splitActionsBySnapshots, segmentUnitsForSide } from '#/components/battle/battleUtils';
+import { EnumTeamSideUI } from '#/components/battle/enums';
 import './BattleDisplay.css';
 import '#/components/shared/SharedBase.css';
 
@@ -55,6 +56,20 @@ export const BattleDisplay: React.FC<IBattleDisplayProps> = ({
   // Split actions into segments by snapshot; a single segment when absent
   const segments = splitActionsBySnapshots(actions, snapshots);
 
+  // 開場入場列以「首段快照」為準：中途召喚／加入的單位不會出現在開場入場列；
+  // 首段無快照（或完全無快照）時仍沿用隊伍單位，行為不變。
+  // Opening entrance rows follow the first segment's snapshot so mid-battle joins
+  // (summons) never appear in the opening list; when the first segment carries no
+  // snapshot (or there are no snapshots at all) the team units are used as before.
+  const openingSegment = segments[0];
+  const hasOpeningSnapshot = Boolean(openingSegment?.snapshot);
+  const entranceLeft = hasOpeningSnapshot
+    ? segmentUnitsForSide(openingSegment, EnumTeamSideUI.Left, leftTeam.units)
+    : leftTeam.units;
+  const entranceRight = hasOpeningSnapshot
+    ? segmentUnitsForSide(openingSegment, EnumTeamSideUI.Right, rightTeam.units)
+    : rightTeam.units;
+
   return (
     <div className="battle-display">
       {/* 戰鬥標題 / Battle title */}
@@ -64,8 +79,8 @@ export const BattleDisplay: React.FC<IBattleDisplayProps> = ({
         {/* Row 1: 隊伍資訊（起始快照狀態）/ Team info (initial snapshot state) */}
         <BattleTeamRow leftTeam={leftTeam} rightTeam={rightTeam} segment={segments[0]} />
 
-        {/* Row 2: 單位入場 / Unit entrance */}
-        <BattleUnitEntrance leftUnits={leftTeam.units} rightUnits={rightTeam.units} />
+        {/* Row 2: 單位入場（首段快照；中途召喚者不在開場入場列）/ Unit entrance (first snapshot; mid-battle summons excluded) */}
+        <BattleUnitEntrance leftUnits={entranceLeft} rightUnits={entranceRight} />
 
         {/* Row 3+: 分段（快照）/ Segments (snapshot-driven) */}
         {segments.map((segment) => (

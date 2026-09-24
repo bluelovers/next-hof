@@ -187,6 +187,26 @@ describe('3.3 mapBattleEvent', () => {
 		expect(action.message).toContain(EnumBattleEventType.Info);
 	});
 
+	it('summon event maps to a summon action carrying the summoned unit', () => {
+		const action = mapBattleEvent(
+			{ type: EnumBattleEventType.Summon, actor: '100', target: '1000', skill: 2000, value: 10 },
+			lookup,
+			repo,
+		);
+
+		expect(action.type).toBe(EnumActionType.Summon);
+		expect(action.source).toBe('Warrior');
+		expect(action.target).toBe('GoblinAxe');
+		expect(action.side).toBe(EnumTeamSideUI.Right);
+		expect(action.skill?.name).toBeDefined();
+		// target＝被召喚單位 def no、value＝等級、圖依 def no 查 sprite-map
+		// target = summoned def no, value = level, image looked up in sprite-map by def no
+		expect(action.summoned).toEqual([
+			{ name: 'GoblinAxe', level: 10, imageUrl: '/image/char/mon_053.png' },
+		]);
+		expect(action.message).toContain('joined to the team');
+	});
+
 	it('a real battle produces N actions for N events, in order, with actor/target names', () => {
 		const run = runShowcaseBattle({ charNos: [100, 104], monNos: [1000, 1002], seed: 5 });
 		const { events, data } = run;
