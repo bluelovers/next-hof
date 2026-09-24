@@ -8,3 +8,5 @@ node_modules
 tsconfig.tsbuildinfo
 nul
 debug-storybook.log
+.kilocode
+.kiro
