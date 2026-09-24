@@ -47,14 +47,12 @@ import {
   buildChargeMessage,
   buildDelayMessage,
   buildDrainMessage,
-  buildFailMessage,
   buildLevelUpMessage,
   buildMagicCircleMessage,
   buildNamedMessage,
   buildPossessiveMessage,
   buildRecoveredMessage,
   buildRegenMessage,
-  buildReviveMessage,
   buildSacrificeMessage,
   buildSpDamageMessage,
   buildStatChangeMessage,
@@ -251,6 +249,7 @@ function enterAction(unit: IShowcaseUnit): IBattleAction {
   return {
     type: EnumActionType.Enter,
     source: unit.name,
+    level: unit.level,
     message: `${unit.name} Lv.${unit.level} enter the Battlefield.`,
     side: unit.side,
     attribute: EnumAttributeType.Normal,
@@ -559,8 +558,10 @@ const logMessagesActions: IBattleAction[] = [
     { value: 32, valueUnit: 'HP', prefix: '* ', attribute: EnumAttributeType.Recover }
   ),
 
-  // ---- 復活 / Revive ----
-  logAction(EnumActionType.Revive, hero1, buildReviveMessage(hero1.name), EnumTeamSideUI.Right, {
+  // ---- 復活（`name <recover>revived</recover>!`；名稱預設色、只有 revived 上色）----
+  // Revive (`name <recover>revived</recover>!`; the name keeps the default colour, only revived is coloured)
+  logAction(EnumActionType.Revive, hero1, 'revived!', EnumTeamSideUI.Right, {
+    emphasis: 'revived',
     attribute: EnumAttributeType.Recover,
   }),
 
@@ -580,11 +581,14 @@ const logMessagesActions: IBattleAction[] = [
 
   // ---- 中毒：施加（spdmg）／每回合傷害（spdmg）／解除（無 span）／抗毒（support）----
   // Poison: apply (spdmg) / per-turn damage (spdmg) / cure (no span) / resist (support)
+  // ---- 中毒施加（`get <spdmg>poisoned</spdmg>!`；名稱預設色、只有 poisoned 上色）----
+  // Poison apply (`get <spdmg>poisoned</spdmg>!`; the name keeps the default colour, only poisoned is coloured)
   logAction(
     EnumActionType.Poison,
     goblinAxe,
-    buildNamedMessage(goblinAxe.name, 'get poisoned!'),
-    EnumTeamSideUI.Left
+    'get poisoned\u00a0!',
+    EnumTeamSideUI.Left,
+    { emphasis: 'poisoned', attribute: EnumAttributeType.Spdmg }
   ),
   logAction(
     EnumActionType.Poison,
@@ -680,11 +684,13 @@ const logMessagesActions: IBattleAction[] = [
     { value: 50, valueUnit: 'HP', attribute: EnumAttributeType.Dmg }
   ),
 
-  // ---- 施放失敗：武器不符／SP 不足 / Failed to cast: weapon mismatch / SP shortage ----
+  // ---- 施放失敗：武器不符 / Failed to cast: weapon mismatch ----
+  // 首行 `.u` 底線名稱＋技能圖示，失敗字樣 `.dmg`；次行無樣式原因。
+  // First line: `.u` underlined name + skill icon, the ` Failed ` word in `.dmg`; second line: unstyled reason.
   logAction(
     EnumActionType.Fail,
     goblinAxe,
-    buildFailMessage(goblinAxe.name, SKILL_FATAL_STAB.name, 'Weapon type doesnt match'),
+    '(Weapon type doesnt match)',
     EnumTeamSideUI.Left,
     { skill: SKILL_FATAL_STAB, attribute: EnumAttributeType.Dmg }
   ),
@@ -707,17 +713,19 @@ const logMessagesActions: IBattleAction[] = [
   // ---- 升級（`name LevelUp!`）/ Level up ----
   logAction(EnumActionType.LevelUp, hero1, buildLevelUpMessage(hero1.name), EnumTeamSideUI.Right),
 
-  // ---- 掉落道具（`<b>名</b> dropped` 後接 `<b class="u">道具名</b>.`）----
-  // Dropped item (`<b>name</b> dropped` followed by `<b class="u">item name</b>.`)
-  logAction(EnumActionType.ItemDrop, goblinWarriorA, 'Magic Scroll', EnumTeamSideUI.Left),
+  // ---- 掉落道具（`name dropped` 後接道具圖示＋`<b class="u">道具名</b>.`）----
+  // Dropped item (`name dropped` followed by the item icon + `<b class="u">item name</b>.`)
+  logAction(EnumActionType.ItemDrop, goblinWarriorA, 'Magic Scroll', EnumTeamSideUI.Left, {
+    itemIconUrl: '/image/icon/item/item_018.png',
+  }),
 
-  // ---- 退場（`name leave the Battlefield.`，dmg 色）/ Leave the battlefield (dmg colour) ----
+  // ---- 退場（`name Lv.N leave the Battlefield.`，dmg 色）/ Leave the battlefield (dmg colour) ----
   logAction(
-    EnumActionType.Info,
+    EnumActionType.Leave,
     goblinAxe,
-    buildNamedMessage(goblinAxe.name, 'leave the Battlefield.'),
+    '',
     EnumTeamSideUI.Left,
-    { attribute: EnumAttributeType.Dmg }
+    { level: goblinAxe.level }
   ),
 
   // ---- 純文字資訊（無名稱、無 span；對照 4.8 / 6.7 / 3.3 / 7.4 / 7.5 / 3.2 等）----
@@ -735,12 +743,20 @@ const logMessagesActions: IBattleAction[] = [
     buildNamedMessage(goblinWarriorA.name, "sunk in thought and couldn't act.(No more patterns)"),
     EnumTeamSideUI.Left
   ),
-  logAction(
-    EnumActionType.Info,
-    hero1,
-    buildNamedMessage(hero1.name, 'exchanged rate of HP and SP.'),
-    EnumTeamSideUI.Right
-  ),
+  // ---- HP/SP 交換（3 行區塊：exchanged rate of HP and SP. ＋ HP 行 ＋ SP 行）----
+  // HP/SP exchange (3-line block: exchanged rate of HP and SP. + HP line + SP line)
+  logAction(EnumActionType.EnergyExchange, hero1, '', EnumTeamSideUI.Right, {
+    energyExchange: {
+      hpFrom: 500,
+      hpFromRate: 50,
+      hpTo: 800,
+      hpToRate: 80,
+      spFrom: 80,
+      spFromRate: 80,
+      spTo: 50,
+      spToRate: 50,
+    },
+  }),
 ];
 
 // ==================== 召喚快照 / Summon snapshots ====================

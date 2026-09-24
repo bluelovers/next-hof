@@ -222,6 +222,34 @@ export interface IMagicCircleRecord {
 	amount?: number;
 }
 
+/**
+ * HP/SP 交換紀錄（type＝EnergyExchange 時的結構化欄位）
+ * HP/SP exchange record (the structured field used when type = EnergyExchange)
+ *
+ * 對應 Char/Battle/Effect.php 的 EnergyExchange：`{名} exchanged rate of HP and SP.` 後接
+ * `HP: from(rate%) to to(rate%)` 與 `SP: from(rate%) to to(rate%)` 兩行。
+ * Mirrors Char/Battle/Effect.php's EnergyExchange: `{name} exchanged rate of HP and SP.`
+ * followed by two lines `HP: from(rate%) to to(rate%)` and `SP: from(rate%) to to(rate%)`.
+ */
+export interface IEnergyExchangeRecord {
+	/** HP 交換前 / HP before */
+	hpFrom: number;
+	/** HP 交換前比率 / HP before rate */
+	hpFromRate: number;
+	/** HP 交換後 / HP after */
+	hpTo: number;
+	/** HP 交換後比率 / HP after rate */
+	hpToRate: number;
+	/** SP 交換前 / SP before */
+	spFrom: number;
+	/** SP 交換前比率 / SP before rate */
+	spFromRate: number;
+	/** SP 交換後 / SP after */
+	spTo: number;
+	/** SP 交換後比率 / SP after rate */
+	spToRate: number;
+}
+
 /** 戰鬥動作 / Battle action */
 export interface IBattleAction {
 	/** 動作類型 / Action type */
@@ -262,6 +290,14 @@ export interface IBattleAction {
 	summoned?: ISummonedUnit[];
 	/** 魔方陣紀錄（type＝MagicCircle 時使用）/ Magic-circle record (used when type = MagicCircle) */
 	magicCircle?: IMagicCircleRecord;
+	/** HP/SP 交換紀錄（type＝EnergyExchange 時使用）/ HP/SP exchange record (used when type = EnergyExchange) */
+	energyExchange?: IEnergyExchangeRecord;
+	/** 等級（type＝enter/leave 時用於顯示 Lv.N）/ Level (shown as "Lv.N" for enter/leave) */
+	level?: number;
+	/** 強調字串（type＝Poison 的施加行與 Revive：僅該字串上色，名稱與標點保持預設色）/ Emphasis string */
+	emphasis?: string;
+	/** 掉落道具圖示 URL（type＝ItemDrop 時，置於「dropped」與道具名之間）/ Dropped-item icon URL (between "dropped" and the item name for ItemDrop) */
+	itemIconUrl?: string;
 }
 
 /** 戰鬥結果 / Battle result */

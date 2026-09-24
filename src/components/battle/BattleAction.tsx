@@ -56,10 +56,20 @@ const EnterMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
   const attrClass = getAttrClass(action.attribute);
   return (
     <span className={`result ${attrClass}`}>
-      <span className="bold">{action.source}</span> {getEnterBattlefieldText()}
+      <span className="bold">{action.source}</span> {getEnterBattlefieldText(action.level)}
     </span>
   );
 };
+
+/**
+ * 退場訊息（`name Lv.N leave the Battlefield.`，dmg 色；對照 Battle.php）
+ * Leave message (`name Lv.N leave the Battlefield.`, dmg colour; mirrors Battle.php)
+ */
+const LeaveMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <span className="dmg">
+    <span className="bold">{action.source}</span> {getEnterBattlefieldText(action.level, true)}
+  </span>
+);
 
 /**
  * 技能/攻擊訊息（單一事實來源）
@@ -250,10 +260,25 @@ const RegenMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
   return <NamedMessage action={action} className={getMessageClass(action)} />;
 };
 
-/** 復活訊息（`name revived!`）/ Revive message (`name revived!`) */
-const ReviveMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <NamedMessage action={action} className={getMessageClass(action)} />
-);
+/**
+ * 復活訊息（單一事實來源）
+ * Revive message (single source of truth)
+ *
+ * 對照 Char/Battle/Effect.php：`name` 保持預設色，只有 `revived!` 上 recover 色。
+ * Mirrors Char/Battle/Effect.php: the name keeps the default colour and only `revived!`
+ * is wrapped in the recover colour.
+ */
+const ReviveMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
+  const parts = action.message.split(action.emphasis ?? 'revived');
+  return (
+    <span>
+      {action.source && <span className="bold">{action.source}</span>}{' '}
+      {parts[0]}
+      <span className="recover">{action.emphasis ?? 'revived'}</span>
+      {parts[1]}
+    </span>
+  );
+};
 
 /** 增益訊息（`got quicked!`／`casting shorted!`／`got barriered!`）/ Buff message */
 const BuffMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
@@ -265,10 +290,30 @@ const DebuffMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
   <NamedMessage action={action} className={getMessageClass(action)} />
 );
 
-/** 中毒訊息（施加／每回合傷害／解除／抗毒）/ Poison message (apply / damage / cure / resist) */
-const PoisonMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <NamedMessage action={action} className={getMessageClass(action)} />
-);
+/**
+ * 中毒訊息（單一事實來源）
+ * Poison message (single source of truth)
+ *
+ * 施加行（`get poisoned!`）對照 Char/Battle/Effect.php：名稱保持預設色，只有 `poisoned`
+ * 上 spdmg 色；其餘（每回合傷害／解除／抗毒）整行依 getMessageClass 上色。
+ * The apply line (`get poisoned!`) mirrors Char/Battle/Effect.php: the name keeps the
+ * default colour and only `poisoned` is wrapped in spdmg, while the others (per-turn
+ * damage / cure / resist) are coloured as a whole by getMessageClass.
+ */
+const PoisonMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
+  if (action.emphasis) {
+    const parts = action.message.split(action.emphasis);
+    return (
+      <span>
+        {action.source && <span className="bold">{action.source}</span>}{' '}
+        {parts[0]}
+        <span className="spdmg">{action.emphasis}</span>
+        {parts[1]}
+      </span>
+    );
+  }
+  return <NamedMessage action={action} className={getMessageClass(action)} />;
+};
 
 /** 屬性升降訊息（`STR rise 10%`、`MAXHP extended to 999`）/ Stat-change message */
 const StatChangeMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
@@ -290,9 +335,39 @@ const SacrificeMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
   <NamedValueMessage action={action} className={getMessageClass(action)} text="sacrifice" />
 );
 
-/** 施放失敗訊息（`name Failed to skill (reason)`）/ Failed-to-cast message */
+/**
+ * 武器不符失敗訊息（單一事實來源）
+ * Weapon-mismatch failure message (single source of truth)
+ *
+ * 對照 Battle/Skill.php：名稱與技能圖示以 `.u` 底線呈現，失敗字樣 ` Failed ` 以 `.dmg`
+ * 強調，其後另起一行印出無樣式的原因（如 `(Weapon type doesnt match)`）。
+ * Mirrors Battle/Skill.php: the name and the skill icon are underlined with `.u`, the
+ * ` Failed ` word is emphasised with `.dmg`, and on a new line the unstyled reason (e.g.
+ * `(Weapon type doesnt match)`) is printed.
+ */
 const FailMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <NamedMessage action={action} className={getMessageClass(action)} />
+  <>
+    <span className="u">
+      <span className="bold">{action.source}</span>
+      <span className="dmg"> Failed </span>
+      to{' '}
+      {action.skill && (
+        <SkillIcon
+          iconUrl={action.skill.iconUrl}
+          name={action.skill.name}
+          size={18}
+          className="skill-icon"
+        />
+      )}
+      {action.skill?.name}
+    </span>
+    {action.message && (
+      <>
+        <br />
+        {action.message}
+      </>
+    )}
+  </>
 );
 
 /** 未命中訊息（`Failed!`；原始日誌無 span，沿用預設色）/ Miss message (`Failed!`, no span in the original log) */
@@ -317,7 +392,15 @@ const LevelUpMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
 const ItemDropMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
   <span>
     {action.source && <span className="bold">{action.source}</span>}
-    {action.source && ' dropped '}
+    {action.source && ' dropped'}
+    {action.itemIconUrl && (
+      <SkillIcon
+        iconUrl={action.itemIconUrl}
+        name={action.message}
+        size={18}
+        className="skill-icon"
+      />
+    )}
     <span className="u">
       <span className="bold">{action.message}</span>
     </span>
@@ -329,6 +412,31 @@ const ItemDropMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
 const InfoMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
   <span className={getMessageClass(action)}>{action.message}</span>
 );
+
+/**
+ * HP/SP 交換訊息（單一事實來源）
+ * HP/SP exchange message (single source of truth)
+ *
+ * 對照 Char/Battle/Effect.php 的 EnergyExchange：首行 `{名} exchanged rate of HP and SP.`，
+ * 次行 `HP: from(rate%) to to(rate%)`、第三行 `SP: from(rate%) to to(rate%)`。
+ * Mirrors Char/Battle/Effect.php's EnergyExchange: a first line
+ * `{name} exchanged rate of HP and SP.`, then `HP: from(rate%) to to(rate%)` and
+ * `SP: from(rate%) to to(rate%)`.
+ */
+const EnergyExchangeMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
+  const r = action.energyExchange;
+  if (!r) return <span className="bold">{action.source}</span>;
+  return (
+    <span>
+      {action.source && <span className="bold">{action.source}</span>}{' '}
+      exchanged rate of HP and SP.
+      <br />
+      HP: {r.hpFrom}({r.hpFromRate}%) to {r.hpTo}({r.hpToRate}%)
+      <br />
+      SP: {r.spFrom}({r.spFromRate}%) to {r.spTo}({r.spToRate}%)
+    </span>
+  );
+};
 
 /**
  * 傷害/治療訊息（單一事實來源）
@@ -455,6 +563,10 @@ function renderActionContent(action: IBattleAction): React.ReactNode {
       return <LevelUpMessage action={action} />;
     case 'itemdrop':
       return <ItemDropMessage action={action} />;
+    case 'energyexchange':
+      return <EnergyExchangeMessage action={action} />;
+    case 'leave':
+      return <LeaveMessage action={action} />;
     case 'info':
       return <InfoMessage action={action} />;
     default:

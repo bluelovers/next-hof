@@ -115,6 +115,10 @@ export enum EnumActionType {
 	ItemDrop = 'itemdrop',
 	/** 純文字資訊（`Failed!`、`Damage x6!`、`heal x2!`）/ plain info text */
 	Info = 'info',
+	/** HP/SP 交換（`name exchanged rate of HP and SP.`）/ HP/SP exchange */
+	EnergyExchange = 'energyexchange',
+	/** 退場（`name Lv.N leave the Battlefield.`）/ leave the battlefield */
+	Leave = 'leave',
 }
 
 /**

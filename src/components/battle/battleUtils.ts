@@ -296,11 +296,6 @@ export function buildSacrificeMessage(source: string | undefined, value: number)
   return buildNamedMessage(source, `sacrifice ${value} HP`);
 }
 
-/** 復活（`name revived!`）/ Revive (`name revived!`) */
-export function buildReviveMessage(source: string | undefined): string {
-  return buildNamedMessage(source, 'revived!');
-}
-
 /** 升級（`name LevelUp!`）/ Level up (`name LevelUp!`) */
 export function buildLevelUpMessage(source: string | undefined): string {
   return buildNamedMessage(source, 'LevelUp!');
@@ -359,15 +354,6 @@ export function buildDelayMessage(
   return buildNamedMessage(source, `Delayed(${oldValue} >>> ${newValue}/${base})`);
 }
 
-/**
- * 施放失敗（`name Failed to skill (reason)`；對應 PHP 的武器不符與 SP 不足兩種列印）
- * Failed to cast (`name Failed to skill (reason)`; covers PHP's weapon-mismatch and
- * SP-shortage prints)
- */
-export function buildFailMessage(source: string | undefined, skillName: string, reason: string): string {
-  return buildNamedMessage(source, `Failed to ${skillName} (${reason})`);
-}
-
 /** 訊息型別 → CSS class（單一事實來源）/ Action type → CSS class (single source of truth) */
 const MESSAGE_CLASS: Partial<Record<EnumActionType, string>> = {
   [EnumActionType.Damage]: 'dmg',
@@ -380,6 +366,7 @@ const MESSAGE_CLASS: Partial<Record<EnumActionType, string>> = {
   [EnumActionType.Casting]: 'charge',
   [EnumActionType.LevelUp]: 'levelup',
   [EnumActionType.Enter]: 'result',
+  [EnumActionType.Leave]: 'dmg',
   [EnumActionType.ItemDrop]: 'u',
 };
 
@@ -421,14 +408,19 @@ export function getMessageClass(action: IBattleAction): string {
 }
 
 /**
- * 入場訊息的後綴文字（單一事實來源）
- * Trailing text for the "enter the Battlefield" message (single source of truth)
+ * 入場／退場訊息的後綴文字（單一事實來源）
+ * Trailing text for the enter / leave the Battlefield message (single source of truth)
+ *
+ * 對照 Battle.php 的 `Name Lv.N enter|leave the Battlefield.`；退場為 dmg 色。
+ * Mirrors Battle.php's `Name Lv.N enter|leave the Battlefield.`; leaving is coloured dmg.
  *
  * @param level - 單位等級（提供時顯示 "Lv.x"） / Unit level (shows "Lv.x" when given)
+ * @param leave - 是否為退場（預設 false＝入場）/ Whether this is a leave (default false = enter)
  * @returns 訊息後綴 / Message suffix
  */
-export function getEnterBattlefieldText(level?: number): string {
-  return level != null ? `Lv.${level} enter the Battlefield.` : 'enter the Battlefield.';
+export function getEnterBattlefieldText(level?: number, leave = false): string {
+  const verb = leave ? 'leave' : 'enter';
+  return level != null ? `Lv.${level} ${verb} the Battlefield.` : `${verb} the Battlefield.`;
 }
 
 /**
