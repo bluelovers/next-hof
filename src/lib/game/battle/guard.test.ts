@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { EnumPosition } from '../constants';
-import { EnumCharType, EnumGuardKind } from '../types';
+import { EnumCharType, EnumGuardKind, EnumTeamSide } from '../types';
 import { Character } from '../character/Character';
 import { createSeedRepository } from '../data/seed-data';
 import { BattleTeam } from '../team/BattleTeam';
@@ -19,7 +19,7 @@ describe('Guard (9.3)', () => {
 	const invalid = { ...repo.getSkill(1000)!, invalid: 1 };
 
 	it('back-row target guarded by alive front always-guard; invalid hits directly', () => {
-		const team = new BattleTeam('1');
+		const team = new BattleTeam(EnumTeamSide.Team1);
 		const front = mk(1);
 		front.POSITION = EnumPosition.Front;
 		front.behavior = { guard: EnumGuardKind.Always };

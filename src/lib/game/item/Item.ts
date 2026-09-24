@@ -4,6 +4,8 @@
 import type { IItemDef, EnumWeaponType } from '../types';
 import type { IDataRepository } from '../data/repository';
 
+/** 道具類別預設值 / Default item category */
+export const ITEM_TYPE_DEFAULT = 'ITEM' as const;
 
 /**
  * 原始道具資料 / Raw item data
@@ -26,7 +28,7 @@ export function parseItem(raw: IRawItem): IItemDef {
 		dh: raw.dh ?? false,
 		handle: raw.handle ?? 0,
 		need: raw.need ?? {},
-		type2: raw.type2 ?? 'ITEM',
+		type2: raw.type2 ?? ITEM_TYPE_DEFAULT,
 		P_MAXHP: raw.P_MAXHP ?? 0,
 		P_MAXSP: raw.P_MAXSP ?? 0,
 		M_MAXHP: raw.M_MAXHP ?? 0,

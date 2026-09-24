@@ -4,6 +4,7 @@ import {
 	GET_STATUS_POINT, GET_SKILL_POINT, NORMAL_BATTLE_TIME, ENEMY_INCREASE,
 	BATTLE_MAX_TURNS, TURN_EXTENDS, BATTLE_MAX_EXTENDS, MAX_STATUS_MAXIMUM,
 	DELAY_TYPE, DELAY_BASE, UNION_BATTLE_TIME, UNION_BATTLE_NEXT,
+	EnumTeamSide, EnumState, EnumPosition,
 } from './constants';
 
 describe('game constants', () => {
@@ -26,5 +27,15 @@ describe('game constants', () => {
 		expect(DELAY_BASE).toBe(5);
 		expect(UNION_BATTLE_TIME).toBe(10);
 		expect(UNION_BATTLE_NEXT).toBe(1200);
+	});
+
+	it('EnumTeamSide has numeric values', () => {
+		expect(EnumTeamSide.Team0).toBe(0);
+		expect(EnumTeamSide.Team1).toBe(1);
+	});
+
+	it('EnumState has numeric values', () => {
+		expect(EnumState.Alive).toBe(0);
+		expect(EnumState.Dead).toBe(1);
 	});
 });

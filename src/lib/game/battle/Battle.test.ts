@@ -7,6 +7,8 @@ import { createSeedRepository } from '../data/seed-data';
 import { newChar, newMon } from '../character/factory';
 import { Battle } from './Battle';
 import { EnumCharType } from '../types';
+import { EnumOutcome } from './BattleResult';
+import { EnumBattleEventType } from '../types';
 
 const repo = createSeedRepository();
 
@@ -24,7 +26,7 @@ describe('Battle engine (9.1)', () => {
 		const battle = new Battle([c100], [c25], { repo, rng });
 		expect(battle.DelayValue(c100)).toBe(Math.sqrt(100) + 5);
 		expect(battle.DelayValue(c25)).toBe(Math.sqrt(25) + 5);
-		expect(battle.NextActer()).toBe(c100); // SPD 越高越早上場
+		expect(battle.NextActer()).toBe(c100);
 	});
 });
 
@@ -45,13 +47,13 @@ describe('Battle action (9.2)', () => {
 });
 
 describe('Battle result (9.4)', () => {
-	it('enemy wipeout → TEAM_0 wins', () => {
+	it('enemy wipeout → Team0 wins', () => {
 		const rng = new RNG(1);
 		const attacker = newChar({ ...repo.getCharBase(100)!, str: 200 }, repo, rng);
 		const target = newMon(repo.getMon(1000)!, repo, rng);
 		const battle = new Battle([attacker], [target], { repo, rng });
 		const res = battle.run();
-		expect(res.outcome).toBe('win');
+		expect(res.outcome).toBe(EnumOutcome.Win);
 		expect(res.turns).toBeGreaterThan(0);
 	});
 
@@ -68,7 +70,7 @@ describe('Battle result (9.4)', () => {
 		});
 		const battle = new Battle([d1], [d2], { repo: repo2, rng });
 		const res = battle.run();
-		expect(res.outcome).toBe('draw');
+		expect(res.outcome).toBe(EnumOutcome.Draw);
 	});
 });
 
@@ -83,9 +85,9 @@ describe('Integration 2v2 (11.1)', () => {
 		const battle = new Battle([p1, p2], [m1, m2], { repo, rng, time });
 		const res = battle.run();
 
-		expect(res.outcome).not.toBe('draw');
+		expect(res.outcome).not.toBe(EnumOutcome.Draw);
 		expect(battle.log.length).toBeGreaterThan(0);
-		expect(battle.log.some((e) => e.type === 'damage')).toBe(true);
+		expect(battle.log.some((e) => e.type === EnumBattleEventType.Damage)).toBe(true);
 
 		// 確定性：相同 seed 重跑得到相同結果與日誌長度
 		const rng2 = new RNG(12345);

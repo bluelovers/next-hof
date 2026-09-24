@@ -8,6 +8,14 @@ import type { IBehavior, ISpecial, ICharCore, IMonReward } from '../types';
 import { EnumCharType, EnumEquipSlot, EnumWeaponType } from '../types';
 import type { RNG } from '../core/rng';
 
+/**
+ * 角色識別字串工具 / Character ID string utilities
+ * 集中管理 Character 的數字 ID 到字串的轉換，消除散佈的 String(x.no) 呼叫。
+ * Centralizes the conversion of numeric character IDs to strings.
+ */
+export function charIdToString(no: number): string {
+	return String(no);
+}
 
 /**
  * 角色初始化參數 / Character initialization parameters
@@ -42,6 +50,15 @@ export function defaultSpecial(): ISpecial {
 		HpRegen: 0,
 		SpRegen: 0,
 	};
+}
+
+/**
+ * 由初始化參數建立唯一識別字串 / Build a unique identifier string from init parameters
+ * 使用陣列 join 取代字串聯合，確保格式一致。
+ * Uses array join instead of string concatenation to ensure consistent format.
+ */
+export function buildUniqid(types: EnumCharType[], no: number): string {
+	return [types.join('-'), no, Math.random().toString(36).slice(2, 8)].join('-');
 }
 
 export class Character {
@@ -129,7 +146,7 @@ export class Character {
 		this.no = init.no;
 		this.name = init.name;
 		this.types = new Set(init.types);
-		this.uniqid = `${init.types.join('-')}-${init.no}-${Math.random().toString(36).slice(2, 8)}`;
+		this.uniqid = buildUniqid(init.types, init.no);
 		this.level = init.level;
 		this.exp = init.exp ?? 0;
 		this.str = init.str;
@@ -146,6 +163,11 @@ export class Character {
 		this.equip = init.equip ?? {};
 		this.behavior = init.behavior;
 		this.reward = init.reward;
+	}
+
+	/** 將角色編號轉為字串（供事件日誌使用）/ Convert character number to string (for event logging) */
+	toIdString(): string {
+		return charIdToString(this.no);
 	}
 
 	/** 是否為玩家角色 / whether this is a player character */

@@ -22,12 +22,15 @@ export const TURN_EXTENDS = 20;
 export const BATTLE_MAX_EXTENDS = 100;
 export const BATTLE_STAT_TURNS = 10;
 export const MAX_BATTLE_LOG = 100;
-export const MAX_STATUS_MAXIMUM = MAX_STATUS * 10; // 絕對上限 = 基礎上限的 10 倍 / absolute cap = 10x base cap
+/** 絕對上限 = 基礎上限的 10 倍 / absolute cap = 10x base cap */
+export const MAX_STATUS_MAXIMUM = MAX_STATUS * 10;
 
-// Delay 系統 / Delay system
-export const DELAY_TYPE = 1; // 1 = 新版（依 SPD 距離）
-export const DELAY = 2.5; // 舊版係數（DELAY_TYPE=0 使用）
-export const DELAY_BASE = 5; // 新版基底值
+/** Delay 系統 / Delay system */
+export const DELAY_TYPE = 1;
+/** 舊版係數（DELAY_TYPE=0 使用） */
+export const DELAY = 2.5;
+/** 新版基底值 */
+export const DELAY_BASE = 5;
 
 // Union / 排名戰 / Union & Ranking
 export const UNION_BATTLE_TIME = 10;
@@ -40,16 +43,23 @@ export const RANK_BATTLE_NEXT_WIN = 60;
 export const REFINE_LIMIT = 10;
 export const SELLING_PRICE = 1 / 5;
 
-// 陣營 / Team indices
-export const TEAM_0 = '0';
-export const TEAM_1 = '1';
-
 // 魔方陣上限 / Magic circle cap
 export const MAGIC_CIRCLE_MAX = 5;
 
 /**
+ * 陣營側別 / Battle team side
+ * 使用數值枚舉取代字串字面量，徹底消除 TEAM_0='0' / TEAM_1='1' 設計。
+ * Uses numeric enum instead of string literals.
+ */
+export enum EnumTeamSide {
+	/** 陣營 0 / Team side 0 */
+	Team0 = 0,
+	/** 陣營 1 / Team side 1 */
+	Team1 = 1,
+}
+
+/**
  * 角色狀態列舉 / Character state enumeration
- * 列舉 / enumeration
  */
 export enum EnumState {
 	/** 存活 / alive */
@@ -66,7 +76,6 @@ export enum EnumState {
 
 /**
  * 隊伍位置列舉 / Formation position enumeration
- * 列舉 / enumeration
  */
 export enum EnumPosition {
 	/** 前衛（可守護後衛）/ front row (can guard the back row) */
@@ -76,13 +85,11 @@ export enum EnumPosition {
 }
 
 /**
- * 預期行為列舉 / Expected behavior enumeration
- * 列舉 / enumeration
+ * 預期行為列舉
  */
 export enum EnumExpect {
-	/** 蓄力預期（EnumExpect.Charge 目前無使用點）/ expected charge action (EnumExpect.Charge is currently unused) */
+	/** 蓄力預期 */
 	Charge = 'charge',
-	/** 詠唱預期（Battle.UseSkill 比對，不符則中斷）/ expected cast (compared in Battle.UseSkill; mismatch aborts) */
+	/** 詠唱預期 */
 	Cast = 'cast',
 }
-

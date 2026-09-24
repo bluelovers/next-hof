@@ -1,7 +1,7 @@
 // 戰鬥隊伍 / Battle team
 // 對應 docs/log/battle/04 §4（Battle_Team）。管理成員、存活統計與隨機選取。
 
-import { EnumState } from '../constants';
+import { EnumState, EnumTeamSide } from '../constants';
 import type { Character } from '../character/Character';
 import type { RNG } from '../core/rng';
 import { weightedPick } from '../core/random';
@@ -14,8 +14,8 @@ import { weightedPick } from '../core/random';
  * Manages members, alive counts, and random target selection.
  */
 export class BattleTeam {
-	/** 隊伍側別（'0'／'1'）/ side identifier ('0' / '1') */
-	side: string;
+	/** 隊伍側別 / side identifier */
+	side: EnumTeamSide;
 	/** 隊伍成員 / team members */
 	members: Character[] = [];
 	/** 魔方陣累計數（team-level）/ accumulated magic circles (team-level) */
@@ -23,9 +23,9 @@ export class BattleTeam {
 
 	/**
 	 * 建立隊伍 / Create a team
-	 * @param side 側別 / side ('0' or '1')
+	 * @param side 側別 / side (EnumTeamSide.Team0 or EnumTeamSide.Team1)
 	 */
-	constructor(side: string) {
+	constructor(side: EnumTeamSide) {
 		this.side = side;
 	}
 

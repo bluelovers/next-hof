@@ -4,6 +4,7 @@
 
 import { EnumState } from '../constants';
 import type { Character } from '../character/Character';
+import { charIdToString } from '../character/Character';
 import { hpDamage, hpRecover, getPoison, getNormal } from '../character/status';
 import { UPMAP, DOWNMAP, PLUSMAP, EnumAtkSlot, EnumDefSlot } from '../character/status-attrs';
 import type { ISkillDef, IBattleEvent } from '../types';
@@ -130,7 +131,7 @@ export function applySkill(skill: ISkillDef, user: Character, target: Character,
 		const hpBefore = target.HP;
 		const heal = calcRecoveryValue(skill, user);
 		const applied = hpRecover(target, heal);
-		events.push({ type: EnumBattleEventType.Heal, actor: String(user.no), target: String(target.no), skill: skill.no, value: applied, hpBefore, hpAfter: target.HP });
+		events.push({ type: EnumBattleEventType.Heal, actor: charIdToString(user.no), target: charIdToString(target.no), skill: skill.no, value: applied, hpBefore, hpAfter: target.HP });
 		statusChanges(skill, target, user, rng);
 		return { heal: applied, events };
 	}
@@ -140,13 +141,13 @@ export function applySkill(skill: ISkillDef, user: Character, target: Character,
 	// 絕對防禦 Barrier：消耗一次，完全抵擋
 	if (target.SPECIAL.Barrier > 0 && !skill.pierce) {
 		target.SPECIAL.Barrier--;
-		events.push({ type: EnumBattleEventType.Guard, actor: String(target.no), target: String(target.no), text: 'barrier' });
+		events.push({ type: EnumBattleEventType.Guard, actor: charIdToString(target.no), target: charIdToString(target.no), text: 'barrier' });
 		return { damage: 0, events };
 	}
 
 	const hpBefore = target.HP;
 	const applied = hpDamage(target, dmg);
-	events.push({ type: EnumBattleEventType.Damage, actor: String(user.no), target: String(target.no), skill: skill.no, value: applied, hpBefore, hpAfter: target.HP });
+	events.push({ type: EnumBattleEventType.Damage, actor: charIdToString(user.no), target: charIdToString(target.no), skill: skill.no, value: applied, hpBefore, hpAfter: target.HP });
 	statusChanges(skill, target, user, rng);
 	return { damage: applied, events };
 }

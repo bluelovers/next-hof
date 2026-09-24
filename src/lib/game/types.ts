@@ -1,7 +1,7 @@
 // 共用型別定義 / Shared type definitions
 // 欄位對應 docs/data/{char,job,skill,item,mon}.md 分析的 YAML 結構。
 
-import { EnumState, EnumPosition } from './constants';
+import { EnumState, EnumPosition, EnumTeamSide } from './constants';
 import type { ICompField } from './character/status-attrs';
 
 /**
@@ -139,6 +139,39 @@ export enum EnumGuardKind {
 	/** 從不發動 / Never active */
 	Never = 'never',
 }
+
+/**
+ * 守護種類對應的機率值 / Guard kind probability values
+ * 單一事實來源：Guard 機率百分比集中定義於此，杜絕 guard.ts 中的硬編碼數字。
+ * Single source of truth: guard probability percentages centralized here, eliminating hardcoded numbers in guard.ts.
+ * 僅 Prob25/Prob50/Prob75 有數值含義，Life 系列為 HP% 閾值，Always/Never 為恆真/恆假。
+ */
+export const GUARD_KIND_PROBABILITY: Record<EnumGuardKind, number | null> = {
+	[EnumGuardKind.Always]: null,
+	[EnumGuardKind.Never]: 0,
+	[EnumGuardKind.Life25]: null,
+	[EnumGuardKind.Life50]: null,
+	[EnumGuardKind.Life75]: null,
+	[EnumGuardKind.Prob25]: 25,
+	[EnumGuardKind.Prob50]: 50,
+	[EnumGuardKind.Prob75]: 75,
+} as const;
+
+/**
+ * 守護種類對應的 HP% 閾值 / Guard kind HP% thresholds
+ * 單一事實來源：Life 系列守護的 HP% 門檻集中定義於此，杜絕 guard.ts 中的硬編碼數字。
+ * Single source of truth: Life-series guard HP% thresholds centralized here, eliminating hardcoded numbers in guard.ts.
+ */
+export const GUARD_KIND_HP_THRESHOLD: Record<EnumGuardKind, number | null> = {
+	[EnumGuardKind.Always]: null,
+	[EnumGuardKind.Never]: null,
+	[EnumGuardKind.Life25]: 25,
+	[EnumGuardKind.Life50]: 50,
+	[EnumGuardKind.Life75]: 75,
+	[EnumGuardKind.Prob25]: null,
+	[EnumGuardKind.Prob50]: null,
+	[EnumGuardKind.Prob75]: null,
+} as const;
 
 /**
  * 模式項目 / Pattern item
@@ -689,8 +722,8 @@ export interface IBattleSnapshotUnit {
 	no: string;
 	/** 名稱 / name */
 	name: string;
-	/** 隊伍 '0' 或 '1' / team */
-	team: '0' | '1';
+	/** 隊伍側別 / team */
+	team: EnumTeamSide;
 	hp: number;
 	maxHp: number;
 	sp: number;

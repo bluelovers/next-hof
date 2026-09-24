@@ -4,6 +4,11 @@
 import type { Character } from '../character/Character';
 import type { IPatternItem } from '../types';
 import { DecideJudge } from './judge';
+import {
+	DEFAULT_PATTERN_FLEE,
+	DEFAULT_PATTERN_SPECIAL,
+	DEFAULT_PATTERN_TAIL,
+} from './judge-codes';
 
 /**
  * 組裝角色完整 pattern：
@@ -11,18 +16,15 @@ import { DecideJudge } from './judge';
  *  - 中間：角色自身 behavior.pattern
  *  - 末尾：預設 [1000,0,1000]
  *
- * Assemble a character's full pattern:
- *  - prelude [1405,1,9000] (flee) and [1940,10,3040] (special/revive)
- *  - middle: the character's own behavior.pattern
- *  - tail: default [1000,0,1000]
+ * Assembled from judge-codes.ts constants instead of inline magic numbers.
  */
 export function buildPattern(char: Character): IPatternItem[] {
 	const base = char.behavior?.pattern ? char.behavior.pattern.slice() : [];
 	const pattern: IPatternItem[] = [];
-	pattern.push({ judge: 1405, quantity: 1, action: 9000 });
-	pattern.push({ judge: 1940, quantity: 10, action: 3040 });
+	pattern.push(DEFAULT_PATTERN_FLEE);
+	pattern.push(DEFAULT_PATTERN_SPECIAL);
 	for (const p of base) pattern.push(p);
-	pattern.push({ judge: 1000, quantity: 0, action: 1000 });
+	pattern.push(DEFAULT_PATTERN_TAIL);
 	return pattern;
 }
 

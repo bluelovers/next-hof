@@ -5,8 +5,9 @@
 import {
 	EnumState, EnumExpect,
 	BATTLE_MAX_TURNS, TURN_EXTENDS, BATTLE_MAX_EXTENDS, DELAY_BASE, BATTLE_STAT_TURNS,
+	EnumTeamSide,
 } from '../constants';
-import { Character } from '../character/Character';
+import { Character, charIdToString } from '../character/Character';
 import { setBattleVariable } from '../character/battle-variable';
 import { autoRegeneration, poisonDamage } from '../character/status';
 import { getSkill } from '../skill/Skill';
@@ -15,6 +16,7 @@ import { BattleTeam } from '../team/BattleTeam';
 import { Defending } from './guard';
 import { buildPattern, MultiFactJudge } from './pattern';
 import { computeOutcome, BattleResult, EnumOutcome } from './BattleResult';
+import { EnumJudgeCode } from './judge-codes';
 import type { IDataRepository } from '../data/repository';
 import type { RNG } from '../core/rng';
 import type { ITimeService } from '../core/time-service';
@@ -42,8 +44,8 @@ export class Battle {
 	rng: RNG;
 	/** 時間服務（可為 null）/ time service (may be null) */
 	time: ITimeService | null;
-	/** 雙方隊伍（鍵 '0'／'1'）/ both teams (keys '0' / '1') */
-	teams: { '0': BattleTeam; '1': BattleTeam };
+	/** 雙方隊伍（鍵 EnumTeamSide.Team0／EnumTeamSide.Team1）/ both teams */
+	teams: Record<EnumTeamSide, BattleTeam>;
 	/** 當前回合數 / current turn counter */
 	turn = 0;
 	/** 延長次數 / extension count */
@@ -69,9 +71,9 @@ export class Battle {
 		this.repo = cfg.repo;
 		this.rng = cfg.rng;
 		this.time = cfg.time ?? null;
-		this.teams = { '0': new BattleTeam('0'), '1': new BattleTeam('1') };
-		for (const c of team0) this.teams['0'].add(c);
-		for (const c of team1) this.teams['1'].add(c);
+		this.teams = { [EnumTeamSide.Team0]: new BattleTeam(EnumTeamSide.Team0), [EnumTeamSide.Team1]: new BattleTeam(EnumTeamSide.Team1) };
+		for (const c of team0) this.teams[EnumTeamSide.Team0].add(c);
+		for (const c of team1) this.teams[EnumTeamSide.Team1].add(c);
 		for (const c of this.allChars()) {
 			setBattleVariable(c, this.repo, this.rng);
 			c.delay = 0;
@@ -80,13 +82,13 @@ export class Battle {
 
 	/** 所有單位（己隊 + 敵隊）/ every unit on both teams */
 	allChars(): Character[] {
-		return [...this.teams['0'].members, ...this.teams['1'].members];
+		return [...this.teams[EnumTeamSide.Team0].members, ...this.teams[EnumTeamSide.Team1].members];
 	}
 
 	/** 取得該單位的敵對隊伍 / the opposing team of the given unit */
 	enemyTeamOf(char: Character): BattleTeam {
 		const side = (char.team as BattleTeam).side;
-		return side === '0' ? this.teams['1'] : this.teams['0'];
+		return side === EnumTeamSide.Team0 ? this.teams[EnumTeamSide.Team1] : this.teams[EnumTeamSide.Team0];
 	}
 
 	/** 行動延遲值：sqrt(SPD) + DELAY_BASE（SPD 越高延遲越短）/ action delay: sqrt(SPD) + DELAY_BASE (higher SPD = shorter delay) */
@@ -119,13 +121,13 @@ export class Battle {
 	}
 
 	/**
-	 * 取得下一個技能編號（樣式判定失敗時回預設 1000 攻擊）
-	 * Pick the next skill number (falls back to the default attack 1000 when no rule matches)
+	 * 取得下一個技能編號（樣式判定失敗時回預設攻擊）
+	 * Pick the next skill number (falls back to the default attack when no rule matches)
 	 */
 	ChooseSkill(actor: Character): number {
 		const keys = buildPattern(actor);
 		const action = MultiFactJudge(keys, actor, this);
-		return action ?? 1000;
+		return action ?? EnumJudgeCode.DefaultAttack;
 	}
 
 	/**
@@ -148,14 +150,14 @@ export class Battle {
 		const count = skill.target?.[2] ?? 1;
 
 		if (t === EnumTargetType.Enemy) {
-			if (method === 'all') return enemyTeam.alive();
+			if (method === EnumTargetMethod.All) return enemyTeam.alive();
 			if (method === EnumTargetMethod.Multi) return enemyTeam.pickList(count, this.rng);
 			const p = enemyTeam.pick(this.rng);
 			return p ? [p] : [];
 		}
 		if (t === EnumTargetType.Friend) {
-			if (method === 'all') return friendTeam.alive();
-			if (method === 'multi') return friendTeam.pickList(count, this.rng);
+			if (method === EnumTargetMethod.All) return friendTeam.alive();
+			if (method === EnumTargetMethod.Multi) return friendTeam.pickList(count, this.rng);
 			const p = friendTeam.pick(this.rng);
 			return p ? [p] : [];
 		}
@@ -179,7 +181,7 @@ export class Battle {
 		if (skill.charge && actor.expect === null) {
 			actor.expect = skillNo;
 			actor.expect_type = EnumExpect.Cast;
-			this.log.push({ type: EnumBattleEventType.Cast, actor: String(actor.no), skill: skillNo });
+			this.log.push({ type: EnumBattleEventType.Cast, actor: charIdToString(actor.no), skill: skillNo });
 			// 戰鬥的總行動回數減少(蓄力不計為行動)
 			this.actions--;
 			return;
@@ -196,7 +198,7 @@ export class Battle {
 		if (skill.sp > 0) actor.SP -= need;
 
 		// 實際施放技能，計為一次行動
-		this.log.push({ type: EnumBattleEventType.Act, actor: String(actor.no), skill: skillNo });
+		this.log.push({ type: EnumBattleEventType.Act, actor: charIdToString(actor.no), skill: skillNo });
 
 		const targets = this.selectTargets(actor, skill);
 		for (const tgt of targets) {
@@ -209,13 +211,12 @@ export class Battle {
 			for (const ev of res.events) this.log.push(ev);
 			if (realTarget.HP <= 0 && realTarget.STATE !== EnumState.Dead) {
 				realTarget.STATE = EnumState.Dead;
-				this.log.push({ type: EnumBattleEventType.Death, target: String(realTarget.no) });
+				this.log.push({ type: EnumBattleEventType.Death, target: charIdToString(realTarget.no) });
 			}
 		}
 	}
 
-	/**
-	 * 執行單一單位的回合 / Run one unit's turn
+	/** 執行單一單位的回合 / Run one unit's turn
 	 * 自動回復 → 中毒傷害 → 死亡則跳過 → 選技能 → 施放 → 行動計數 +1。
 	 * auto-regen → poison damage → skip if dead → choose skill → cast → actCount +1.
 	 */
@@ -232,9 +233,9 @@ export class Battle {
 	/** 建立目前快照單位列表 / Build current snapshot unit list */
 	private snapshotUnits(): IBattleSnapshot['units'] {
 		return this.allChars().map((c) => ({
-			no: String(c.no),
+			no: charIdToString(c.no),
 			name: c.name,
-			team: c.team as '0' | '1',
+			team: c.team as EnumTeamSide,
 			hp: c.HP,
 			maxHp: c.MAXHP,
 			sp: c.SP,
@@ -258,7 +259,7 @@ export class Battle {
 			const actor = this.NextActer();
 			if (!actor) {
 				this.result = new BattleResult(
-					computeOutcome(this.teams['0'], this.teams['1']), this.turn, this.extend,
+					computeOutcome(this.teams[EnumTeamSide.Team0], this.teams[EnumTeamSide.Team1]), this.turn, this.extend,
 				);
 				break;
 			}
@@ -267,7 +268,7 @@ export class Battle {
 			this.SetDelay();
 			this.turn++;
 
-			const outcome = computeOutcome(this.teams['0'], this.teams['1']);
+			const outcome = computeOutcome(this.teams[EnumTeamSide.Team0], this.teams[EnumTeamSide.Team1]);
 			if (outcome !== EnumOutcome.Draw) {
 				this.result = new BattleResult(outcome, this.turn, this.extend);
 				break;
@@ -291,4 +292,3 @@ export class Battle {
 		return this.result;
 	}
 }
-

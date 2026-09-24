@@ -5,6 +5,7 @@
 
 import { MAX_STATUS_MAXIMUM } from '../constants';
 import type { Character } from './Character';
+import { STATUS_UP_KEY_NAME, STATUS_DOWN_KEY_NAME, STATUS_PLUS_KEY_NAME, BASE_STAT_COMP_NAMES } from './status-key';
 
 /**
  * atk 陣列索引（物理/魔法）/ atk array indices (physical/magic)
@@ -144,10 +145,12 @@ export const STATUS_ATTR_TABLE: Record<IStatusAttr, IStatusAttrEntry> = {
 /**
  * 由對照表衍生 Up* / Down* / Plus* 操作對照（單一事實來源衍生）/ Derived op maps
  *
- * 逐一走訪 STATUS_ATTR_TABLE：up/down 缺省時回退至通用 upAttr/downAttr；
+ * 使用 STATUS_UP_KEY_NAME / STATUS_DOWN_KEY_NAME / STATUS_PLUS_KEY_NAME 靜態對照表
+ * 取得鍵名，杜絕 'Up'+key 字串聯合；up/down 缺省時回退至通用 upAttr/downAttr；
  * plus 僅在有登錄時才建立 Plus* 鍵（Plus 只對六維與 MAXHP/MAXSP 存在）。
- * Walks STATUS_ATTR_TABLE: missing up/down fall back to the generic upAttr/downAttr;
- * Plus* keys are created only where plus is registered (six primary stats + MAXHP/MAXSP).
+ * Uses static lookup tables instead of 'Up'+key concatenation;
+ * missing up/down fall back to generic upAttr/downAttr;
+ * Plus* keys created only where plus is registered.
  */
 function buildStatusMaps(): { UPMAP: Record<string, IAttrFn>; DOWNMAP: Record<string, IAttrFn>; PLUSMAP: Record<string, IAttrFn> } {
 	const UPMAP: Record<string, IAttrFn> = {};
@@ -155,9 +158,11 @@ function buildStatusMaps(): { UPMAP: Record<string, IAttrFn>; DOWNMAP: Record<st
 	const PLUSMAP: Record<string, IAttrFn> = {};
 	for (const key of Object.keys(STATUS_ATTR_TABLE) as IStatusAttr[]) {
 		const e = STATUS_ATTR_TABLE[key];
-		UPMAP['Up' + key] = e.up ?? upAttr(e.get, e.set);
-		DOWNMAP['Down' + key] = e.down ?? downAttr(e.get, e.set);
-		if (e.plus) PLUSMAP['Plus' + key] = e.plus;
+		// 使用 STATUS_UP_KEY_NAME 靜態對照表取代 'Up' + key 字串聯合
+		UPMAP[STATUS_UP_KEY_NAME[key]] = e.up ?? upAttr(e.get, e.set);
+		// 使用 STATUS_DOWN_KEY_NAME 靜態對照表取代 'Down' + key 字串聯合
+		DOWNMAP[STATUS_DOWN_KEY_NAME[key]] = e.down ?? downAttr(e.get, e.set);
+		if (e.plus) PLUSMAP[STATUS_PLUS_KEY_NAME[key]] = e.plus;
 	}
 	return { UPMAP, DOWNMAP, PLUSMAP };
 }
@@ -198,13 +203,12 @@ export type IPrimaryStat = typeof PRIMARY_STATS[number];
 
 /**
  * 基礎屬性 → 戰鬥屬性 + 補正屬性 對照 / Base stat to battle/compensation mapping
- * 由 PRIMARY_STATS 衍生（battle = 大寫、comp = P_ + 大寫），避免重複列舉名稱。
- * Derived from PRIMARY_STATS (battle = uppercase, comp = P_ + uppercase) to avoid re-listing names.
+ * 由 BASE_STAT_COMP_NAMES 靜態對照表衍生，杜絕 'P_' + name 字串聯合。
+ * Derived from BASE_STAT_COMP_NAMES static lookup, eliminating 'P_' + name concatenation.
  * 型別別名 / type alias
  */
-export const BASE_STAT_COMP_MAP = Object.fromEntries(
-	PRIMARY_STATS.map((s) => [s, {
-		battle: s.toUpperCase() as Uppercase<IPrimaryStat>,
-		comp: ('P_' + s.toUpperCase()) as `P_${Uppercase<IPrimaryStat>}`,
-	}]),
-) as Record<IPrimaryStat, { battle: Uppercase<IPrimaryStat>; comp: `P_${Uppercase<IPrimaryStat>}` }>;
+export const BASE_STAT_COMP_MAP = Object.freeze(
+	Object.fromEntries(
+		PRIMARY_STATS.map((s) => [s, BASE_STAT_COMP_NAMES[s]]),
+	) as Record<IPrimaryStat, { battle: string; comp: string }>,
+);

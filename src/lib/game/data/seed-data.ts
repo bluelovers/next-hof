@@ -4,6 +4,7 @@
 
 import { EnumWeaponType, EnumTargetType, EnumTargetMethod, EnumEquipSlot, EnumGuardKind, type ISkillDef, type IItemDef, type IJobDef, type ICharDef, type IMonDef } from '../types';
 import { EnumPosition } from '../constants';
+import { EnumJudgeCode } from '../battle/judge-codes';
 import { InMemoryRepository, type IDataRepository } from './repository';
 
 // 職業 / Jobs
@@ -87,8 +88,8 @@ const char100: ICharDef = {
 	behavior: {
 		position: EnumPosition.Front, guard: EnumGuardKind.Always,
 		pattern: [
-			{ judge: 1205, quantity: 8, action: 1001 },
-			{ judge: 1000, quantity: 0, action: 1000 },
+			{ judge: EnumJudgeCode.HpRelated, quantity: 8, action: EnumJudgeCode.AlwaysTrue },
+			{ judge: EnumJudgeCode.DefaultAttack, quantity: 0, action: EnumJudgeCode.DefaultAttack },
 		],
 	},
 	data_ex: { recruit_money: 2000 },
@@ -101,7 +102,7 @@ const char101: ICharDef = {
 	equip: { [EnumEquipSlot.MainHand]: 1000, [EnumEquipSlot.Armor]: 5000 },
 	behavior: {
 		position: EnumPosition.Front, guard: EnumGuardKind.Always,
-		pattern: [{ judge: 1000, quantity: 0, action: 1000 }],
+		pattern: [{ judge: EnumJudgeCode.DefaultAttack, quantity: 0, action: EnumJudgeCode.DefaultAttack }],
 	},
 	data_ex: { recruit_money: 2000 },
 };
@@ -112,11 +113,11 @@ const char102: ICharDef = {
 	str: 4, int: 16, dex: 4, spd: 5, luk: 3, job: 200, skill: [1000, 2000],
 	behavior: {
 		position: EnumPosition.Back, guard: EnumGuardKind.Never,
-		// 1940 約 10% 機率施放 FireStorm，其餘回退普攻（避免 SP 耗盡後空轉）
-		// 1940 ~10% chance of FireStorm, otherwise basic attack (avoids stalling when SP runs out)
+		// EnumJudgeCode.SpecialTrigger 約 10% 機率施放 FireStorm，其餘回退普攻（避免 SP 耗盡後空轉）
+		// SpecialTrigger ~10% chance of FireStorm, otherwise basic attack (avoids stalling when SP runs out)
 		pattern: [
-			{ judge: 1940, quantity: 0, action: 2000 },
-			{ judge: 1000, quantity: 0, action: 1000 },
+			{ judge: EnumJudgeCode.SpecialTrigger, quantity: 0, action: 2000 },
+			{ judge: EnumJudgeCode.DefaultAttack, quantity: 0, action: EnumJudgeCode.DefaultAttack },
 		],
 	},
 	data_ex: { recruit_money: 3000 },
@@ -129,7 +130,7 @@ const char103: ICharDef = {
 	equip: { [EnumEquipSlot.MainHand]: 1000, [EnumEquipSlot.Armor]: 5000 },
 	behavior: {
 		position: EnumPosition.Back, guard: EnumGuardKind.Never,
-		pattern: [{ judge: 1000, quantity: 0, action: 1000 }],
+		pattern: [{ judge: EnumJudgeCode.DefaultAttack, quantity: 0, action: EnumJudgeCode.DefaultAttack }],
 	},
 	data_ex: { recruit_money: 2500 },
 };
@@ -141,11 +142,11 @@ const char104: ICharDef = {
 	equip: { [EnumEquipSlot.Armor]: 5000 },
 	behavior: {
 		position: EnumPosition.Back, guard: EnumGuardKind.Never,
-		// 1101：自身 HP ≤ 40% 時治療，否則普攻
-		// 1101: heal while own HP <= 40%, otherwise basic attack
+		// EnumJudgeCode.LowHp40：自身 HP ≤ 40% 時治療，否則普攻
+		// LowHp40: heal while own HP <= 40%, otherwise basic attack
 		pattern: [
-			{ judge: 1101, quantity: 40, action: 3000 },
-			{ judge: 1000, quantity: 0, action: 1000 },
+			{ judge: EnumJudgeCode.LowHp40, quantity: 40, action: 3000 },
+			{ judge: EnumJudgeCode.DefaultAttack, quantity: 0, action: EnumJudgeCode.DefaultAttack },
 		],
 	},
 	data_ex: { recruit_money: 2500 },
@@ -158,7 +159,7 @@ const char105: ICharDef = {
 	equip: { [EnumEquipSlot.MainHand]: 1000, [EnumEquipSlot.Armor]: 5000 },
 	behavior: {
 		position: EnumPosition.Front, guard: EnumGuardKind.Always,
-		pattern: [{ judge: 1000, quantity: 0, action: 1000 }],
+		pattern: [{ judge: EnumJudgeCode.DefaultAttack, quantity: 0, action: EnumJudgeCode.DefaultAttack }],
 	},
 	data_ex: { recruit_money: 2000 },
 };
@@ -168,14 +169,14 @@ const mon1000: IMonDef = {
 	no: 1000, name: 'GoblinAxe', level: 1, maxhp: 140, hp: 140, maxsp: 10, sp: 10,
 	str: 20, int: 2, dex: 10, spd: 8, luk: 2, skill: [1000],
 	reward: { moneyhold: 50, exphold: 30, itemtable: {} },
-	behavior: { position: EnumPosition.Front, guard: EnumGuardKind.Always, pattern: [{ judge: 1000, quantity: 0, action: 1000 }] },
+	behavior: { position: EnumPosition.Front, guard: EnumGuardKind.Always, pattern: [{ judge: EnumJudgeCode.DefaultAttack, quantity: 0, action: EnumJudgeCode.DefaultAttack }] },
 };
 
 const mon1001: IMonDef = {
 	no: 1001, name: 'DarkElfHunter', level: 39, maxhp: 580, hp: 580, maxsp: 80, sp: 80,
 	str: 60, int: 50, dex: 40, spd: 35, luk: 10, skill: [2000],
 	reward: { moneyhold: 200, exphold: 120, itemtable: {} },
-	behavior: { position: EnumPosition.Back, guard: EnumGuardKind.Never, pattern: [{ judge: 1000, quantity: 0, action: 2000 }] },
+	behavior: { position: EnumPosition.Back, guard: EnumGuardKind.Never, pattern: [{ judge: EnumJudgeCode.DefaultAttack, quantity: 0, action: 2000 }] },
 };
 
 // 展示頁入門怪物：史萊姆（低威脅，供入門 encounter 使用）/ Showcase entry monster: Slime
@@ -183,7 +184,7 @@ const mon1002: IMonDef = {
 	no: 1002, name: 'Slime', level: 1, maxhp: 60, hp: 60, maxsp: 5, sp: 5,
 	str: 8, int: 1, dex: 5, spd: 4, luk: 1, skill: [1000],
 	reward: { moneyhold: 10, exphold: 5, itemtable: {} },
-	behavior: { position: EnumPosition.Front, guard: EnumGuardKind.Never, pattern: [{ judge: 1000, quantity: 0, action: 1000 }] },
+	behavior: { position: EnumPosition.Front, guard: EnumGuardKind.Never, pattern: [{ judge: EnumJudgeCode.DefaultAttack, quantity: 0, action: EnumJudgeCode.DefaultAttack }] },
 };
 
 /** 建立並填入範例資料的倉庫 / Build an in-memory repository seeded with sample data */
