@@ -7,7 +7,24 @@
  *
  * 注意：分隔線樣式 .break 和 .break-top 已移至 SharedBase.css（多元件共用）
  * Note: Divider styles .break and .break-top moved to SharedBase.css (shared across components)
+ *
+ * 響應式：兩隊統計以 flex 排版，容器過窄時自動堆疊。
+ * Responsive: team stats use flex and stack automatically when too narrow.
  */
+
+.battle-result {
+  width: 100%;
+}
+
+.result-title-row {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.result-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+}
 
 /* ==================== 結果標題 / Result Title ==================== */
 
@@ -30,10 +47,10 @@
 /* ==================== 統計數據 / Statistics ==================== */
 
 .result-stats {
-  width: 50%;
+  flex: 1 1 240px;
+  min-width: 0;
   text-align: center;
   padding: 10px;
-  vertical-align: top;
 }
 
 .result-stats .stat-row {

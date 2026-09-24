@@ -275,8 +275,9 @@ describe('3.4 buildResultData', () => {
 		expect(result.winner).toBe('Dark Force');
 		expect(result.winnerSide).toBe(EnumTeamSideUI.Left);
 		expect(result.isDraw).toBe(false);
-		expect(result.leftTeam.alive).toBe(0);
-		expect(result.rightTeam.alive).toBeGreaterThan(0);
+		// leftTeam = enemies (still standing on our loss), rightTeam = allies (wiped out)
+		expect(result.leftTeam.alive).toBeGreaterThan(0);
+		expect(result.rightTeam.alive).toBe(0);
 	});
 
 	it('draw branch: flags a draw without naming a winner', () => {

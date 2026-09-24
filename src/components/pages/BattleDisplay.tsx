@@ -7,10 +7,17 @@
  *
  * 包含 / Includes:
  * - 隊伍資訊 / Team info
- * - 戰場畫面 / Battlefield scene
- * - HP/SP 狀態 / HP/SP status
- * - 行動日誌 / Action log
+ * - 單位入場 / Unit entrance
+ * - 分段戰場（快照驅動）/ Segmented battlefield (snapshot-driven)
+ * - 每段 HP/SP 狀態 / Per-segment HP/SP status
+ * - 每段行動日誌 / Per-segment action log
  * - 戰鬥結果 / Battle result
+ *
+ * 布局已由 table 改為響應式 div（支援現代瀏覽器與手機）；
+ * 有 snapshots 時依快照切成多段（多段顯示），否則退化為單段。
+ * Layout moved from table to responsive divs (modern browsers + mobile);
+ * when snapshots exist the log is split into multiple segments, otherwise it
+ * degrades to a single segment.
  */
 import React from 'react';
 import type { IBattleDisplayData, IBattleUnit } from '#/components/battle/types';
@@ -20,8 +27,13 @@ import { BattleUnit } from '#/components/battle/BattleUnit';
 import { BattleLog } from '#/components/battle/BattleLog';
 import { BattleResult } from '#/components/battle/BattleResult';
 import { EnumTeamSideUI } from '#/components/battle/enums';
-import { getSideClass, getEnterBattlefieldText } from '#/components/battle/battleUtils';
-import type { ITeamSide } from '#/components/battle/types';
+import {
+  getSideClass,
+  getEnterBattlefieldText,
+  splitActionsBySnapshots,
+  segmentUnitsForSide,
+  filterSpritesBySnapshot,
+} from '#/components/battle/battleUtils';
 import './BattleDisplay.css';
 import '#/components/shared/SharedBase.css';
 
@@ -47,199 +59,175 @@ export const BattleDisplay: React.FC<IBattleDisplayProps> = ({
   showHpBars = true,
   showSpBars = true,
 }) => {
-  const { leftTeam, rightTeam, battlefield, sprites, actions, result, title, time } = data;
+  const { leftTeam, rightTeam, battlefield, sprites, actions, result, title, time, snapshots } = data;
+
+  // 依快照把行動切成多段；無快照時為單段
+  // Split actions into segments by snapshot; a single segment when absent
+  const segments = splitActionsBySnapshots(actions, snapshots);
+  const initialSegment = segments[0];
 
   return (
     <div className="battle-display">
       {/* 戰鬥標題 / Battle title */}
       {title && (
-        <div style={{ padding: '15px 0', width: '100%', textAlign: 'center' }} className="break">
-          <h2>{title}</h2>
-          {time && <div>this battle starts at<br />{time}</div>}
-        </div>
+        <header className="battle-header break">
+          <h2 className="battle-title">{title}</h2>
+          {time && (
+            <div className="battle-time">
+              this battle starts at
+              <br />
+              {time}
+            </div>
+          )}
+        </header>
       )}
 
-      <table className="battle-frame" cellSpacing="0">
-        <tbody>
-          {/* Row 1: 隊伍資訊 / Team info */}
-          <tr>
-            <BattleTeamInfo
-              name={leftTeam.name}
-              units={leftTeam.units}
-              sideClass={getSideClass(EnumTeamSideUI.Left)}
-            />
-            <BattleTeamInfo
-              name={rightTeam.name}
-              units={rightTeam.units}
-              sideClass={getSideClass(EnumTeamSideUI.Right)}
-            />
-          </tr>
+      <div className="battle-content">
+        {/* Row 1: 隊伍資訊（起始快照狀態）/ Team info (initial snapshot state) */}
+        <div className="battle-row battle-row--teams">
+          <BattleTeamInfo
+            name={leftTeam.name}
+            units={segmentUnitsForSide(initialSegment, EnumTeamSideUI.Left, leftTeam.units)}
+            sideClass={getSideClass(EnumTeamSideUI.Left)}
+          />
+          <BattleTeamInfo
+            name={rightTeam.name}
+            units={segmentUnitsForSide(initialSegment, EnumTeamSideUI.Right, rightTeam.units)}
+            sideClass={getSideClass(EnumTeamSideUI.Right)}
+          />
+        </div>
 
-          {/* Row 2: 單位入場 / Unit entrance */}
+        {/* Row 2: 單位入場 / Unit entrance */}
+        <div className="battle-enter">
           {leftTeam.units.map((unit, i) => (
-            <tr key={`enter-left-${i}`}>
-              <td className={getSideClass(EnumTeamSideUI.Left)}>
+            <div className="enter-row" key={`enter-left-${i}`}>
+              <div className={`enter-cell ${getSideClass(EnumTeamSideUI.Left)}`}>
                 <span className="result">
-                  <span className="bold">{unit.name}</span> {getEnterBattlefieldText(unit.level)}
+                  <span className="bold">{unit.name}</span>{' '}
+                  {getEnterBattlefieldText(unit.level)}
                 </span>
-              </td>
-              <td className={getSideClass(EnumTeamSideUI.Right)}>&nbsp;</td>
-            </tr>
+              </div>
+              <div className={`enter-cell ${getSideClass(EnumTeamSideUI.Right)}`} aria-hidden="true" />
+            </div>
           ))}
           {rightTeam.units.map((unit, i) => (
-            <tr key={`enter-right-${i}`}>
-              <td className={getSideClass(EnumTeamSideUI.Left)}>&nbsp;</td>
-              <td className={getSideClass(EnumTeamSideUI.Right)}>
+            <div className="enter-row" key={`enter-right-${i}`}>
+              <div className={`enter-cell ${getSideClass(EnumTeamSideUI.Left)}`} aria-hidden="true" />
+              <div className={`enter-cell ${getSideClass(EnumTeamSideUI.Right)}`}>
                 <span className="result">
-                  <span className="bold">{unit.name}</span> {getEnterBattlefieldText(unit.level)}
+                  <span className="bold">{unit.name}</span>{' '}
+                  {getEnterBattlefieldText(unit.level)}
                 </span>
-              </td>
-            </tr>
+              </div>
+            </div>
           ))}
+        </div>
 
-          {/* Row 3: 戰場畫面 / Battlefield scene */}
-          <BattleFieldScene
-            sprites={sprites}
-            config={battlefield}
-            showLabels={showSpriteLabels}
+        {/* Row 3+: 分段（快照）/ Segments (snapshot-driven) */}
+        {segments.map((segment) => {
+          const leftUnits = segmentUnitsForSide(segment, EnumTeamSideUI.Left, leftTeam.units);
+          const rightUnits = segmentUnitsForSide(segment, EnumTeamSideUI.Right, rightTeam.units);
+          const segmentSprites = filterSpritesBySnapshot(sprites, segment.snapshot);
+          const hasPrev = segment.index > 0;
+          const hasNext = segment.index < segments.length - 1;
+
+          return (
+            <section
+              className="battle-segment"
+              id={`battle-seg-${segment.index}`}
+              key={segment.index}
+              aria-label={`battle segment ${segment.index + 1} / ${segments.length}`}
+            >
+              {/* 戰場畫面 / Battlefield scene */}
+              <div className="battle-row battle-row--scene">
+                <BattleFieldScene
+                  sprites={segmentSprites}
+                  config={battlefield}
+                  showLabels={showSpriteLabels}
+                />
+              </div>
+
+              {/* HP/SP 狀態（該段起始）/ HP/SP status (segment start) */}
+              <div className="battle-row battle-row--status">
+                <div className={`battle-side ${getSideClass(EnumTeamSideUI.Left)} break`}>
+                  {renderUnits(leftUnits, showHpBars, showSpBars)}
+                </div>
+                <div className={`battle-side ${getSideClass(EnumTeamSideUI.Right)} break`}>
+                  {renderUnits(rightUnits, showHpBars, showSpBars)}
+                </div>
+              </div>
+
+              {/* 該段行動日誌 / Segment action log */}
+              {segment.actions.length > 0 && (
+                <div className="battle-row battle-row--log">
+                  <BattleLog actions={segment.actions} />
+                </div>
+              )}
+
+              {/* 分段導覽（僅多段時顯示）/ Segment navigation (only when paged) */}
+              {segments.length > 1 && (
+                <nav className="battle-segment-nav" aria-label="segment navigation">
+                  {hasPrev ? (
+                    <a
+                      className="battle-segment-link"
+                      href={`#battle-seg-${segment.index - 1}`}
+                    >
+                      &lt;&lt;
+                    </a>
+                  ) : (
+                    <span className="battle-segment-link battle-segment-link--disabled" aria-hidden="true">
+                      &lt;&lt;
+                    </span>
+                  )}
+                  <span className="battle-segment-counter">
+                    {segment.index + 1} / {segments.length}
+                  </span>
+                  {hasNext ? (
+                    <a
+                      className="battle-segment-link"
+                      href={`#battle-seg-${segment.index + 1}`}
+                    >
+                      &gt;&gt;
+                    </a>
+                  ) : (
+                    <span className="battle-segment-link battle-segment-link--disabled" aria-hidden="true">
+                      &gt;&gt;
+                    </span>
+                  )}
+                </nav>
+              )}
+            </section>
+          );
+        })}
+
+        {/* 戰鬥結果 / Battle result */}
+        {result && (
+          <BattleResult
+            result={result}
+            leftTeamName={leftTeam.name}
+            rightTeamName={rightTeam.name}
           />
-
-          {/* Row 4: HP/SP 狀態 / HP/SP status */}
-          <tr>
-            {/* 左側隊伍狀態 / Left team status */}
-            <td className={`${getSideClass(EnumTeamSideUI.Left)} break`}>
-              <table style={{ width: '100%' }}>
-                <tbody>
-                  <tr>
-                    <td style={{ width: '50%' }}>
-                      {/* 左欄隊員 (從原始頁面來看，部分在左半部) */}
-                      {renderUnitColumn(leftTeam.units, EnumTeamSideUI.Left, showHpBars, showSpBars)}
-                    </td>
-                    <td style={{ width: '50%' }}>
-                      {/* 右半部留空或放更多單位 */}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </td>
-
-            {/* 右側隊伍狀態 / Right team status */}
-            <td className={`${getSideClass(EnumTeamSideUI.Right)} break`}>
-              <table style={{ width: '100%' }}>
-                <tbody>
-                  <tr>
-                    <td style={{ width: '50%' }}>
-                      {renderUnitColumnHead(rightTeam.units, showHpBars, showSpBars)}
-                    </td>
-                    <td style={{ width: '50%' }}>
-                      {renderUnitColumnTail(rightTeam.units, showHpBars, showSpBars)}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </td>
-          </tr>
-
-          {/* Row 5: 行動日誌 / Action log */}
-          <BattleLog actions={actions} twoColumn />
-
-          {/* Row 6: 戰鬥結果 / Battle result */}
-          {result && (
-            <BattleResult
-              result={result}
-              leftTeamName={leftTeam.name}
-              rightTeamName={rightTeam.name}
-            />
-          )}
-        </tbody>
-      </table>
+        )}
+      </div>
     </div>
   );
 };
 
 /**
- * 渲染左側隊伍的單位欄位
- * Render left team unit columns
- *
- * 原始頁面中，左側隊伍的單位排列在單一欄中
- * In the original page, left team units are arranged in a single column
+ * 渲染某一側隊伍的單位狀態（單一事實來源）
+ * Render one side's unit statuses (single source of truth)
  */
-function renderUnitColumn(
+function renderUnits(
   units: IBattleUnit[],
-  side: ITeamSide,
   showHpBars: boolean,
   showSpBars: boolean
 ): React.ReactNode {
-  // 左側隊伍：由上到下排列所有單位
-  // Left team: list all units top to bottom
   return units.map((unit, i) => (
-    <React.Fragment key={`left-unit-${i}`}>
+    <div className="battle-side-unit" key={`${unit.name}-${i}`}>
       <div className="bold">{unit.name}</div>
       <div className="hpsp">
-        <BattleUnit
-          unit={unit}
-          showHpBar={showHpBars}
-          showSpBar={showSpBars}
-        />
+        <BattleUnit unit={unit} showHpBar={showHpBars} showSpBar={showSpBars} />
       </div>
-    </React.Fragment>
-  ));
-}
-
-/**
- * 渲染右側隊伍的前半部單位
- * Render right team first half units
- *
- * 原始頁面中，右側隊伍的單位分為兩欄
- * In the original page, right team units are split into two columns
- */
-function renderUnitColumnHead(
-  units: IBattleUnit[],
-  showHpBars: boolean,
-  showSpBars: boolean
-): React.ReactNode {
-  // 右側隊伍前半部 (第一個單位單獨一欄)
-  // Right team first half (first unit in its own column)
-  if (units.length === 0) return null;
-  const firstUnit = units[0];
-  return (
-    <>
-      <div className="bold">{firstUnit.name}</div>
-      <div className="hpsp">
-        <BattleUnit
-          unit={firstUnit}
-          showHpBar={showHpBars}
-          showSpBar={showSpBars}
-        />
-      </div>
-    </>
-  );
-}
-
-/**
- * 渲染右側隊伍的後半部單位
- * Render right team remaining units
- *
- * 原始頁面中，其餘單位在第二欄
- * In the original page, remaining units are in the second column
- */
-function renderUnitColumnTail(
-  units: IBattleUnit[],
-  showHpBars: boolean,
-  showSpBars: boolean
-): React.ReactNode {
-  // 右側隊伍後半部 (其餘單位)
-  // Right team remaining units
-  return units.slice(1).map((unit, i) => (
-    <React.Fragment key={`right-tail-unit-${i}`}>
-      <div className="bold">{unit.name}</div>
-      <div className="hpsp">
-        <BattleUnit
-          unit={unit}
-          showHpBar={showHpBars}
-          showSpBar={showSpBars}
-        />
-      </div>
-    </React.Fragment>
+    </div>
   ));
 }

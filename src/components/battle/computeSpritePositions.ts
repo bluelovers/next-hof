@@ -20,6 +20,8 @@ import { getSpriteImageDir, computeSpriteFlipped, useFlipPositioning } from './s
 export interface IBattlePositionChar {
   /** 角色 ID / Character ID */
   id: string;
+  /** 單位編號（引擎 char no 字串；供精靈與快照比對）/ Unit no (engine char no string; for sprite/snapshot matching) */
+  unitNo?: string;
   /** 角色名稱 / Character name */
   name?: string;
   /** 精靈圖片路徑 / Sprite image path */
@@ -158,6 +160,7 @@ function computeRowPositions(
 
     return {
       id: char.id,
+      unitNo: char.unitNo,
       name: char.name,
       imageUrl: char.imageUrl,
       x,

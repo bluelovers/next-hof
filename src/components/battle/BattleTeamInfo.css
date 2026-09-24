@@ -4,10 +4,16 @@
  *
  * 原始來源：BattleDisplay.css 第 35-39 行
  * Source: BattleDisplay.css lines 35-39
+ *
+ * 響應式：改以 flex 基底（而非 table 欄寬）排版，
+ * 容器寬度不足時自動換行堆疊（手機）。
+ * Responsive: flex-basis replaces table column width, so panels wrap and
+ * stack automatically when the container is narrow (mobile).
  */
 
 .teams {
-  width: 50%;
+  flex: 1 1 240px;
+  min-width: 0;
   text-align: center;
   padding: 10px;
 }

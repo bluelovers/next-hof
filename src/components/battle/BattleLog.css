@@ -1,0 +1,45 @@
+/**
+ * BattleLog 元件樣式
+ * BattleLog component styles
+ *
+ * 響應式雙欄日誌：桌面為左右兩欄（每列僅一個行動，另一欄留空），
+ * 窄螢幕時改為單欄，且自動隱藏沒有行動的空欄。
+ * Responsive two-column log: on desktop a row has a left/right slot with exactly
+ * one populated; on narrow screens it collapses to one column and hides empty slots.
+ */
+
+.battle-log {
+  width: 100%;
+}
+
+.log-row {
+  display: flex;
+  align-items: stretch;
+}
+
+.log-cell {
+  flex: 1 1 50%;
+  min-width: 0;
+}
+
+.log-cell--full {
+  flex-basis: 100%;
+}
+
+/* ==================== 窄螢幕 / Narrow screens ==================== */
+
+@media (max-width: 640px) {
+  .log-row {
+    flex-direction: column;
+  }
+
+  /* 空欄不佔位：僅顯示實際有行動的一側 / Empty slots take no space */
+  .log-cell:empty {
+    display: none;
+  }
+
+  /* 覆寫 .ttd1 的欄位分隔線（堆疊後不需要）/ Override .ttd1 column divider when stacked */
+  .log-row .log-cell {
+    border-left: none;
+  }
+}

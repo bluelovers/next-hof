@@ -27,7 +27,7 @@ export interface IBattleResultProps {
  * Extracted from duplicated leftTeam / rightTeam rendering logic
  */
 const TeamStats: React.FC<{ stats: ITeamFinalStats }> = ({ stats }) => (
-  <td className="result-stats">
+  <div className="result-stats">
     <div className="stat-row">
       HP remain : {stats.hpRemain}/{stats.totalUnits > 0 ? stats.hpRemain : 0}
     </div>
@@ -47,7 +47,7 @@ const TeamStats: React.FC<{ stats: ITeamFinalStats }> = ({ stats }) => (
         Funds : $&nbsp;{stats.funds}
       </div>
     )}
-  </td>
+  </div>
 );
 
 /**
@@ -75,20 +75,14 @@ export const BattleResult: React.FC<IBattleResultProps> = ({
   const titleText = isDraw ? 'Draw!' : `${winner} Wins!`;
 
   return (
-    <>
-      <tr>
-        <td
-          colSpan={2}
-          className="break break-top"
-          style={{ textAlign: 'center', padding: '10px 0px' }}
-        >
-          <div className={titleClass}>{titleText}</div>
-        </td>
-      </tr>
-      <tr>
+    <div className="battle-result">
+      <div className="result-title-row break break-top">
+        <div className={titleClass}>{titleText}</div>
+      </div>
+      <div className="result-stats-row">
         <TeamStats stats={leftTeam} />
         <TeamStats stats={rightTeam} />
-      </tr>
-    </>
+      </div>
+    </div>
   );
 };

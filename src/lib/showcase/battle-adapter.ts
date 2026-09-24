@@ -11,6 +11,7 @@ import { Battle } from '#/lib/game/battle/Battle';
 import { EnumOutcome } from '#/lib/game/battle/BattleResult';
 import { newChar, newMon } from '#/lib/game/character/factory';
 import type { Character } from '#/lib/game/character/Character';
+import { charIdToString } from '#/lib/game/character/Character';
 import { RNG } from '#/lib/game/core/rng';
 import { createSeedRepository } from '#/lib/game/data/seed-data';
 import type { IDataRepository } from '#/lib/game/data/repository';
@@ -418,6 +419,7 @@ export function buildPositionRoster(
 ): IBattlePositionChar[] {
 	const toEntry = (c: Character, side: ITeamSide, imageUrl: string): IBattlePositionChar => ({
 		id: c.uniqid,
+		unitNo: charIdToString(c.no),
 		name: c.name,
 		imageUrl,
 		imageSize: getSpriteImageSize(imageUrl),
@@ -460,6 +462,7 @@ function toSnapshotDisplay(snap: IBattleSnapshot, lookup: IUnitLookup, repo?: ID
 				if (sk) chargeKind = sk.type === 0 ? EnumChargeKind.Charging : EnumChargeKind.Casting;
 			}
 			return {
+				id: u.no,
 				name: u.name,
 				side,
 				hp: u.hp,

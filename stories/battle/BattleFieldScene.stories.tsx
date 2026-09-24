@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { TableDarkDecorator } from '../decorators';
+import { BattleStageDarkDecorator } from '../decorators';
 import { BattleFieldScene } from '../../src/components/battle/BattleFieldScene';
 import { sampleSprites, sampleEnemySprites, sampleAllySprites, sampleSpritesMixed, sampleSpritesFlat, createSampleConfig } from './sampleData';
 
@@ -20,7 +20,7 @@ const meta: Meta<typeof BattleFieldScene> = {
   },
   tags: ['autodocs'],
   decorators: [
-    TableDarkDecorator,
+    BattleStageDarkDecorator,
   ],
 };
 

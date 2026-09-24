@@ -36,13 +36,13 @@ export const BattleTeamInfo: React.FC<IBattleTeamInfoProps> = ({
   const totalHp = calcTotalHp(units);
 
   return (
-    <td className={`teams ${sideClass}`}>
+    <div className={`teams ${sideClass}`}>
       <div className="bold">{name}</div>
       Total Lv : {totalLevel}
       <br />
       Average Lv : {avgLevel}
       <br />
       Total HP : {totalHp.current} / {totalHp.max}
-    </td>
+    </div>
   );
 };

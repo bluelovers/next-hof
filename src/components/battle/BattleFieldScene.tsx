@@ -6,12 +6,16 @@
  * 使用巢狀 div 疊加方式實現，與原始頁面相同
  * Displays character sprites positioned on the battlefield
  * Uses nested div layering matching the original page
+ *
+ * 注意：此元件已改為 div 響應式區塊（不再輸出 table cell），
+ * 分頁導覽改由父層（BattleDisplay 的分段）負責。
+ * NOTE: this component now renders a responsive div block (no table cell);
+ * paging navigation is owned by the parent (BattleDisplay segments).
  */
 import React from 'react';
 import type { IBattleSprite, IBattleFieldConfig } from './types';
 import { BattleFieldLayers } from './BattleFieldLayers';
 import './BattleFieldScene.css';
-import { ITSRequireAtLeastOne } from 'ts-type';
 
 /** 戰場畫面屬性 / Battlefield scene props */
 export interface IBattleFieldSceneProps {
@@ -40,14 +44,9 @@ export const BattleFieldScene: React.FC<IBattleFieldSceneProps> = ({
   showLabels,
 }) => {
   return (
-    <td colSpan={2} className="btl-img">
-      <div style={{ width: '100%', position: 'relative' }}>
-        {/* 導航箭頭 / Navigation arrow */}
-        <div className="nav-arrow">
-          &lt;&lt;<a href="#">&gt;&gt;</a>
-        </div>
-
-        {/* 最外層背景 + 巢狀精靈圖層 / Outermost background + nested sprite layers */}
+    <div className="btl-img">
+      {/* 最外層背景 + 巢狀精靈圖層 / Outermost background + nested sprite layers */}
+      <div className="btl-img-inner">
         <BattleFieldLayers
           sprites={sprites}
           config={config}
@@ -57,6 +56,6 @@ export const BattleFieldScene: React.FC<IBattleFieldSceneProps> = ({
           bgSize={config.bgSize}
         />
       </div>
-    </td>
+    </div>
   );
 };

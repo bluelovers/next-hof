@@ -83,6 +83,11 @@ export interface IBattleTeam {
 export interface IBattleSprite {
 	/** 角色 ID（同時作為 DOM id 用於定位/選取） / Character ID (also used as DOM id for targeting) */
 	id?: string;
+	/**
+	 * 單位編號（引擎 char no 字串；與快照單位比對用，同名怪物可共享）
+	 * Unit number (engine char no string; used to match snapshot units; shared by same-name monsters)
+	 */
+	unitNo?: string;
 	/** 精靈圖片路徑 / Sprite image path */
 	imageUrl: string;
 	/** X 軸位置 / X position */
@@ -257,6 +262,8 @@ export interface IBattleDisplayData {
  * EnumUnitStatus). The Display suffix avoids colliding with the domain type.
  */
 export interface IBattleSnapshotDisplayUnit {
+	/** 單位編號（引擎 char no 字串；與精靈 unitNo 比對用）/ unit no (engine char no string; matched against sprite unitNo) */
+	id?: string;
 	/** 單位名稱 / name */
 	name: string;
 	/** 顯示側別 / display side */
@@ -278,4 +285,22 @@ export interface IBattleSnapshotDisplay {
 	/** 對應 actions 的索引位置 / index into actions */
 	at: number;
 	units: IBattleSnapshotDisplayUnit[];
+}
+
+/**
+ * 戰鬥日誌分段（快照驅動）
+ * Battle log segment (snapshot-driven)
+ *
+ * 每個分段對應一個快照起始狀態與其後發生的行動；
+ * 無快照資料時退化為單一分段（snapshot 為 undefined）。
+ * Each segment pairs a snapshot's starting state with the actions that follow it;
+ * without snapshot data it degrades to a single segment (snapshot undefined).
+ */
+export interface IBattleSegment {
+	/** 分段索引（由 0 起）/ segment index (0-based) */
+	index: number;
+	/** 分段起始快照（無則 undefined）/ snapshot at segment start (undefined when absent) */
+	snapshot?: IBattleSnapshotDisplay;
+	/** 此分段的行動 / actions in this segment */
+	actions: IBattleAction[];
 }

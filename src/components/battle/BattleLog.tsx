@@ -8,16 +8,16 @@
  * one action placed in its own team's column (left team → left column, right team →
  * right column), with the other column left empty to keep the columns aligned.
  *
- * 如此既保留「哪一隊行動」的資訊，也讓由上而下的閱讀順序反映戰鬥時間先後
- * （不再把左右行動並列而失去時序）。
- * This keeps side attribution while the top-to-bottom order reflects battle time
- * (no more side-by-side pairing that loses chronological order).
+ * 布局為響應式 div（非 table）：窄螢幕時自動改為單欄，僅顯示有行動的一側。
+ * Layout is responsive divs (not a table): on narrow screens it collapses to a single
+ * column and only the populated side is shown.
  */
 import React from 'react';
 import { EnumTeamSideUI } from './enums';
 import type { IBattleAction } from './types';
 import { BattleAction } from './BattleAction';
 import { getSideClass } from './battleUtils';
+import './BattleLog.css';
 import '#/components/shared/SharedBase.css';
 
 /** 戰鬥日誌屬性 / Battle log props */
@@ -40,35 +40,35 @@ export const BattleLog: React.FC<IBattleLogProps> = ({
   // Single-column mode: one row per action (keeps chronological order)
   if (!twoColumn) {
     return (
-      <>
+      <div className="battle-log battle-log--single">
         {actions.map((action, index) => (
-          <tr key={index}>
-            <td colSpan={2} className="break">
+          <div className="log-row break" key={index}>
+            <div className="log-cell log-cell--full">
               <BattleAction action={action} />
-            </td>
-          </tr>
+            </div>
+          </div>
         ))}
-      </>
+      </div>
     );
   }
 
   return (
-    <>
+    <div className="battle-log battle-log--two-col">
       {actions.map((action, index) => {
         // 未指定側別時歸左欄（沿用既有行為）
         // Actions without a side fall back to the left column (prior behaviour)
         const isRight = action.side === EnumTeamSideUI.Right;
         return (
-          <tr key={index}>
-            <td className={`${getSideClass(EnumTeamSideUI.Left)} break`}>
-              {isRight ? '\u00a0' : <BattleAction action={action} />}
-            </td>
-            <td className={`${getSideClass(EnumTeamSideUI.Right)} break`}>
-              {isRight ? <BattleAction action={action} /> : '\u00a0'}
-            </td>
-          </tr>
+          <div className="log-row break" key={index}>
+            <div className={`log-cell log-cell--left ${getSideClass(EnumTeamSideUI.Left)}`}>
+              {!isRight && <BattleAction action={action} />}
+            </div>
+            <div className={`log-cell log-cell--right ${getSideClass(EnumTeamSideUI.Right)}`}>
+              {isRight && <BattleAction action={action} />}
+            </div>
+          </div>
         );
       })}
-    </>
+    </div>
   );
 };

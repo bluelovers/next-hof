@@ -12,8 +12,18 @@
 /* ==================== 戰鬥畫面背景 / Battle Scene Background ==================== */
 
 .btl-img {
+  width: 100%;
   background: var(--color-border-dark);
   padding: 3px;
+}
+
+/* 水平置中的內層容器：讓不同背景尺寸仍維持居中排版
+   Centered inner wrapper so varying background sizes stay centred */
+.btl-img-inner {
+  width: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
 }
 
 .battle-scene {

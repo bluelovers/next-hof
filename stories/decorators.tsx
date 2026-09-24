@@ -131,9 +131,9 @@ export const HomePageDarkDecorator = makeDarkDecorator({
   color: LIGHT_TEXT_COLOR,
 });
 
-/** 表格型深色裝飾器（battle 表格用，單一事實來源） / Table-style dark decorator for battle tables */
-export const TableDarkDecorator = makeDarkDecorator({
-  table: true,
+/** 戰場舞台深色裝飾器（戰場元件為響應式 div，不需 table 包裝）
+ *  Battle stage dark decorator (battlefield is a responsive div; no table wrapper) */
+export const BattleStageDarkDecorator = makeDarkDecorator({
   padding: '10px',
   borderRadius: STAGE_BORDER_RADIUS,
 });
@@ -149,12 +149,11 @@ export const BattleActionDarkDecorator = makeDarkDecorator({
   fontSize: DARK_FONT_SIZE,
 });
 
-/** 表格型結果深色裝飾器（單一事實來源） / Battle result table dark decorator */
+/** 戰鬥結果深色裝飾器（元件已改為響應式 div，不需 table 包裝）
+ *  Battle result dark decorator (component is a responsive div; no table wrapper) */
 export const BattleResultDarkDecorator = makeDarkDecorator({
-  table: true,
   borderRadius: STAGE_BORDER_RADIUS,
   width: '600px',
-  tableStyle: { width: '100%' },
 });
 
 /** 戰鬥單位深色裝飾器（單一事實來源） / Battle unit dark decorator */
@@ -247,10 +246,10 @@ export const CardDarkDecorator = makeDarkDecorator({
 /** 無內距深色裝飾器（單一事實來源，NavigationBar / TeamStatus 共用） / Flush (no padding) dark decorator */
 export const FlushDarkDecorator = makeDarkDecorator({ padding: 0 });
 
-/** 戰隊資訊表格深色裝飾器（單一事實來源） / Battle team info table dark decorator */
+/** 隊伍資訊深色裝飾器（元件已改為響應式 div，不需 table 包裝）
+ *  Battle team info dark decorator (component is a responsive div; no table wrapper) */
 export const BattleTeamInfoDarkDecorator = makeDarkDecorator({
-  table: true,
-  tableStyle: { width: '400px' },
+  width: '400px',
 });
 
 /** 角色精靈顯示深色裝飾器（單一事實來源） / Character sprite display dark decorator */
