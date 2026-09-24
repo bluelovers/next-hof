@@ -514,11 +514,13 @@ const logMessagesActions: IBattleAction[] = [
   logAction(EnumActionType.Recover, healer1, buildRecoveredMessage(healer1.name, 84, 'HP'), EnumTeamSideUI.Left, {
     value: 84,
     valueUnit: 'HP',
+    valueChange: '129 > 213',
     attribute: EnumAttributeType.Recover,
   }),
   logAction(EnumActionType.Recover, priest1, buildRecoveredMessage(priest1.name, 30, 'SP'), EnumTeamSideUI.Left, {
     value: 30,
     valueUnit: 'SP',
+    valueChange: '60 > 90',
     attribute: EnumAttributeType.Support,
   }),
 
@@ -529,14 +531,26 @@ const logMessagesActions: IBattleAction[] = [
     undefined,
     buildDrainMessage(40, 'HP', hero1.name),
     EnumTeamSideUI.Left,
-    { value: 40, valueUnit: 'HP', target: hero1.name, attribute: EnumAttributeType.Recover }
+    {
+      value: 40,
+      valueUnit: 'HP',
+      target: hero1.name,
+      attribute: EnumAttributeType.Recover,
+      valueChanges: [{ from: 1000, to: 960 }, { who: '我方', from: 200, to: 240 }],
+    }
   ),
   logAction(
     EnumActionType.Drain,
     undefined,
     buildDrainMessage(25, 'SP', hero1.name),
     EnumTeamSideUI.Left,
-    { value: 25, valueUnit: 'SP', target: hero1.name, attribute: EnumAttributeType.Support }
+    {
+      value: 25,
+      valueUnit: 'SP',
+      target: hero1.name,
+      attribute: EnumAttributeType.Support,
+      valueChanges: [{ from: 100, to: 75 }, { who: '我方', from: 50, to: 75 }],
+    }
   ),
 
   // ---- 持續回復（`gained SP regeneration +15%`）----
@@ -594,7 +608,8 @@ const logMessagesActions: IBattleAction[] = [
     EnumActionType.Poison,
     goblinAxe,
     buildNamedMessage(goblinAxe.name, 'got 12 damage by poison.'),
-    EnumTeamSideUI.Left
+    EnumTeamSideUI.Left,
+    { value: 12, valueChange: '1200 > 1050' }
   ),
   logAction(
     EnumActionType.Poison,
@@ -617,6 +632,11 @@ const logMessagesActions: IBattleAction[] = [
     EnumTeamSideUI.Left,
     { attribute: EnumAttributeType.Support }
   ),
+  // ---- 自我中毒（無名稱、無 span；對照 5.4 `Got poisoned`）----
+  // Self-poison (no name, no span; mirrors 5.4 `Got poisoned`)
+  logAction(EnumActionType.Poison, undefined, 'Got poisoned', EnumTeamSideUI.Left, {
+    attribute: EnumAttributeType.Normal,
+  }),
 
   // ---- 屬性升降（`STR rise 10%`、上限升降，原始日誌無 span）----
   // Stat change (`STR rise 10%`, cap changes; no span in the original log)
@@ -740,9 +760,10 @@ const logMessagesActions: IBattleAction[] = [
   logAction(
     EnumActionType.Info,
     goblinWarriorA,
-    buildNamedMessage(goblinWarriorA.name, "sunk in thought and couldn't act.(No more patterns)"),
+    buildNamedMessage(goblinWarriorA.name, "sunk in thought and couldn't act."),
     EnumTeamSideUI.Left
   ),
+  logAction(EnumActionType.Info, undefined, '(No more patterns)', EnumTeamSideUI.Left),
   // ---- HP/SP 交換（3 行區塊：exchanged rate of HP and SP. ＋ HP 行 ＋ SP 行）----
   // HP/SP exchange (3-line block: exchanged rate of HP and SP. + HP line + SP line)
   logAction(EnumActionType.EnergyExchange, hero1, '', EnumTeamSideUI.Right, {

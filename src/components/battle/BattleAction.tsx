@@ -39,12 +39,9 @@ const ValueChange: React.FC<{ action: IBattleAction }> = ({ action }) => {
   if (!action.valueChange) return null;
   const valClass = getValueChangeClass(action.type);
   return (
-    <>
-      {' '}
-      <span className={valClass}>
-        ({action.valueChange})
-      </span>
-    </>
+    <span className={valClass}>
+      ({action.valueChange})
+    </span>
   );
 };
 
@@ -171,6 +168,7 @@ const NamedMessage: React.FC<{ action: IBattleAction; className?: string }> = ({
       {action.prefix}
       {name && <span className="bold">{name}</span>}
       {text}
+      <ValueChange action={action} />
     </span>
   );
 };
@@ -194,6 +192,7 @@ const NamedValueMessage: React.FC<{ action: IBattleAction; className?: string; t
       <span className="bold">{action.source}</span> {text}{' '}
       <span className="bold">{action.value}</span>
       {action.valueUnit && ` ${action.valueUnit}`}
+      <ValueChange action={action} />
     </span>
   );
 };
@@ -225,6 +224,15 @@ const SpDamageMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
  * 原始日誌：`Drained <b>N</b> HP from <b>target</b>`（行首無施放者名稱）。
  * Original log: `Drained <b>N</b> HP from <b>target</b>` (no caster name at the head).
  */
+/**
+ * 吸取訊息（單一事實來源）
+ * Drain message (single source of truth)
+ *
+ * 原始日誌：`Drained <b>N</b> HP from <b>target</b>(targetFrom > targetTo)<b>who</b>(whoFrom > whoTo)`，
+ * 支援任意數量的 `who(n1->n2)` 數值變化；who 缺省時只印 `(n1 > n2)`。
+ * Original log: `Drained <b>N</b> HP from <b>target</b>(tFrom > tTo)<b>who</b>(wFrom > wTo)`,
+ * supporting any number of `who(n1->n2)` value changes; when `who` is absent only `(n1 > n2)` prints.
+ */
 const DrainMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
   <span className={getMessageClass(action)}>
     Drained{' '}
@@ -235,6 +243,12 @@ const DrainMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
         {' '}from <span className="bold">{action.target}</span>
       </>
     )}
+    {action.valueChanges?.map((vc, i) => (
+      <span key={i}>
+        {vc.who && <span className="bold">{vc.who}</span>}
+        ({vc.from} &gt; {vc.to})
+      </span>
+    ))}
   </span>
 );
 
@@ -309,6 +323,18 @@ const PoisonMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
         {parts[0]}
         <span className="spdmg">{action.emphasis}</span>
         {parts[1]}
+      </span>
+    );
+  }
+  // 每回合中毒傷害（4.7）：整行 spdmg，數值加粗，並附 `(前 > 後)`。
+  // Per-turn poison damage (4.7): the whole line is spdmg, the value is bold, and the
+  // `(from > to)` is appended.
+  if (action.value !== undefined) {
+    return (
+      <span className={getMessageClass(action)}>
+        {action.source && <span className="bold">{action.source}</span>} got{' '}
+        <span className="bold">{action.value}</span> damage by poison.
+        <ValueChange action={action} />
       </span>
     );
   }

@@ -250,6 +250,26 @@ export interface IEnergyExchangeRecord {
 	spToRate: number;
 }
 
+/**
+ * 數值變化紀錄（type＝Drain 等「多重 who」場景使用）
+ * Value-change record (used for multi-"who" scenes such as Drain)
+ *
+ * 對照 Skill/Effect.php 的 `Drained N HP from 敵人(1500 > 1200)我方(800 > 1100)`：
+ * 每筆記錄描述「某個 who 的數值由 from 變為 to」，who 缺省時只印 `(from > to)`
+ * （例如 `from 敵人` 已帶出名稱，其變化即省略 who）。
+ * Mirrors Skill/Effect.php's `Drained N HP from enemy(1500 > 1200)ally(800 > 1100)`:
+ * each record says "who's value went from→to"; when `who` is absent only `(from > to)`
+ * is printed (e.g. after `from enemy` the name is already shown, so its change drops the who).
+ */
+export interface IValueChangeRecord {
+	/** 誰的數值變化（缺省時只印括號；非缺省時以粗體名牌呈現）/ Whose value changed (omitted → parentheses only) */
+	who?: string;
+	/** 變化前 / Before */
+	from: number;
+	/** 變化後 / After */
+	to: number;
+}
+
 /** 戰鬥動作 / Battle action */
 export interface IBattleAction {
 	/** 動作類型 / Action type */
@@ -264,6 +284,8 @@ export interface IBattleAction {
 	value?: number;
 	/** 數值變化的前後描述 / Value change description */
 	valueChange?: string;
+	/** 多重數值變化（Drain 等「who(n1->n2)」場景；who 缺省時只印括號）/ Multi value changes (Drain's "who(n1->n2)"; parentheses only when who is absent) */
+	valueChanges?: IValueChangeRecord[];
 	/**
 	 * 數值單位（Recovered／Drain／Sacrifice 等的 HP・SP・% 尾碼）
 	 * Value unit (the HP / SP / % suffix for Recover / Drain / Sacrifice)
