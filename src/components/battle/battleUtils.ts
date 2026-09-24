@@ -7,7 +7,7 @@
  * Centralizes percentage math, bar colors, and status/attribute → CSS class mappings
  * so BattleUnit and BattleAction share one implementation instead of diverging.
  */
-import { EnumUnitStatus, EnumAttributeType, EnumTeamSideUI, EnumTeamSideClass, EnumActionType, EnumMagicCircleKind } from './enums';
+import { EnumUnitStatus, EnumAttributeType, EnumTeamSideUI, EnumTeamSideClass, EnumActionType, EnumMagicCircleKind, EnumChargeKind } from './enums';
 import { TEAM_SIDE_CLASS } from './types';
 import { computeSpriteFlipped } from './spriteFlip';
 import { corpseSpecOf } from '#/lib/game/battle/corpse-policy';
@@ -96,6 +96,8 @@ export function getAttrClass(attr?: EnumAttributeType): string {
       return 'support';
     case EnumAttributeType.Charge:
       return 'charge';
+    case EnumAttributeType.Spdmg:
+      return 'spdmg';
     default:
       return '';
   }
@@ -202,6 +204,220 @@ export function buildMagicCircleMessage(source?: string, record?: IMagicCircleRe
   if (kind === EnumMagicCircleKind.Fail) return phrase;
   const amount = record?.amount !== undefined ? ` x${record.amount}` : '';
   return `${source ?? ''} ${phrase}${amount}`.trim();
+}
+
+// ==================== 原始日誌文案（單一事實來源）/ Original log copy (single source of truth) ====================
+//
+// 以下建構器逐字對應 HOF/Class 的戰鬥日誌輸出；轉接層與展示資料都必須經由它們
+// 產生 message，文案因此只書寫一次。
+// The builders below mirror the battle-log output of HOF/Class word for word; the adapter
+// and the showcase data both go through them, so every string is written exactly once.
+
+/**
+ * 以「粗體名稱 ＋ 其後文字」組合訊息（多數日誌行的版面）
+ * Compose a message from a bold name plus the text that follows (most log lines)
+ *
+ * @param source - 單位名稱（缺省時整段即為文字）/ Unit name (the whole string is the text when absent)
+ * @param text - 名稱之後的文字 / Text after the name
+ * @returns 訊息文字 / Message text
+ */
+export function buildNamedMessage(source: string | undefined, text: string): string {
+  return source ? `${source} ${text}` : text;
+}
+
+/**
+ * 所有格訊息（`name's poison has cured.`；名稱與 `'s` 之間不空格）
+ * Possessive message (`name's poison has cured.`; no space between the name and `'s`)
+ *
+ * 對應 Char/Battle/Effect.php 的 `Name('bold') . "'s …"` 拼接。
+ * Mirrors the `Name('bold') . "'s …"` concatenation of Char/Battle/Effect.php.
+ *
+ * @param source - 單位名稱 / Unit name
+ * @param text - 所有格之後的文字 / Text after the possessive
+ * @returns 訊息文字 / Message text
+ */
+export function buildPossessiveMessage(source: string | undefined, text: string): string {
+  return source ? `${source}'s ${text}` : text;
+}
+
+/**
+ * 把訊息拆回「粗體名稱」與其後的文字（單一事實來源）
+ * Split a message back into the bold name and the text that follows (single source of truth)
+ *
+ * 文案一律由 buildNamedMessage 以 `${source} ${text}` 建立，因此以 source 前綴切分即可
+ * 還原兩段，不需要額外欄位；找不到前綴時整段視為文字（名稱不加粗）。
+ * Copy is always built as `${source} ${text}` by buildNamedMessage, so slicing on the source
+ * prefix recovers both parts without an extra field; when the prefix is missing the whole
+ * string is treated as the text (no bold name).
+ */
+export function splitNamedMessage(action: Pick<IBattleAction, 'source' | 'message'>): {
+  name?: string;
+  text: string;
+} {
+  const { source, message } = action;
+  if (source && message.startsWith(source)) {
+    return { name: source, text: message.slice(source.length) };
+  }
+  return { text: message };
+}
+
+/** 蓄力／詠唱文案（`start charging.` / `start casting.`）/ Charge/casting copy */
+export function buildChargeMessage(castType?: EnumChargeKind): string {
+  return `start ${castType ?? EnumChargeKind.Casting}.`;
+}
+
+/** SP 傷害（`NSP Damage to target`，數值與 SP 間無空格）/ SP damage (no space between the value and "SP Damage") */
+export function buildSpDamageMessage(value: number, target?: string): string {
+  return target ? `${value}SP Damage to ${target}` : `${value}SP Damage`;
+}
+
+/** 回復（`name Recovered N HP`）/ Recovery (`name Recovered N HP`) */
+export function buildRecoveredMessage(source: string | undefined, value: number, unit: string): string {
+  return buildNamedMessage(source, `Recovered ${value} ${unit}`);
+}
+
+/** 吸取（`Drained N HP from target`）/ Drain (`Drained N HP from target`) */
+export function buildDrainMessage(value: number, unit: string, target?: string): string {
+  return target ? `Drained ${value} ${unit} from ${target}` : `Drained ${value} ${unit}`;
+}
+
+/** 持續回復（`name gained HP regeneration +N%`）/ Regen (`name gained HP regeneration +N%`) */
+export function buildRegenMessage(source: string | undefined, unit: string, value: number): string {
+  return buildNamedMessage(source, `gained ${unit} regeneration +${value}%`);
+}
+
+/** 自動回復（`name Auto Regenerate N HP`）/ Auto regenerate (`name Auto Regenerate N HP`) */
+export function buildAutoRegenMessage(source: string | undefined, unit: string, value: number): string {
+  return buildNamedMessage(source, `Auto Regenerate ${value} ${unit}`);
+}
+
+/** 犧牲（`name sacrifice N HP`）/ Sacrifice (`name sacrifice N HP`) */
+export function buildSacrificeMessage(source: string | undefined, value: number): string {
+  return buildNamedMessage(source, `sacrifice ${value} HP`);
+}
+
+/** 復活（`name revived!`）/ Revive (`name revived!`) */
+export function buildReviveMessage(source: string | undefined): string {
+  return buildNamedMessage(source, 'revived!');
+}
+
+/** 升級（`name LevelUp!`）/ Level up (`name LevelUp!`) */
+export function buildLevelUpMessage(source: string | undefined): string {
+  return buildNamedMessage(source, 'LevelUp!');
+}
+
+/**
+ * 屬性升降（`name STR rise 10%` / `name STR down 10%` / `name ATK rise to the maximum(100%)`）
+ * Stat change (`name STR rise 10%` / `name STR down 10%` / `name ATK rise to the maximum(100%)`)
+ */
+export function buildStatChangeMessage(
+  source: string | undefined,
+  stat: string,
+  direction: 'rise' | 'down',
+  value: number,
+  unit = '%',
+  atMaximum = false
+): string {
+  const tail = atMaximum ? `${direction} to the maximum(${value}${unit})` : `${direction} ${value}${unit}`;
+  return buildNamedMessage(source, `${stat} ${tail}`);
+}
+
+/** 上限升降（`name MAXHP(舊值) extended to 999` / `name MAXSP(舊值) down to 500`）/ Cap change */
+export function buildStatToMessage(
+  source: string | undefined,
+  stat: string,
+  direction: 'extended' | 'down to',
+  value: number,
+  from?: number
+): string {
+  // `extended` 補回介係詞 `to`；有舊值時帶出 `(舊值)`，與原始日誌逐字一致
+  // `extended` regains the preposition `to`; when an old value exists it is shown as `(old)`,
+  // matching the original log verbatim
+  const phrase = direction === 'extended' ? 'extended to' : direction;
+  // 有舊值時帶出 `(舊值) `，否則補一個空格，使 `MAXHP extended to` 與
+  // `MAXHP(500) extended to` 都與原始日誌逐字一致。
+  // With an old value it shows `(old) `, otherwise a single space, so both
+  // `MAXHP extended to` and `MAXHP(500) extended to` match the original log verbatim.
+  const lead = from !== undefined ? `(${from}) ` : ' ';
+  return buildNamedMessage(source, `${stat}${lead}${phrase} ${value}`);
+}
+
+/**
+ * 行動後硬直（單一事實來源；對照 Skill.php 的 `Name Delayed` ＋ DelayByRate 的括號輸出）
+ * Post-action delay (single source of truth; mirrors the `Name Delayed` of Skill.php plus the
+ * parenthesised `(old >>> new/base)` that DelayByRate prints)
+ *
+ * 原始日誌：`GoblinAxe Delayed(15 >>> 25/100)`
+ * Original log: `GoblinAxe Delayed(15 >>> 25/100)`
+ */
+export function buildDelayMessage(
+  source: string | undefined,
+  oldValue: number,
+  newValue: number,
+  base: number
+): string {
+  return buildNamedMessage(source, `Delayed(${oldValue} >>> ${newValue}/${base})`);
+}
+
+/**
+ * 施放失敗（`name Failed to skill (reason)`；對應 PHP 的武器不符與 SP 不足兩種列印）
+ * Failed to cast (`name Failed to skill (reason)`; covers PHP's weapon-mismatch and
+ * SP-shortage prints)
+ */
+export function buildFailMessage(source: string | undefined, skillName: string, reason: string): string {
+  return buildNamedMessage(source, `Failed to ${skillName} (${reason})`);
+}
+
+/** 訊息型別 → CSS class（單一事實來源）/ Action type → CSS class (single source of truth) */
+const MESSAGE_CLASS: Partial<Record<EnumActionType, string>> = {
+  [EnumActionType.Damage]: 'dmg',
+  [EnumActionType.Down]: 'dmg',
+  [EnumActionType.Fail]: 'dmg',
+  [EnumActionType.Sacrifice]: 'dmg',
+  [EnumActionType.SpDamage]: 'spdmg',
+  [EnumActionType.Heal]: 'recover',
+  [EnumActionType.Revive]: 'recover',
+  [EnumActionType.Casting]: 'charge',
+  [EnumActionType.LevelUp]: 'levelup',
+  [EnumActionType.Enter]: 'result',
+  [EnumActionType.ItemDrop]: 'u',
+};
+
+/**
+ * 取得訊息的 CSS 類別（單一事實來源）
+ * Get a message's CSS class (single source of truth)
+ *
+ * 逐型別對應原始 basis.css 的 .dmg／.recover／.support／.spdmg／.charge／.levelup。
+ * Recover／Drain／Regen 依 valueUnit（HP／SP）在 recover 與 support 間切換，與原始
+ * 日誌「依單位配色」一致；Buff／Poison 支援以 attribute 覆寫（原始日誌同一事件有
+ * 多種配色：中毒為 spdmg、抗毒為 support、解除則無 span）。
+ * Maps each type to the original basis.css .dmg / .recover / .support / .spdmg /
+ * .charge / .levelup. Recover / Drain / Regen switch between recover and support by
+ * valueUnit (HP / SP) the way the original log colours by unit; Buff / Poison accept an
+ * attribute override because the original log uses several colours for one event
+ * (spdmg for poison, support for resist, none for cure).
+ *
+ * StatChange／Move／Delay／Info 在原始日誌沒有 span，故回傳空字串沿用預設色。
+ * StatChange / Move / Delay / Info carry no span in the original log and fall back to
+ * the default colour.
+ */
+export function getMessageClass(action: IBattleAction): string {
+  switch (action.type) {
+    case EnumActionType.Recover:
+    case EnumActionType.Drain:
+    case EnumActionType.Regen:
+      return action.valueUnit === 'SP' ? 'support' : 'recover';
+    // Buff／Poison 支援以 attribute 覆寫：未指定才取家族預設色，
+    // 明確指定（含 Normal＝不著色）一律尊重原值。
+    // Buff / Poison accept an attribute override: the family default applies only when no
+    // attribute is given; an explicit one (Normal = uncoloured included) is always honoured.
+    case EnumActionType.Buff:
+      return action.attribute !== undefined ? getAttrClass(action.attribute) : 'support';
+    case EnumActionType.Poison:
+      return action.attribute !== undefined ? getAttrClass(action.attribute) : 'spdmg';
+    default:
+      return MESSAGE_CLASS[action.type] ?? getAttrClass(action.attribute);
+  }
 }
 
 /**

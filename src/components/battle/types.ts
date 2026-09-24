@@ -236,6 +236,16 @@ export interface IBattleAction {
 	value?: number;
 	/** 數值變化的前後描述 / Value change description */
 	valueChange?: string;
+	/**
+	 * 數值單位（Recovered／Drain／Sacrifice 等的 HP・SP・% 尾碼）
+	 * Value unit (the HP / SP / % suffix for Recover / Drain / Sacrifice)
+	 */
+	valueUnit?: string;
+	/**
+	 * 名稱之前的裝飾前綴（如 Auto Regenerate 行首的 `* `）
+	 * Decorative prefix before the name (such as the leading `* ` of an Auto Regenerate line)
+	 */
+	prefix?: string;
 	/** 訊息文字 / Message text */
 	message: string;
 	/** 隊伍側 (用於顯示在哪一欄) / Team side */

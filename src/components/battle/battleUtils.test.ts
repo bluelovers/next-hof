@@ -10,8 +10,23 @@ import {
 	resolveSegmentSprites,
 	SPRITE_CORPSE_URL,
 	SPRITE_CORPSE_URL_REV,
+	buildNamedMessage,
+	buildPossessiveMessage,
+	splitNamedMessage,
+	buildChargeMessage,
+	buildDelayMessage,
+	buildSpDamageMessage,
+	buildStatChangeMessage,
+	buildStatToMessage,
+	getMessageClass,
 } from './battleUtils';
-import { EnumActionType, EnumTeamSideUI, EnumUnitStatus, EnumChargeKind } from './enums';
+import {
+	EnumActionType,
+	EnumAttributeType,
+	EnumTeamSideUI,
+	EnumUnitStatus,
+	EnumChargeKind,
+} from './enums';
 import type {
 	IBattleAction,
 	IBattleSnapshotDisplay,
@@ -286,5 +301,95 @@ describe('resolveSegmentSprites', () => {
 			unit('u1', true, { corpse: { imageUrl: '/image/other/tomb.png' } }),
 		]);
 		expect(resolveSegmentSprites(sprites, snap)[0].flipped).toBe(true);
+	});
+});
+
+describe('原始日誌文案與配色 / original log copy and colours', () => {
+	it('buildNamedMessage + splitNamedMessage round-trip the bold name', () => {
+		const message = buildNamedMessage('Hero1', 'got barriered!');
+		expect(message).toBe('Hero1 got barriered!');
+		expect(splitNamedMessage({ source: 'Hero1', message })).toEqual({
+			name: 'Hero1',
+			text: ' got barriered!',
+		});
+	});
+
+	it('buildPossessiveMessage keeps the name and the possessive joined', () => {
+		const message = buildPossessiveMessage('GoblinAxe', 'poison has cured.');
+		expect(message).toBe("GoblinAxe's poison has cured.");
+		// 名稱與 `'s` 之間不空格，切分後文字以 `'` 開頭
+		// No space between the name and `'s`, so the split text starts with `'`
+		expect(splitNamedMessage({ source: 'GoblinAxe', message })).toEqual({
+			name: 'GoblinAxe',
+			text: "'s poison has cured.",
+		});
+	});
+
+	it('splitNamedMessage keeps the whole line when there is no matching name', () => {
+		expect(splitNamedMessage({ message: 'Failed!' })).toEqual({ text: 'Failed!' });
+		expect(splitNamedMessage({ source: 'Hero1', message: 'Someone else down.' })).toEqual({
+			text: 'Someone else down.',
+		});
+	});
+
+	it('buildChargeMessage picks the copy from the charge kind', () => {
+		expect(buildChargeMessage(EnumChargeKind.Charging)).toBe('start charging.');
+		expect(buildChargeMessage(EnumChargeKind.Casting)).toBe('start casting.');
+		expect(buildChargeMessage()).toBe('start casting.');
+	});
+
+	it('buildSpDamageMessage keeps the original no-space wording', () => {
+		expect(buildSpDamageMessage(120, 'GoblinAxe')).toBe('120SP Damage to GoblinAxe');
+		expect(buildSpDamageMessage(120)).toBe('120SP Damage');
+	});
+
+	it('buildStatChangeMessage covers rise, down and the maximum wording', () => {
+		expect(buildStatChangeMessage('Hero1', 'STR', 'rise', 10)).toBe('Hero1 STR rise 10%');
+		expect(buildStatChangeMessage('Hero1', 'ATK', 'down', 15)).toBe('Hero1 ATK down 15%');
+		expect(buildStatChangeMessage('Hero1', 'ATK', 'rise', 100, '%', true)).toBe(
+			'Hero1 ATK rise to the maximum(100%)',
+		);
+		expect(buildStatToMessage('Hero1', 'MAXHP', 'extended', 999)).toBe(
+			'Hero1 MAXHP extended to 999',
+		);
+		expect(buildStatToMessage('Hero1', 'MAXHP', 'extended', 999, 500)).toBe(
+			'Hero1 MAXHP(500) extended to 999',
+		);
+	});
+
+	it('buildDelayMessage mirrors the DelayByRate parentheses', () => {
+		expect(buildDelayMessage('GoblinAxe', 15, 25, 100)).toBe('GoblinAxe Delayed(15 >>> 25/100)');
+	});
+
+	it('getMessageClass maps each family to the original span class', () => {
+		const of = (type: EnumActionType, extra: Partial<IBattleAction> = {}): string =>
+			getMessageClass({ type, message: '', ...extra });
+
+		expect(of(EnumActionType.Damage)).toBe('dmg');
+		expect(of(EnumActionType.Fail)).toBe('dmg');
+		expect(of(EnumActionType.Sacrifice)).toBe('dmg');
+		expect(of(EnumActionType.SpDamage)).toBe('spdmg');
+		expect(of(EnumActionType.Poison)).toBe('spdmg');
+		expect(of(EnumActionType.Buff)).toBe('support');
+		expect(of(EnumActionType.Casting)).toBe('charge');
+		expect(of(EnumActionType.LevelUp)).toBe('levelup');
+		expect(of(EnumActionType.Enter)).toBe('result');
+		expect(of(EnumActionType.Revive)).toBe('recover');
+		// 原始日誌依單位配色：HP→recover、SP→support
+		// The original log colours by unit: HP → recover, SP → support
+		expect(of(EnumActionType.Recover, { valueUnit: 'HP' })).toBe('recover');
+		expect(of(EnumActionType.Recover, { valueUnit: 'SP' })).toBe('support');
+		expect(of(EnumActionType.Drain, { valueUnit: 'SP' })).toBe('support');
+		expect(of(EnumActionType.Regen, { valueUnit: 'SP' })).toBe('support');
+		// 屬性升降／位移／延遲／資訊在原始日誌沒有 span
+		// Stat change / movement / delay / info carry no span in the original log
+		expect(of(EnumActionType.StatChange)).toBe('');
+		expect(of(EnumActionType.Move)).toBe('');
+		expect(of(EnumActionType.Delay)).toBe('');
+		expect(of(EnumActionType.Info)).toBe('');
+		// Poison 可以 attribute 覆寫（抗毒為 support、解除無 span）
+		// Poison accepts an attribute override (support for resist, none for cure)
+		expect(of(EnumActionType.Poison, { attribute: EnumAttributeType.Support })).toBe('support');
+		expect(of(EnumActionType.Poison, { attribute: EnumAttributeType.Normal })).toBe('');
 	});
 });

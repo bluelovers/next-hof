@@ -13,6 +13,7 @@ import {
 	EnumUnitStatus,
 	EnumActionType,
 	EnumMagicCircleKind,
+	EnumChargeKind,
 } from '#/components/battle/enums';
 import { EnumPosition } from '#/lib/game/constants';
 import {
@@ -146,7 +147,7 @@ describe('3.3 mapBattleEvent', () => {
 			EnumActionType.Heal,
 			EnumActionType.Protect,
 			EnumActionType.Down,
-			EnumActionType.Result,
+			EnumActionType.Poison,
 		]);
 
 		// Act → skill
@@ -178,15 +179,61 @@ describe('3.3 mapBattleEvent', () => {
 		expect(actions[5].source).toBe('GoblinAxe');
 		expect(actions[5].side).toBe(EnumTeamSideUI.Left);
 
-		// 未知型別 → type result
-		expect(actions[6].type).toBe(EnumActionType.Result);
-		expect(actions[6].message).toBe('poisoned');
+		// Poison → poison，來源＝中毒單位（文案由 buildNamedMessage 組出）
+		// Poison → poison with the poisoned unit as the source (copy built by buildNamedMessage)
+		expect(actions[6].type).toBe(EnumActionType.Poison);
+		expect(actions[6].message).toBe('GoblinAxe poisoned');
+	});
+
+	it('every engine event type maps to a dedicated action type', () => {
+		const cases: Array<[EnumBattleEventType, EnumActionType]> = [
+			[EnumBattleEventType.Act, EnumActionType.Skill],
+			[EnumBattleEventType.Cast, EnumActionType.Casting],
+			[EnumBattleEventType.Charge, EnumActionType.Casting],
+			[EnumBattleEventType.Damage, EnumActionType.Damage],
+			[EnumBattleEventType.Heal, EnumActionType.Heal],
+			[EnumBattleEventType.Guard, EnumActionType.Protect],
+			[EnumBattleEventType.Death, EnumActionType.Down],
+			[EnumBattleEventType.Summon, EnumActionType.Summon],
+			[EnumBattleEventType.MagicCircle, EnumActionType.MagicCircle],
+			[EnumBattleEventType.Buff, EnumActionType.Buff],
+			[EnumBattleEventType.Debuff, EnumActionType.Debuff],
+			[EnumBattleEventType.Poison, EnumActionType.Poison],
+			[EnumBattleEventType.Miss, EnumActionType.Miss],
+			[EnumBattleEventType.Info, EnumActionType.Info],
+		];
+
+		for (const [event, expected] of cases) {
+			const action = mapBattleEvent(
+				{ type: event, actor: '100', target: '1000', text: 'sample' },
+				lookup,
+				repo,
+			);
+			expect(action.type, `${event} should map to ${expected}`).toBe(expected);
+		}
+	});
+
+	it('charge event always reads as charging, cast event follows the skill type', () => {
+		const charge = mapBattleEvent(
+			{ type: EnumBattleEventType.Charge, actor: '100', skill: 1000 },
+			lookup,
+			repo,
+		);
+		expect(charge.castType).toBe(EnumChargeKind.Charging);
+		expect(charge.message).toBe('start charging.');
+
+		const cast = mapBattleEvent(
+			{ type: EnumBattleEventType.Cast, actor: '100', skill: 1000 },
+			lookup,
+			repo,
+		);
+		expect(cast.message).toMatch(/^start (charging|casting)\.$/);
 	});
 
 	it('unknown type without text falls back to a message containing the type', () => {
-		const action = mapBattleEvent({ type: EnumBattleEventType.Info }, lookup, repo);
+		const action = mapBattleEvent({ type: 'nonsense' as EnumBattleEventType }, lookup, repo);
 		expect(action.type).toBe(EnumActionType.Result);
-		expect(action.message).toContain(EnumBattleEventType.Info);
+		expect(action.message).toContain('nonsense');
 	});
 
 	it('summon event maps to a summon action carrying the summoned unit', () => {

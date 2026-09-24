@@ -43,6 +43,10 @@
   --color-recover-glow: #2e7398;
   --color-support: #66cc66;
   --color-support-glow: #88ff77;
+  --color-spdmg: #993399;
+  --color-spdmg-glow: #b02fdd;
+  --color-levelup: #ffff33;
+  --color-levelup-glow: #d34f16;
   --color-result: #66cc66;
   --color-result-glow: #3c6237;
 
@@ -129,6 +133,19 @@
 .support {
   color: var(--color-support);
   text-shadow: 0 0 0.2em var(--color-support-glow);
+}
+
+/* SP 傷害與中毒（原始 basis.css 的 .spdmg）/ SP damage and poison (the .spdmg of the original basis.css) */
+.spdmg {
+  color: var(--color-spdmg);
+  text-shadow: 0 0 0.2em var(--color-spdmg-glow);
+}
+
+/* 升級（原始 basis.css 的 .levelup）/ Level up (the .levelup of the original basis.css) */
+.levelup {
+  font-weight: bold;
+  color: var(--color-levelup);
+  text-shadow: 0 0 0.2em var(--color-levelup-glow);
 }
 
 /* ==================== 導航連結共用類別 / Shared Nav Link Classes ==================== */

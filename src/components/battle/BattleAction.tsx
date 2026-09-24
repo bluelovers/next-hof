@@ -18,6 +18,9 @@ import {
   getEnterBattlefieldText,
   MAGIC_CIRCLE_PHRASE,
   getMagicCircleClass,
+  getMessageClass,
+  splitNamedMessage,
+  buildChargeMessage,
 } from './battleUtils';
 
 /** 戰鬥行動屬性 / Battle action props */
@@ -143,6 +146,191 @@ const MagicCircleMessage: React.FC<{ action: IBattleAction }> = ({ action }) => 
 };
 
 /**
+ * 通用「粗體名稱 ＋ 其後文字」版面（單一事實來源）
+ * Shared "bold name + trailing text" layout (single source of truth)
+ *
+ * 名稱與文字由 splitNamedMessage 從 message 還原，文案則一律由 battleUtils 的建構器
+ * 產生，因此各家族訊息組件只需指定配色。
+ * splitNamedMessage recovers the name and the text from `message`, and battleUtils'
+ * builders always produce the copy, so each family component only has to pick a colour.
+ */
+const NamedMessage: React.FC<{ action: IBattleAction; className?: string }> = ({ action, className }) => {
+  const { name, text } = splitNamedMessage(action);
+  return (
+    <span className={className}>
+      {action.prefix}
+      {name && <span className="bold">{name}</span>}
+      {text}
+    </span>
+  );
+};
+
+/**
+ * 「粗體名稱 ＋ 文字 ＋ 粗體數值 ＋ 單位」版面（Recovered／Sacrifice／Auto Regenerate）
+ * "bold name + text + bold value + unit" layout (Recovered / Sacrifice / Auto Regenerate)
+ *
+ * 缺少 value 時退回 NamedMessage（直接輸出 message，保證文案不丟失）。
+ * Falls back to NamedMessage when `value` is absent so the copy is never dropped.
+ */
+const NamedValueMessage: React.FC<{ action: IBattleAction; className?: string; text: string }> = ({
+  action,
+  className,
+  text,
+}) => {
+  if (action.value === undefined) return <NamedMessage action={action} className={className} />;
+  return (
+    <span className={className}>
+      {action.prefix}
+      <span className="bold">{action.source}</span> {text}{' '}
+      <span className="bold">{action.value}</span>
+      {action.valueUnit && ` ${action.valueUnit}`}
+    </span>
+  );
+};
+
+/**
+ * SP 傷害訊息（單一事實來源）
+ * SP damage message (single source of truth)
+ *
+ * 原始日誌：`<b>N</b>SP Damage to <b>target</b>`，數值與「SP Damage」之間無空格。
+ * Original log: `<b>N</b>SP Damage to <b>target</b>` with no space between the value and
+ * "SP Damage".
+ */
+const SpDamageMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <span className={getMessageClass(action)}>
+    <span className="bold">{action.value}</span>SP Damage
+    {action.target && (
+      <>
+        {' '}to <span className="bold">{action.target}</span>
+      </>
+    )}
+    <ValueChange action={action} />
+  </span>
+);
+
+/**
+ * 吸取訊息（單事實來源）
+ * Drain message (single source of truth)
+ *
+ * 原始日誌：`Drained <b>N</b> HP from <b>target</b>`（行首無施放者名稱）。
+ * Original log: `Drained <b>N</b> HP from <b>target</b>` (no caster name at the head).
+ */
+const DrainMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <span className={getMessageClass(action)}>
+    Drained{' '}
+    <span className="bold">{action.value ?? 0}</span>
+    {action.valueUnit && ` ${action.valueUnit}`}
+    {action.target && (
+      <>
+        {' '}from <span className="bold">{action.target}</span>
+      </>
+    )}
+  </span>
+);
+
+/** 回復訊息（`name Recovered N HP`）/ Recovery message (`name Recovered N HP`) */
+const RecoverMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <NamedValueMessage action={action} className={getMessageClass(action)} text="Recovered" />
+);
+
+/**
+ * 持續回復訊息（單一事實來源）
+ * Regeneration message (single source of truth)
+ *
+ * 兩種原始版面：`name gained HP regeneration +N%` 與每回合的
+ * `* name Auto Regenerate N HP`（prefix 帶出行首星號、數值加粗）。
+ * Two original layouts: `name gained HP regeneration +N%` and the per-turn
+ * `* name Auto Regenerate N HP` (the prefix carries the leading asterisk and the value is
+ * bold).
+ */
+const RegenMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
+  if (action.prefix !== undefined && action.value !== undefined) {
+    return <NamedValueMessage action={action} className={getMessageClass(action)} text="Auto Regenerate" />;
+  }
+  return <NamedMessage action={action} className={getMessageClass(action)} />;
+};
+
+/** 復活訊息（`name revived!`）/ Revive message (`name revived!`) */
+const ReviveMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <NamedMessage action={action} className={getMessageClass(action)} />
+);
+
+/** 增益訊息（`got quicked!`／`casting shorted!`／`got barriered!`）/ Buff message */
+const BuffMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <NamedMessage action={action} className={getMessageClass(action)} />
+);
+
+/** 減益訊息（能力下降；原始日誌無 span，沿用預設色）/ Debuff message (no span in the original log) */
+const DebuffMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <NamedMessage action={action} className={getMessageClass(action)} />
+);
+
+/** 中毒訊息（施加／每回合傷害／解除／抗毒）/ Poison message (apply / damage / cure / resist) */
+const PoisonMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <NamedMessage action={action} className={getMessageClass(action)} />
+);
+
+/** 屬性升降訊息（`STR rise 10%`、`MAXHP extended to 999`）/ Stat-change message */
+const StatChangeMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <NamedMessage action={action} className={getMessageClass(action)} />
+);
+
+/** 位移訊息（`moved to front.`、`knock backed!`）/ Movement message */
+const MoveMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <NamedMessage action={action} className={getMessageClass(action)} />
+);
+
+/** 延遲訊息（`name delayed N.`）/ Delay message (`name delayed N.`) */
+const DelayMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <NamedMessage action={action} className={getMessageClass(action)} />
+);
+
+/** 犧牲訊息（`name sacrifice N HP`）/ Sacrifice message (`name sacrifice N HP`) */
+const SacrificeMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <NamedValueMessage action={action} className={getMessageClass(action)} text="sacrifice" />
+);
+
+/** 施放失敗訊息（`name Failed to skill (reason)`）/ Failed-to-cast message */
+const FailMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <NamedMessage action={action} className={getMessageClass(action)} />
+);
+
+/** 未命中訊息（`Failed!`；原始日誌無 span，沿用預設色）/ Miss message (`Failed!`, no span in the original log) */
+const MissMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <NamedMessage action={action} className={getMessageClass(action)} />
+);
+
+/** 升級訊息（`name LevelUp!`）/ Level-up message (`name LevelUp!`) */
+const LevelUpMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <NamedMessage action={action} className={getMessageClass(action)} />
+);
+
+/**
+ * 掉落道具訊息（單一事實來源）
+ * Dropped-item message (single source of truth)
+ *
+ * 原始日誌為 `<b>名</b> dropped<img/>` 後接 `<span class="bold u">道具名</span>.`；
+ * message 即道具名稱，source 為掉落者。
+ * The original log is `<b>name</b> dropped<img/>` followed by
+ * `<span class="bold u">item name</span>.`; `message` holds the item name and `source` the dropper.
+ */
+const ItemDropMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <span>
+    {action.source && <span className="bold">{action.source}</span>}
+    {action.source && ' dropped '}
+    <span className="u">
+      <span className="bold">{action.message}</span>
+    </span>
+    .
+  </span>
+);
+
+/** 純文字資訊（`Failed!`、`Damage x6!`、`heal x2!`）/ Plain info text */
+const InfoMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <span className={getMessageClass(action)}>{action.message}</span>
+);
+
+/**
  * 傷害/治療訊息（單一事實來源）
  * Damage/heal message (single source of truth)
  */
@@ -193,6 +381,21 @@ const StatusMessage: React.FC<{
   </span>
 );
 
+/**
+ * 蓄力/詠唱訊息（單一事實來源）
+ * Charge/casting message (single source of truth)
+ *
+ * 文案由 buildChargeMessage 依 castType 決定，修正過去硬編碼「start casting.」
+ * 導致物理蓄力（start charging.）誤顯示為詠唱的缺陷；castType 缺省時維持詠唱，
+ * 既有展示資料行為不變。
+ * The copy comes from buildChargeMessage keyed on castType, fixing the defect where the
+ * hardcoded "start casting." showed a physical charge (start charging.) as a cast. An absent
+ * castType still reads as casting, so existing showcase data behaves as before.
+ */
+const CastingMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <StatusMessage action={action} className="charge" suffix={buildChargeMessage(action.castType)} />
+);
+
 // ==================== 行動內容路由 / Action content router ====================
 
 /**
@@ -217,9 +420,43 @@ function renderActionContent(action: IBattleAction): React.ReactNode {
     case 'protect':
       return <ProtectMessage action={action} />;
     case 'casting':
-      return <StatusMessage action={action} className="charge" suffix="start casting." />;
+      return <CastingMessage action={action} />;
     case 'down':
       return <StatusMessage action={action} className="dmg" suffix="down." />;
+    case 'spdamage':
+      return <SpDamageMessage action={action} />;
+    case 'recover':
+      return <RecoverMessage action={action} />;
+    case 'drain':
+      return <DrainMessage action={action} />;
+    case 'regen':
+      return <RegenMessage action={action} />;
+    case 'revive':
+      return <ReviveMessage action={action} />;
+    case 'buff':
+      return <BuffMessage action={action} />;
+    case 'debuff':
+      return <DebuffMessage action={action} />;
+    case 'poison':
+      return <PoisonMessage action={action} />;
+    case 'statchange':
+      return <StatChangeMessage action={action} />;
+    case 'move':
+      return <MoveMessage action={action} />;
+    case 'delay':
+      return <DelayMessage action={action} />;
+    case 'sacrifice':
+      return <SacrificeMessage action={action} />;
+    case 'fail':
+      return <FailMessage action={action} />;
+    case 'miss':
+      return <MissMessage action={action} />;
+    case 'levelup':
+      return <LevelUpMessage action={action} />;
+    case 'itemdrop':
+      return <ItemDropMessage action={action} />;
+    case 'info':
+      return <InfoMessage action={action} />;
     default:
       return <span className={getAttrClass(action.attribute)}>{action.message}</span>;
   }

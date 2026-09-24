@@ -32,7 +32,7 @@ import type {
 	ITeamFinalStats,
 	ITeamSide,
 } from '#/components/battle/types';
-import { buildMagicCircleMessage } from '#/components/battle/battleUtils';
+import { buildMagicCircleMessage, buildNamedMessage, buildChargeMessage } from '#/components/battle/battleUtils';
 import {
 	computeBattleSpritePositions,
 	groupBattleChars,
@@ -253,12 +253,14 @@ function magicCircleAmount(def: ISkillDef | undefined, kind: EnumMagicCircleKind
  * 事件轉接：IBattleEvent → IBattleAction（任務 3.3）
  * Event adapter: IBattleEvent → IBattleAction (task 3.3)
  *
- * 對應：Act→skill、Cast→casting、Damage→damage、Heal→heal、Guard→protect、Death→down、
- * Summon→summon、MagicCircle→magiccircle，未知型別以 type 'result' + message 文字 fallback，
- * 確保 N 事件 → N 條日誌。
- * Mapping: Act→skill, Cast→casting, Damage→damage, Heal→heal, Guard→protect, Death→down,
- * Summon→summon, MagicCircle→magiccircle; unknown types fall back to type 'result' + a
- * message so N events → N entries.
+ * 對應：Act→skill、Cast→casting、Charge→casting(charging)、Damage→damage、Heal→heal、
+ * Guard→protect、Death→down、Summon→summon、MagicCircle→magiccircle、Buff→buff、
+ * Debuff→debuff、Poison→poison、Miss→miss、Info→info，
+ * 未知型別以 type 'result' + message 文字 fallback，確保 N 事件 → N 條日誌。
+ * Mapping: Act→skill, Cast→casting, Charge→casting(charging), Damage→damage, Heal→heal,
+ * Guard→protect, Death→down, Summon→summon, MagicCircle→magiccircle, Buff→buff,
+ * Debuff→debuff, Poison→poison, Miss→miss, Info→info; unknown types fall back to type
+ * 'result' + a message so N events → N entries.
  */
 export function mapBattleEvent(
 	ev: IBattleEvent,
@@ -289,7 +291,7 @@ export function mapBattleEvent(
 			return {
 				type: EnumActionType.Casting,
 				source: actor.name,
-				message: `start ${verb}.`,
+				message: buildChargeMessage(verb),
 				side,
 				attribute: EnumAttributeType.Charge,
 				castType: verb,
@@ -420,6 +422,81 @@ export function mapBattleEvent(
 				skill: skillName ? { name: skillName } : undefined,
 				magicCircle,
 				message: buildMagicCircleMessage(actor.name, magicCircle),
+				side,
+				attribute: EnumAttributeType.Normal,
+			};
+		}
+		case EnumBattleEventType.Charge: {
+			// 蓄力開始契約（引擎目前尚無生產點）：Charge 事件本身即「貯め開始」，
+			// 文案與 castType 皆固定為 charging，與 Cast（依技能型別判斷）分開。
+			// Charge-start contract (the engine has no producer yet): the Charge event *is*
+			// "charge start", so both the copy and castType are fixed to charging, kept apart
+			// from Cast (which decides by skill type).
+			return {
+				type: EnumActionType.Casting,
+				source: actor.name,
+				message: buildChargeMessage(EnumChargeKind.Charging),
+				side,
+				attribute: EnumAttributeType.Charge,
+				castType: EnumChargeKind.Charging,
+				skill: skillName ? { name: skillName } : undefined,
+			};
+		}
+		case EnumBattleEventType.Buff: {
+			// 增益契約：text＝原始日誌文案（如 `got barriered!`／`STR rise 10%`），缺省時退回通用文案
+			// Buff contract: text = the original log phrase (e.g. `got barriered!` / `STR rise 10%`);
+			// generic copy is the fallback
+			return {
+				type: EnumActionType.Buff,
+				source: actor.name,
+				message: buildNamedMessage(actor.name, ev.text ?? 'gained buff.'),
+				side,
+				attribute: EnumAttributeType.Support,
+			};
+		}
+		case EnumBattleEventType.Debuff: {
+			// 減益契約：text＝原始日誌文案（如 `STR down 10%`）；原始日誌無 span，故沿用預設色
+			// Debuff contract: text = the original log phrase (e.g. `STR down 10%`); the original
+			// log carries no span for it, so the default colour is kept
+			return {
+				type: EnumActionType.Debuff,
+				source: actor.name,
+				message: buildNamedMessage(actor.name, ev.text ?? 'got debuffed.'),
+				side,
+				attribute: EnumAttributeType.Normal,
+			};
+		}
+		case EnumBattleEventType.Poison: {
+			// 中毒契約：target＝中毒單位、text＝原始日誌文案（`get poisoned!`／`blocked poison.` 等）
+			// Poison contract: target = the poisoned unit, text = the original log phrase
+			// (`get poisoned!` / `blocked poison.` / …)
+			const name = target.name ?? actor.name;
+			return {
+				type: EnumActionType.Poison,
+				source: name,
+				message: buildNamedMessage(name, ev.text ?? 'get poisoned!'),
+				side: target.side ?? side,
+				attribute: EnumAttributeType.Spdmg,
+			};
+		}
+		case EnumBattleEventType.Miss: {
+			// 未命中契約：text＝原始日誌文案（`Failed!`／`No target.Failed!`）
+			// Miss contract: text = the original log phrase (`Failed!` / `No target.Failed!`)
+			return {
+				type: EnumActionType.Miss,
+				source: actor.name,
+				message: buildNamedMessage(actor.name, ev.text ?? 'Failed!'),
+				side,
+				attribute: EnumAttributeType.Normal,
+			};
+		}
+		case EnumBattleEventType.Info: {
+			// 一般資訊契約：text 即完整訊息（原始日誌無名稱、無 span）
+			// Info contract: text is the whole message (no name and no span in the original log)
+			return {
+				type: EnumActionType.Info,
+				source: actor.name,
+				message: ev.text ?? '',
 				side,
 				attribute: EnumAttributeType.Normal,
 			};

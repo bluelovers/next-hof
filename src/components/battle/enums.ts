@@ -37,6 +37,8 @@ export enum EnumAttributeType {
 	Support = 'support',
 	Charge = 'charge',
 	Normal = 'normal',
+	/** SP 傷害與中毒（原始 basis.css 的 .spdmg）/ SP damage and poison (the .spdmg of the original basis.css) */
+	Spdmg = 'spdmg',
 }
 
 /** 標籤演算法位置（UI-only）/ Label placement (UI-only) */
@@ -79,6 +81,40 @@ export enum EnumActionType {
 	Casting = 'casting',
 	Down = 'down',
 	Result = 'result',
+	/** SP 傷害（`N SP Damage to target`）/ SP damage (`N SP Damage to target`) */
+	SpDamage = 'spdamage',
+	/** 回復（`name Recovered N HP/SP`）/ recovery (`name Recovered N HP/SP`) */
+	Recover = 'recover',
+	/** 吸取（`Drained N HP from target`）/ drain (`Drained N HP from target`) */
+	Drain = 'drain',
+	/** 持續回復（`gained HP regeneration +N%`、`Auto Regenerate N HP`）/ regeneration */
+	Regen = 'regen',
+	/** 復活（`name revived!`）/ revive (`name revived!`) */
+	Revive = 'revive',
+	/** 增益（quicked／casting shorted／barriered）/ buff (quicked / casting shorted / barriered) */
+	Buff = 'buff',
+	/** 減益（能力下降）/ debuff (stat down) */
+	Debuff = 'debuff',
+	/** 中毒：施加／每回合傷害／解除 / poison: apply / damage / cure */
+	Poison = 'poison',
+	/** 屬性升降（`STR rise 10%`、`MAXHP extended to N`）/ stat change */
+	StatChange = 'statchange',
+	/** 位移（`moved to front.`、`knock backed!`）/ movement (`moved to front.` / `knock backed!`) */
+	Move = 'move',
+	/** 延遲（`name delayed N.`）/ delay (`name delayed N.`) */
+	Delay = 'delay',
+	/** 犧牲（`name sacrifice N HP`）/ sacrifice (`name sacrifice N HP`) */
+	Sacrifice = 'sacrifice',
+	/** 施放失敗（武器不符／SP 不足）/ failed to cast (weapon mismatch / SP shortage) */
+	Fail = 'fail',
+	/** 未命中（原始日誌的 `Failed!`）/ miss (the original log's `Failed!`) */
+	Miss = 'miss',
+	/** 升級（`name LevelUp!`）/ level up (`name LevelUp!`) */
+	LevelUp = 'levelup',
+	/** 掉落道具 / dropped item */
+	ItemDrop = 'itemdrop',
+	/** 純文字資訊（`Failed!`、`Damage x6!`、`heal x2!`）/ plain info text */
+	Info = 'info',
 }
 
 /**
