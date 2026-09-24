@@ -91,6 +91,33 @@ import { IJobData } from '../../game-data/GameDataTypes';
 
 ---
 
+## 測試執行 / Test Execution
+
+**一次執行 `pnpm run test` 即可，不需分兩次執行。**
+**Run a single command `pnpm run test`; no need to run the two checks separately.**
+
+`pnpm run test` 依序執行 / `pnpm run test` runs, in order:
+
+1. `pretest` → `test:tsc` — TypeScript 型別檢查（`tsc --noEmit`）/ TypeScript type check
+2. `test` → `test:vitest:unit` — 單元測試（`vitest run --project unit`）/ unit tests
+
+```bash
+pnpm run test   # 型別檢查 + 單元測試 / type check + unit tests
+```
+
+> **注意 / Note：** `test:tsc` 採**非阻斷式設計**（`&` 分隔符，刻意為之）：型別錯誤會印出
+> `error TS` 訊息，但**不中止**後續的 `test:vitest:unit`，整體 exit code 亦可能為 0。
+> 驗證時除 exit code 外，須一併檢查輸出中是否出現 `error TS`。
+>
+> `test:tsc` is intentionally non-blocking (`&` separator): type errors print `error TS`
+> but do **not** stop `test:vitest:unit`, and the overall exit code may still be 0.
+> When verifying, also scan the output for `error TS` instead of relying on exit code alone.
+
+- [ ] 修改程式碼後執行 `pnpm run test` 即完成完整驗證
+- [ ] After code changes, run `pnpm run test` once for full verification
+
+---
+
 ## 元件製作檢查清單 / Component Creation Checklist
 
 製作或修改元件時，必須仔細檢查以下項目：
