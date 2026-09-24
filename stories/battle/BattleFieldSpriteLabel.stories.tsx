@@ -43,7 +43,7 @@ import {
 /** 名冊角色（不含尺寸；位置與翻轉交由計算邏輯得出） / Roster char (no size; position & flip come from the compute logic) */
 interface IStoryRosterChar {
   /** 戰鬥單位實例 uid / Battle-unit instance uid */
-  unitUid: string;
+  unitUuid: string;
   /** 角色名稱 / Name */
   name?: string;
   /** 精靈圖片路徑 / Sprite image path */
@@ -98,7 +98,7 @@ const makeRender = (char: IStoryRosterChar) => (args: IBattleFieldSpriteLabelPro
 
 /** 左隊（前/後衛由 position 決定） / Left team (front/back by position) */
 const heroLeft = {
-  unitUid: 'mon_018',
+  unitUuid: 'mon_018',
   name: 'Hero1',
   imageUrl: '/image/char/mon_018.png',
   position: EnumPosition.Back,
@@ -106,7 +106,7 @@ const heroLeft = {
 };
 /** 右隊 char_rev（直接定位於右側，flipped:false） / Right team char_rev (directly on the right, not flipped) */
 const mageRight = {
-  unitUid: 'mon_018b',
+  unitUuid: 'mon_018b',
   name: 'Mage1',
   imageUrl: '/image/char_rev/mon_018.png',
   position: EnumPosition.Front,
@@ -114,7 +114,7 @@ const mageRight = {
 };
 /** 右隊 char（由邏輯推導為 flipped:true，標籤會反向抵消鏡像） / Right team char (logic derives flipped:true; label cancels the mirror) */
 const goblinRight = {
-  unitUid: 'mon_052',
+  unitUuid: 'mon_052',
   name: 'Goblin',
   imageUrl: '/image/char/mon_052.png',
   position: EnumPosition.Front,

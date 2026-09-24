@@ -270,7 +270,7 @@ export class Battle {
 	/** 建立目前快照單位列表 / Build current snapshot unit list */
 	private snapshotUnits(): IBattleSnapshot['units'] {
 		return this.allChars().map((c) => ({
-			unitUid: c.unitUid,
+			unitUuid: c.unitUuid,
 			corpse: this.resolveCorpse(c),
 			no: charIdToString(c.no),
 			name: c.name,

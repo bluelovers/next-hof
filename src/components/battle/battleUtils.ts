@@ -330,13 +330,13 @@ function joinClassNames(base?: string, extra?: string): string | undefined {
  * Resolve the battlefield sprites to show for one segment from its snapshot
  * (single source of truth)
  *
- * 以「戰鬥單位實例 unitUid」精確比對（sprite.unitUid ↔ snapshotUnit.unitUid），
+ * 以「戰鬥單位實例 unitUuid」精確比對（sprite.unitUuid ↔ snapshotUnit.unitUuid），
  * 完全不以物種 `no` 判定，因此可正確處理真實遊戲的各種情況：
- * Matches by battle-unit instance unitUid (sprite.unitUid ↔ snapshotUnit.unitUid) and never
+ * Matches by battle-unit instance unitUuid (sprite.unitUuid ↔ snapshotUnit.unitUuid) and never
  * by species `no`, so it handles the real-game cases correctly:
  *
- * - 中途加入（召喚）：此快照尚未出現的 unitUid 不顯示；一旦出現在快照就開始顯示。
- *   Joins (summon): a unitUid absent from the snapshot is hidden; it appears once present.
+ * - 中途加入（召喚）：此快照尚未出現的 unitUuid 不顯示；一旦出現在快照就開始顯示。
+ *   Joins (summon): a unitUuid absent from the snapshot is hidden; it appears once present.
  * - 死亡：依單位政策呈現——`corpse` 為真時改用屍體圖（SPRITE_CORPSE_URL）留在場上；
  *   `!corpse`（含未設定）時直接消失（不留屍體）。
  *   `corpse` 寫成物件時為「留下屍體」並可指定屍體圖路徑、附加 CSS class 與 inline style
@@ -346,8 +346,8 @@ function joinClassNames(base?: string, extra?: string): string | undefined {
  *   `corpse` still means "leave a corpse" and additionally picks the corpse image path, an
  *   extra CSS class and an inline style (see ICorpseSpec); with no image path given the
  *   original image's directory still decides the corpse asset.
- * - 復活：快照中 dead=false 即恢復原圖（同一 unitUid）。
- *   Revive: once the snapshot shows dead=false the original image returns (same unitUid).
+ * - 復活：快照中 dead=false 即恢復原圖（同一 unitUuid）。
+ *   Revive: once the snapshot shows dead=false the original image returns (same unitUuid).
  * - 型態變化：快照提供 `imageUrl` 時以外觀覆寫呈現。
  *   Form change: when the snapshot supplies `imageUrl`, that appearance override is used.
  *
@@ -366,12 +366,12 @@ export function resolveSegmentSprites(
 
   const unitById = new Map<string, IBattleSnapshotDisplayUnit>();
   for (const unit of snapshot.units) {
-    if (unit.unitUid) unitById.set(unit.unitUid, unit);
+    if (unit.unitUuid) unitById.set(unit.unitUuid, unit);
   }
 
   return sprites
     .map((sprite) => {
-      const unit = sprite.unitUid ? unitById.get(sprite.unitUid) : undefined;
+      const unit = sprite.unitUuid ? unitById.get(sprite.unitUuid) : undefined;
       // 此快照中不存在（尚未加入／已離場）→ 不顯示
       // Not present at this moment (not yet joined / already gone) → hidden
       if (!unit) return undefined;

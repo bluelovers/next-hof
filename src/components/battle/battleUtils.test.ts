@@ -121,7 +121,7 @@ describe('segmentUnitsForSide', () => {
 describe('resolveSegmentSprites', () => {
 	/** 建立最小精靈 / Build a minimal sprite */
 	function sprite(id: string, imageUrl = `/image/char/${id}.png`): IBattleSprite {
-		return { unitUid: id, imageUrl, x: 0, y: 0 };
+		return { unitUuid: id, imageUrl, x: 0, y: 0 };
 	}
 
 	/** 建立最小快照單位 / Build a minimal snapshot unit */
@@ -131,7 +131,7 @@ describe('resolveSegmentSprites', () => {
 		extra?: Partial<IBattleSnapshotDisplayUnit>,
 	): IBattleSnapshotDisplayUnit {
 		return {
-			unitUid: id,
+			unitUuid: id,
 			name: `unit-${id}`,
 			side: EnumTeamSideUI.Left,
 			hp: dead ? 0 : 1,
@@ -173,13 +173,13 @@ describe('resolveSegmentSprites', () => {
 		const sprites = [sprite('u1'), sprite('u2')];
 		const snap = snapshot(0, [unit('u1', true, { corpse: false }), unit('u2', true)]);
 		// u1 vanishes (no corpse); u2 stays as a corpse
-		expect(resolveSegmentSprites(sprites, snap).map((s) => s.unitUid)).toEqual(['u2']);
+		expect(resolveSegmentSprites(sprites, snap).map((s) => s.unitUuid)).toEqual(['u2']);
 	});
 
 	it('treats an unset corpse policy as falsy (vanish), never as leave-corpse', () => {
 		const sprites = [sprite('u1')];
 		const unset: IBattleSnapshotDisplayUnit = {
-			unitUid: 'u1',
+			unitUuid: 'u1',
 			name: 'unit-u1',
 			side: EnumTeamSideUI.Left,
 			hp: 0,
@@ -194,7 +194,7 @@ describe('resolveSegmentSprites', () => {
 	it('hides units absent from the snapshot (not yet joined / already gone)', () => {
 		const sprites = [sprite('u1'), sprite('u2')];
 		const snap = snapshot(0, [unit('u1', false)]);
-		expect(resolveSegmentSprites(sprites, snap).map((s) => s.unitUid)).toEqual(['u1']);
+		expect(resolveSegmentSprites(sprites, snap).map((s) => s.unitUuid)).toEqual(['u1']);
 	});
 
 	it('restores the original image after a revive (same uid)', () => {

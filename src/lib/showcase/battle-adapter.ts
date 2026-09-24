@@ -141,7 +141,7 @@ export function toBattleUnit(c: Character, side: ITeamSide): IBattleUnit {
 		sp: Math.max(0, c.SP),
 		maxSp: c.MAXSP,
 		status: c.STATE === EnumState.Dead ? EnumUnitStatus.Down : c.expect !== null ? EnumUnitStatus.Casting : EnumUnitStatus.Alive,
-		unitUid: c.unitUid,
+		unitUuid: c.unitUuid,
 		side,
 		spd: c.SPD,
 		position: c.POSITION === EnumPosition.Back ? EnumPosition.Back : EnumPosition.Front,
@@ -417,7 +417,7 @@ export function buildPositionRoster(
 	enemies: readonly Character[],
 ): IBattlePositionChar[] {
 	const toEntry = (c: Character, side: ITeamSide, imageUrl: string): IBattlePositionChar => ({
-		unitUid: c.unitUid,
+		unitUuid: c.unitUuid,
 		name: c.name,
 		imageUrl,
 		imageSize: getSpriteImageSize(imageUrl),
@@ -465,7 +465,7 @@ function toSnapshotDisplay(snap: IBattleSnapshot, repo?: IDataRepository): IBatt
 				if (sk) chargeKind = sk.type === EnumSkillDamageType.Physical ? EnumChargeKind.Charging : EnumChargeKind.Casting;
 			}
 			return {
-				unitUid: u.unitUid,
+				unitUuid: u.unitUuid,
 				name: u.name,
 				side,
 				corpse: u.corpse,

@@ -111,10 +111,10 @@ describe('corpse policy inheritance (battle > team > character)', () => {
 		const battle = new Battle([ally], [enemy], { repo, rng });
 		battle.run();
 
-		const byId = new Map(battle.snapshots[0].units.map((u) => [u.unitUid, u]));
+		const byId = new Map(battle.snapshots[0].units.map((u) => [u.unitUuid, u]));
 		// c.team 是 BattleTeam 物件；快照必須取其 side，而非整個物件
-		expect(byId.get(ally.unitUid)!.team).toBe(EnumTeamSide.Team0);
-		expect(byId.get(enemy.unitUid)!.team).toBe(EnumTeamSide.Team1);
+		expect(byId.get(ally.unitUuid)!.team).toBe(EnumTeamSide.Team0);
+		expect(byId.get(enemy.unitUuid)!.team).toBe(EnumTeamSide.Team1);
 	});
 
 	it('resolves character > battle and defaults to no corpse', () => {
@@ -134,10 +134,10 @@ describe('corpse policy inheritance (battle > team > character)', () => {
 		});
 		battle.run();
 
-		const byId = new Map(battle.snapshots[0].units.map((u) => [u.unitUid, u]));
-		expect(byId.get(keeps.unitUid)!.corpse).toBe(true);
-		expect(byId.get(inherits.unitUid)!.corpse).toBe(true);
-		expect(byId.get(vanishes.unitUid)!.corpse).toBe(false);
+		const byId = new Map(battle.snapshots[0].units.map((u) => [u.unitUuid, u]));
+		expect(byId.get(keeps.unitUuid)!.corpse).toBe(true);
+		expect(byId.get(inherits.unitUuid)!.corpse).toBe(true);
+		expect(byId.get(vanishes.unitUuid)!.corpse).toBe(false);
 	});
 
 	it('team-level overrides battle-level; unset battle-level defaults to false', () => {
@@ -159,11 +159,11 @@ describe('corpse policy inheritance (battle > team > character)', () => {
 		const battle2 = new Battle([newChar(strong, repo, rng)], [bare], { repo, rng });
 		battle2.run();
 
-		const byId = new Map(battle.snapshots[0].units.map((u) => [u.unitUid, u]));
-		expect(byId.get(ally.unitUid)!.corpse).toBe(true); // team-level true
-		expect(byId.get(enemy.unitUid)!.corpse).toBe(false); // battle-level default false
+		const byId = new Map(battle.snapshots[0].units.map((u) => [u.unitUuid, u]));
+		expect(byId.get(ally.unitUuid)!.corpse).toBe(true); // team-level true
+		expect(byId.get(enemy.unitUuid)!.corpse).toBe(false); // battle-level default false
 
-		const byId2 = new Map(battle2.snapshots[0].units.map((u) => [u.unitUid, u]));
+		const byId2 = new Map(battle2.snapshots[0].units.map((u) => [u.unitUuid, u]));
 		expect([...byId2.values()].every((u) => u.corpse === false)).toBe(true);
 	});
 
@@ -191,11 +191,11 @@ describe('corpse policy inheritance (battle > team > character)', () => {
 		});
 		battle.run();
 
-		const byId = new Map(battle.snapshots[0].units.map((u) => [u.unitUid, u]));
-		expect(byId.get(decorated.unitUid)!.corpse).toEqual(spec);
-		expect(byId.get(inherits.unitUid)!.corpse).toEqual({ className: 'battle-wide' });
+		const byId = new Map(battle.snapshots[0].units.map((u) => [u.unitUuid, u]));
+		expect(byId.get(decorated.unitUuid)!.corpse).toEqual(spec);
+		expect(byId.get(inherits.unitUuid)!.corpse).toEqual({ className: 'battle-wide' });
 		// 隊伍級 false 否決戰鬥級物件（仍以 falsy 判定）
 		// Team-level false vetoes the battle-level object (still judged falsy)
-		expect(byId.get(enemy.unitUid)!.corpse).toBe(false);
+		expect(byId.get(enemy.unitUuid)!.corpse).toBe(false);
 	});
 });

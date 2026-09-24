@@ -20,9 +20,9 @@ import { EnumPosition } from '../../src/lib/game/constants';
 
 /** 共用敵方精靈樣本 / Shared enemy sprite samples */
 export const sampleEnemySprites: IBattleSprite[] = [
-  { unitUid: 'mon_052', imageUrl: '/image/char/mon_052.png', x: 164, y: 16, flipped: false, name: 'GoblinWarrior(A)' },
-  { unitUid: 'mon_052', imageUrl: '/image/char/mon_052.png', x: 148, y: 56, flipped: false, name: 'GoblinWarrior(B)' },
-  { unitUid: 'mon_053', imageUrl: '/image/char/mon_053.png', x: 124, y: 96, flipped: false, name: 'GoblinAxe' },
+  { unitUuid: 'mon_052', imageUrl: '/image/char/mon_052.png', x: 164, y: 16, flipped: false, name: 'GoblinWarrior(A)' },
+  { unitUuid: 'mon_052', imageUrl: '/image/char/mon_052.png', x: 148, y: 56, flipped: false, name: 'GoblinWarrior(B)' },
+  { unitUuid: 'mon_053', imageUrl: '/image/char/mon_053.png', x: 124, y: 96, flipped: false, name: 'GoblinAxe' },
 ];
 
 /**
@@ -41,9 +41,9 @@ export const sampleEnemySprites: IBattleSprite[] = [
  * combined with the old nested layering, split a single team across sides.
  */
 export const sampleAllySprites: IBattleSprite[] = [
-  { unitUid: 'mon_018', imageUrl: '/image/char_rev/mon_018.png', x: 352, y: 14, flipped: false, name: 'Hero1' },
-  { unitUid: 'mon_214', imageUrl: '/image/char_rev/mon_214.png', x: 388, y: 64, flipped: false, name: 'Mage1' },
-  { unitUid: 'mon_079', imageUrl: '/image/char_rev/mon_079.png', x: 300, y: 110, flipped: false, name: 'Priest1' },
+  { unitUuid: 'mon_018', imageUrl: '/image/char_rev/mon_018.png', x: 352, y: 14, flipped: false, name: 'Hero1' },
+  { unitUuid: 'mon_214', imageUrl: '/image/char_rev/mon_214.png', x: 388, y: 64, flipped: false, name: 'Mage1' },
+  { unitUuid: 'mon_079', imageUrl: '/image/char_rev/mon_079.png', x: 300, y: 110, flipped: false, name: 'Priest1' },
 ];
 
 /** 共用完整戰場精靈樣本（敵方 + 友方） / Shared full battlefield sprite samples (enemies + allies) */
@@ -100,7 +100,7 @@ export function createSampleConfig(
 /** 名冊角色（不含尺寸，位置由 computeBattleSpritePositions 計算） / Roster char (no size; position computed) */
 interface IRosterChar {
   /** 戰鬥單位實例 uid（同時作為 DOM id） / Battle-unit instance uid (also DOM id) */
-  unitUid: string;
+  unitUuid: string;
   /** 角色名稱 / Name */
   name?: string;
   /** 精靈圖片路徑 / Sprite image path */
@@ -135,20 +135,20 @@ interface IRosterTeam {
 const demoRoster: { left: IRosterTeam; right: IRosterTeam } = {
   left: {
     back: [
-      { unitUid: 'mon_018', name: 'Hero1', imageUrl: '/image/char/mon_018.png', position: EnumPosition.Back, side: EnumTeamSideUI.Left },
+      { unitUuid: 'mon_018', name: 'Hero1', imageUrl: '/image/char/mon_018.png', position: EnumPosition.Back, side: EnumTeamSideUI.Left },
     ],
     front: [
-      { unitUid: 'mon_014', name: 'Mage1', imageUrl: '/image/char/mon_014.png', position: EnumPosition.Front, side: EnumTeamSideUI.Left },
-      { unitUid: 'mon_079', name: 'Priest1', imageUrl: '/image/char/mon_079.png', position: EnumPosition.Front, side: EnumTeamSideUI.Left },
+      { unitUuid: 'mon_014', name: 'Mage1', imageUrl: '/image/char/mon_014.png', position: EnumPosition.Front, side: EnumTeamSideUI.Left },
+      { unitUuid: 'mon_079', name: 'Priest1', imageUrl: '/image/char/mon_079.png', position: EnumPosition.Front, side: EnumTeamSideUI.Left },
     ],
   },
   right: {
     back: [
-      { unitUid: 'mon_052a', name: 'GoblinWarrior(A)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Back, side: EnumTeamSideUI.Right },
+      { unitUuid: 'mon_052a', name: 'GoblinWarrior(A)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Back, side: EnumTeamSideUI.Right },
     ],
     front: [
-      { unitUid: 'mon_052b', name: 'GoblinWarrior(B)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
-      { unitUid: 'mon_053', name: 'GoblinAxe', imageUrl: '/image/char/mon_053.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
+      { unitUuid: 'mon_052b', name: 'GoblinWarrior(B)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
+      { unitUuid: 'mon_053', name: 'GoblinAxe', imageUrl: '/image/char/mon_053.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
     ],
   },
 };
@@ -201,13 +201,13 @@ const mixedRoster: { left: IRosterTeam; right: IRosterTeam } = {
   left: { front: [], back: [] },
   right: {
     back: [
-      { unitUid: 'mon_190', name: 'mon_190(char_rev)', imageUrl: '/image/char_rev/mon_190.png', position: EnumPosition.Back, side: EnumTeamSideUI.Right },
-      { unitUid: 'mon_170', name: 'mon_170(char_rev)', imageUrl: '/image/char/mon_170.png', position: EnumPosition.Back, side: EnumTeamSideUI.Right },
+      { unitUuid: 'mon_190', name: 'mon_190(char_rev)', imageUrl: '/image/char_rev/mon_190.png', position: EnumPosition.Back, side: EnumTeamSideUI.Right },
+      { unitUuid: 'mon_170', name: 'mon_170(char_rev)', imageUrl: '/image/char/mon_170.png', position: EnumPosition.Back, side: EnumTeamSideUI.Right },
     ],
     front: [
-      { unitUid: 'mon_052', name: 'Goblin(char)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
-      { unitUid: 'mon_018', name: 'Hero(char_rev)', imageUrl: '/image/char_rev/mon_018.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
-      { unitUid: 'mon_079', name: 'Priest(char_rev)', imageUrl: '/image/char_rev/mon_079.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
+      { unitUuid: 'mon_052', name: 'Goblin(char)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
+      { unitUuid: 'mon_018', name: 'Hero(char_rev)', imageUrl: '/image/char_rev/mon_018.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
+      { unitUuid: 'mon_079', name: 'Priest(char_rev)', imageUrl: '/image/char_rev/mon_079.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
     ],
   },
 };
@@ -243,12 +243,12 @@ export function createMixedSampleSprites(
  * by side / position, with no manual front/back nesting.
  */
 const flatRosterSample: IRosterChar[] = [
-  { unitUid: 'mon_018', name: 'Hero1', imageUrl: '/image/char/mon_018.png', position: EnumPosition.Back, side: EnumTeamSideUI.Left },
-  { unitUid: 'mon_014', name: 'Mage1', imageUrl: '/image/char/mon_014.png', position: EnumPosition.Front, side: EnumTeamSideUI.Left },
-  { unitUid: 'mon_079', name: 'Priest1', imageUrl: '/image/char/mon_079.png', position: EnumPosition.Front, side: EnumTeamSideUI.Left },
-  { unitUid: 'mon_052a', name: 'GoblinWarrior(A)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Back, side: EnumTeamSideUI.Right },
-  { unitUid: 'mon_052b', name: 'GoblinWarrior(B)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
-  { unitUid: 'mon_053', name: 'GoblinAxe', imageUrl: '/image/char/mon_053.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
+  { unitUuid: 'mon_018', name: 'Hero1', imageUrl: '/image/char/mon_018.png', position: EnumPosition.Back, side: EnumTeamSideUI.Left },
+  { unitUuid: 'mon_014', name: 'Mage1', imageUrl: '/image/char/mon_014.png', position: EnumPosition.Front, side: EnumTeamSideUI.Left },
+  { unitUuid: 'mon_079', name: 'Priest1', imageUrl: '/image/char/mon_079.png', position: EnumPosition.Front, side: EnumTeamSideUI.Left },
+  { unitUuid: 'mon_052a', name: 'GoblinWarrior(A)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Back, side: EnumTeamSideUI.Right },
+  { unitUuid: 'mon_052b', name: 'GoblinWarrior(B)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
+  { unitUuid: 'mon_053', name: 'GoblinAxe', imageUrl: '/image/char/mon_053.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
 ];
 
 /** 將扁平名冊補上真實圖像尺寸，轉為 groupBattleChars 所需的 IBattlePositionChar[] */

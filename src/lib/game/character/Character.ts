@@ -56,9 +56,9 @@ export function defaultSpecial(): ISpecial {
 /**
  * 建立戰鬥單位實例唯一識別碼 / Build a battle-unit instance uid
  *
- * 優先採用呼叫方（資料提供者）提供的 unitUid；否則以 `crypto.randomUUID()` 產生，
+ * 優先採用呼叫方（資料提供者）提供的 unitUuid；否則以 `crypto.randomUUID()` 產生，
  * 在不支援的環境（非安全上下文）退化為「計數器 + 亂數」後綴，確保同一程序內不重複。
- * Prefers a caller/provider-supplied unitUid; otherwise generates one via
+ * Prefers a caller/provider-supplied unitUuid; otherwise generates one via
  * `crypto.randomUUID()`, degrading to a counter + random suffix where unavailable
  * (non-secure contexts) while still guaranteeing uniqueness within the process.
  *
@@ -83,13 +83,13 @@ export class Character {
 	/** 類型集合（char/mon/summon/union）/ type tags (char/mon/summon/union) */
 	types: Set<EnumCharType>;
 	/**
-	 * 戰鬥單位實例唯一識別碼（個體追蹤；同一 `no` 可有多個 unitUid）。
+	 * 戰鬥單位實例唯一識別碼（個體追蹤；同一 `no` 可有多個 unitUuid）。
 	 * 這是「這一個單位個體」的身份，非物種／定義編號，也不是任何 item／map id。
 	 * Battle-unit instance uid (per-instance tracking; one `no` may have several
 	 * unitUids). This is *this* unit individual's identity — not a species/definition id,
 	 * and not any item/map id.
 	 */
-	unitUid: string;
+	unitUuid: string;
 	/** 等級 / level */
 	level: number;
 	/** 當前累積經驗 / accumulated exp */
@@ -165,15 +165,15 @@ export class Character {
 
 	/**
 	 * 由初始化參數建立角色 / Build a character from its init parameters
-	 * hp/sp 省略時以 maxhp/maxsp 補齊；types 轉為 Set 並建立實例 unitUid（可由 init.unitUid 覆寫）。
-	 * hp/sp default to maxhp/maxsp; types become a Set and an instance unitUid is built
-	 * (overridable via init.unitUid).
+	 * hp/sp 省略時以 maxhp/maxsp 補齊；types 轉為 Set 並建立實例 unitUuid（可由 init.unitUuid 覆寫）。
+	 * hp/sp default to maxhp/maxsp; types become a Set and an instance unitUuid is built
+	 * (overridable via init.unitUuid).
 	 */
 	constructor(init: ICharInit) {
 		this.no = init.no;
 		this.name = init.name;
 		this.types = new Set(init.types);
-		this.unitUid = buildUnitUid(init.types, init.no, init.unitUid);
+		this.unitUuid = buildUnitUid(init.types, init.no, init.unitUuid);
 		this.level = init.level;
 		this.exp = init.exp ?? 0;
 		this.str = init.str;

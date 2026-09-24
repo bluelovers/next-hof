@@ -19,7 +19,7 @@ import { EnumCharType } from '../types';
 export function newChar(def: ICharDef, repo: IDataRepository, rng: RNG): Character {
 	const c = new Character({
 		no: def.no,
-		unitUid: def.unitUid,
+		unitUuid: def.unitUuid,
 		name: def.name,
 		types: [EnumCharType.Char],
 		level: def.level,
@@ -54,7 +54,7 @@ export function newChar(def: ICharDef, repo: IDataRepository, rng: RNG): Charact
 export function newMon(def: IMonDef, repo: IDataRepository, rng: RNG, strength = 1): Character {
 	const c = new Character({
 		no: def.no,
-		unitUid: def.unitUid,
+		unitUuid: def.unitUuid,
 		name: def.name,
 		types: [EnumCharType.Mon],
 		level: def.level,

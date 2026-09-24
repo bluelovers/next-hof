@@ -691,15 +691,15 @@ export interface ICharCore {
 	 * 戰鬥單位實例唯一識別碼（資料提供者可指定；未提供時由 Character 自動產生）
 	 * Battle-unit instance uid (a data provider may supply one; otherwise Character generates it).
 	 *
-	 * 與 `no`（物種／定義編號）不同：同一 `no` 可有多個個體（同名怪物），`unitUid` 用來識別
+	 * 與 `no`（物種／定義編號）不同：同一 `no` 可有多個個體（同名怪物），`unitUuid` 用來識別
 	 * 「這一個」單位個體，召喚（新加入）、復活、型態變化等跨時間的追蹤都以此為準。
 	 * 命名刻意帶上 `unit`，以免與 item／map 等其他實體的 id 混淆。
 	 * Distinct from `no` (species / definition id): one `no` may have several individuals
-	 * (same-name monsters). `unitUid` identifies *this* unit individual and is the key for
+	 * (same-name monsters). `unitUuid` identifies *this* unit individual and is the key for
 	 * tracking it across summon (joining later), revive, and form changes. The `unit`
 	 * prefix is deliberate so it cannot be mistaken for an item/map id.
 	 */
-	unitUid?: string;
+	unitUuid?: string;
 	/**
 	 * 死亡後是否留下屍體（角色級政策）。
 	 * `true`／物件＝留下屍體（物件可指定屍體圖、CSS class、style）；`false`＝死亡即消失；
@@ -860,7 +860,7 @@ export type { EnumState };
 /** 快照單位資料（戰場狀態某一刻的切面）/ Snapshot unit data (a moment's field state) */
 export interface IBattleSnapshotUnit {
 	/** 戰鬥單位實例唯一識別碼（Character.unitUid；個體追蹤用）/ unit instance uid (for per-instance tracking) */
-	unitUid: string;
+	unitUuid: string;
 	/**
 	 * 已解析的屍體政策（角色 > 隊伍 > 戰鬥級繼承後的結果；false＝不留下屍體，
 	 * 物件＝留下屍體並帶有圖／class／style 規格）

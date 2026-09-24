@@ -25,7 +25,7 @@ describe('Character factory (4.1)', () => {
 	});
 });
 
-describe('instance identity (unitUid)', () => {
+describe('instance identity (unitUuid)', () => {
 	const base = {
 		name: 'x',
 		types: [EnumCharType.Mon],
@@ -34,16 +34,16 @@ describe('instance identity (unitUid)', () => {
 		maxhp: 100, maxsp: 10,
 	};
 
-	it('honours a provider-supplied unitUid', () => {
-		const c = new Character({ ...base, no: 1000, unitUid: 'mon-instance-7' });
-		expect(c.unitUid).toBe('mon-instance-7');
+	it('honours a provider-supplied unitUuid', () => {
+		const c = new Character({ ...base, no: 1000, unitUuid: 'mon-instance-7' });
+		expect(c.unitUuid).toBe('mon-instance-7');
 	});
 
 	it('generates distinct unitUids for same-no individuals', () => {
 		const a = new Character({ ...base, no: 1000 });
 		const b = new Character({ ...base, no: 1000 });
-		expect(a.unitUid).not.toBe(b.unitUid);
-		expect(a.unitUid.length).toBeGreaterThan(0);
+		expect(a.unitUuid).not.toBe(b.unitUuid);
+		expect(a.unitUuid.length).toBeGreaterThan(0);
 	});
 
 	it('carries the per-unit corpse policy', () => {

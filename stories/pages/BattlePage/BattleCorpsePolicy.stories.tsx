@@ -241,7 +241,7 @@ function buildDemoData(
 
 	const roster: IBattlePositionChar[] = [
 		{
-			unitUid: 'demo-left',
+			unitUuid: 'demo-left',
 			name: LEFT_NAME,
 			imageUrl: LEFT_IMAGE,
 			imageSize: getSpriteImageSize(LEFT_IMAGE),
@@ -249,7 +249,7 @@ function buildDemoData(
 			side: EnumTeamSideUI.Left,
 		},
 		{
-			unitUid: 'demo-right',
+			unitUuid: 'demo-right',
 			name: RIGHT_NAME,
 			imageUrl: RIGHT_IMAGE,
 			imageSize: getSpriteImageSize(RIGHT_IMAGE),
@@ -259,12 +259,12 @@ function buildDemoData(
 	];
 
 	const deadUnit = (
-		unitUid: string,
+		unitUuid: string,
 		name: string,
 		side: EnumTeamSideUI,
 		corpse: ICorpsePolicy,
 	): IBattleSnapshotDisplayUnit => ({
-		unitUid,
+		unitUuid,
 		name,
 		side,
 		hp: 0,

@@ -59,10 +59,10 @@ export interface IBattleUnit {
 	/** 單位狀態 / Unit status */
 	status?: EnumUnitStatus;
 	/**
-	 * 戰鬥單位實例唯一識別碼（Character.unitUid；用於關聯戰場精靈）
-	 * Battle-unit instance uid (Character.unitUid; links to the battlefield sprite)
+	 * 戰鬥單位實例唯一識別碼（Character.unitUuid；用於關聯戰場精靈）
+	 * Battle-unit instance uid (Character.unitUuid; links to the battlefield sprite)
 	 */
-	unitUid?: string;
+	unitUuid?: string;
 	/** 隊伍側 / Team side */
 	side: EnumTeamSideUI;
 	/** 速度（決定行動順序）/ speed (action order) */
@@ -86,15 +86,15 @@ export interface IBattleTeam {
 /** 戰場精靈 / Battlefield sprite */
 export interface IBattleSprite {
 	/**
-	 * 戰鬥單位實例唯一識別碼（Character.unitUid；同時作為 DOM id 用於定位/選取）
-	 * Battle-unit instance uid (Character.unitUid; also used as the DOM id for
+	 * 戰鬥單位實例唯一識別碼（Character.unitUuid；同時作為 DOM id 用於定位/選取）
+	 * Battle-unit instance uid (Character.unitUuid; also used as the DOM id for
 	 * targeting/selection).
 	 *
-	 * 與快照單位的 `unitUid` 相同，兩者以此精確對應到「同一個單位個體」。
-	 * Matches a snapshot unit's `unitUid`, so sprites and snapshot units map to the exact
+	 * 與快照單位的 `unitUuid` 相同，兩者以此精確對應到「同一個單位個體」。
+	 * Matches a snapshot unit's `unitUuid`, so sprites and snapshot units map to the exact
 	 * same unit individual (never by species `no`).
 	 */
-	unitUid?: string;
+	unitUuid?: string;
 	/** 精靈圖片路徑 / Sprite image path */
 	imageUrl: string;
 	/** X 軸位置 / X position */
@@ -276,10 +276,10 @@ export interface IBattleDisplayData {
  */
 export interface IBattleSnapshotDisplayUnit {
 	/**
-	 * 戰鬥單位實例唯一識別碼（對應精靈的 `unitUid`，即 Character.unitUid）
-	 * Battle-unit instance uid (matches a sprite's `unitUid`, i.e. Character.unitUid)
+	 * 戰鬥單位實例唯一識別碼（對應精靈的 `unitUuid`，即 Character.unitUuid）
+	 * Battle-unit instance uid (matches a sprite's `unitUuid`, i.e. Character.unitUuid)
 	 */
-	unitUid?: string;
+	unitUuid?: string;
 	/** 單位名稱 / name */
 	name: string;
 	/** 顯示側別 / display side */
