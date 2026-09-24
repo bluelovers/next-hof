@@ -11,9 +11,10 @@
 
 /* ==================== 行動日誌 / Action Log ==================== */
 
+/* 無下框線：紀錄列的水平分隔線已整體隱藏（見 BattleLog.css）
+   No bottom border: horizontal separators across the log rows are hidden (see BattleLog.css) */
 .action-entry {
   padding: 4px 8px;
-  border-bottom: 1px solid rgba(7, 11, 14, 0.3);
 }
 
 .action-entry .skill-icon {

@@ -42,7 +42,7 @@ export const BattleLog: React.FC<IBattleLogProps> = ({
     return (
       <div className="battle-log battle-log--single">
         {actions.map((action, index) => (
-          <div className="log-row break" key={index}>
+          <div className="log-row" key={index}>
             <div className="log-cell log-cell--full">
               <BattleAction action={action} />
             </div>
@@ -59,7 +59,7 @@ export const BattleLog: React.FC<IBattleLogProps> = ({
         // Actions without a side fall back to the left column (prior behaviour)
         const isRight = action.side === EnumTeamSideUI.Right;
         return (
-          <div className="log-row break" key={index}>
+          <div className="log-row" key={index}>
             <div className={`log-cell log-cell--left ${getSideClass(EnumTeamSideUI.Left)}`}>
               {!isRight && <BattleAction action={action} />}
             </div>

@@ -67,7 +67,9 @@ const SideStatus: React.FC<{
   const sideSprite = showTeamSprite ? (teamSprite ?? units.find((u) => u.sprite)?.sprite) : undefined;
 
   return (
-    <div className={`battle-side ${getSideClass(side)} break`}>
+    // 刻意不套用共用的 .break：HP/SP 狀態欄底部不畫水平框線（見 SharedBase.css）
+    // Deliberately skips the shared .break utility: no horizontal rule under the HP/SP status column (see SharedBase.css)
+    <div className={`battle-side ${getSideClass(side)}`}>
       {sideSprite && (
         <div className="battle-side-sprite">
           <CharacterSprite {...sideSprite} />
