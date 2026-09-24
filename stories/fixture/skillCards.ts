@@ -6,19 +6,22 @@
  * Individual skill data for each story showcase.
  */
 import type { ISkillData } from '../../src/components/game-data/GameDataTypes';
+import { EnumTargetType } from '../../src/lib/game/types';
+import { EnumTargetMethod } from '../../src/lib/game/types';
+import { EnumSkillType } from '../../src/components/battle/enums';
 
 /** 基本技能卡片 / Basic skill card (FireBall) */
 export const basicSkill: ISkillData = {
   name: 'FireBall',
   iconUrl: '/image/icon/skill/skill_018.png',
-  target: 'enemy',
-  scope: 'multi',
+  target: EnumTargetType.Enemy,
+  scope: EnumTargetMethod.Multi,
   sp: 20,
   powerPct: 100,
   hits: 4,
   hitRate: '60:0',
   effect: '施放一個火球對多個敵人造成範圍傷害',
-  skillType: 'magic',
+  skillType: EnumSkillType.Magic,
   isInvalid: true,
 };
 
@@ -26,8 +29,8 @@ export const basicSkill: ISkillData = {
 export const multiHitSkill: ISkillData = {
   name: 'DoubleAttack',
   iconUrl: '/image/icon/skill/skill_073.png',
-  target: 'enemy',
-  scope: 'normal',
+  target: EnumTargetType.Enemy,
+  scope: EnumTargetMethod.Individual,
   sp: 15,
   powerPct: 90,
   hits: 2,
@@ -38,14 +41,14 @@ export const multiHitSkill: ISkillData = {
 export const supportSkill: ISkillData = {
   name: 'PartyHeal',
   iconUrl: '/image/icon/skill/skill_013c.png',
-  target: 'friend',
-  scope: 'all',
+  target: EnumTargetType.Friend,
+  scope: EnumTargetMethod.All,
   sp: 30,
   powerPct: 150,
   hits: 1,
   hitRate: '50:0',
   effect: 'HP回復',
-  skillType: 'magic',
+  skillType: EnumSkillType.Magic,
   isSupport: true,
 };
 
@@ -53,8 +56,8 @@ export const supportSkill: ISkillData = {
 export const selfBuffSkill: ISkillData = {
   name: 'ObtainMind',
   iconUrl: '/image/icon/skill/skill_057.png',
-  target: 'self',
-  scope: 'normal',
+  target: EnumTargetType.Self,
+  scope: EnumTargetMethod.Individual,
   sp: 0,
   sacrificePct: 15,
   upStats: { INT: 100 },
@@ -65,13 +68,13 @@ export const selfBuffSkill: ISkillData = {
 export const highSPCostSkill: ISkillData = {
   name: 'SummonLeviathan',
   iconUrl: '/image/icon/skill/skill_029.png',
-  target: 'self',
-  scope: 'normal',
+  target: EnumTargetType.Self,
+  scope: EnumTargetMethod.Individual,
   sp: 700,
   hitRate: '100:300',
   effect: '召唤海兽',
   magicCircleCost: 4,
-  skillType: 'magic',
+  skillType: EnumSkillType.Magic,
   isQuick: true,
 };
 
@@ -79,8 +82,8 @@ export const highSPCostSkill: ISkillData = {
 export const withoutIconSkill: ISkillData = {
   name: 'StanceRestore',
   iconUrl: '',
-  target: 'friend',
-  scope: 'all',
+  target: EnumTargetType.Friend,
+  scope: EnumTargetMethod.All,
   sp: 0,
   effect: '隊列修正',
 };
@@ -89,8 +92,8 @@ export const withoutIconSkill: ISkillData = {
 export const longNameSkill: ISkillData = {
   name: 'FullSupport',
   iconUrl: '/image/icon/skill/we_other007z.png',
-  target: 'friend',
-  scope: 'normal',
+  target: EnumTargetType.Friend,
+  scope: EnumTargetMethod.Individual,
   sp: 200,
   hitRate: '0:150',
   weaponLimit: 'Whip',

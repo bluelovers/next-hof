@@ -63,14 +63,12 @@ export interface ISkillCardProps extends ISkillCardRenderProps {
  */
 function targetClass(target: EnumTargetType): string {
   switch (target) {
-    case 'enemy': return 'dmg';
-    case 'friend': return 'recover';
-    case 'self': return 'support';
-    case 'all': return 'support';
-    // 防禦性預設：EnumTargetType 現直接自 #/lib/game/types 匯入，TS 可推論窮盡，
-    // 此 default 僅作最後防線。
-    // Defensive default: EnumTargetType is now imported directly from #/lib/game/types,
-    // so TS can prove exhaustiveness; this default is just a final safety net.
+    case EnumTargetType.Enemy: return 'dmg';
+    case EnumTargetType.Friend: return 'recover';
+    case EnumTargetType.Self: return 'support';
+    case EnumTargetType.All: return 'support';
+    // 防禦性預設：未來若 EnumTargetType 新增成員，此 default 避免遺漏處理。
+    // Defensive default: if EnumTargetType gains new members, this keeps behavior safe.
     default: return 'support';
   }
 }
@@ -81,8 +79,11 @@ function targetClass(target: EnumTargetType): string {
  */
 function scopeClass(scope: EnumTargetMethod): string {
   switch (scope) {
-    case 'multi': return 'spdmg';
-    case 'all': return 'charge';
+    case EnumTargetMethod.Individual: return 'recover';
+    case EnumTargetMethod.Multi: return 'spdmg';
+    case EnumTargetMethod.All: return 'charge';
+    // 防禦性預設：未來若 EnumTargetMethod 新增成員，此 default 避免遺漏處理。
+    // Defensive default: if EnumTargetMethod gains new members, this keeps behavior safe.
     default: return 'recover';
   }
 }

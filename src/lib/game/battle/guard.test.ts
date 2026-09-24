@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { EnumPosition } from '../constants';
-import { EnumCharType, EnumGuardKind, EnumTeamSide } from '../types';
+import { EnumPosition, EnumTeamSide } from '../constants';
+import { EnumCharType, EnumGuardKind } from '../types';
 import { Character } from '../character/Character';
 import { createSeedRepository } from '../data/seed-data';
 import { BattleTeam } from '../team/BattleTeam';

@@ -19,7 +19,7 @@ export interface IBattleTeamInfoProps {
   /** 單位列表 / Unit list */
   units: IBattleUnit[];
   /** 隊伍側邊類別 / Team side CSS class */
-  sideClass: ITeamSideClass;
+  sideClass: EnumTeamSideClass;
 }
 
 /**

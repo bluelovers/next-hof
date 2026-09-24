@@ -31,9 +31,10 @@ export function setBattleVariable(char: Character, repo: IDataRepository, rng: R
 	skillPassive(char, repo);
 	CalcEquips(char, repo);
 
+	const ch = char as unknown as Record<string, number>;
 	for (const k of PRIMARY_STATS) {
 		const m = BASE_STAT_COMP_MAP[k];
-		char[m.battle] = char[k] + char[m.comp];
+		ch[m.battle] = ch[k] + ch[m.comp];
 	}
 
 	char.MAXHP = Math.round(char.maxhp * (1 + char.M_MAXHP / 100) + char.P_MAXHP);

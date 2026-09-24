@@ -9,6 +9,8 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { makeScaleDecorator, CharacterSpriteDisplayDarkDecorator } from '../decorators';
 import { CharacterSprite } from '../../src/components/characters/CharacterSprite';
+import { EnumSpriteVariant } from '../../src/components/battle/enums';
+import { EnumSpriteSize } from '../../src/components/battle/enums';
 
 /** 圖像基礎路徑 / Image base path */
 const IMG = '/image/char';
@@ -38,7 +40,7 @@ type Story = StoryObj<typeof meta>;
 export const SingleSprite: Story = {
   args: {
     url: `${IMG}/mon_079.png`,
-    variant: 'boxed',
+    variant: EnumSpriteVariant.Boxed,
   },
   parameters: {
     docs: {
@@ -54,8 +56,8 @@ export const SingleSprite: Story = {
 export const FemaleLarge: Story = {
   args: {
     url: `${IMG}/mon_080r.png`,
-    variant: 'boxed',
-    size: 'large',
+    variant: EnumSpriteVariant.Boxed,
+    size: EnumSpriteSize.Large,
   },
   parameters: {
     docs: {
@@ -71,8 +73,8 @@ export const FemaleLarge: Story = {
 export const FemaleSmall: Story = {
   args: {
     url: `${IMG}/mon_080r.png`,
-    variant: 'boxed',
-    size: 'small',
+    variant: EnumSpriteVariant.Boxed,
+    size: EnumSpriteSize.Small,
   },
   parameters: {
     docs: {
@@ -88,7 +90,7 @@ export const FemaleSmall: Story = {
 export const BorderlessSprite: Story = {
   args: {
     url: `${IMG}/mon_079.png`,
-    variant: 'boxed',
+    variant: EnumSpriteVariant.Boxed,
     border: false,
   },
   parameters: {
@@ -105,7 +107,7 @@ export const BorderlessSprite: Story = {
 export const NoBackgroundSprite: Story = {
   args: {
     url: `${IMG}/mon_079.png`,
-    variant: 'boxed',
+    variant: EnumSpriteVariant.Boxed,
     background: false,
   },
   parameters: {
@@ -122,8 +124,8 @@ export const NoBackgroundSprite: Story = {
 export const LargeSprites: Story = {
   args: {
     url: `${IMG}/mon_079.png`,
-    variant: 'boxed',
-    size: 'large',
+    variant: EnumSpriteVariant.Boxed,
+    size: EnumSpriteSize.Large,
   },
   decorators: [makeScaleDecorator({ scale: 1.5 })],
   parameters: {
@@ -140,8 +142,8 @@ export const LargeSprites: Story = {
 export const SmallSprites: Story = {
   args: {
     url: `${IMG}/mon_079.png`,
-    variant: 'boxed',
-    size: 'small',
+    variant: EnumSpriteVariant.Boxed,
+    size: EnumSpriteSize.Small,
   },
   decorators: [makeScaleDecorator({ scale: 0.8 })],
   parameters: {

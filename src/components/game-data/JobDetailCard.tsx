@@ -10,6 +10,7 @@ import type { IJobData } from '../game-data/GameDataTypes';
 import { SkillCard } from '../game-data/SkillCard';
 import { CharacterSprite } from '#/components/characters/CharacterSprite';
 import './JobDetailCard.css';
+import { EnumSpriteVariant } from '#/components/battle/enums';
 
 /** 職業詳細卡片屬性 / Job detail card props */
 export interface IJobDetailCardProps {
@@ -40,7 +41,7 @@ export const JobDetailCard: React.FC<IJobDetailCardProps> = ({
         </td>
         <td className={`job-sprite-cell ${bgClass}`}>
           {spriteUrls.map((url, i) => (
-            <CharacterSprite key={i} url={url} variant="avatar" />
+            <CharacterSprite key={i} url={url} variant={EnumSpriteVariant.Avatar} />
           ))}
         </td>
         <td className={`job-desc-cell ${bgClass}`}>

@@ -13,6 +13,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { BattleFieldLayersDarkDecorator } from '../decorators';
 import { BattleFieldLayers } from '../../src/components/battle/BattleFieldLayers';
 import { sampleSprites, createSampleConfig, sampleFieldSize } from './sampleData';
+import { EnumBattleFieldVAlign } from '../../src/components/battle/enums';
+import { EnumBattleFieldBgScale } from '../../src/components/battle/enums';
 
 const meta: Meta<typeof BattleFieldLayers> = {
   title: 'BattleField/BattleFieldLayers',
@@ -39,7 +41,7 @@ const meta: Meta<typeof BattleFieldLayers> = {
     config: createSampleConfig('grass'),
     ...sampleFieldSize,
     showLabels: true,
-    valign: 'bottom',
+    valign: EnumBattleFieldVAlign.Bottom,
   },
   // 外層舞台，方便觀察背景尺寸與角色框的相對位置
   // Outer stage to visualize the relationship between background size and sprite frame
@@ -77,7 +79,7 @@ export const LargeHeightOnly: Story = {
 export const AlignBottom: Story = {
   args: {
     bgSize: { width: 720, height: 320 },
-    valign: 'bottom',
+    valign: EnumBattleFieldVAlign.Bottom,
   },
 };
 
@@ -85,7 +87,7 @@ export const AlignBottom: Story = {
 export const AlignMiddle: Story = {
   args: {
     bgSize: { width: 720, height: 320 },
-    valign: 'middle',
+    valign: EnumBattleFieldVAlign.Middle,
   },
 };
 
@@ -93,7 +95,7 @@ export const AlignMiddle: Story = {
 export const AlignTop: Story = {
   args: {
     bgSize: { width: 720, height: 320 },
-    valign: 'top',
+    valign: EnumBattleFieldVAlign.Top,
   },
 };
 
@@ -108,7 +110,7 @@ export const BgScaleNatural: Story = {
 export const BgScaleCover: Story = {
   args: {
     bgSize: { width: 720, height: 320 },
-    config: { ...createSampleConfig('grass'), bgScale: 'cover' },
+    config: { ...createSampleConfig('grass'), bgScale: EnumBattleFieldBgScale.Cover },
   },
 };
 
@@ -116,7 +118,7 @@ export const BgScaleCover: Story = {
 export const BgScaleContain: Story = {
   args: {
     bgSize: { width: 720, height: 320 },
-    config: { ...createSampleConfig('grass'), bgScale: 'contain' },
+    config: { ...createSampleConfig('grass'), bgScale: EnumBattleFieldBgScale.Contain },
   },
 };
 
@@ -124,7 +126,7 @@ export const BgScaleContain: Story = {
 export const BgScaleStretch: Story = {
   args: {
     bgSize: { width: 720, height: 320 },
-    config: { ...createSampleConfig('grass'), bgScale: 'stretch' },
+    config: { ...createSampleConfig('grass'), bgScale: EnumBattleFieldBgScale.Stretch },
   },
 };
 
@@ -132,7 +134,7 @@ export const BgScaleStretch: Story = {
 export const BgScaleRepeat: Story = {
   args: {
     bgSize: { width: 720, height: 320 },
-    config: { ...createSampleConfig('grass'), bgScale: 'repeat' },
+    config: { ...createSampleConfig('grass'), bgScale: EnumBattleFieldBgScale.Repeat },
   },
 };
 
@@ -156,6 +158,6 @@ export const BgEgyptNative: Story = {
 /** 埃及背景：背景框維持 480×200，以 cover 縮放覆蓋整個框 / Egypt bg: keep 480×200 box, cover-scaled to fill the box */
 export const BgEgyptCover: Story = {
   args: {
-    config: { ...createSampleConfig('egypt'), bgScale: 'cover' },
+    config: { ...createSampleConfig('egypt'), bgScale: EnumBattleFieldBgScale.Cover },
   },
 };

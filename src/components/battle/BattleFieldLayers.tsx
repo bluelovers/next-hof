@@ -23,6 +23,7 @@ import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from './types';
 import type { ISpriteImageSize } from './spriteImageSizes';
 import { BattleFieldSpriteFrame } from './BattleFieldSpriteFrame';
 import { BattleFieldMagicCircle } from './BattleFieldMagicCircle';
+import { EnumBattleFieldBgScale, EnumBattleFieldVAlign } from '#/components/battle/enums';
 
 /** 戰場圖層屬性 / Battlefield layers props */
 export interface IBattleFieldLayersProps {
@@ -100,7 +101,7 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
   height: rawHeight,
   showLabels,
   bgSize,
-  valign = 'bottom',
+  valign = EnumBattleFieldVAlign.Bottom,
   style,
 }) => {
   // 角色排版尺寸：選填，未提供時使用預設值（保持原有設計）
@@ -118,7 +119,7 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
 
   // 背景圖排版：預設自然尺寸 + 水平置中垂直置底，縮放模式由 config.bgScale 控制
   // Background image layout: default natural size + centered/bottom; scale mode from config.bgScale
-  const bgScaleMode = config.bgScale ?? 'natural';
+  const bgScaleMode = config.bgScale ?? EnumBattleFieldBgScale.Natural;
   const bgImageLayout = resolveBgImageLayout(bgScaleMode, resolvedBgSize);
 
   /** 背景樣式 / Background style */

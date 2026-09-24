@@ -89,10 +89,10 @@ export const BattleLog: React.FC<IBattleLogProps> = ({
 
         return rows.map((row, colIndex) => (
           <tr key={`${rowIndex}-${colIndex}`}>
-            <td className={`${getSideClass('left')} break`}>
+            <td className={`${getSideClass(EnumTeamSideUI.Left)} break`}>
               {row.left && <BattleAction action={row.left} />}
             </td>
-            <td className={`${getSideClass('right')} break`}>
+            <td className={`${getSideClass(EnumTeamSideUI.Right)} break`}>
               {row.right && <BattleAction action={row.right} />}
             </td>
           </tr>

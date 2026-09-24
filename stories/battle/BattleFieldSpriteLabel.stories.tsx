@@ -24,6 +24,7 @@ import { makeStageDecorator, STAGE_BG_COLOR } from '../decorators';
 import {
   sampleFieldSize,
 } from './sampleData';
+import { EnumBattleFieldVAlign } from '../../src/components/battle/enums';
 import {
   BattleFieldSpriteLabel,
   type IBattleFieldSpriteLabelProps,
@@ -87,7 +88,7 @@ const makeRender = (char: IStoryRosterChar) => (args: IBattleFieldSpriteLabelPro
       width={fieldSize.width}
       height={fieldSize.height}
       showLabels
-      valign="bottom"
+      valign={EnumBattleFieldVAlign.Bottom}
       // 為 frame 加上可視邊框與底色，才能看見「顯示範圍」是否把標籤收納在內
       // Give the frame a visible border + tint so we can see whether the label stays inside the display range.
       style={{ border: '1px dashed #5a6b7e', background: 'rgba(255,255,255,0.04)' }}

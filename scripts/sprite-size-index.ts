@@ -27,9 +27,9 @@
  * Mirrors PHP CopyRow(): getimagesize() reads image size for centering.
  *
  * 使用 / Usage:
- *   npm run sprite:index                                       # 完整重建（每資料夾一份快取 + 彙總 TS）
- *   npm run sprite:index -- --append image/char/xxx.png        # 單檔讀取並寫入所屬資料夾快取
- *   npm run sprite:index -- --append image/char/xxx.png --no-append  # 只讀取不寫入
+ *   pnpm run sprite:index                                       # 完整重建（每資料夾一份快取 + 彙總 TS）
+ *   pnpm run sprite:index -- --append image/char/xxx.png        # 單檔讀取並寫入所屬資料夾快取
+ *   pnpm run sprite:index -- --append image/char/xxx.png --no-append  # 只讀取不寫入
  *
  * 注意：CLI 的圖檔引數請用「public 相對路徑」（無開頭斜線），因為在 msys/MinGW
  * bash 下，以 / 開頭的引數會被改寫為 Windows 路徑（如 D:/msys64/image/...）。

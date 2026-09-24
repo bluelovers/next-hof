@@ -10,6 +10,10 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { BattleDisplay } from '#/components/pages/BattleDisplay';
 import type { IBattleDisplayData, IBattleAction } from '#/components/battle/types';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
+import { EnumTeamSideUI } from '#/components/battle/enums';
+import { EnumAttributeType } from '#/components/battle/enums';
+import { EnumUnitStatus } from '#/components/battle/enums';
+import { EnumActionType } from '#/components/battle/enums';
 
 const meta: Meta<typeof BattleDisplay> = {
   title: 'Pages/BattlePage/BattleDisplay',
@@ -33,18 +37,18 @@ type Story = StoryObj<typeof BattleDisplay>;
 
 /** 左側隊伍（ゴブリンと遊ぶ）/ Left team (Goblins) */
 const leftTeamUnits = [
-  { name: 'GoblinWarrior(A)', level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: 'left' as const },
-  { name: 'GoblinWarrior(B)', level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: 'left' as const },
-  { name: 'GoblinWarrior(C)', level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: 'left' as const },
-  { name: 'GoblinAxe', level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: 'left' as const },
+  { name: 'GoblinWarrior(A)', level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: EnumTeamSideUI.Left as const },
+  { name: 'GoblinWarrior(B)', level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: EnumTeamSideUI.Left as const },
+  { name: 'GoblinWarrior(C)', level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: EnumTeamSideUI.Left as const },
+  { name: 'GoblinAxe', level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: EnumTeamSideUI.Left as const },
 ];
 
 /** 右側隊伍（TestTeam）/ Right team (TestTeam) */
 const rightTeamUnits = [
-  { name: 'Hero1', level: 3, hp: 349, maxHp: 349, sp: 349, maxSp: 53, side: 'right' as const },
-  { name: 'Mage1', level: 3, hp: 159, maxHp: 159, sp: 159, maxSp: 112, side: 'right' as const },
-  { name: 'Healer1', level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: 'right' as const },
-  { name: 'Priest1', level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: 'right' as const },
+  { name: 'Hero1', level: 3, hp: 349, maxHp: 349, sp: 349, maxSp: 53, side: EnumTeamSideUI.Right as const },
+  { name: 'Mage1', level: 3, hp: 159, maxHp: 159, sp: 159, maxSp: 112, side: EnumTeamSideUI.Right as const },
+  { name: 'Healer1', level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: EnumTeamSideUI.Right as const },
+  { name: 'Priest1', level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: EnumTeamSideUI.Right as const },
 ];
 
 /** 戰場精靈排列 / Battlefield sprite arrangement */
@@ -65,192 +69,192 @@ const battleSprites = [
 const battleActions: IBattleAction[] = [
   // ---- 回合開始 ----
   {
-    type: 'enter',
+    type: EnumActionType.Enter,
     source: 'GoblinWarrior(A)',
     message: 'GoblinWarrior(A) Lv.4 enter the Battlefield.',
-    side: 'left',
-    attribute: 'normal',
+    side: EnumTeamSideUI.Left,
+    attribute: EnumAttributeType.Normal,
   },
   {
-    type: 'enter',
+    type: EnumActionType.Enter,
     source: 'GoblinWarrior(B)',
     message: 'GoblinWarrior(B) Lv.4 enter the Battlefield.',
-    side: 'left',
-    attribute: 'normal',
+    side: EnumTeamSideUI.Left,
+    attribute: EnumAttributeType.Normal,
   },
   {
-    type: 'enter',
+    type: EnumActionType.Enter,
     source: 'GoblinWarrior(C)',
     message: 'GoblinWarrior(C) Lv.1 enter the Battlefield.',
-    side: 'left',
-    attribute: 'normal',
+    side: EnumTeamSideUI.Left,
+    attribute: EnumAttributeType.Normal,
   },
   {
-    type: 'enter',
+    type: EnumActionType.Enter,
     source: 'GoblinAxe',
     message: 'GoblinAxe Lv.1 enter the Battlefield.',
-    side: 'left',
-    attribute: 'normal',
+    side: EnumTeamSideUI.Left,
+    attribute: EnumAttributeType.Normal,
   },
   {
-    type: 'enter',
+    type: EnumActionType.Enter,
     source: 'Priest1',
     message: 'Priest1 Lv.3 enter the Battlefield.',
-    side: 'right',
-    attribute: 'normal',
+    side: EnumTeamSideUI.Right,
+    attribute: EnumAttributeType.Normal,
   },
   {
-    type: 'enter',
+    type: EnumActionType.Enter,
     source: 'Healer1',
     message: 'Healer1 Lv.3 enter the Battlefield.',
-    side: 'right',
-    attribute: 'normal',
+    side: EnumTeamSideUI.Right,
+    attribute: EnumAttributeType.Normal,
   },
   {
-    type: 'enter',
+    type: EnumActionType.Enter,
     source: 'Hero1',
     message: 'Hero1 Lv.3 enter the Battlefield.',
-    side: 'right',
-    attribute: 'normal',
+    side: EnumTeamSideUI.Right,
+    attribute: EnumAttributeType.Normal,
   },
   {
-    type: 'enter',
+    type: EnumActionType.Enter,
     source: 'Mage1',
     message: 'Mage1 Lv.3 enter the Battlefield.',
-    side: 'right',
-    attribute: 'normal',
+    side: EnumTeamSideUI.Right,
+    attribute: EnumAttributeType.Normal,
   },
 
   // ---- 行動：GoblinWarrior(B) FatalStab -> Hero1(保護Priest1) ----
   {
-    type: 'skill',
+    type: EnumActionType.Skill,
     source: 'GoblinWarrior(B)',
     skill: { name: 'FatalStab', iconUrl: '/image/icon/skill/skill_074z.png' },
     message: 'GoblinWarrior(B) FatalStab',
-    side: 'left',
-    attribute: 'dmg',
+    side: EnumTeamSideUI.Left,
+    attribute: EnumAttributeType.Dmg,
   },
   {
-    type: 'protect',
+    type: EnumActionType.Protect,
     source: 'Hero1',
     target: 'Priest1',
     message: 'Hero1 protected Priest1!',
-    side: 'left',
-    attribute: 'support',
+    side: EnumTeamSideUI.Left,
+    attribute: EnumAttributeType.Support,
   },
   {
-    type: 'damage',
+    type: EnumActionType.Damage,
     source: 'GoblinWarrior(B)',
     target: 'Hero1',
     value: 182,
     valueChange: '349 > 167',
     message: '182 Damage to Hero1',
-    side: 'left',
-    attribute: 'dmg',
+    side: EnumTeamSideUI.Left,
+    attribute: EnumAttributeType.Dmg,
   },
 
   // ---- 行動：GoblinWarrior(A) FatalStab -> Hero1(保護Healer1) ----
   {
-    type: 'skill',
+    type: EnumActionType.Skill,
     source: 'GoblinWarrior(A)',
     skill: { name: 'FatalStab', iconUrl: '/image/icon/skill/skill_074z.png' },
     message: 'GoblinWarrior(A) FatalStab',
-    side: 'left',
-    attribute: 'dmg',
+    side: EnumTeamSideUI.Left,
+    attribute: EnumAttributeType.Dmg,
   },
   {
-    type: 'protect',
+    type: EnumActionType.Protect,
     source: 'Hero1',
     target: 'Healer1',
     message: 'Hero1 protected Healer1!',
-    side: 'left',
-    attribute: 'support',
+    side: EnumTeamSideUI.Left,
+    attribute: EnumAttributeType.Support,
   },
   {
-    type: 'damage',
+    type: EnumActionType.Damage,
     source: 'GoblinWarrior(A)',
     target: 'Hero1',
     value: 166,
     valueChange: '167 > 1',
     message: '166 Damage to Hero1',
-    side: 'left',
-    attribute: 'dmg',
+    side: EnumTeamSideUI.Left,
+    attribute: EnumAttributeType.Dmg,
   },
 
   // ---- 行動：GoblinAxe Attack -> Healer1 ----
   {
-    type: 'attack',
+    type: EnumActionType.Attack,
     source: 'GoblinAxe',
     skill: { name: 'Attack', iconUrl: '/image/icon/skill/skill_042.png' },
     message: 'GoblinAxe Attack',
-    side: 'left',
-    attribute: 'dmg',
+    side: EnumTeamSideUI.Left,
+    attribute: EnumAttributeType.Dmg,
   },
   {
-    type: 'damage',
+    type: EnumActionType.Damage,
     source: 'GoblinAxe',
     target: 'Healer1',
     value: 44,
     valueChange: '213 > 169',
     message: '44 Damage to Healer1',
-    side: 'left',
-    attribute: 'dmg',
+    side: EnumTeamSideUI.Left,
+    attribute: EnumAttributeType.Dmg,
   },
 
   // ---- 行動：Mage1 casting ----
   {
-    type: 'casting',
+    type: EnumActionType.Casting,
     source: 'Mage1',
     message: 'Mage1 start casting.',
-    side: 'right',
-    attribute: 'charge',
+    side: EnumTeamSideUI.Right,
+    attribute: EnumAttributeType.Charge,
   },
 
   // ---- 行動：GoblinWarrior(B) Attack -> Mage1 ----
   {
-    type: 'attack',
+    type: EnumActionType.Attack,
     source: 'GoblinWarrior(B)',
     skill: { name: 'Attack', iconUrl: '/image/icon/skill/skill_042.png' },
     message: 'GoblinWarrior(B) Attack',
-    side: 'left',
-    attribute: 'dmg',
+    side: EnumTeamSideUI.Left,
+    attribute: EnumAttributeType.Dmg,
   },
   {
-    type: 'damage',
+    type: EnumActionType.Damage,
     source: 'GoblinWarrior(B)',
     target: 'Mage1',
     value: 48,
     valueChange: '49 > 1',
     message: '48 Damage to Mage1',
-    side: 'left',
-    attribute: 'dmg',
+    side: EnumTeamSideUI.Left,
+    attribute: EnumAttributeType.Dmg,
   },
 
   // ---- 行動：GoblinWarrior(A) Attack -> Mage1 (down) ----
   {
-    type: 'attack',
+    type: EnumActionType.Attack,
     source: 'GoblinWarrior(A)',
     skill: { name: 'Attack', iconUrl: '/image/icon/skill/skill_042.png' },
     message: 'GoblinWarrior(A) Attack',
-    side: 'left',
-    attribute: 'dmg',
+    side: EnumTeamSideUI.Left,
+    attribute: EnumAttributeType.Dmg,
   },
   {
-    type: 'damage',
+    type: EnumActionType.Damage,
     source: 'GoblinWarrior(A)',
     target: 'Mage1',
     value: 40,
     valueChange: '1 > -39',
     message: '40 Damage to Mage1',
-    side: 'left',
-    attribute: 'dmg',
+    side: EnumTeamSideUI.Left,
+    attribute: EnumAttributeType.Dmg,
   },
   {
-    type: 'down',
+    type: EnumActionType.Down,
     source: 'Mage1',
     message: 'Mage1 down.',
-    side: 'left',
-    attribute: 'dmg',
+    side: EnumTeamSideUI.Left,
+    attribute: EnumAttributeType.Dmg,
   },
 ];
 
@@ -265,12 +269,12 @@ function createBattleData(overrides?: Partial<IBattleDisplayData>): IBattleDispl
     leftTeam: {
       name: 'ゴブリンと遊ぶ(最弱)',
       units: leftTeamUnits,
-      side: 'left',
+      side: EnumTeamSideUI.Left,
     },
     rightTeam: {
       name: 'TestTeam',
       units: rightTeamUnits,
-      side: 'right',
+      side: EnumTeamSideUI.Right,
     },
     battlefield: {
       backgroundImageUrl: '/image/land/bg_grass.png',
@@ -351,7 +355,7 @@ export const MidBattle: Story = {
       leftTeam: {
         name: 'ゴブリンと遊ぶ(最弱)',
         units: midBattleUnits,
-        side: 'left',
+        side: EnumTeamSideUI.Left,
       },
       actions: battleActions.slice(0, 6),
     }),
@@ -370,10 +374,10 @@ export const MidBattle: Story = {
 
 /** 單位陣亡 / With casualties */
 const casualtiesUnits = rightTeamUnits.map((u) => {
-  if (u.name === 'Mage1') return { ...u, hp: 0, status: 'down' as const };
-  if (u.name === 'Priest1') return { ...u, hp: 0, status: 'down' as const };
-  if (u.name === 'Healer1') return { ...u, hp: 0, status: 'down' as const };
-  if (u.name === 'Hero1') return { ...u, hp: 1, status: 'alive' as const };
+  if (u.name === 'Mage1') return { ...u, hp: 0, status: EnumUnitStatus.Down as const };
+  if (u.name === 'Priest1') return { ...u, hp: 0, status: EnumUnitStatus.Down as const };
+  if (u.name === 'Healer1') return { ...u, hp: 0, status: EnumUnitStatus.Down as const };
+  if (u.name === 'Hero1') return { ...u, hp: 1, status: EnumUnitStatus.Alive as const };
   return u;
 });
 
@@ -383,7 +387,7 @@ export const WithCasualties: Story = {
       rightTeam: {
         name: 'TestTeam',
         units: casualtiesUnits,
-        side: 'right',
+        side: EnumTeamSideUI.Right,
       },
       actions: battleActions.slice(9, 18),
     }),
@@ -409,7 +413,7 @@ const resultUnits = leftTeamUnits.map((u) => ({
 const defeatedUnits = rightTeamUnits.map((u) => ({
   ...u,
   hp: 0,
-  status: 'down' as const,
+  status: EnumUnitStatus.Down as const,
 }));
 
 export const BattleOver: Story = {
@@ -418,12 +422,12 @@ export const BattleOver: Story = {
       leftTeam: {
         name: 'ゴブリンと遊ぶ(最弱)',
         units: resultUnits,
-        side: 'left',
+        side: EnumTeamSideUI.Left,
       },
       rightTeam: {
         name: 'TestTeam',
         units: defeatedUnits,
-        side: 'right',
+        side: EnumTeamSideUI.Right,
       },
       actions: battleActions.slice(15),
       result: {

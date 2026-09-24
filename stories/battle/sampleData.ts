@@ -7,6 +7,7 @@
  * independently-maintained sample data across files.
  */
 import type { IBattleSprite, IBattleFieldConfig, IBattleMagicCircle } from '../../src/components/battle/types';
+import { getSpriteImageSize } from '../../src/components/battle/spriteImageSizes';
 import {
   computeBattleSpritePositions,
   groupBattleChars,

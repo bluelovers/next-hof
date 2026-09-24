@@ -18,6 +18,7 @@ import './CharacterCardBase.css';
 import type { ICharacterBase, ICharacterData, IBattleCharacterData } from './CharacterTypes';
 import { CharacterSprite } from './CharacterSprite';
 import { getCarpetClass } from './characterUtils';
+import { EnumSpriteVariant } from '#/components/battle/enums';
 
 // ==================== 共用型別 / Shared types ====================
 
@@ -51,7 +52,7 @@ export const CharacterPedestal: React.FC<ICharacterPedestalProps> = ({
   const sprite = (
     <CharacterSprite
       url={character.imageUrl}
-      variant="avatar"
+      variant={EnumSpriteVariant.Avatar}
       alt={character.name}
     />
   );

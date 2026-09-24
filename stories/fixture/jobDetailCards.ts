@@ -6,6 +6,9 @@
  * Individual job data for each story showcase.
  */
 import type { IJobData } from '../../src/components/game-data/GameDataTypes';
+import { EnumTargetType } from '../../src/lib/game/types';
+import { EnumTargetMethod } from '../../src/lib/game/types';
+import { EnumSkillType } from '../../src/components/battle/enums';
 
 /** 基本職業卡片 / Basic job card */
 export const basicJob: IJobData = {
@@ -19,8 +22,8 @@ export const basicJob: IJobData = {
     {
       name: 'スラッシュ',
       iconUrl: '/image/icon/skill/skill_073.png',
-      target: 'enemy',
-      scope: 'normal',
+      target: EnumTargetType.Enemy,
+      scope: EnumTargetMethod.Individual,
       sp: 5,
       powerPct: 80,
       hits: 1,
@@ -43,28 +46,28 @@ export const multipleSpritesJob: IJobData = {
     {
       name: 'ファイア',
       iconUrl: '/image/icon/skill/skill_018.png',
-      target: 'enemy',
-      scope: 'normal',
+      target: EnumTargetType.Enemy,
+      scope: EnumTargetMethod.Individual,
       sp: 10,
       powerPct: 80,
       hits: 1,
       hitRate: '85',
       weaponLimit: '杖',
       effect: '敵単体に炎属性ダメージ',
-      skillType: 'magic',
+      skillType: EnumSkillType.Magic,
     },
     {
       name: 'ヒール',
       iconUrl: '/image/icon/skill/skill_013c.png',
-      target: 'friend',
-      scope: 'normal',
+      target: EnumTargetType.Friend,
+      scope: EnumTargetMethod.Individual,
       sp: 15,
       powerPct: 50,
       hits: 1,
       hitRate: '100',
       weaponLimit: '杖',
       effect: '味単体に回復',
-      skillType: 'magic',
+      skillType: EnumSkillType.Magic,
       isSupport: true,
     },
   ],
@@ -82,8 +85,8 @@ export const multipleSkillsJob: IJobData = {
     {
       name: 'マルチショット',
       iconUrl: '/image/icon/skill/item_042.png',
-      target: 'enemy',
-      scope: 'multi',
+      target: EnumTargetType.Enemy,
+      scope: EnumTargetMethod.Multi,
       sp: 20,
       powerPct: 40,
       hits: 3,
@@ -95,8 +98,8 @@ export const multipleSkillsJob: IJobData = {
     {
       name: 'スナイプ',
       iconUrl: '/image/icon/skill/item_042.png',
-      target: 'enemy',
-      scope: 'normal',
+      target: EnumTargetType.Enemy,
+      scope: EnumTargetMethod.Individual,
       sp: 25,
       powerPct: 150,
       hits: 1,
@@ -108,8 +111,8 @@ export const multipleSkillsJob: IJobData = {
     {
       name: 'バインド',
       iconUrl: '/image/icon/skill/skill_025.png',
-      target: 'enemy',
-      scope: 'normal',
+      target: EnumTargetType.Enemy,
+      scope: EnumTargetMethod.Individual,
       sp: 30,
       powerPct: 0,
       hits: 1,
@@ -132,15 +135,15 @@ export const alternatingBgJob: IJobData = {
     {
       name: 'ヒール',
       iconUrl: '/image/icon/skill/skill_013c.png',
-      target: 'friend',
-      scope: 'normal',
+      target: EnumTargetType.Friend,
+      scope: EnumTargetMethod.Individual,
       sp: 15,
       powerPct: 50,
       hits: 1,
       hitRate: '100',
       weaponLimit: '杖',
       effect: '味単体に回復',
-      skillType: 'magic',
+      skillType: EnumSkillType.Magic,
       isSupport: true,
     },
   ],
@@ -158,8 +161,8 @@ export const longDescJob: IJobData = {
     {
       name: 'ホーリー',
       iconUrl: '/image/icon/skill/skill_010.png',
-      target: 'enemy',
-      scope: 'normal',
+      target: EnumTargetType.Enemy,
+      scope: EnumTargetMethod.Individual,
       sp: 35,
       powerPct: 120,
       hits: 1,
@@ -170,15 +173,15 @@ export const longDescJob: IJobData = {
     {
       name: 'プロテクション',
       iconUrl: '/image/icon/skill/skill_045z.png',
-      target: 'friend',
-      scope: 'multi',
+      target: EnumTargetType.Friend,
+      scope: EnumTargetMethod.Multi,
       sp: 25,
       powerPct: 0,
       hits: 1,
       hitRate: '100',
       weaponLimit: '聖盾',
       effect: '味全体の防御力をアップ',
-      skillType: 'magic',
+      skillType: EnumSkillType.Magic,
       isSupport: true,
     },
   ],

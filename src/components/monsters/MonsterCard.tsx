@@ -17,6 +17,7 @@ import type { ILandType } from '#/components/areas/landTypes';
 import { buildLandClass } from '#/components/areas/landTypes';
 import type { IMonsterData } from './MonsterTypes';
 import { CharacterSprite } from '#/components/characters/CharacterSprite';
+import { EnumSpriteVariant } from '#/components/battle/enums';
 
 /** MonsterCard 屬性 / MonsterCard props */
 export interface IMonsterCardProps {
@@ -36,7 +37,7 @@ export const MonsterCard: React.FC<IMonsterCardProps> = ({ monster }) => {
       <div className={landClass}>
         <CharacterSprite
           url={monster.imageUrl}
-          variant="avatar"
+          variant={EnumSpriteVariant.Avatar}
           alt={monster.name}
         />
       </div>

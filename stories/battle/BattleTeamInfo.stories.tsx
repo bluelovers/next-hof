@@ -9,6 +9,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { BattleTeamInfoDarkDecorator } from '../decorators';
 import { BattleTeamInfo } from '../../src/components/battle/BattleTeamInfo';
+import { EnumTeamSideUI, EnumTeamSideClass } from '../../src/components/battle/enums';
 
 const meta: Meta<typeof BattleTeamInfo> = {
   title: 'Battle/Atoms/BattleTeamInfo',
@@ -29,12 +30,12 @@ export const GoblinTeam: Story = {
   args: {
     name: 'ゴブリンと遊ぶ(最弱)',
     units: [
-      { name: 'GoblinWarrior(A)', level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: 'left' },
-      { name: 'GoblinWarrior(B)', level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: 'left' },
-      { name: 'GoblinWarrior(C)', level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: 'left' },
-      { name: 'GoblinAxe', level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: 'left' },
+      { name: 'GoblinWarrior(A)', level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: EnumTeamSideUI.Left },
+      { name: 'GoblinWarrior(B)', level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: EnumTeamSideUI.Left },
+      { name: 'GoblinWarrior(C)', level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: EnumTeamSideUI.Left },
+      { name: 'GoblinAxe', level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: EnumTeamSideUI.Left },
     ],
-    sideClass: 'ttd2',
+    sideClass: EnumTeamSideClass.Ttd2,
   },
 };
 
@@ -43,12 +44,12 @@ export const TestTeam: Story = {
   args: {
     name: 'TestTeam',
     units: [
-      { name: 'Hero1', level: 3, hp: 349, maxHp: 349, sp: 349, maxSp: 53, side: 'right' },
-      { name: 'Mage1', level: 3, hp: 159, maxHp: 159, sp: 159, maxSp: 112, side: 'right' },
-      { name: 'Healer1', level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: 'right' },
-      { name: 'Priest1', level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: 'right' },
+      { name: 'Hero1', level: 3, hp: 349, maxHp: 349, sp: 349, maxSp: 53, side: EnumTeamSideUI.Right },
+      { name: 'Mage1', level: 3, hp: 159, maxHp: 159, sp: 159, maxSp: 112, side: EnumTeamSideUI.Right },
+      { name: 'Healer1', level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: EnumTeamSideUI.Right },
+      { name: 'Priest1', level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: EnumTeamSideUI.Right },
     ],
-    sideClass: 'ttd1',
+    sideClass: EnumTeamSideClass.Ttd1,
   },
 };
 
@@ -57,11 +58,11 @@ export const HighLevelTeam: Story = {
   args: {
     name: 'ChampionGuild',
     units: [
-      { name: 'Paladin', level: 99, hp: 9999, maxHp: 9999, sp: 5000, maxSp: 5000, side: 'right' },
-      { name: 'ArchMage', level: 95, hp: 3200, maxHp: 3200, sp: 8000, maxSp: 8000, side: 'right' },
-      { name: 'HighPriest', level: 90, hp: 4500, maxHp: 4500, sp: 6000, maxSp: 6000, side: 'right' },
-      { name: 'Ranger', level: 88, hp: 3800, maxHp: 3800, sp: 4000, maxSp: 4000, side: 'right' },
+      { name: 'Paladin', level: 99, hp: 9999, maxHp: 9999, sp: 5000, maxSp: 5000, side: EnumTeamSideUI.Right },
+      { name: 'ArchMage', level: 95, hp: 3200, maxHp: 3200, sp: 8000, maxSp: 8000, side: EnumTeamSideUI.Right },
+      { name: 'HighPriest', level: 90, hp: 4500, maxHp: 4500, sp: 6000, maxSp: 6000, side: EnumTeamSideUI.Right },
+      { name: 'Ranger', level: 88, hp: 3800, maxHp: 3800, sp: 4000, maxSp: 4000, side: EnumTeamSideUI.Right },
     ],
-    sideClass: 'ttd1',
+    sideClass: EnumTeamSideClass.Ttd1,
   },
 };

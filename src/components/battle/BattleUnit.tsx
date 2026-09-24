@@ -16,6 +16,7 @@ import {
   getSpBarColor,
   getStateTextClass,
 } from './battleUtils';
+import { EnumAttributeType } from '#/components/battle/enums';
 
 /** 戰鬥單位屬性 / Battle unit props */
 export interface IBattleUnitProps {
@@ -55,7 +56,7 @@ export const BattleUnit: React.FC<IBattleUnitProps> = ({
               }}
             />
           </div>
-          <span className={`hp-text ${getStateTextClass(status, 'recover')}`}>
+          <span className={`hp-text ${getStateTextClass(status, EnumAttributeType.Recover)}`}>
             HP: {hp}/{maxHp}
           </span>
         </div>
@@ -71,7 +72,7 @@ export const BattleUnit: React.FC<IBattleUnitProps> = ({
               }}
             />
           </div>
-          <span className={`sp-text ${getStateTextClass(status, 'support')}`}>
+          <span className={`sp-text ${getStateTextClass(status, EnumAttributeType.Support)}`}>
             SP: {sp}/{maxSp}
           </span>
         </div>

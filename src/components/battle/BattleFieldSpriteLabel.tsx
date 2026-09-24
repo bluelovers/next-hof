@@ -29,6 +29,7 @@ import {
   type ISpriteLabelPositionResult,
 } from './labelPosition';
 import './BattleFieldSpriteLabel.css';
+import { EnumSpriteLabelPlacement } from '#/components/battle/enums';
 
 // 將純邏輯工具重新匯出，使 BattleFieldSpriteLabel 模組同時提供組件與標籤定位邏輯
 // Re-export the pure logic tool so the BattleFieldSpriteLabel module exposes both the
@@ -119,7 +120,7 @@ export const BattleFieldSpriteLabel: React.FC<IBattleFieldSpriteLabelProps> = ({
   x,
   y,
   imageSize,
-  placement = 'below',
+  placement = EnumSpriteLabelPlacement.Below,
   frameSize,
   labelSize,
   gap,

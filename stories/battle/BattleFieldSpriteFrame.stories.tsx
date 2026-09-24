@@ -13,6 +13,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { makeStageDecorator } from '../decorators';
 import { BattleFieldSpriteFrame } from '../../src/components/battle/BattleFieldSpriteFrame';
 import { sampleSprites, sampleFieldSize } from './sampleData';
+import { EnumBattleFieldVAlign } from '../../src/components/battle/enums';
 
 const meta: Meta<typeof BattleFieldSpriteFrame> = {
   title: 'BattleField/BattleFieldSpriteFrame',
@@ -34,7 +35,7 @@ const meta: Meta<typeof BattleFieldSpriteFrame> = {
     sprites: sampleSprites,
     ...sampleFieldSize,
     showLabels: true,
-    valign: 'bottom',
+    valign: EnumBattleFieldVAlign.Bottom,
   },
   // 模擬放大後的背景舞台（640×360），框（480×200）在其中依 valign 定位
   // Simulated enlarged background stage (640×360); the frame (480×200) positions within by valign
@@ -56,10 +57,10 @@ export const AlignBottom: Story = {};
 
 /** 垂直置中 / Vertical middle */
 export const AlignMiddle: Story = {
-  args: { valign: 'middle' },
+  args: { valign: EnumBattleFieldVAlign.Middle },
 };
 
 /** 垂直置頂 / Vertical top */
 export const AlignTop: Story = {
-  args: { valign: 'top' },
+  args: { valign: EnumBattleFieldVAlign.Top },
 };
