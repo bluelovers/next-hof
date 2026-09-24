@@ -8,7 +8,7 @@ import { charIdToString } from '../character/Character';
 import { hpDamage, hpRecover, getPoison, getNormal } from '../character/status';
 import { UPMAP, DOWNMAP, PLUSMAP, EnumAtkSlot, EnumDefSlot } from '../character/status-attrs';
 import type { ISkillDef, IBattleEvent } from '../types';
-import { EnumInfluence, EnumBattleEventType } from '../types';
+import { EnumInfluence, EnumBattleEventType, EnumSkillDamageType } from '../types';
 import type { RNG } from '../core/rng';
 
 
@@ -40,7 +40,7 @@ export interface ISkillResult {
  *    guarantees a minimum of 10% of raw; pierce additionally adds SPECIAL.Pierce×pow%.
  */
 export function calcBasicDamage(skill: ISkillDef, user: Character, target: Character): number {
-	const isMagic = skill.type === 1;
+	const isMagic = skill.type === EnumSkillDamageType.Magic;
 	const stat = skill.inf === EnumInfluence.Dex
 		? user.DEX
 		: (isMagic ? user.INT : user.STR);

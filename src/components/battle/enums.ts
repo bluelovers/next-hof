@@ -87,8 +87,8 @@ export enum EnumChargeKind {
 }
 
 /**
- * 技能類型（UI 顯示層；lib 以 ISkillDef.type 0|1 表示）
- * Skill type (UI layer; lib represents it as ISkillDef.type 0|1, not an enum).
+ * 技能類型（UI 顯示層；lib 以 EnumSkillDamageType 表示：Physical=0／Magic=1）
+ * Skill type (UI layer; lib uses EnumSkillDamageType: Physical = 0 / Magic = 1).
  */
 export enum EnumSkillType {
 	Physical = 'physical',

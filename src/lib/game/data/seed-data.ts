@@ -9,7 +9,7 @@
 // Corpse-policy 3-level demo (character level set here; team/battle levels in the showcase
 // battle config): battle-level corpse:true, team-level Team1:false, and per-def overrides below.
 
-import { EnumWeaponType, EnumTargetType, EnumTargetMethod, EnumEquipSlot, EnumGuardKind, type ISkillDef, type IItemDef, type IJobDef, type ICharDef, type IMonDef } from '../types';
+import { EnumWeaponType, EnumTargetType, EnumTargetMethod, EnumEquipSlot, EnumGuardKind, EnumSkillDamageType, EnumGender, type ISkillDef, type IItemDef, type IJobDef, type ICharDef, type IMonDef } from '../types';
 import { EnumPosition } from '../constants';
 import { EnumJudgeCode } from '../battle/judge-codes';
 import { InMemoryRepository, type IDataRepository } from './repository';
@@ -23,8 +23,8 @@ const job100: IJobDef = {
 	pattern: null,
 	img: 'mon_079',
 	gender: {
-		1: { img: 'mon_079', job_name: 'Warrior' },
-		2: { img: 'mon_080r', job_name: 'Warrior' },
+		[EnumGender.Male]: { img: 'mon_079', job_name: 'Warrior' },
+		[EnumGender.Female]: { img: 'mon_080r', job_name: 'Warrior' },
 	},
 	info: { desc: '職業描述文字' },
 };
@@ -54,19 +54,19 @@ const job300: IJobDef = {
 // 技能 / Skills
 const skills: ISkillDef[] = [
 	{
-		no: 1000, name: 'Attack', exp: '通常攻撃', sp: 0, type: 0,
+		no: 1000, name: 'Attack', exp: '通常攻撃', sp: 0, type: EnumSkillDamageType.Physical,
 		target: [EnumTargetType.Enemy, EnumTargetMethod.Individual, 1], pow: 100,
 	},
 	{
-		no: 2000, name: 'FireStorm', exp: '施展火焰风暴', sp: 70, type: 1,
+		no: 2000, name: 'FireStorm', exp: '施展火焰风暴', sp: 70, type: EnumSkillDamageType.Magic,
 		target: [EnumTargetType.Enemy, EnumTargetMethod.Multi, 6], pow: 100, invalid: 1, charge: [70, 0],
 	},
 	{
-		no: 3000, name: 'Healing', exp: '治療', sp: 5, type: 0,
+		no: 3000, name: 'Healing', exp: '治療', sp: 5, type: EnumSkillDamageType.Physical,
 		target: [EnumTargetType.Friend, EnumTargetMethod.Individual, 1], pow: 200, support: 1,
 	},
 	{
-		no: 3040, name: 'Revive', exp: '蘇生', sp: 0, type: 0,
+		no: 3040, name: 'Revive', exp: '蘇生', sp: 0, type: EnumSkillDamageType.Physical,
 		target: [EnumTargetType.Friend, EnumTargetMethod.Individual, 1], pow: 100, revive: 1,
 	},
 ];

@@ -14,7 +14,7 @@ import type { Character } from '#/lib/game/character/Character';
 import { RNG } from '#/lib/game/core/rng';
 import { createSeedRepository } from '#/lib/game/data/seed-data';
 import type { IDataRepository } from '#/lib/game/data/repository';
-import { EnumBattleEventType } from '#/lib/game/types';
+import { EnumBattleEventType, EnumSkillDamageType } from '#/lib/game/types';
 import type { IBattleEvent, IBattleSnapshot } from '#/lib/game/types';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
 import { EnumTeamSideUI, EnumChargeKind, EnumUnitStatus, EnumActionType, EnumAttributeType } from '#/components/battle/enums';
@@ -229,7 +229,7 @@ export function mapBattleEvent(
 			};
 		}
 		case EnumBattleEventType.Cast: {
-			const verb = skillDef?.type === 0 ? EnumChargeKind.Charging : EnumChargeKind.Casting;
+			const verb = skillDef?.type === EnumSkillDamageType.Physical ? EnumChargeKind.Charging : EnumChargeKind.Casting;
 			return {
 				type: EnumActionType.Casting,
 				source: actor.name,
@@ -462,7 +462,7 @@ function toSnapshotDisplay(snap: IBattleSnapshot, repo?: IDataRepository): IBatt
 			let chargeKind: EnumChargeKind | undefined;
 			if (u.expectSkill !== null && u.expectSkill !== undefined && repo) {
 				const sk = repo.getSkill(u.expectSkill);
-				if (sk) chargeKind = sk.type === 0 ? EnumChargeKind.Charging : EnumChargeKind.Casting;
+				if (sk) chargeKind = sk.type === EnumSkillDamageType.Physical ? EnumChargeKind.Charging : EnumChargeKind.Casting;
 			}
 			return {
 				unitUid: u.unitUid,

@@ -2,7 +2,7 @@
 // 欄位對應 docs/data/{char,job,skill,item,mon}.md 分析的 YAML 結構。
 
 import { EnumState, EnumPosition, EnumTeamSide } from './constants';
-import type { ICompField } from './character/status-attrs';
+import type { ICompField, IStatusAttr } from './character/status-attrs';
 import type { ICorpsePolicy } from './battle/corpse-policy';
 
 /**
@@ -194,7 +194,6 @@ export interface IPatternItem {
 	action: number;
 }
 
-
 /**
  * 行為定義 / Behavior definition
  * 介面 / interface
@@ -262,7 +261,14 @@ export enum EnumTargetMethod {
  * 數量僅在 Multi 時有意義；技能省略 target 時預設 [Enemy, Individual, 1]。
  * count matters only for Multi; a skill without target defaults to [Enemy, Individual, 1].
  */
-export type ITargetSpec = [EnumTargetType, EnumTargetMethod, number];
+export type ITargetSpec = [
+	/** 目標類型（陣營中心）/ target type (selection-center camp) */
+	type: EnumTargetType,
+	/** 選取方式 / selection method */
+	method: EnumTargetMethod,
+	/** 數量（僅 Multi 有意義）/ count (meaningful only for Multi) */
+	count: number,
+];
 
 /**
  * 狀態屬性 / Status attribute
@@ -295,8 +301,11 @@ export interface ISpecial {
 	HealBonus: number;
 	/** 絕對防禦次數：>0 時消耗一次並使該次傷害歸 0（pierce 可穿透）/ absolute guard charges: consumes one to nullify a hit (pierced by pierce) */
 	Barrier: number;
-	/** 貫穿值 [物理, 魔法]（索引同 EnumAtkSlot；pierce 技能加算至傷害）/ pierce damage [physical, magic] (indices match EnumAtkSlot; added when skill.pierce is set) */
-	Pierce: [number, number];
+	/**
+	 * 貫穿值（索引同 EnumAtkSlot：0=物理、1=魔法；pierce 技能加算至傷害）
+	 * pierce damage (indices follow EnumAtkSlot: 0 = physical, 1 = magic; added when skill.pierce is set)
+	 */
+	Pierce: [phys: number, mag: number];
 	/** 召喚加成（裝備 P_SUMMON 累加）/ summon bonus (accumulated from equipment P_SUMMON) */
 	Summon: number;
 	/** 不死系標記 / undead flag */
@@ -350,11 +359,64 @@ export enum EnumSkillPriority {
 }
 
 /**
+ * 技能傷害類型 / Skill damage type
+ * 列舉 / enumeration
+ *
+ * Physical＝0（物理：STR／物理 atk 槽）、Magic＝1（魔法：INT／魔法 atk 槽）；
+ * 成員值與 YAML 來源一致。
+ * Physical = 0 (physical: STR / physical atk slot), Magic = 1 (magic: INT / magic atk slot);
+ * member values match the YAML source.
+ *
+ * calcBasicDamage 據此選擇能力與 atk/def 的物理／魔法索引；
+ * showcase battle-adapter 據此決定蓄力文案（Physical→charging、Magic→casting）。
+ * calcBasicDamage picks the stat and the physical/magic atk/def slots from this value;
+ * the showcase battle-adapter picks the charge wording (Physical → charging, Magic → casting).
+ */
+export enum EnumSkillDamageType {
+	/** 物理（YAML 值 0）/ physical (YAML value 0) */
+	Physical = 0,
+	/** 魔法（YAML 值 1）/ magic (YAML value 1) */
+	Magic = 1,
+}
+
+/**
+ * 技能 Up* 臨時增益欄位 / Skill Up* temporary buff fields
+ * 型別別名 / type alias
+ *
+ * 由 IStatusAttr 衍生（`Up${IStatusAttr}`，共 11 鍵），鍵名對應 status-key.ts 的
+ * STATUS_UP_KEY_NAME 與 status-attrs.ts 的 UPMAP；新增狀態屬性時本型別自動跟隨，
+ * 無需在 ISkillDef 重複宣告欄位（SSoT／型別追溯）。
+ * Derived from IStatusAttr (`Up${IStatusAttr}`, 11 keys) mirroring STATUS_UP_KEY_NAME / UPMAP:
+ * adding a status attribute updates this type automatically — no hand-maintained copy inside
+ * ISkillDef (SSoT / type traceability).
+ *
+ * statusChanges 命中 UPMAP 鍵時，以 % 作用於「使用者」。
+ * When statusChanges hits a UPMAP key, the % value is applied to the *user*.
+ */
+export type ISkillUpFields = Partial<Record<`Up${IStatusAttr}`, number>>;
+
+/**
+ * 技能 Down* 臨時減益欄位 / Skill Down* temporary debuff fields
+ * 型別別名 / type alias
+ *
+ * 由 IStatusAttr 衍生（`Down${IStatusAttr}`，共 11 鍵），鍵名對應 status-key.ts 的
+ * STATUS_DOWN_KEY_NAME 與 status-attrs.ts 的 DOWNMAP（SSoT／型別追溯）。
+ * Derived from IStatusAttr (`Down${IStatusAttr}`, 11 keys) mirroring STATUS_DOWN_KEY_NAME /
+ * DOWNMAP (SSoT / type traceability).
+ *
+ * statusChanges 命中 DOWNMAP 鍵時，以 % 作用於「目標」。
+ * When statusChanges hits a DOWNMAP key, the % value is applied to the *target*.
+ */
+export type ISkillDownFields = Partial<Record<`Down${IStatusAttr}`, number>>;
+
+/**
  * 技能定義 / Skill definition
  * 介面 / interface
  *
- * 對應 YAML skill 資料結構，extends ICompBonuses 以共用 P_* 與 M_* 補正欄位。
- * Mirrors the YAML skill data structure; extends ICompBonuses to share P_* and M_* bonus fields.
+ * 對應 YAML skill 資料結構；extends ICompBonuses 共用 P_* / M_* 補正欄位，
+ * 並 extends ISkillUpFields／ISkillDownFields 衍生 Up* / Down* 能力變化欄位。
+ * Mirrors the YAML skill data structure; extends ICompBonuses to share P_* / M_* bonus fields,
+ * and extends ISkillUpFields / ISkillDownFields for the derived Up* / Down* status-change fields.
  *
  * 欄位消費狀態（本 repo）/ Field consumption status (this repo):
  * - 戰鬥引擎實際讀取：sp, type, target, pow, inf, charge, support, invalid,
@@ -369,7 +431,7 @@ export enum EnumSkillPriority {
  *   revive, SpRecoveryRate, MagicCircle*, priority, learn, exp, img）目前僅供資料層保留
  *   remaining fields are currently kept in the data layer only
  */
-export interface ISkillDef extends ICompBonuses {
+export interface ISkillDef extends ICompBonuses, ISkillUpFields, ISkillDownFields {
 	/** 技能編號（repository 的索引鍵）/ skill number (repository index key) */
 	no: number;
 	/** 技能名稱 / skill name */
@@ -381,13 +443,13 @@ export interface ISkillDef extends ICompBonuses {
 	/** SP 消耗；怪物施放時以 ×0.7 折扣檢查（Battle.UseSkill）/ SP cost; monsters pay ×0.7 when checked (Battle.UseSkill) */
 	sp: number;
 	/**
-	 * 技能類型：0＝物理、1＝魔法
-	 * skill type: 0 = physical, 1 = magic
+	 * 技能傷害類型：Physical＝0（物理）、Magic＝1（魔法）
+	 * skill damage type: Physical = 0 (physical), Magic = 1 (magic)
 	 *
 	 * calcBasicDamage 據此選擇 STR/INT 與 atk/def 的物理／魔法索引。
 	 * calcBasicDamage uses this to pick STR/INT and the physical/magic atk/def slots.
 	 */
-	type: 0 | 1;
+	type: EnumSkillDamageType;
 	/** 習得所需技能點（0＝初期即持有）/ skill points to learn (0 = known from the start) */
 	learn?: number;
 	/** 目標規格 [類型, 方式, 數量]；省略時預設 [Enemy, Individual, 1] / target spec [type, method, count]; defaults to [Enemy, Individual, 1] */
@@ -424,7 +486,7 @@ export interface ISkillDef extends ICompBonuses {
 	 * 期間施放其他技能會被中斷（expect 不符即 return）。
 	 * casting another skill during the charge is rejected (mismatched expect returns early).
 	 */
-	charge?: [number, number];
+	charge?: [castTime: number, stiff: number];
 	/**
 	 * 行動後硬直 %（目前僅資料層保留，引擎未讀取）/ post-action stiff % (data-layer only; not read by the engine)
 	 */
@@ -434,18 +496,17 @@ export interface ISkillDef extends ICompBonuses {
 	/** 回復加成（被動技能時由 passive.ts 累加至 SPECIAL.HealBonus）/ heal bonus (passive.ts accumulates it into SPECIAL.HealBonus for passive skills) */
 	HealBonus?: number;
 	/**
-	 * 能力變化（statusChanges 依鍵名前綴分派至 UPMAP/DOWNMAP/PLUSMAP）
-	 * status effects (statusChanges dispatches by key prefix to UPMAP/DOWNMAP/PLUSMAP)
+	 * 永久加算 Plus*（無 %）：作用於使用者，僅 PLUSMAP 已註冊屬性生效。
+	 * statusChanges 依鍵名前綴分派至 UPMAP/DOWNMAP/PLUSMAP，本欄位承載 PLUSMAP 分支。
+	 * Permanent flat Plus* bonus (no %): applied to the user; only PLUSMAP-registered stats take effect.
+	 * statusChanges dispatches by key prefix to UPMAP/DOWNMAP/PLUSMAP; this field feeds the PLUSMAP branch.
 	 *
-	 * 臨時增益 %：作用於使用者（Up* 鍵命中 UPMAP）
-	 * Temporary buff %: applied to the user (Up* keys hit UPMAP)
+	 * 有意保留顯式欄位而非由 IStatusAttr 衍生：PLUSMAP 只註冊六維＋MAXHP/MAXSP，
+	 * 顯式列出可讓 PlusATK 等未註冊鍵在編譯期即被拒絕，避免「型別通過但執行期 no-op」的靜默失效。
+	 * Deliberately explicit instead of derived from IStatusAttr: PLUSMAP registers only the six base
+	 * stats plus MAXHP/MAXSP, so unregistered keys (PlusATK etc.) stay compile-time errors rather
+	 * than accepted fields that silently no-op at runtime.
 	 */
-	UpSTR?: number; UpINT?: number; UpDEX?: number; UpSPD?: number; UpLUK?: number;
-	UpATK?: number; UpMATK?: number; UpDEF?: number; UpMDEF?: number; UpMAXHP?: number; UpMAXSP?: number;
-	/** 臨時減益 %：作用於目標（Down* 鍵命中 DOWNMAP）/ temporary debuff %: applied to the target (Down* keys hit DOWNMAP) */
-	DownSTR?: number; DownINT?: number; DownDEX?: number; DownSPD?: number; DownLUK?: number;
-	DownATK?: number; DownMATK?: number; DownDEF?: number; DownMDEF?: number; DownMAXHP?: number; DownMAXSP?: number;
-	/** 永久加算（無 %）：作用於使用者，僅在 PLUSMAP 有登錄的屬性可生效 / permanent flat bonus (no %): applied to the user; only PLUSMAP-registered stats take effect */
 	PlusSTR?: number; PlusINT?: number; PlusDEX?: number; PlusSPD?: number; PlusLUK?: number;
 	PlusMAXHP?: number; PlusMAXSP?: number;
 	/** 為真時無視 target.def 百分比／定值減傷，並加算 SPECIAL.Pierce（且穿透 Barrier）/ when truthy, ignores target.def percent/flat reduction, adds SPECIAL.Pierce, and bypasses Barrier */
@@ -496,6 +557,19 @@ export interface ISkillDef extends ICompBonuses {
 }
 
 /**
+ * 道具類別細分 / Item sub-category
+ * 型別別名 / type alias
+ *
+ * 對應 YAML item.type2 的有限集合：WEAPON / ARMOR / ITEM / MATERIAL / OTHER。
+ * Mirrors the closed set of YAML item.type2 values: WEAPON / ARMOR / ITEM / MATERIAL / OTHER.
+ * 以聯合型別（非 Enum）表示：值來自外部 YAML 資料層，聯合型別保留字面字串直接賦值
+ * （Item.ts ITEM_TYPE_DEFAULT、seed-data、測試皆以字面值寫入），同時提供拼寫檢查。
+ * A union (not an enum): the values come from the external YAML data layer; the union keeps
+ * literal assignment working (ITEM_TYPE_DEFAULT, seed data, tests) while still catching typos.
+ */
+export type IItemCategory = 'WEAPON' | 'ARMOR' | 'ITEM' | 'MATERIAL' | 'OTHER';
+
+/**
  * 道具定義 / Item definition
  * 介面 / interface
  */
@@ -506,30 +580,55 @@ export interface IItemDef extends ICompBonuses {
 	name: string;
 	/** 武器／裝備型別（同時決定可裝備欄位）/ weapon/equipment type (also decides the equip slot) */
 	type: EnumWeaponType;
-	/** 類別細分：WEAPON / ARMOR / ITEM / MATERIAL / OTHER / sub-category: WEAPON / ARMOR / ITEM / MATERIAL / OTHER */
-	type2?: string; // WEAPON / ARMOR / ITEM / MATERIAL / OTHER
+	/** 類別細分（WEAPON / ARMOR / ITEM / MATERIAL / OTHER，見 IItemCategory）/ sub-category (see IItemCategory) */
+	type2?: IItemCategory;
 	/** 圖示資源路徑 / icon asset path */
 	img?: string;
 	/** 購入價格（金幣）/ buy price (gold) */
 	buy?: number;
 	/** 賣出價格（金幣）/ sell price (gold) */
 	sell?: number;
-	/** [物理攻, 魔法攻] / [physical atk, magic atk] */
-	atk?: [number, number]; // [物理攻, 魔法攻]
-	/** [物理%減, 物理定值減, 魔法%減, 魔法定值減] / [physical %, physical flat, magic %, magic flat] damage reduction */
-	def?: [number, number, number, number]; // [物理%, 物理-, 魔法%, 魔法-]
+	/** 攻擊力（索引同 EnumAtkSlot：0=物理、1=魔法）/ attack power (indices follow EnumAtkSlot: 0 = physical, 1 = magic) */
+	atk?: [phys: number, mag: number];
+	/** 減傷四槽（索引同 EnumDefSlot：物理%減、物理定值減、魔法%減、魔法定值減）/ four reduction slots (indices follow EnumDefSlot: physical %, physical flat, magic %, magic flat) */
+	def?: [physPct: number, physFlat: number, magPct: number, magFlat: number];
 	/** 雙手武器（佔用手部＋副手）/ two-handed weapon (occupies both hand slots) */
-	dh?: boolean; // 雙手武器
+	dh?: boolean;
 	/** 裝備負荷（參與 Delay 系統運算）/ equipment weight (feeds the delay calculation) */
-	handle?: number; // 負荷
+	handle?: number;
 	/** 習得條件 { 職業編號: 等級 } / learn requirement { job number: level } */
-	need?: Record<number, number>; // { job_no: level }
+	need?: Record<number, number>;
 	/** 強化／進化後的基礎道具名 / base item name after refinement/evolution */
 	base_name?: string;
 	/** 附加的召喚效果值（SPECIAL.P_SUMMON）/ attached summon bonus (SPECIAL.P_SUMMON) */
 	P_SUMMON?: number;
 	/** 附加的貫穿效果值（SPECIAL.P_PIERCE）/ attached pierce bonus (SPECIAL.P_PIERCE) */
 	P_PIERCE?: number;
+}
+
+/**
+ * 性別 / Gender
+ * 列舉 / enumeration
+ *
+ * 作為 IJobDef.gender 的鍵（Partial<Record>）：0＝男性、1＝女性。
+ * Keys of IJobDef.gender (Partial<Record>): 0 = male, 1 = female.
+ */
+export enum EnumGender {
+	/** 男性（值 0）/ male (value 0) */
+	Male = 0,
+	/** 女性（值 1）/ female (value 1) */
+	Female = 1,
+}
+
+/**
+ * 性別專屬的名稱與圖示覆寫 / Gender-specific name & icon overrides
+ * 介面 / interface
+ */
+export interface IGenderOverride {
+	/** 圖示路徑（覆寫職業預設 img）/ icon path (overrides the job default img) */
+	img?: string;
+	/** 性別專屬職業名稱（覆寫 job_name）/ gender-specific job name (overrides job_name) */
+	job_name?: string;
 }
 
 /**
@@ -549,8 +648,8 @@ export interface IJobDef {
 	pattern?: IBehavior | null;
 	/** 職業圖示路徑 / job icon path */
 	img?: string;
-	/** 依性別（0/1）區分的名稱與圖示 / per-gender (0/1) name and icon overrides */
-	gender?: Record<number, { img?: string; job_name?: string }>;
+	/** 依性別（EnumGender）區分的名稱與圖示 / per-gender (EnumGender) name and icon overrides */
+	gender?: Partial<Record<EnumGender, IGenderOverride>>;
 	/** 職業說明資訊 / job description info */
 	info?: { desc?: string };
 	/** 職業階級（數字越小越高階）/ job rank (lower = higher tier) */
@@ -649,7 +748,14 @@ export interface ICharDef extends ICharCore {
  * 介面 / interface
  */
 export interface IMonDef extends ICharCore {
+	/** 掉落與獎勵設定（省略＝無獎勵）/ drop & reward settings (omitted = no reward) */
 	reward?: IMonReward;
+	/**
+	 * 工會怪標記 / union-monster flag
+	 *
+	 * 目前僅資料層保留：引擎以 factory.newUnion() 疊加 EnumCharType.Union，尚未讀取本欄。
+	 * Data-layer only: the engine stacks EnumCharType.Union via factory.newUnion() and does not read this field yet.
+	 */
 	isUnion?: boolean;
 }
 
@@ -716,7 +822,6 @@ export enum EnumBattleEventType {
 	Info = 'info',
 }
 
-
 /**
  * 戰鬥事件 / Battle event
  * 介面 / interface
@@ -758,10 +863,15 @@ export interface IBattleSnapshotUnit {
 	name: string;
 	/** 隊伍側別 / team */
 	team: EnumTeamSide;
+	/** 目前 HP / current HP */
 	hp: number;
+	/** HP 上限 / max HP */
 	maxHp: number;
+	/** 目前 SP / current SP */
 	sp: number;
+	/** SP 上限 / max SP */
 	maxSp: number;
+	/** 是否已死亡 / whether this unit is dead */
 	dead: boolean;
 	/** 當前正在蓄力/詠唱的技號（無則 null）/ skill being charged/cast, null otherwise */
 	expectSkill: number | null;

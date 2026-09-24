@@ -6,7 +6,7 @@ import { InMemoryRepository } from '../data/repository';
 import { getSkill } from './Skill';
 import { skillPassive } from './passive';
 import { calcBasicDamage, calcRecoveryValue, applySkill } from './effect';
-import { EnumCharType, EnumTargetType, EnumTargetMethod, type ISkillDef } from '../types';
+import { EnumCharType, EnumTargetType, EnumTargetMethod, EnumSkillDamageType, type ISkillDef } from '../types';
 
 const repo = createSeedRepository();
 
@@ -44,7 +44,7 @@ describe('Skill effect (6.2)', () => {
 		target.def = [20, 5, 0, 0];
 		target.HP = 300; target.MAXHP = 300;
 
-		const atk: ISkillDef = { no: 1000, name: 'Attack', sp: 0, type: 0, target: [EnumTargetType.Enemy, EnumTargetMethod.Individual, 1], pow: 160 };
+		const atk: ISkillDef = { no: 1000, name: 'Attack', sp: 0, type: EnumSkillDamageType.Physical, target: [EnumTargetType.Enemy, EnumTargetMethod.Individual, 1], pow: 160 };
 		// sqrt(100)*10 = 100; *1.6 = 160; *(1-0.2)=128; -5=123; ceil(max(123,12.3))=123
 		expect(calcBasicDamage(atk, user, target)).toBe(123);
 
@@ -67,7 +67,7 @@ describe('Skill effect (6.2)', () => {
 		});
 		target.HP = 100; target.MAXHP = 1000;
 
-		const heal: ISkillDef = { no: 3000, name: 'Healing', sp: 5, type: 0, target: [EnumTargetType.Friend, EnumTargetMethod.Individual, 1], pow: 200, support: 1 };
+		const heal: ISkillDef = { no: 3000, name: 'Healing', sp: 5, type: EnumSkillDamageType.Physical, target: [EnumTargetType.Friend, EnumTargetMethod.Individual, 1], pow: 200, support: 1 };
 		expect(calcRecoveryValue(heal, user)).toBe(200); // ceil((10*10)*2)=200
 
 		const res = applySkill(heal, user, target);
@@ -79,7 +79,7 @@ describe('Skill effect (6.2)', () => {
 describe('Passive skill (6.3)', () => {
 	it('accumulates P_STR from a passive skill', () => {
 		const r = new InMemoryRepository();
-		r.addSkill({ no: 7000, name: 'PassiveStr', sp: 0, type: 0, passive: 1, P_STR: 50 });
+		r.addSkill({ no: 7000, name: 'PassiveStr', sp: 0, type: EnumSkillDamageType.Physical, passive: 1, P_STR: 50 });
 
 		const char = new Character({
 			no: 1, name: 'c', types: [EnumCharType.Char], level: 1,

@@ -11,8 +11,13 @@ import type { IDataRepository } from '../data/repository';
  *
  * 必填欄位（no/name/sp/type）+ 其餘 ISkillDef 欄位皆可缺省。
  * Required fields (no/name/sp/type) plus optional remaining ISkillDef fields.
+ *
+ * type 以索引訪問 ISkillDef['type'] 保持型別追溯：原型別（EnumSkillDamageType）變更時自動同步，
+ * 杜絕在此重複宣告型別造成 Type Drift。
+ * type uses index access (ISkillDef['type']) for type traceability: it stays in sync when the
+ * original type (EnumSkillDamageType) changes, eliminating a duplicated declaration (type drift).
  */
-type IRawSkill = Partial<ISkillDef> & { no: number; name: string; sp: number; type: 0 | 1 };
+type IRawSkill = Partial<ISkillDef> & { no: number; name: string; sp: number; type: ISkillDef['type'] };
 
 /** 正規化原始技能資料 / normalize raw skill data */
 export function parseSkill(raw: IRawSkill): ISkillDef {
