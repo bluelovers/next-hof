@@ -57,6 +57,8 @@ export const BattleSegment: React.FC<IBattleSegmentProps> = ({
   showSpriteLabels,
   showHpBars,
   showSpBars,
+  showTeamSprite,
+  showUnitSprites,
 }) => {
   const leftUnits = segmentUnitsForSide(segment, EnumTeamSideUI.Left, leftTeam.units);
   const rightUnits = segmentUnitsForSide(segment, EnumTeamSideUI.Right, rightTeam.units);
@@ -83,6 +85,8 @@ export const BattleSegment: React.FC<IBattleSegmentProps> = ({
         rightUnits={rightUnits}
         showHpBars={showHpBars}
         showSpBars={showSpBars}
+        showTeamSprite={showTeamSprite}
+        showUnitSprites={showUnitSprites}
       />
 
       {/* 該段行動日誌 / Segment action log */}

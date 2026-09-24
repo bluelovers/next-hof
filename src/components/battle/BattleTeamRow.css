@@ -5,8 +5,10 @@
  * 原始來源：BattleDisplay.css 的 .battle-row（通用列）＋ 第 165-167 行
  * Source: BattleDisplay.css generic .battle-row + lines 165-167
  *
- * 兩個 .teams 面板（BattleTeamInfo）以 flex 併排，過窄時換行堆疊。
- * The two .teams panels (BattleTeamInfo) sit side by side via flex and wrap when narrow.
+ * 兩個側邊面板（BattleTeamInfo / BattleResult 的共用 BattleSidePanel，.teams）
+ * 以 flex 併排，過窄時換行堆疊。
+ * The two side panels (shared BattleTeamInfo / BattleResult BattleSidePanel, .teams)
+ * sit side by side via flex and wrap when narrow.
  */
 
 .battle-team-row {

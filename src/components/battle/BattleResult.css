@@ -46,13 +46,23 @@
 
 /* ==================== 統計數據 / Statistics ==================== */
 
-.result-stats {
-  flex: 1 1 240px;
-  min-width: 0;
-  text-align: center;
-  padding: 10px;
+/* 隊伍名稱標題（統計欄最上方；與統計列同置中）/ Team name heading (top of the stats column; centred with the rows) */
+.result-team-name {
+  padding-bottom: 2px;
 }
 
+/* 統計列間距（面板容器版面 .teams 見 BattleSidePanel.css，單一事實來源）
+   Stat-row spacing (the panel container layout .teams lives in BattleSidePanel.css; single source of truth) */
 .result-stats .stat-row {
   padding: 2px 0;
+}
+
+/* ==================== 窄螢幕 / Narrow screens ==================== */
+
+@media (max-width: 640px) {
+  /* 堆疊後不需要欄位分隔線（作用域限本元件，不依賴父頁面 CSS）
+     No column divider once stacked (scoped to this component; no parent-page CSS) */
+  .result-stats-row .ttd1 {
+    border-left: none;
+  }
 }

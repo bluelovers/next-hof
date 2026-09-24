@@ -267,6 +267,9 @@ export function snapshotUnitToBattleUnit(unit: IBattleSnapshotDisplayUnit): IBat
     maxSp: unit.maxSp,
     status,
     side: unit.side,
+    // 單位精靈資料：快照帶圖時才有（是否渲染另由 showUnitSprites 決定）
+    // Unit sprite data: only when the snapshot carries an image (rendering itself is gated by showUnitSprites)
+    sprite: unit.imageUrl ? { url: unit.imageUrl } : undefined,
   };
 }
 

@@ -1,0 +1,24 @@
+/**
+ * BattleSidePanel 元件樣式
+ * BattleSidePanel component styles
+ *
+ * 原始來源：BattleTeamInfo.css 的 .teams（BattleResult 的 .result-stats 亦為同版面）
+ * Source: .teams from BattleTeamInfo.css (BattleResult's .result-stats used the same layout)
+ *
+ * 由 BattleTeamInfo 與 BattleResult 共用的側邊面板版面；
+ * 側邊分隔線樣式（.ttd2/.ttd1）來自 SharedBase.css。
+ * Side-panel layout shared by BattleTeamInfo and BattleResult;
+ * side divider styles (.ttd2/.ttd1) come from SharedBase.css.
+ *
+ * 響應式：以 flex 基底排版（而非 table 欄寬），
+ * 容器寬度不足時自動換行堆疊（手機）。
+ * Responsive: flex-basis replaces table column width, so panels wrap and
+ * stack automatically when the container is narrow (mobile).
+ */
+
+.teams {
+  flex: 1 1 240px;
+  min-width: 0;
+  text-align: center;
+  padding: 10px;
+}

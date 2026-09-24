@@ -46,6 +46,8 @@ export const BattleDisplay: React.FC<IBattleDisplayProps> = ({
   showSpriteLabels,
   showHpBars = true,
   showSpBars = true,
+  showTeamSprite,
+  showUnitSprites,
 }) => {
   const { leftTeam, rightTeam, battlefield, sprites, actions, result, title, time, snapshots } = data;
 
@@ -78,6 +80,8 @@ export const BattleDisplay: React.FC<IBattleDisplayProps> = ({
             showSpriteLabels={showSpriteLabels}
             showHpBars={showHpBars}
             showSpBars={showSpBars}
+            showTeamSprite={showTeamSprite}
+            showUnitSprites={showUnitSprites}
           />
         ))}
 

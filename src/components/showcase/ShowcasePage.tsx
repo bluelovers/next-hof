@@ -145,7 +145,9 @@ export const ShowcasePage: React.FC = () => {
         </section>
       ) : (
         <section className="showcase-result" aria-label="battle result">
-          <BattleDisplay data={battle.data} showSpriteLabels />
+          {/* 展示頁全員顯示單位精靈（資料由轉接層帶入，showUnitSprites 開啟） */}
+          {/* Show every unit's sprite on the showcase page (data comes from the adapter; showUnitSprites on) */}
+          <BattleDisplay data={battle.data} showSpriteLabels showUnitSprites />
           <div className="showcase-actions">
             <button
               type="button"

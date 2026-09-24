@@ -9,8 +9,8 @@ import React from 'react';
 import type { IBattleUnit } from './types';
 import { EnumTeamSideClass } from './enums';
 import { calcTotalLevel, calcTotalHp } from './battleUtils';
+import { BattleSidePanel } from './BattleSidePanel';
 import './BattleTeamInfo.css';
-import '#/components/shared/SharedBase.css';
 
 /** 隊伍資訊屬性 / Team info props */
 export interface IBattleTeamInfoProps {
@@ -36,13 +36,13 @@ export const BattleTeamInfo: React.FC<IBattleTeamInfoProps> = ({
   const totalHp = calcTotalHp(units);
 
   return (
-    <div className={`teams ${sideClass}`}>
+    <BattleSidePanel sideClass={sideClass}>
       <div className="bold">{name}</div>
       Total Lv : {totalLevel}
       <br />
       Average Lv : {avgLevel}
       <br />
       Total HP : {totalHp.current} / {totalHp.max}
-    </div>
+    </BattleSidePanel>
   );
 };

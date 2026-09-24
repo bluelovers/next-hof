@@ -28,6 +28,29 @@
   padding: 1px 0;
 }
 
+/* 單位角色精靈列（選填；有 sprite 時改為橫向排列，精靈在左）
+   Unit sprite row (optional; switches to a horizontal layout with the sprite on the left) */
+.battle-side-unit--sprite {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.battle-side-unit-sprite {
+  flex: 0 0 auto;
+}
+
+.battle-side-unit-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* 側邊角色精靈容器（左右共用；選填，位於該側單位列表上方）/ Side character sprite container (shared by both sides; optional, above that side's unit list) */
+.battle-side-sprite {
+  display: block;
+  padding-bottom: 4px;
+}
+
 /* ==================== 窄螢幕 / Narrow screens ==================== */
 
 @media (max-width: 640px) {

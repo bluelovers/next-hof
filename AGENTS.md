@@ -88,6 +88,7 @@ import { IJobData } from '../../game-data/GameDataTypes';
 | BattleSegment | `src/components/battle/BattleSegment` |
 | BattleSegmentStatus | `src/components/battle/BattleSegmentStatus` |
 | BattleSegmentNav | `src/components/battle/BattleSegmentNav` |
+| BattleSidePanel | `src/components/battle/BattleSidePanel` |
 
 ---
 

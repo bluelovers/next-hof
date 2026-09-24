@@ -19,6 +19,7 @@ import {
 import { EnumPosition } from '#/lib/game/constants';
 import type { ICorpsePolicyField } from '#/lib/game/battle/corpse-policy';
 import type { IBattleUnitVitals, IUnitList } from '#/lib/game/types';
+import type { ICharacterSpriteProps } from '#/components/characters/CharacterSprite';
 
 /** 隊伍側別（UI 層）/ Team side (UI layer) */
 export type ITeamSide = EnumTeamSideUI;
@@ -69,6 +70,11 @@ export interface IBattleUnit extends IBattleUnitVitals, IBattleDisplayUnitFields
 	spd?: number;
 	/** 站位：前衛 / 後衛 / position: front / back */
 	position?: EnumPosition;
+	/**
+	 * 單位角色精靈（選填；提供時顯示於該單位名稱與 HP/SP 條的左側）
+	 * Unit character sprite (optional; rendered to the left of that unit's name and HP/SP bars when provided)
+	 */
+	sprite?: ICharacterSpriteProps;
 }
 
 /** 隊伍資訊 / Team info */
@@ -307,10 +313,28 @@ export interface IBattleSpriteLabelOptions {
 }
 
 /**
- * 戰鬥畫面顯示開關總集（＝共用組 A ＋ B）
- * Combined battle display toggles (group A + group B)
+ * 精靈顯示開關（共用組 C：隊伍精靈＋單位精靈）
+ * Sprite display toggles (group C: team sprite + unit sprites)
+ *
+ * 兩者只控制「是否渲染」，資料各自來自 BattleSegmentStatus 的
+ * leftSprite／rightSprite 與 IBattleUnit.sprite；資料缺省時即使開啟也不輸出。
+ * Both only gate rendering: the data comes from BattleSegmentStatus's leftSprite /
+ * rightSprite and IBattleUnit.sprite respectively, and nothing is rendered when the
+ * data is absent even if the toggle is on.
  */
-export interface IBattleDisplayOptions extends IBattleBarToggleOptions, IBattleSpriteLabelOptions {}
+export interface IBattleSpriteToggleOptions {
+	/** 是否顯示隊伍（側）精靈 / Whether to show the team (side) sprite */
+	showTeamSprite?: boolean;
+	/** 是否顯示單位精靈 / Whether to show unit sprites */
+	showUnitSprites?: boolean;
+}
+
+/**
+ * 戰鬥畫面顯示開關總集（＝共用組 A ＋ B ＋ C）
+ * Combined battle display toggles (group A + group B + group C)
+ */
+export interface IBattleDisplayOptions
+	extends IBattleBarToggleOptions, IBattleSpriteLabelOptions, IBattleSpriteToggleOptions {}
 
 /**
  * 快照單位（顯示側）

@@ -128,11 +128,26 @@ export function buildShowcaseTeams(
 }
 
 /**
+ * def no → 單位精靈圖 URL（角色／怪物表分開查，缺圖回 placeholder）
+ * def no → unit sprite URL (separate char/mon lookup; placeholder when unmapped)
+ *
+ * 單位精靈（IBattleUnit.sprite）與快照單位外觀（imageUrl）共用此查表；
+ * 兩張表的 def no 互斥，故以 isMon 決定查哪一張。
+ * Shared by unit sprites (IBattleUnit.sprite) and snapshot unit appearance
+ * (imageUrl); the two def-no tables are disjoint, so `isMon` picks the right one.
+ */
+function spriteUrlFor(no: number, isMon: boolean): string {
+	return isMon ? getMonSpriteUrl(no) : getCharSpriteUrl(no);
+}
+
+/**
  * 單位轉接：Character → IBattleUnit（任務 3.2）
  * Unit adapter: Character → IBattleUnit (task 3.2)
  *
- * hp/sp 顯示值夾限於 0 起（引擎可能留下負值），status 依 STATE／詠唱中判定。
+ * hp/sp 顯示值夾限於 0 起（引擎可能留下負值），status 依 STATE／詠唱中判定；
+ * 同時帶入單位精靈（sprite-map 依 def no 查表），供狀態列左側顯示。
  * Display hp/sp clamp at 0 (engine may leave negatives); status from STATE/charging.
+ * Also carries the unit sprite (sprite-map lookup by def no) for the status column.
  */
 export function toBattleUnit(c: Character, side: ITeamSide): IBattleUnit {
 	return {
@@ -147,6 +162,7 @@ export function toBattleUnit(c: Character, side: ITeamSide): IBattleUnit {
 		side,
 		spd: c.SPD,
 		position: c.POSITION === EnumPosition.Back ? EnumPosition.Back : EnumPosition.Front,
+		sprite: { url: spriteUrlFor(c.no, c.isMon()) },
 	};
 }
 
@@ -451,8 +467,10 @@ export function buildSprites(
  * 從快照轉換為展示側快照 / Convert engine snapshot to display snapshot
  *
  * 側別直接取自引擎快照的 `team`（不再經由 no → lookup 推導）；單位以實例 uid 識別。
+ * `imageUrl` 由 def no 查 sprite-map（角色表優先），作為單位精靈資料來源。
  * Side comes straight from the engine snapshot's `team` (no more no → lookup); units are
- * identified by their instance uid.
+ * identified by their instance uid. `imageUrl` is resolved from sprite-map by def no
+ * (char table first) and serves as the unit sprite's data source.
  */
 function toSnapshotDisplay(snap: IBattleSnapshot, repo?: IDataRepository): IBattleSnapshotDisplay {
 	return {
@@ -460,6 +478,9 @@ function toSnapshotDisplay(snap: IBattleSnapshot, repo?: IDataRepository): IBatt
 		units: snap.units.map((u) => {
 			const side = u.team === EnumTeamSide.Team1 ? EnumTeamSideUI.Left : EnumTeamSideUI.Right;
 			const dead = u.dead;
+			// def no → 精靈圖（角色表優先，怪物表次之）/ def no → sprite image (char table first, then mon)
+			const unitNo = Number(u.no);
+			const imageUrl = repo ? spriteUrlFor(unitNo, !repo.getCharBase(unitNo)) : undefined;
 			// 依 skill.type 決定 (charging)/(casting)
 			let chargeKind: EnumChargeKind | undefined;
 			if (u.expectSkill !== null && u.expectSkill !== undefined && repo) {
@@ -470,6 +491,7 @@ function toSnapshotDisplay(snap: IBattleSnapshot, repo?: IDataRepository): IBatt
 				unitUuid: u.unitUuid,
 				name: u.name,
 				side,
+				imageUrl,
 				corpse: u.corpse,
 				hp: u.hp,
 				maxHp: u.maxHp,
