@@ -6,12 +6,13 @@
  * Displays a single skill/attack/action log entry (summon and magic circle included)
  */
 import React from 'react';
-import type { IBattleAction } from './types';
+import type { IBattleAction, IValueChangeRecord } from './types';
 import './BattleAction.css';
 import '#/components/shared/SharedBase.css';
 import { SkillIcon } from '#/components/shared/SkillIcon';
 import { CharacterSprite } from '#/components/characters/CharacterSprite';
 import { EnumSpriteVariant, EnumMagicCircleKind } from './enums';
+import { EnumActionType } from './enums';
 import {
   getAttrClass,
   getValueChangeClass,
@@ -34,16 +35,60 @@ export interface IBattleActionProps {
 /**
  * 值變化描述（單一事實來源）
  * Value change description (single source of truth)
+ *
+ * 同時支援「預組好的字串」與「n1→n2」兩種輸入；who 缺省時只印 `(n1 > n2)`，提供時以
+ * 粗體名牌呈現（`who(n1 > n2)`），兩者皆無前導空白以對齊原始日誌。括號與數值變化內容
+ * 一律由此處組裝，呼叫方無需自行拼接。
+ * Supports both a pre-assembled string and an n1→n2 pair; `who` is optional and, when
+ * present, is shown as a bold label (`who(n1 > n2)`). Either way has no leading space,
+ * mirroring the original log. The parentheses and the change copy are always assembled
+ * here so callers never concatenate them by hand.
  */
-const ValueChange: React.FC<{ action: IBattleAction }> = ({ action }) => {
-  if (!action.valueChange) return null;
-  const valClass = getValueChangeClass(action.type);
+const ValueChange: React.FC<{
+  valueChange?: string;
+  from?: number;
+  to?: number;
+  who?: string;
+  type?: EnumActionType;
+}> = ({ valueChange, from, to, who, type }) => {
+  const text =
+    valueChange !== undefined
+      ? valueChange
+      : from !== undefined && to !== undefined
+        ? `${from} > ${to}`
+        : undefined;
+  if (text === undefined) return null;
+  const valClass = getValueChangeClass(type);
   return (
     <span className={valClass}>
-      ({action.valueChange})
+      {who && <span className="bold">{who}</span>}
+      ({text})
     </span>
   );
 };
+
+/**
+ * 多重數值變化列表（單一事實來源；內部統一委託 ValueChange）
+ * Multi value-change list (single source of truth; delegates to ValueChange internally)
+ *
+ * 對照 Skill/Effect.php 的 `Drained N HP from 敵人(1500 > 1200)我方(800 > 1100)`：每一筆
+ * IValueChangeRecord 委託 ValueChange 渲染，本元件不自行組裝括號或名牌。
+ * Mirrors Skill/Effect.php's multi-(who(n1>n2)) drain line; each IValueChangeRecord is
+ * delegated to ValueChange, so this component never assembles the parentheses or labels.
+ */
+const ValueChanges: React.FC<{ changes?: IValueChangeRecord[]; type?: EnumActionType }> = ({
+  changes,
+  type,
+}) => (
+  <>
+    {changes?.map((vc, i) => (
+      <>
+        {((i > 0) ? ' ' : null)}
+        <ValueChange key={i} from={vc.from} to={vc.to} who={vc.who} type={type} />
+      </>
+    ))}
+  </>
+);
 
 /**
  * 入場訊息（單一事實來源）
@@ -168,7 +213,7 @@ const NamedMessage: React.FC<{ action: IBattleAction; className?: string }> = ({
       {action.prefix}
       {name && <span className="bold">{name}</span>}
       {text}
-      <ValueChange action={action} />
+      <ValueChange valueChange={action.valueChange} type={action.type} />
     </span>
   );
 };
@@ -192,7 +237,7 @@ const NamedValueMessage: React.FC<{ action: IBattleAction; className?: string; t
       <span className="bold">{action.source}</span> {text}{' '}
       <span className="bold">{action.value}</span>
       {action.valueUnit && ` ${action.valueUnit}`}
-      <ValueChange action={action} />
+      <ValueChange valueChange={action.valueChange} type={action.type} />
     </span>
   );
 };
@@ -213,7 +258,7 @@ const SpDamageMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
         {' '}to <span className="bold">{action.target}</span>
       </>
     )}
-    <ValueChange action={action} />
+    <ValueChange valueChange={action.valueChange} type={action.type} />
   </span>
 );
 
@@ -243,12 +288,7 @@ const DrainMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
         {' '}from <span className="bold">{action.target}</span>
       </>
     )}
-    {action.valueChanges?.map((vc, i) => (
-      <span key={i}>
-        {vc.who && <span className="bold">{vc.who}</span>}
-        ({vc.from} &gt; {vc.to})
-      </span>
-    ))}
+    <ValueChanges changes={action.valueChanges} type={action.type} />
   </span>
 );
 
@@ -334,7 +374,7 @@ const PoisonMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
       <span className={getMessageClass(action)}>
         {action.source && <span className="bold">{action.source}</span>} got{' '}
         <span className="bold">{action.value}</span> damage by poison.
-        <ValueChange action={action} />
+        <ValueChange valueChange={action.valueChange} type={action.type} />
       </span>
     );
   }
@@ -478,7 +518,7 @@ const ValueMessage: React.FC<{
     <span className={`${typeClass} ${attrClass}`}>
       <span className="bold">{action.value}</span> {label}
       {action.target && <> to <span className="bold">{action.target}</span></>}
-      <ValueChange action={action} />
+      <ValueChange valueChange={action.valueChange} type={action.type} />
     </span>
   );
 };
