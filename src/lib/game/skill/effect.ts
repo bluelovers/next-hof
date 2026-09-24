@@ -127,9 +127,10 @@ export function applySkill(skill: ISkillDef, user: Character, target: Character,
 	const events: IBattleEvent[] = [];
 
 	if (skill.support) {
+		const hpBefore = target.HP;
 		const heal = calcRecoveryValue(skill, user);
 		const applied = hpRecover(target, heal);
-		events.push({ type: EnumBattleEventType.Heal, actor: String(user.no), target: String(target.no), skill: skill.no, value: applied });
+		events.push({ type: EnumBattleEventType.Heal, actor: String(user.no), target: String(target.no), skill: skill.no, value: applied, hpBefore, hpAfter: target.HP });
 		statusChanges(skill, target, user, rng);
 		return { heal: applied, events };
 	}
@@ -143,8 +144,9 @@ export function applySkill(skill: ISkillDef, user: Character, target: Character,
 		return { damage: 0, events };
 	}
 
+	const hpBefore = target.HP;
 	const applied = hpDamage(target, dmg);
-	events.push({ type: EnumBattleEventType.Damage, actor: String(user.no), target: String(target.no), skill: skill.no, value: applied });
+	events.push({ type: EnumBattleEventType.Damage, actor: String(user.no), target: String(target.no), skill: skill.no, value: applied, hpBefore, hpAfter: target.HP });
 	statusChanges(skill, target, user, rng);
 	return { damage: applied, events };
 }

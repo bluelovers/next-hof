@@ -4,7 +4,7 @@
 
 import {
 	EnumState, EnumExpect,
-	BATTLE_MAX_TURNS, TURN_EXTENDS, BATTLE_MAX_EXTENDS, DELAY_BASE,
+	BATTLE_MAX_TURNS, TURN_EXTENDS, BATTLE_MAX_EXTENDS, DELAY_BASE, BATTLE_STAT_TURNS,
 } from '../constants';
 import { Character } from '../character/Character';
 import { setBattleVariable } from '../character/battle-variable';
@@ -18,7 +18,7 @@ import { computeOutcome, BattleResult, EnumOutcome } from './BattleResult';
 import type { IDataRepository } from '../data/repository';
 import type { RNG } from '../core/rng';
 import type { ITimeService } from '../core/time-service';
-import type { ISkillDef, IBattleEvent } from '../types';
+import type { ISkillDef, IBattleEvent, IBattleSnapshot } from '../types';
 import { EnumTargetType, EnumTargetMethod, EnumBattleEventType } from '../types';
 
 
@@ -52,6 +52,12 @@ export class Battle {
 	log: IBattleEvent[] = [];
 	/** 戰鬥結果（null＝尚未分出勝負）/ battle result (null = not decided yet) */
 	result: BattleResult | null = null;
+	/** 已進行行動數（含 charge 扣回）/ number of actions taken (charge deducted) */
+	actions = 0;
+	/** 最後一次快照時的 actions 值 / actions value at last snapshot */
+	private lastSnapshotActions = -1;
+	/** 快照列表（每 10 actions 一張戰場圖＋HP/SP）/ snapshots (one battlefield + HP/SP per 10 actions) */
+	snapshots: IBattleSnapshot[] = [];
 
 	/**
 	 * 建立戰鬥並初始化雙方單位 / Create the battle and initialize both sides
@@ -174,6 +180,8 @@ export class Battle {
 			actor.expect = skillNo;
 			actor.expect_type = EnumExpect.Cast;
 			this.log.push({ type: EnumBattleEventType.Cast, actor: String(actor.no), skill: skillNo });
+			// 戰鬥的總行動回數減少(蓄力不計為行動)
+			this.actions--;
 			return;
 		}
 		if (actor.expect !== null && actor.expect !== skillNo) {
@@ -186,6 +194,9 @@ export class Battle {
 		const need = Math.ceil(skill.sp * (actor.isMon() ? 0.7 : 1));
 		if (skill.sp > 0 && actor.SP < need) return;
 		if (skill.sp > 0) actor.SP -= need;
+
+		// 實際施放技能，計為一次行動
+		this.log.push({ type: EnumBattleEventType.Act, actor: String(actor.no), skill: skillNo });
 
 		const targets = this.selectTargets(actor, skill);
 		for (const tgt of targets) {
@@ -215,6 +226,22 @@ export class Battle {
 		const skillNo = this.ChooseSkill(actor);
 		this.UseSkill(actor, skillNo);
 		actor.actCount++;
+		this.actions++;
+	}
+
+	/** 建立目前快照單位列表 / Build current snapshot unit list */
+	private snapshotUnits(): IBattleSnapshot['units'] {
+		return this.allChars().map((c) => ({
+			no: String(c.no),
+			name: c.name,
+			team: c.team as '0' | '1',
+			hp: c.HP,
+			maxHp: c.MAXHP,
+			sp: c.SP,
+			maxSp: c.MAXSP,
+			dead: c.STATE === EnumState.Dead,
+			expectSkill: c.expect,
+		}));
 	}
 
 	/**
@@ -223,6 +250,11 @@ export class Battle {
 	 */
 	run(): BattleResult {
 		while (!this.result) {
+			// 每 BATTLE_STAT_TURNS 次行動插入一張快照（對齊 PHP BattleState）
+			if (this.actions % BATTLE_STAT_TURNS === 0 && this.actions !== this.lastSnapshotActions) {
+				this.lastSnapshotActions = this.actions;
+				this.snapshots.push({ at: this.log.length, units: this.snapshotUnits() });
+			}
 			const actor = this.NextActer();
 			if (!actor) {
 				this.result = new BattleResult(
@@ -251,6 +283,12 @@ export class Battle {
 				this.turn = 0;
 			}
 		}
+		// 補最終快照（若與上一張不同）
+		const lastSnap = this.snapshots[this.snapshots.length - 1];
+		if (!lastSnap || lastSnap.at !== this.log.length) {
+			this.snapshots.push({ at: this.log.length, units: this.snapshotUnits() });
+		}
 		return this.result;
 	}
 }
+

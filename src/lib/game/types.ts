@@ -629,6 +629,8 @@ export enum EnumBattleEventType {
 	Death = 'death',
 	/** 施放技能 / skill cast */
 	Cast = 'cast',
+	/** 實際行動（技能施放成功，非蓄力開始） / actual action (skill executed, not charge start) */
+	Act = 'act',
 	/**
 	 * 詠唱／蓄力開始 / charge (cast time) started
 	 * 目前無生產點 / currently no producer
@@ -672,8 +674,35 @@ export interface IBattleEvent {
 	skill?: number;
 	/** 數值（傷害量／回復量等）/ numeric value (damage/heal amount, etc.) */
 	value?: number;
+	/** 數值變化的前後 HP（Damage/Heal 時帶出 a > b 用）/ HP before/after for value-change display */
+	hpBefore?: number;
+	hpAfter?: number;
 	/** 顯示文字（Info 等文字類事件）/ display text (for Info and other text events) */
 	text?: string;
 }
 
 export type { EnumState };
+
+/** 快照單位資料（戰場狀態某一刻的切面）/ Snapshot unit data (a moment's field state) */
+export interface IBattleSnapshotUnit {
+	/** 單位編號 String(char.no) / unit number as string */
+	no: string;
+	/** 名稱 / name */
+	name: string;
+	/** 隊伍 '0' 或 '1' / team */
+	team: '0' | '1';
+	hp: number;
+	maxHp: number;
+	sp: number;
+	maxSp: number;
+	dead: boolean;
+	/** 當前正在蓄力/詠唱的技號（無則 null）/ skill being charged/cast, null otherwise */
+	expectSkill: number | null;
+}
+
+/** 戰鬥快照（每 10 次行動插入，記錄戰場圖與 HP/SP）/ Battle snapshot (one per 10 actions) */
+export interface IBattleSnapshot {
+	/** 插入時的 log.length / log length at insertion time */
+	at: number;
+	units: IBattleSnapshotUnit[];
+}

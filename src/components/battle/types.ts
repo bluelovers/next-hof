@@ -71,6 +71,10 @@ export interface IBattleUnit {
   spriteId?: string;
   /** 隊伍側 / Team side */
   side: ITeamSide;
+  /** 速度（決定行動順序）/ speed (action order) */
+  spd?: number;
+  /** 站位：前衛 / 後衛 / position: front / back */
+  position?: 'front' | 'back';
 }
 
 /** 隊伍資訊 / Team info */
@@ -189,12 +193,20 @@ export interface IBattleAction {
   side?: ITeamSide;
   /** 訊息類型 / Message attribute type */
   attribute?: IAttributeType;
+  /** 蓄力種類（casting 事件用）/ charge kind (for casting events) */
+  castType?: 'charging' | 'casting';
+  /** 傷害前 HP（Damage/Heal 時）/ HP before (Damage/Heal) */
+  hpBefore?: number;
+  /** 傷害後 HP（Damage/Heal 時）/ HP after (Damage/Heal) */
+  hpAfter?: number;
 }
 
 /** 戰鬥結果 / Battle result */
 export interface IBattleResult {
   /** 勝利隊伍名稱 / Winner team name */
   winner: string;
+  /** 勝利側別（用於配色）/ winning side (for colouring) */
+  winnerSide?: ITeamSide;
   /** 是否平手 / Whether draw */
   isDraw?: boolean;
   /** 左側隊伍最終統計 / Left team final stats */
@@ -217,6 +229,8 @@ export interface ITeamFinalStats {
   totalExp?: number;
   /** 獲得的資金 / Funds */
   funds?: string;
+  /** 隊伍最大 HP 總和（用於 HP remain 比率計算）/ total max HP (for HP remain ratio) */
+  totalMaxHp?: number;
 }
 
 /** BattleDisplay 完整資料 / Complete battle display data */
@@ -237,4 +251,31 @@ export interface IBattleDisplayData {
   actions: IBattleAction[];
   /** 戰鬥結果 / Battle result */
   result?: IBattleResult;
+  /** 快照列表（每 10 actions 一張戰場圖＋HP/SP）/ snapshots (one per 10 actions) */
+  snapshots?: IBattleSnapshot[];
+}
+
+/** 快照單位（顯示側）/ Snapshot unit (display side) */
+export interface IBattleSnapshotUnit {
+  /** 單位名稱 / name */
+  name: string;
+  /** 顯示側別 / display side */
+  side: ITeamSide;
+  hp: number;
+  maxHp: number;
+  sp: number;
+  maxSp: number;
+  /** 是否倒下 / whether down */
+  dead: boolean;
+  /** 狀態（倒下為 down）/ status */
+  status?: 'down';
+  /** 蓄力/詠唱種類（無則 undefined）/ charge/cast kind */
+  chargeKind?: 'charging' | 'casting';
+}
+
+/** 戰鬥快照（顯示側）/ Battle snapshot (display side) */
+export interface IBattleSnapshot {
+  /** 對應 actions 的索引位置 / index into actions */
+  at: number;
+  units: IBattleSnapshotUnit[];
 }

@@ -2,12 +2,9 @@
 // 將引擎的「名冊 → 建隊 → 戰鬥執行」輸出轉為展示頁所需的 IBattleDisplayData
 // 契約（隊伍/單位/日誌/結果/精靈）。以固定種子保證同輸入同結果，所有轉接函式
 // 皆可獨立單元測試（OpenSpec 任務 3.1–3.5）。
-// Bridges the engine's "roster → teams → battle run" output into the showcase
-// IBattleDisplayData contract (teams/units/log/result/sprites). A fixed seed keeps
-// runs reproducible, and every adapter function is unit-testable (tasks 3.1–3.5).
 //
-// 側別慣例（與 sprite-map.ts 一致）：我方＝左隊 'left'、敵方＝右隊 'right'。
-// Side convention (matches sprite-map.ts): allies = left team, enemies = right team.
+// 側別慣例（與原版頁面一致）：敵方＝左隊 'left'、我方＝右隊 'right'。
+// Side convention (matches the original page): enemies = left team 'left', allies = right team 'right'.
 
 import { EnumState, EnumPosition, MAX_CHAR } from '#/lib/game/constants';
 import { Battle } from '#/lib/game/battle/Battle';
@@ -18,7 +15,7 @@ import { RNG } from '#/lib/game/core/rng';
 import { createSeedRepository } from '#/lib/game/data/seed-data';
 import type { IDataRepository } from '#/lib/game/data/repository';
 import { EnumBattleEventType } from '#/lib/game/types';
-import type { IBattleEvent } from '#/lib/game/types';
+import type { IBattleEvent, IBattleSnapshot } from '#/lib/game/types';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
 import type {
 	IBattleAction,
@@ -27,6 +24,7 @@ import type {
 	IBattleSprite,
 	IBattleTeam,
 	IBattleUnit,
+	IBattleSnapshot as IBattleSnapshotDisplay,
 	ITeamFinalStats,
 	ITeamSide,
 } from '#/components/battle/types';
@@ -106,11 +104,6 @@ export interface IShowcaseBattleOutcome {
 /**
  * 依 def no 建立我方與敵方兩隊角色（任務 3.1）
  * Build ally and enemy characters from def nos (task 3.1)
- *
- * @param charNos 我方角色 def no / ally char def nos
- * @param monNos 敵方怪物 def nos / enemy monster def nos
- * @param repo 資料倉庫 / data repository
- * @param rng 隨機源（同一種子 → 同一序列）/ random source (same seed → same sequence)
  */
 export function buildShowcaseTeams(
 	charNos: readonly number[],
@@ -149,6 +142,8 @@ export function toBattleUnit(c: Character, side: ITeamSide): IBattleUnit {
 		status: c.STATE === EnumState.Dead ? 'down' : c.expect !== null ? 'casting' : 'alive',
 		spriteId: c.uniqid,
 		side,
+		spd: c.SPD,
+		position: c.POSITION === EnumPosition.Back ? 'back' : 'front',
 	};
 }
 
@@ -167,14 +162,17 @@ export function buildTeam(
 /**
  * 建立 no → { name, side } 查詢表（我方先建、敵方後建；seed 編號互斥）
  * Build the no → { name, side } lookup (allies first, enemies after; seed nos are disjoint)
+ *
+ * 側別已翻轉：我方＝'right'、敵方＝'left'（與原版頁面一致）
+ * Side flipped: allies = 'right', enemies = 'left' (matches original page)
  */
 export function buildUnitLookup(
 	allies: readonly Character[],
 	enemies: readonly Character[],
 ): IUnitLookup {
 	const lookup = new Map<number, IUnitRef>();
-	for (const c of allies) lookup.set(c.no, { name: c.name, side: 'left' });
-	for (const c of enemies) lookup.set(c.no, { name: c.name, side: 'right' });
+	for (const c of allies) lookup.set(c.no, { name: c.name, side: 'right' });
+	for (const c of enemies) lookup.set(c.no, { name: c.name, side: 'left' });
 	return lookup;
 }
 
@@ -200,9 +198,9 @@ function resolveRef(key: string | undefined, lookup: IUnitLookup): IResolvedRef 
  * 事件轉接：IBattleEvent → IBattleAction（任務 3.3）
  * Event adapter: IBattleEvent → IBattleAction (task 3.3)
  *
- * 對應：Damage→damage、Heal→heal、Guard→protect、Death→down、Cast→casting，
+ * 對應：Act→skill、Cast→casting、Damage→damage、Heal→heal、Guard→protect、Death→down，
  * 未知型別以 type 'result' + message 文字 fallback，確保 N 事件 → N 條日誌。
- * Mapping: Damage→damage, Heal→heal, Guard→protect, Death→down, Cast→casting;
+ * Mapping: Act→skill, Cast→casting, Damage→damage, Heal→heal, Guard→protect, Death→down;
  * unknown types fall back to type 'result' + a message so N events → N entries.
  */
 export function mapBattleEvent(
@@ -214,42 +212,85 @@ export function mapBattleEvent(
 	const target = resolveRef(ev.target, lookup);
 	/** 行動歸屬側別：優先 actor，其次 target（Death 只有 target）/ owning side: actor first, target fallback */
 	const side = actor.side ?? target.side;
-	const skillName = ev.skill !== undefined ? repo?.getSkill(ev.skill)?.name : undefined;
+	const skillDef = ev.skill !== undefined ? repo?.getSkill(ev.skill) : undefined;
+	const skillName = skillDef?.name;
 
 	switch (ev.type) {
+		case EnumBattleEventType.Act: {
+			// 對齊 PHP：技能 div 由 UseSkill 印出（act 為實際施放）
+			// Mirrors PHP: the skill div is printed by UseSkill (act = actual cast)
+			return {
+				type: 'skill',
+				source: actor.name,
+				target: target.name,
+				skill: skillName ? { name: skillName } : undefined,
+				message: skillName ? `${actor.name} ${skillName}` : actor.name ?? '',
+				side,
+				attribute: 'normal',
+			};
+		}
+		case EnumBattleEventType.Cast: {
+			// 依 skill.type 決定文案：0→start charging.、1→start casting.
+			// Charge text by skill.type: 0→start charging., 1→start casting.
+			const verb = skillDef?.type === 0 ? 'charging' : 'casting';
+			return {
+				type: 'casting',
+				source: actor.name,
+				message: `start ${verb}.`,
+				side,
+				attribute: 'charge',
+				castType: verb,
+				skill: skillName ? { name: skillName } : undefined,
+			};
+		}
 		case EnumBattleEventType.Damage: {
 			const value = ev.value ?? 0;
+			const valueChange =
+				ev.hpBefore !== undefined && ev.hpAfter !== undefined
+					? `${ev.hpBefore} > ${ev.hpAfter}`
+					: actor.name
+						? `by ${actor.name}`
+						: undefined;
 			const message = target.name ? `${value} Damage to ${target.name}` : `${value} Damage`;
 			return {
 				type: 'damage',
 				source: actor.name,
 				target: target.name,
 				value,
-				valueChange: actor.name ? `by ${actor.name}` : undefined,
+				valueChange,
 				message,
 				side,
 				attribute: 'dmg',
+				hpBefore: ev.hpBefore,
+				hpAfter: ev.hpAfter,
 				skill: skillName ? { name: skillName } : undefined,
 			};
 		}
 		case EnumBattleEventType.Heal: {
 			const value = ev.value ?? 0;
-			const message = target.name ? `${value} Heal to ${target.name}` : `${value} Heal`;
+			const valueChange =
+				ev.hpBefore !== undefined && ev.hpAfter !== undefined
+					? `${ev.hpBefore} > ${ev.hpAfter}`
+					: undefined;
+			// PHP: <b>target</b> <span class="recover">Recovered <b>N HP</b></span>(a > b)
+			const message = target.name
+				? `${target.name} Recovered ${value} HP`
+				: `${value} Heal`;
 			return {
 				type: 'heal',
 				source: actor.name,
 				target: target.name,
 				value,
-				valueChange: actor.name ? `by ${actor.name}` : undefined,
+				valueChange,
 				message,
 				side,
 				attribute: 'recover',
+				hpBefore: ev.hpBefore,
+				hpAfter: ev.hpAfter,
 				skill: skillName ? { name: skillName } : undefined,
 			};
 		}
 		case EnumBattleEventType.Guard: {
-			// 現行生產點僅 Barrier（actor === target）；保留 actor ≠ target 的守護分支
-			// Current producer is Barrier only (actor === target); keep the actor ≠ target branch
 			const message =
 				actor.name && target.name && actor.name !== target.name
 					? `${actor.name} protected ${target.name}!`
@@ -274,23 +315,7 @@ export function mapBattleEvent(
 				attribute: 'dmg',
 			};
 		}
-		case EnumBattleEventType.Cast: {
-			const who = actor.name ?? 'Unknown';
-			const message = skillName
-				? `${who} start casting ${skillName}.`
-				: `${who} start casting.`;
-			return {
-				type: 'casting',
-				source: actor.name,
-				message,
-				side,
-				attribute: 'charge',
-				skill: skillName ? { name: skillName } : undefined,
-			};
-		}
 		default: {
-			// 未知/未實作事件型別：以 text 或型別＋名稱組出 fallback 文字
-			// Unknown/unimplemented type: fall back to text, or type plus names
 			const message =
 				ev.text ??
 				`${actor.name ?? ''} ${ev.type}${target.name ? ` ${target.name}` : ''}`.trim();
@@ -310,14 +335,14 @@ export function mapBattleEvent(
 export interface IResultDataInput {
 	/** 引擎判定 / Engine outcome */
 	outcome: EnumOutcome;
-	/** 我方（左隊）名稱 / Left (ally) team name */
-	leftTeamName: string;
-	/** 敵方（右隊）名稱 / Right (enemy) team name */
-	rightTeamName: string;
-	/** 我方成員 / Left team members */
-	leftMembers: readonly Character[];
-	/** 敵方成員 / Right team members */
-	rightMembers: readonly Character[];
+	/** 敵方（左隊）名稱 / Enemy (left team) name */
+	enemyTeamName: string;
+	/** 我方（右隊）名稱 / Ally (right team) name */
+	allyTeamName: string;
+	/** 敵方成員（左隊）/ Enemy members (left team) */
+	enemyMembers: readonly Character[];
+	/** 我方成員（右隊）/ Ally members (right team) */
+	allyMembers: readonly Character[];
 	/** 事件日誌（供 totalDamage 彙總）/ event log (for totalDamage) */
 	events?: readonly IBattleEvent[];
 	/** no → 單位查詢表 / no → unit lookup */
@@ -325,8 +350,8 @@ export interface IResultDataInput {
 }
 
 /**
- * 建立單隊最終統計（hpRemain／alive／totalUnits／totalDamage）
- * Build one team's final stats (hpRemain/alive/totalUnits/totalDamage)
+ * 建立單隊最終統計（hpRemain／alive／totalUnits／totalDamage／totalMaxHp）
+ * Build one team's final stats (hpRemain/alive/totalUnits/totalDamage/totalMaxHp)
  */
 function buildTeamStats(
 	members: readonly Character[],
@@ -336,8 +361,10 @@ function buildTeamStats(
 ): ITeamFinalStats {
 	let hpRemain = 0;
 	let alive = 0;
+	let totalMaxHp = 0;
 	for (const c of members) {
 		hpRemain += Math.max(0, c.HP);
+		totalMaxHp += c.MAXHP;
 		if (c.STATE !== EnumState.Dead) alive++;
 	}
 	let totalDamage = 0;
@@ -346,30 +373,37 @@ function buildTeamStats(
 		const info = ev.actor !== undefined ? lookup?.get(Number(ev.actor)) : undefined;
 		if (info?.side === side) totalDamage += ev.value ?? 0;
 	}
-	return { hpRemain, alive, totalUnits: members.length, totalDamage };
+	return { hpRemain, alive, totalUnits: members.length, totalDamage, totalMaxHp };
 }
 
 /**
  * 結果轉接：引擎判定 → IBattleResult（任務 3.4）
  * Result adapter: engine outcome → IBattleResult (task 3.4)
  *
- * Win → winner＝我方名；Lose → winner＝敵方名；Draw → winner ''＋isDraw true
- * （UI 於 isDraw 時顯示「Draw!」）。
+ * Win → winner＝我方名（右隊）、winnerSide='right'；Lose → winner＝敵方名（左隊）、winnerSide='left'；
+ * Draw → winner ''＋isDraw true。
  */
 export function buildResultData(input: IResultDataInput): IBattleResult {
-	const { outcome, leftTeamName, rightTeamName, leftMembers, rightMembers } = input;
+	const { outcome, allyTeamName, enemyTeamName, allyMembers, enemyMembers } = input;
 	const isDraw = outcome === EnumOutcome.Draw;
 	const winner =
 		outcome === EnumOutcome.Win
-			? leftTeamName
+			? allyTeamName
 			: outcome === EnumOutcome.Lose
-				? rightTeamName
+				? enemyTeamName
 				: '';
+	const winnerSide =
+		outcome === EnumOutcome.Win
+			? 'right'
+			: outcome === EnumOutcome.Lose
+				? 'left'
+				: undefined;
 	return {
 		winner,
+		winnerSide,
 		isDraw,
-		leftTeam: buildTeamStats(leftMembers, 'left', input.events, input.lookup),
-		rightTeam: buildTeamStats(rightMembers, 'right', input.events, input.lookup),
+		leftTeam: buildTeamStats(enemyMembers, 'left', input.events, input.lookup),
+		rightTeam: buildTeamStats(allyMembers, 'right', input.events, input.lookup),
 	};
 }
 
@@ -377,8 +411,10 @@ export function buildResultData(input: IResultDataInput): IBattleResult {
  * 精靈名冊轉接：Character[] → IBattlePositionChar[]（側別＋站位＋圖檔，任務 3.5）
  * Sprite roster adapter: Character[] → IBattlePositionChar[] (side/row/image, task 3.5)
  *
- * 圖檔經 sprite-map（查無回傳 placeholder）；站位取引擎實際 POSITION（開戰隨機），
- * 右隊 char/ 圖由 computeBattleSpritePositions 自動翻轉朝左。
+ * 側別已翻轉：我方＝'right'、敵方＝'left'。名冊以敵方（左隊）在前、我方（右隊）在後排列，
+ * 對齊原版頁面左右欄位順序。右隊 char/ 圖由 computeBattleSpritePositions 自動翻轉朝左。
+ * Side flipped: allies = 'right', enemies = 'left'. Roster lists enemies (left) first,
+ * allies (right) second, matching the original page column order.
  */
 export function buildPositionRoster(
 	allies: readonly Character[],
@@ -393,8 +429,8 @@ export function buildPositionRoster(
 		side,
 	});
 	return [
-		...allies.map((c) => toEntry(c, 'left', getCharSpriteUrl(c.no))),
-		...enemies.map((c) => toEntry(c, 'right', getMonSpriteUrl(c.no))),
+		...enemies.map((c) => toEntry(c, 'left', getMonSpriteUrl(c.no))),
+		...allies.map((c) => toEntry(c, 'right', getCharSpriteUrl(c.no))),
 	];
 }
 
@@ -411,6 +447,35 @@ export function buildSprites(
 		width: SPRITE_LAYOUT_WIDTH,
 		height: SPRITE_LAYOUT_HEIGHT,
 	});
+}
+
+/** 從快照轉換為展示側快照 / Convert engine snapshot to display snapshot */
+function toSnapshotDisplay(snap: IBattleSnapshot, lookup: IUnitLookup, repo?: IDataRepository): IBattleSnapshotDisplay {
+	return {
+		at: snap.at,
+		units: snap.units.map((u) => {
+			const info = lookup.get(Number(u.no));
+			const side = info?.side ?? (u.team === '1' ? 'left' : 'right');
+			const dead = u.dead;
+			// 依 skill.type 決定 (charging)/(casting)
+			let chargeKind: 'charging' | 'casting' | undefined;
+			if (u.expectSkill !== null && u.expectSkill !== undefined && repo) {
+				const sk = repo.getSkill(u.expectSkill);
+				if (sk) chargeKind = sk.type === 0 ? 'charging' : 'casting';
+			}
+			return {
+				name: u.name,
+				side,
+				hp: u.hp,
+				maxHp: u.maxHp,
+				sp: u.sp,
+				maxSp: u.maxSp,
+				dead,
+				status: dead ? 'down' : undefined,
+				chargeKind,
+			};
+		}),
+	};
 }
 
 /**
@@ -441,11 +506,15 @@ export function runShowcaseBattle(input: IShowcaseBattleInput): IShowcaseBattleO
 	const enemyTeamName = input.enemyTeamName ?? DEFAULT_ENEMY_TEAM_NAME;
 
 	const lookup = buildUnitLookup(allies, enemies);
+	const snapshots: IBattleSnapshotDisplay[] = battle.snapshots.map((s) => toSnapshotDisplay(s, lookup, repo));
+
 	const data: IBattleDisplayData = {
 		title: input.title ?? DEFAULT_SHOWCASE_TITLE,
 		time: input.time,
-		leftTeam: buildTeam(allyTeamName, allies, 'left'),
-		rightTeam: buildTeam(enemyTeamName, enemies, 'right'),
+		// 側別對齊原版：左=敵方，右=我方
+		// Side matches original: left=enemies, right=allies
+		leftTeam: buildTeam(enemyTeamName, enemies, 'left'),
+		rightTeam: buildTeam(allyTeamName, allies, 'right'),
 		battlefield: {
 			backgroundImageUrl: SHOWCASE_BATTLEFIELD_BG,
 			backgroundType: 'grass',
@@ -456,13 +525,14 @@ export function runShowcaseBattle(input: IShowcaseBattleInput): IShowcaseBattleO
 		actions: battle.log.map((ev) => mapBattleEvent(ev, lookup, repo)),
 		result: buildResultData({
 			outcome: engineResult.outcome,
-			leftTeamName: allyTeamName,
-			rightTeamName: enemyTeamName,
-			leftMembers: allies,
-			rightMembers: enemies,
+			allyTeamName,
+			enemyTeamName,
+			enemyMembers: enemies,
+			allyMembers: allies,
 			events: battle.log,
 			lookup,
 		}),
+		snapshots: snapshots.length > 0 ? snapshots : undefined,
 	};
 
 	return {
