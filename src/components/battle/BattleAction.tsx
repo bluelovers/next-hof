@@ -23,6 +23,7 @@ import {
   splitNamedMessage,
   buildChargeMessage,
 } from './battleUtils';
+import type { CSSProperties } from 'react';
 
 /** 戰鬥行動屬性 / Battle action props */
 export interface IBattleActionProps {
@@ -131,6 +132,34 @@ const SkillMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
 );
 
 /**
+ * 行動訊息行（單一事實來源）
+ * Action log line (single source of truth)
+ *
+ * 統一「加粗主詞（who）＋ 訊息（message）＋ 可選後綴（children）」的結構，
+ * 供召喚入隊句等共用；message 接受任意合法節點（字串或 DOM/元件），
+ * 後綴 children 用於在訊息之後接續其他內容（如入場句）。
+ * Unifies the "bold subject (who) + message + optional suffix (children)" structure so the
+ * summon-join clause and similar lines share one shape; `message` accepts any valid node
+ * (string or DOM/component) and `children` appends after the message (e.g. an enter clause).
+ */
+const ActionLine: React.FC<{
+  /** 加粗主詞（名稱等）/ Bold subject (name, etc.) */
+  who: React.ReactNode;
+  /** 訊息內容（字串或任意合法節點）/ Message content (string or any valid node) */
+  message: React.ReactNode;
+  /** 外層 class（屬性配色等）/ Outer class (attribute colour, etc.) */
+  className?: string;
+  style?: CSSProperties;
+  /** 訊息之後的後綴內容 / Suffix rendered after the message */
+  children?: React.ReactNode;
+}> = ({ who, message, className, style, children }) => (
+  <span className={className} style={style}>
+    <span className="bold">{who}</span> {message}
+    {children ?? null}
+  </span>
+);
+
+/**
  * 召喚訊息（單一事實來源）
  * Summon message (single source of truth)
  *
@@ -156,10 +185,16 @@ const SummonMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
               className="summoned-unit-sprite"
             />
           )}
-          <span className={attrClass}>
-            <span className="bold">{unit.name}</span> joined to the team.{' '}
-            <span className="bold">{unit.name}</span> {getEnterBattlefieldText(unit.level)}
-          </span>
+          {/* 入隊句由 ActionLine 渲染（who＝名稱、message＝入隊文案），
+              後綴 children 接續 EnterMessage 的入場句（單一事實來源）。
+              The join clause is rendered by ActionLine (who = name, message = join copy);
+              the follow-up enter clause comes from EnterMessage (single source of truth). */}
+          <ActionLine who={unit.name} message="joined to the team." className={attrClass}>
+            <br />
+            <EnterMessage
+              action={{ ...action, type: EnumActionType.Enter, source: unit.name, level: unit.level }}
+            />
+          </ActionLine>
         </div>
       ))}
     </>
