@@ -35,7 +35,7 @@ import {
 } from '#/components/battle/computeSpritePositions';
 import { getSpriteImageSize } from '#/components/battle/spriteImageSizes';
 import { SPRITE_CORPSE_URL } from '#/components/battle/battleUtils';
-import { ITSPickExtra } from 'ts-type';
+import type { IStylePropsRequired } from '#/components/shared/types';
 import './BattleCorpsePolicy.css';
 
 /**
@@ -79,14 +79,16 @@ const DEFAULT_CORPSE_ASSET = SPRITE_CORPSE_URL.split('/').pop() ?? SPRITE_CORPSE
  * 物件規格的三個控制項（任一層級選 custom 時，以此組成 ICorpseSpec）
  * The three controls behind the object spec (used to build ICorpseSpec whenever a level
  * is set to `custom`)
+ *
+ * 控制項的 className / style 一律由 Storybook Controls 給值，故以 IStylePropsRequired
+ * （底層為 ITSPickExtra）把這兩欄升級為必填，其餘與樣式無關的欄位仍補在本介面。
+ * The controls always receive a className / style from the Storybook Controls, so
+ * IStylePropsRequired (backed by ITSPickExtra) promotes those two to required while the
+ * non-style fields stay declared in this interface.
  */
-interface ICorpseSpecControls {
+interface ICorpseSpecControls extends IStylePropsRequired<'className' | 'style'> {
 	/** 屍體圖路徑（空白＝自動）/ corpse image path (blank = auto) */
 	imageUrl: string;
-	/** 附加 CSS class（空白＝無）/ extra CSS class (blank = none) */
-	className: string;
-	/** inline style（空物件＝無）/ inline style (empty object = none) */
-	style: CSSProperties;
 }
 
 /**

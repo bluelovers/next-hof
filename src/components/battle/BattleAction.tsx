@@ -10,7 +10,7 @@ import type { IBattleAction, IValueChangeRecord } from './types';
 import './BattleAction.css';
 import '#/components/shared/SharedBase.css';
 import { SkillIcon } from '#/components/shared/SkillIcon';
-import type { IStyleProps } from '#/components/shared/types';
+import type { IStyleProps, IStylePropsRequired, ITSRequiredWith2 } from '#/components/shared/types';
 import { CharacterSprite } from '#/components/characters/CharacterSprite';
 import { EnumSpriteVariant, EnumMagicCircleKind } from './enums';
 import { EnumActionType } from './enums';
@@ -24,6 +24,7 @@ import {
   splitNamedMessage,
   buildChargeMessage,
 } from './battleUtils';
+import type { ITSRequiredWith } from 'ts-type';
 
 /** 戰鬥行動屬性 / Battle action props */
 export interface IBattleActionProps {
@@ -131,6 +132,17 @@ const SkillMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
   </div>
 );
 
+/** 行動訊息行 props（樣式欄位繼承自 IStyleProps）/ Action line props (style fields inherited from IStyleProps) */
+interface IActionLineProps extends IStyleProps {
+  preMessage?: React.ReactNode;
+  /** 加粗主詞（名稱等）/ Bold subject (name, etc.) */
+  who?: React.ReactNode;
+  /** 訊息內容（字串或任意合法節點）/ Message content (string or any valid node) */
+  message: React.ReactNode;
+  /** 訊息之後的後綴內容 / Suffix rendered after the message */
+  children?: React.ReactNode;
+}
+
 /**
  * 行動訊息行（單一事實來源）
  * Action log line (single source of truth)
@@ -142,21 +154,25 @@ const SkillMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
  * summon-join clause and similar lines share one shape; `message` accepts any valid node
  * (string or DOM/component) and `children` appends after the message (e.g. an enter clause).
  */
-const ActionLine: React.FC<
-  IStyleProps & {
-    /** 加粗主詞（名稱等）/ Bold subject (name, etc.) */
-    who: React.ReactNode;
-    /** 訊息內容（字串或任意合法節點）/ Message content (string or any valid node) */
-    message: React.ReactNode;
-    /** 訊息之後的後綴內容 / Suffix rendered after the message */
-    children?: React.ReactNode;
-  }
-> = ({ who, message, className, style, children }) => (
-  <span className={className} style={style}>
-    <span className="bold">{who}</span> {message}
-    {children ?? null}
-  </span>
-);
+export function ActionLine<R extends keyof IActionLineProps = never>(
+  props: ITSRequiredWith2<IActionLineProps, R>
+) {
+  const { preMessage, who, message, className, style, children } = props as IActionLineProps;
+
+  return (
+    <span className={className} style={style}>
+      {who != null ? (
+        <>
+          {preMessage ?? null}
+          <span className="bold">{who}</span>
+          {' '}
+        </>
+      ) : null}
+      {message}
+      {children ?? null}
+    </span>
+  );
+}
 
 /**
  * 召喚訊息（單一事實來源）
@@ -238,6 +254,11 @@ const MagicCircleMessage: React.FC<{ action: IBattleAction }> = ({ action }) => 
   );
 };
 
+/** 通用「粗體名稱 ＋ 其後文字」版面 props（樣式欄位繼承自 IStyleProps）/ Shared layout props (style fields inherited from IStyleProps) */
+interface INamedMessageProps extends IStyleProps {
+  action: IBattleAction;
+}
+
 /**
  * 通用「粗體名稱 ＋ 其後文字」版面（單一事實來源）
  * Shared "bold name + trailing text" layout (single source of truth)
@@ -247,7 +268,7 @@ const MagicCircleMessage: React.FC<{ action: IBattleAction }> = ({ action }) => 
  * splitNamedMessage recovers the name and the text from `message`, and battleUtils'
  * builders always produce the copy, so each family component only has to pick a colour.
  */
-const NamedMessage: React.FC<{ action: IBattleAction } & IStyleProps> = ({ action, className, style }) => {
+const NamedMessage: React.FC<INamedMessageProps> = ({ action, className, style }) => {
   const { name, text } = splitNamedMessage(action);
   return (
     <span className={className} style={style}>
@@ -258,6 +279,12 @@ const NamedMessage: React.FC<{ action: IBattleAction } & IStyleProps> = ({ actio
     </span>
   );
 };
+
+/** 「粗體名稱 ＋ 文字 ＋ 粗體數值 ＋ 單位」版面 props（樣式欄位繼承自 IStyleProps）/ Named-value layout props (style fields inherited from IStyleProps) */
+interface INamedValueMessageProps extends IStyleProps {
+  action: IBattleAction;
+  text: string;
+}
 
 /**
  * 「粗體名稱 ＋ 文字 ＋ 粗體數值 ＋ 單位」版面（Recovered／Heal／Auto Regenerate）
@@ -274,7 +301,7 @@ const NamedMessage: React.FC<{ action: IBattleAction } & IStyleProps> = ({ actio
  * 缺少 value 時退回 NamedMessage（直接輸出 message，保證文案不丟失）。
  * Falls back to NamedMessage when `value` is absent so the copy is never dropped.
  */
-const NamedValueMessage: React.FC<{ action: IBattleAction; text: string } & IStyleProps> = ({
+const NamedValueMessage: React.FC<INamedValueMessageProps> = ({
   action,
   className,
   style,
@@ -645,15 +672,20 @@ const ProtectMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
 };
 
 /**
+ * 蓄力/倒下/預設訊息 props（className 必填、style 選填，見 IStylePropsRequired）
+ * Status message props (className required, style optional; see IStylePropsRequired)
+ */
+interface IStatusMessageProps extends IStylePropsRequired<'className'> {
+  action: IBattleAction;
+  suffix: string;
+}
+
+/**
  * 蓄力/倒下/預設訊息（單一事實來源）
  * Casting/down/default message (single source of truth)
  */
-const StatusMessage: React.FC<{
-  action: IBattleAction;
-  className: string;
-  suffix: string;
-}> = ({ action, className, suffix }) => (
-  <span className={className}>
+const StatusMessage: React.FC<IStatusMessageProps> = ({ action, className, suffix, style }) => (
+  <span className={className} style={style}>
     <span className="bold">{action.source}</span> {suffix}
   </span>
 );
