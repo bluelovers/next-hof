@@ -60,7 +60,7 @@ export const DamageDealt: Story = {
       source: 'GoblinWarrior(B)',
       target: 'Hero1',
       value: 182,
-      valueChange: '349 > 167',
+      valueChangeText: '349 > 167',
       message: '182 Damage to Hero1(349 > 167)',
       attribute: 'dmg',
     },
@@ -142,7 +142,7 @@ export const HealAction: Story = {
       source: 'Priest1',
       target: 'Hero1',
       value: 120,
-      valueChange: '1 > 121',
+      valueChangeText: '1 > 121',
       message: '120 Heal to Hero1(1 > 121)',
       attribute: 'recover',
     },
@@ -155,9 +155,9 @@ export const LogSequence: Story = {
     <div>
       <BattleAction action={{ type: 'skill', source: 'GoblinWarrior(B)', skill: { name: 'FatalStab', iconUrl: '/image/icon/skill/skill_074z.png' }, message: 'GoblinWarrior(B) FatalStab', attribute: 'dmg' } as IBattleAction} />
       <BattleAction action={{ type: 'protect', source: 'Hero1', target: 'Priest1', message: 'Hero1 protected Priest1!', attribute: 'support' } as IBattleAction} />
-      <BattleAction action={{ type: 'damage', source: 'GoblinWarrior(B)', target: 'Hero1', value: 182, valueChange: '349 > 167', message: '182 Damage to Hero1(349 > 167)', attribute: 'dmg' } as IBattleAction} />
+      <BattleAction action={{ type: 'damage', source: 'GoblinWarrior(B)', target: 'Hero1', value: 182, valueChangeText: '349 > 167', message: '182 Damage to Hero1(349 > 167)', attribute: 'dmg' } as IBattleAction} />
       <BattleAction action={{ type: 'attack', source: 'GoblinAxe', skill: { name: 'Attack', iconUrl: '/image/icon/skill/skill_042.png' }, message: 'GoblinAxe Attack', attribute: 'dmg' } as IBattleAction} />
-      <BattleAction action={{ type: 'damage', source: 'GoblinAxe', target: 'Healer1', value: 44, valueChange: '213 > 169', message: '44 Damage to Healer1(213 > 169)', attribute: 'dmg' } as IBattleAction} />
+      <BattleAction action={{ type: 'damage', source: 'GoblinAxe', target: 'Healer1', value: 44, valueChangeText: '213 > 169', message: '44 Damage to Healer1(213 > 169)', attribute: 'dmg' } as IBattleAction} />
     </div>
   ),
 };

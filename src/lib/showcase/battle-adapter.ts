@@ -34,12 +34,12 @@ import type {
 } from '#/components/battle/types';
 import {
 	buildActMessage,
-	buildChargeMessage,
+	buildActionMessage,
+	buildChargeText,
 	buildDamageMessage,
 	buildDownMessage,
 	buildHealMessage,
 	buildMagicCircleMessage,
-	buildNamedMessage,
 	buildProtectMessage,
 	buildSummonMessage,
 	buildValueChangeText,
@@ -386,10 +386,10 @@ export type IEventMapper = (ev: IBattleEvent, ctx: IEventContext) => IBattleActi
  * 轉接器填寫的欄位：type 必填，其餘覆寫 composeAction 的預設值
  * Fields a mapper fills: type is required, the rest override composeAction's defaults
  *
- * 「粗體名稱 ＋ 其後文字」版面只要給 `text`，message 由 composeAction 以 buildNamedMessage
- * 合併一次（純文字鏡像）；其餘版面直接給 message。
- * The "bold name + trailing text" layout only needs `text` — composeAction joins it into
- * `message` once through buildNamedMessage (a plain-text mirror); every other layout supplies
+ * 「粗體主詞 ＋ 其後文案」版面只要給 `text`，message 由 composeAction 交給唯一合併點
+ * buildActionMessage 合併一次（純文字鏡像）；其餘版面直接給 message。
+ * The "bold subject + trailing copy" layout only needs `text` — composeAction hands it to the
+ * single join point buildActionMessage once (a plain-text mirror); every other layout supplies
  * `message` itself.
  */
 export type IActionFields = Pick<IBattleAction, 'type'> & Partial<IBattleAction>;
@@ -403,10 +403,10 @@ export type IActionFields = Pick<IBattleAction, 'type'> & Partial<IBattleAction>
  * source / target / side / skill come from the context and attribute defaults to Normal; a mapper
  * only states what differs, so a new type can never drop the side or the skill name.
  *
- * `text` 與 `message` 的關係只在此處定義一次：給 text 時以 buildNamedMessage 合併出
+ * `text` 與 `message` 的關係只在此處定義一次：交由唯一合併點 buildActionMessage 產出
  * 純文字鏡像 message，兩者由同一份輸入得出，不會各自漂移。
- * The `text` / `message` relationship is defined exactly once here: when `text` is given,
- * buildNamedMessage produces the plain-text mirror `message`, and both come from the same input
+ * The `text` / `message` relationship is defined exactly once here: the single join point
+ * buildActionMessage produces the plain-text mirror `message`, and both come from the same input
  * so they cannot drift apart.
  *
  * @param ctx - 轉接上下文 / adapter context
@@ -417,9 +417,7 @@ export function composeAction(ctx: IEventContext, fields: IActionFields): IBattl
 	const source = fields.source ?? ctx.actor.name;
 	// 給 text 時在此合併一次；渲染端只讀 source／text，不會再切割 message
 	// Joined here once when `text` is given; renderers read source / text and never slice message
-	const message =
-		fields.message ??
-		(fields.text !== undefined ? buildNamedMessage(source, fields.text) : '');
+	const message = buildActionMessage({ source, text: fields.text, message: fields.message });
 	const base: IBattleAction = {
 		type: fields.type,
 		message,
@@ -449,7 +447,7 @@ const mapCast: IEventMapper = (_ev, ctx) => {
 	const castType = chargeKindOf(ctx.skillDef);
 	return composeAction(ctx, {
 		type: EnumActionType.Casting,
-		message: buildChargeMessage(castType),
+		text: buildChargeText(castType),
 		attribute: EnumAttributeType.Charge,
 		castType,
 	});
@@ -465,18 +463,18 @@ const mapCast: IEventMapper = (_ev, ctx) => {
 const mapCharge: IEventMapper = (_ev, ctx) =>
 	composeAction(ctx, {
 		type: EnumActionType.Casting,
-		message: buildChargeMessage(EnumChargeKind.Charging),
+		text: buildChargeText(EnumChargeKind.Charging),
 		attribute: EnumAttributeType.Charge,
 		castType: EnumChargeKind.Charging,
 	});
 
-/** Damage → 傷害（valueChange＝`前 > 後`；無 hp 資訊時退回 `by 攻擊者`）/ Damage (valueChange = `before > after`; `by attacker` without hp info) */
+/** Damage → 傷害（valueChangeText＝`前 > 後`；無 hp 資訊時退回 `by 攻擊者`）/ Damage (valueChangeText = `before > after`; `by attacker` without hp info) */
 const mapDamage: IEventMapper = (ev, ctx) => {
 	const value = ev.value ?? 0;
 	return composeAction(ctx, {
 		type: EnumActionType.Damage,
 		value,
-		valueChange:
+		valueChangeText:
 			buildValueChangeText({ from: ev.hpBefore, to: ev.hpAfter }) ??
 			(ctx.actor.name ? `by ${ctx.actor.name}` : undefined),
 		message: buildDamageMessage(value, ctx.target.name),
@@ -486,14 +484,14 @@ const mapDamage: IEventMapper = (ev, ctx) => {
 	});
 };
 
-/** Heal → 回復（valueChange＝`前 > 後`、固定 HP 單位）/ Heal (valueChange = `before > after`, HP unit) */
+/** Heal → 回復（valueChangeText＝`前 > 後`、固定 HP 單位）/ Heal (valueChangeText = `before > after`, HP unit) */
 const mapHeal: IEventMapper = (ev, ctx) => {
 	const value = ev.value ?? 0;
 	return composeAction(ctx, {
 		type: EnumActionType.Heal,
 		value,
 		valueUnit: 'HP',
-		valueChange: buildValueChangeText({ from: ev.hpBefore, to: ev.hpAfter }),
+		valueChangeText: buildValueChangeText({ from: ev.hpBefore, to: ev.hpAfter }),
 		message: buildHealMessage(value, ctx.target.name),
 		attribute: EnumAttributeType.Recover,
 		hpBefore: ev.hpBefore,

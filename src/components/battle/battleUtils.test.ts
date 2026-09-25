@@ -10,21 +10,23 @@ import {
 	resolveSegmentSprites,
 	SPRITE_CORPSE_URL,
 	SPRITE_CORPSE_URL_REV,
-	buildNamedMessage,
-	buildPossessiveMessage,
+	buildActionMessage,
+	buildPossessiveText,
 	getNamedCopy,
 	isProtectingGuard,
-	buildChargeMessage,
-	buildDelayMessage,
+	buildChargeText,
+	buildDelayText,
 	buildSpDamageMessage,
-	buildStatChangeMessage,
-	buildStatToMessage,
+	buildStatChangeText,
+	buildStatToText,
 	buildActMessage,
 	buildDamageMessage,
 	buildHealMessage,
 	buildProtectMessage,
 	buildDownMessage,
 	buildSummonMessage,
+	buildItemDropMessage,
+	buildFailMessage,
 	buildValueChangeText,
 	getMessageClass,
 } from './battleUtils';
@@ -313,18 +315,31 @@ describe('resolveSegmentSprites', () => {
 });
 
 describe('原始日誌文案與配色 / original log copy and colours', () => {
-	it('buildNamedMessage is the single join point for name and text', () => {
-		expect(buildNamedMessage('Hero1', 'got barriered!')).toBe('Hero1 got barriered!');
-		// 缺名稱時整段即文字（名稱不加粗，也不會印出 undefined）
-		// Without a name the whole string is the text (no bold name, and no `undefined` printed)
-		expect(buildNamedMessage(undefined, 'got barriered!')).toBe('got barriered!');
-		expect(buildNamedMessage('', 'got barriered!')).toBe('got barriered!');
-		// 所有格屬同類版面：名稱與 `'s` 之間不空格
-		// The possessive is the same family: no space between the name and `'s`
-		expect(buildPossessiveMessage('GoblinAxe', 'poison has cured.')).toBe(
-			"GoblinAxe's poison has cured.",
+	it('buildActionMessage is the single join point for subject and copy', () => {
+		expect(buildActionMessage({ source: 'Hero1', text: 'got barriered!' })).toBe(
+			'Hero1 got barriered!',
 		);
-		expect(buildPossessiveMessage(undefined, 'poison has cured.')).toBe('poison has cured.');
+		// 缺名稱時整段即文案（名稱不加粗，也不會印出 undefined）
+		// Without a name the whole string is the copy (no bold name, and no `undefined` printed)
+		expect(buildActionMessage({ text: 'got barriered!' })).toBe('got barriered!');
+		expect(buildActionMessage({ source: '', text: 'got barriered!' })).toBe('got barriered!');
+		// 沒有任何輸入時給空字串；只給名稱時鏡像即名稱本身
+		// No input at all yields an empty string; with only a subject the mirror is the subject
+		expect(buildActionMessage({})).toBe('');
+		expect(buildActionMessage({ source: 'Hero1' })).toBe('Hero1');
+		// 已是整行的 message 優先，完全跳過合併
+		// A pre-assembled `message` wins and skips the join entirely
+		expect(buildActionMessage({ source: 'Hero1', text: 'down.', message: 'Someone down.' })).toBe(
+			'Someone down.',
+		);
+		// 所有格片段（`'s …`）直接接續名稱，不插入空格
+		// A possessive fragment (`'s …`) attaches straight to the subject with no space
+		expect(
+			buildActionMessage({ source: 'GoblinAxe', text: buildPossessiveText('poison has cured.') }),
+		).toBe("GoblinAxe's poison has cured.");
+		expect(buildActionMessage({ text: buildPossessiveText('poison has cured.') })).toBe(
+			"'s poison has cured.",
+		);
 	});
 
 	it('getNamedCopy reads the structured parts instead of slicing the message', () => {
@@ -335,18 +350,21 @@ describe('原始日誌文案與配色 / original log copy and colours', () => {
 			getNamedCopy({
 				source: 'Hero1',
 				text: 'got barriered!',
-				message: buildNamedMessage('Hero1', 'got barriered!'),
+				message: buildActionMessage({ source: 'Hero1', text: 'got barriered!' }),
 			}),
-		).toEqual({ name: 'Hero1', text: 'got barriered!' });
-		// 所有格文案同樣以結構化欄位保存（`'s` 屬於名稱之後的文字）
-		// The possessive copy is stored the same way (`'s` belongs to the text after the name)
+		).toEqual({ subject: 'Hero1', text: 'got barriered!' });
+		// 所有格文案同樣以結構化欄位保存（`'s` 屬於名稱之後的文案）
+		// The possessive copy is stored the same way (`'s` belongs to the copy after the name)
 		expect(
 			getNamedCopy({
 				source: 'GoblinAxe',
-				text: "'s poison has cured.",
-				message: buildPossessiveMessage('GoblinAxe', 'poison has cured.'),
+				text: buildPossessiveText('poison has cured.'),
+				message: buildActionMessage({
+					source: 'GoblinAxe',
+					text: buildPossessiveText('poison has cured.'),
+				}),
 			}),
-		).toEqual({ name: 'GoblinAxe', text: "'s poison has cured." });
+		).toEqual({ subject: 'GoblinAxe', text: "'s poison has cured." });
 	});
 
 	it('getNamedCopy falls back to the whole line when no text is supplied', () => {
@@ -374,10 +392,15 @@ describe('原始日誌文案與配色 / original log copy and colours', () => {
 		);
 	});
 
-	it('buildChargeMessage picks the copy from the charge kind', () => {
-		expect(buildChargeMessage(EnumChargeKind.Charging)).toBe('start charging.');
-		expect(buildChargeMessage(EnumChargeKind.Casting)).toBe('start casting.');
-		expect(buildChargeMessage()).toBe('start casting.');
+	it('buildChargeText picks the copy from the charge kind', () => {
+		expect(buildChargeText(EnumChargeKind.Charging)).toBe('start charging.');
+		expect(buildChargeText(EnumChargeKind.Casting)).toBe('start casting.');
+		expect(buildChargeText()).toBe('start casting.');
+		// 片段本身不含名稱，整行由唯一合併點接出
+		// The fragment carries no name; the whole line comes from the single join point
+		expect(buildActionMessage({ source: 'Mage1', text: buildChargeText() })).toBe(
+			'Mage1 start casting.',
+		);
 	});
 
 	it('buildSpDamageMessage keeps the original no-space wording', () => {
@@ -385,29 +408,33 @@ describe('原始日誌文案與配色 / original log copy and colours', () => {
 		expect(buildSpDamageMessage(120)).toBe('120SP Damage');
 	});
 
-	it('buildStatChangeMessage covers rise, down and the maximum wording', () => {
-		expect(buildStatChangeMessage('Hero1', 'STR', 'rise', 10)).toBe('Hero1 STR rise 10%');
-		expect(buildStatChangeMessage('Hero1', 'ATK', 'down', 15)).toBe('Hero1 ATK down 15%');
-		expect(buildStatChangeMessage('Hero1', 'ATK', 'rise', 100, '%', true)).toBe(
-			'Hero1 ATK rise to the maximum(100%)',
+	it('buildStatChangeText covers rise, down and the maximum wording', () => {
+		expect(buildStatChangeText('STR', 'rise', 10)).toBe('STR rise 10%');
+		expect(buildStatChangeText('ATK', 'down', 15)).toBe('ATK down 15%');
+		expect(buildStatChangeText('ATK', 'rise', 100, '%', true)).toBe(
+			'ATK rise to the maximum(100%)',
 		);
-		expect(buildStatToMessage('Hero1', 'MAXHP', 'extended', 999)).toBe(
-			'Hero1 MAXHP extended to 999',
-		);
-		expect(buildStatToMessage('Hero1', 'MAXHP', 'extended', 999, 500)).toBe(
-			'Hero1 MAXHP(500) extended to 999',
+		expect(buildStatToText('MAXHP', 'extended', 999)).toBe('MAXHP extended to 999');
+		expect(buildStatToText('MAXHP', 'extended', 999, 500)).toBe('MAXHP(500) extended to 999');
+		// 片段不含名稱：整行一律交給唯一合併點
+		// The fragments carry no name: whole lines always come from the single join point
+		expect(buildActionMessage({ source: 'Hero1', text: buildStatChangeText('STR', 'rise', 10) })).toBe(
+			'Hero1 STR rise 10%',
 		);
 	});
 
-	it('buildDelayMessage mirrors the DelayByRate parentheses', () => {
-		expect(buildDelayMessage('GoblinAxe', 15, 25, 100)).toBe('GoblinAxe Delayed(15 >>> 25/100)');
+	it('buildDelayText mirrors the DelayByRate parentheses', () => {
+		expect(buildDelayText(15, 25, 100)).toBe('Delayed(15 >>> 25/100)');
+		expect(buildActionMessage({ source: 'GoblinAxe', text: buildDelayText(15, 25, 100) })).toBe(
+			'GoblinAxe Delayed(15 >>> 25/100)',
+		);
 	});
 
-	it('buildValueChangeText prefers the pre-assembled copy, then the from/to pair', () => {
+	it('buildValueChangeText prefers the pre-assembled string, then the from/to pair', () => {
 		// 預組字串優先（例如轉接層產出的 `200 > 158`）
-		// The pre-assembled copy wins (such as the adapter's `200 > 158`)
-		expect(buildValueChangeText({ valueChange: '200 > 158' })).toBe('200 > 158');
-		expect(buildValueChangeText({ valueChange: '200 > 158', from: 1, to: 2 })).toBe('200 > 158');
+		// The pre-assembled string wins (such as the adapter's `200 > 158`)
+		expect(buildValueChangeText({ valueChangeText: '200 > 158' })).toBe('200 > 158');
+		expect(buildValueChangeText({ valueChangeText: '200 > 158', from: 1, to: 2 })).toBe('200 > 158');
 		// 沒有預組字串時以 from/to 組出 `from > to`
 		// Without a pre-assembled copy the `from > to` pair is built
 		expect(buildValueChangeText({ from: 200, to: 158 })).toBe('200 > 158');
@@ -455,8 +482,8 @@ describe('事件家族的原始日誌文案 / original log copy per event family
 	it('buildActMessage joins caster and skill, or the caster alone', () => {
 		expect(buildActMessage('Warrior', 'Fireball')).toBe('Warrior Fireball');
 		expect(buildActMessage('Warrior')).toBe('Warrior');
-		// 缺施放者時沿用 buildNamedMessage，不把 undefined 印進日誌
-		// Without a caster buildNamedMessage takes over so `undefined` never reaches the log
+		// 缺施放者時由唯一合併點接手，不把 undefined 印進日誌
+		// Without a caster the single join point takes over so `undefined` never reaches the log
 		expect(buildActMessage(undefined, 'Fireball')).toBe('Fireball');
 		expect(buildActMessage(undefined)).toBe('');
 	});
@@ -466,9 +493,22 @@ describe('事件家族的原始日誌文案 / original log copy per event family
 		expect(buildDamageMessage(42)).toBe('42 Damage');
 	});
 
-	it('buildHealMessage shares buildRecoveredMessage wording and keeps the `N Heal` fallback', () => {
+	it('buildHealMessage shares buildRecoveredText wording and keeps the `N Heal` fallback', () => {
 		expect(buildHealMessage(30, 'Warrior')).toBe('Warrior Recovered 30 HP');
 		expect(buildHealMessage(30)).toBe('30 Heal');
+	});
+
+	it('buildItemDropMessage and buildFailMessage keep the item and reason out of `message`', () => {
+		// 道具名與失敗原因各有自己的結構化欄位，message 永遠只是整行鏡像
+		// The item name and the failure reason each have their own structured field, so `message`
+		// stays a whole-line mirror
+		expect(buildItemDropMessage('Warrior', 'Magic Scroll')).toBe('Warrior dropped Magic Scroll.');
+		expect(buildItemDropMessage(undefined, 'Magic Scroll')).toBe('Magic Scroll.');
+		expect(buildFailMessage('GoblinAxe', 'FatalStab', '(Weapon type doesnt match)')).toBe(
+			'GoblinAxe Failed FatalStab (Weapon type doesnt match)',
+		);
+		expect(buildFailMessage('GoblinAxe', 'FatalStab')).toBe('GoblinAxe Failed FatalStab');
+		expect(buildFailMessage(undefined)).toBe('Failed');
 	});
 
 	it('buildProtectMessage separates guarding someone else from blocking alone', () => {

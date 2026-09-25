@@ -275,8 +275,17 @@ export interface IBattleAction {
 	skill?: ISkillIcon;
 	/** 數值 / Value */
 	value?: number;
-	/** 數值變化的前後描述 / Value change description */
-	valueChange?: string;
+	/**
+	 * 預組好的數值變化字串（`349 > 167`；與結構化清單 valueChanges 對舉）
+	 * Pre-assembled value-change string (`349 > 167`; the counterpart of the structured
+	 * `valueChanges` list)
+	 *
+	 * 兩者刻意不同名：單數＝一段預組文字、複數＝ IValueChangeRecord 清單，
+	 * 避免只差一個 s 卻是完全不同的型別。
+	 * Deliberately distinct names: the singular is one pre-assembled string while the plural is
+	 * an IValueChangeRecord list, so a single letter does not hide a completely different type.
+	 */
+	valueChangeText?: string;
 	/** 多重數值變化（Drain 等「who(n1->n2)」場景；who 缺省時只印括號）/ Multi value changes (Drain's "who(n1->n2)"; parentheses only when who is absent) */
 	valueChanges?: IValueChangeRecord[];
 	/**
@@ -285,28 +294,40 @@ export interface IBattleAction {
 	 */
 	valueUnit?: string;
 	/**
-	 * 名稱之前的裝飾前綴（如 Auto Regenerate 行首的 `* `）
-	 * Decorative prefix before the name (such as the leading `* ` of an Auto Regenerate line)
-	 */
-	prefix?: string;
-	/**
-	 * 訊息文字（純文字鏡像：供測試、無障礙與非互動消費端讀取）
-	 * Message text (plain-text mirror: for tests, accessibility and non-interactive consumers)
+	 * 整行最前方的前綴（如 Auto Regenerate 行首的 `* `）
+	 * Prefix at the very head of the line (such as the leading `* ` of an Auto Regenerate line)
 	 *
-	 * 「粗體名稱 ＋ 其後文字」版面的 message 由組裝點以 buildNamedMessage 合併一次，
+	 * 資料欄位與版面 props 同名（ActionLine.linePrefix），一個概念只有一個名字。
+	 * The data field and the layout prop share one name (ActionLine.linePrefix): one concept,
+	 * one name.
+	 */
+	linePrefix?: string;
+	/**
+	 * 整行純文字鏡像（一律是「整條日誌列印出來的樣子」）
+	 * Plain-text mirror of the whole line (always exactly what the whole log line prints)
+	 *
+	 * 統一語意：不論哪個族系，message 永遠代表整行；因此 ItemDrop 的道具名放在
+	 * itemName、Fail 的原因放在 failReason，不再借用 message 三種意思。
+	 * Uniform meaning: for every family `message` is the whole line, so an ItemDrop item name
+	 * lives in `itemName` and a Fail reason in `failReason` — `message` no longer carries three
+	 * different meanings.
+	 *
+	 * 「粗體名稱 ＋ 其後文字」版面的 message 由唯一合併點 buildActionMessage 產出；
 	 * 渲染端一律改讀結構化的 source／text，不會再把此字串切割還原。
-	 * The copy of the "bold name + trailing text" layout is joined exactly once at assembly by
-	 * buildNamedMessage; renderers read the structured source / text instead and never slice this
-	 * string back apart.
+	 * For the "bold name + trailing text" layout the mirror comes from the single join point
+	 * buildActionMessage; renderers read the structured source / text instead and never slice
+	 * this string back apart.
 	 */
 	message: string;
 	/**
 	 * 粗體名稱之後的文字（與 source 組成結構化版面，取代「組字串 → 再切割」）
 	 * Text after the bold name (structured layout that replaces "join a string → slice it back")
 	 *
-	 * 產生端直接存入這兩段，NamedMessage／RegenMessage 直接輸出，無需任何字串手術。
-	 * The producer stores both parts and NamedMessage / RegenMessage emit them directly, with no
-	 * string surgery at all.
+	 * 由 battleUtils 的 `buildXxxText` 建構器產生（命名慣例：`…Text`＝名稱之後的片段、
+	 * `…Message`＝整行），NamedMessage／RegenMessage 直接輸出，無需任何字串手術。
+	 * Produced by battleUtils' `buildXxxText` builders (naming rule: `…Text` = the fragment after
+	 * the name, `…Message` = the whole line); NamedMessage / RegenMessage emit it directly with
+	 * no string surgery at all.
 	 */
 	text?: string;
 	/** 隊伍側 (用於顯示在哪一欄) / Team side */
@@ -331,6 +352,17 @@ export interface IBattleAction {
 	emphasis?: string;
 	/** 掉落道具圖示 URL（type＝ItemDrop 時，置於「dropped」與道具名之間）/ Dropped-item icon URL (between "dropped" and the item name for ItemDrop) */
 	itemIconUrl?: string;
+	/**
+	 * 掉落的道具名（type＝ItemDrop；獨立成欄位，不再借用 message）
+	 * Dropped item name (type = ItemDrop; its own field instead of borrowing `message`)
+	 */
+	itemName?: string;
+	/**
+	 * 施放失敗的原因（type＝Fail；第二行的無樣式原因，不再借用 message）
+	 * Cast-failure reason (type = Fail; the unstyled reason on the second line instead of
+	 * borrowing `message`)
+	 */
+	failReason?: string;
 }
 
 /** 戰鬥結果 / Battle result */

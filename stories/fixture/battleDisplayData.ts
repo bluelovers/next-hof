@@ -4,13 +4,15 @@
  *
  * 故事檔只保留顯示開關與說明；展示資料全數集中於此，且每個事實只描述一次：
  * - 單位定義（IShowcaseUnit）派生狀態列單位、快照單位與戰場精靈座標
- * - 行動的 `message` 由欄位導出，不與 source / value / target 重複書寫
+ * - 行動文案只書寫一次：有粗體主詞的族系給 `text`（整行 `message` 由唯一合併點
+ *   buildActionMessage 補齊），其餘族系給 `message`；兩者不重複書寫 source / value / target
  * - 技能圖示、隊名、戰場設定、標題與時間皆為常數
  * The story file keeps only display toggles and docs; all showcase data lives here with
  * every fact stated once: unit definitions derive the status-row units, snapshot units and
- * battlefield sprite coordinates; each action's `message` is derived from its own fields
- * rather than restating them; skill icons, team names, the battlefield config and the
- * header are constants.
+ * battlefield sprite coordinates; an action's copy is written once — families with a bold
+ * subject supply `text` (the whole-line `message` is completed by the single join point
+ * buildActionMessage) and the rest supply `message`, so neither restates source / value /
+ * target; skill icons, team names, the battlefield config and the header are constants.
  *
  * 精靈座標與翻轉一律由 computeBattleSpritePositions 計算，禁止手工指定
  * （唯一例外：BattleFieldScene 系列及其 sampleData）。
@@ -43,20 +45,28 @@ import {
   EnumUnitStatus,
 } from '#/components/battle/enums';
 import {
-  buildAutoRegenMessage,
-  buildChargeMessage,
-  buildDelayMessage,
+  buildActionMessage,
+  buildActMessage,
+  buildAutoRegenText,
+  buildChargeText,
+  buildDamageMessage,
+  buildDelayText,
+  buildDownMessage,
   buildDrainMessage,
-  buildLevelUpMessage,
+  buildFailMessage,
+  buildItemDropMessage,
+  buildLevelUpText,
   buildMagicCircleMessage,
-  buildNamedMessage,
-  buildPossessiveMessage,
-  buildRecoveredMessage,
-  buildRegenMessage,
-  buildSacrificeMessage,
+  buildPossessiveText,
+  buildProtectMessage,
+  buildRecoveredText,
+  buildRegenText,
+  buildSacrificeText,
   buildSpDamageMessage,
-  buildStatChangeMessage,
-  buildStatToMessage,
+  buildStatChangeText,
+  buildStatToText,
+  buildSummonMessage,
+  getEnterBattlefieldText,
 } from '#/components/battle/battleUtils';
 import { EnumPosition } from '#/lib/game/constants';
 import { computeTeamHpStats, type ITeamHpUnit } from '#/lib/showcase/battle-adapter';
@@ -244,89 +254,117 @@ function logAvatarUrl(imageUrl: string): string {
   return imageUrl.replace('/image/char_rev/', '/image/char/');
 }
 
-// ==================== 行動建構器（message 由欄位導出）/ Action builders (message derived) ====================
+// ==================== 行動建構器（文案只書寫一次）/ Action builders (every copy written once) ====================
+
+/**
+ * 命名版面日誌（行＝粗體主詞 ＋ 其後文案）
+ * Named-layout log line (bold subject + the copy that follows)
+ *
+ * `text` 只描述名稱之後的文案，整行鏡像 `message` 交給唯一合併點 buildActionMessage
+ * 補齊一次——與 showcase 轉接層的 composeAction 走同一條規則，不存在「先組好字串、
+ * 渲染端再切回來」的多餘轉換。
+ * `text` describes only the copy after the subject, and the whole-line mirror `message` is filled
+ * in once by the single join point buildActionMessage — the same rule the showcase adapter's
+ * composeAction follows, so there is no "assemble a string just to slice it back" conversion.
+ *
+ * @param type - 行動型別 / action type
+ * @param unit - 行動單位（其 name 成為粗體主詞；缺省時整段即文案）/ acting unit (its name becomes the bold subject; without one the whole string is the copy)
+ * @param text - 名稱之後的文案（由 battleUtils 的 `…Text` 建構器產生）/ copy after the name (from battleUtils' `…Text` builders)
+ * @param side - 隊伍側 / team side
+ * @param extra - 型別專屬欄位（可用 message 覆寫合併結果）/ type-specific fields (`message` may override the joined result)
+ * @returns 日誌條目 / log entry
+ */
+function namedLogAction(
+  type: EnumActionType,
+  unit: IShowcaseUnit | undefined,
+  text: string,
+  side: EnumTeamSideUI,
+  extra: Partial<IBattleAction> = {}
+): IBattleAction {
+  const source = unit?.name;
+  const message = buildActionMessage({ source, text, message: extra.message });
+  return { type, source, text, side, ...extra, message };
+}
+
+/**
+ * 整行文案日誌（無粗體主詞結構：`message` 即整行純文字）
+ * Whole-line log action (no bold-subject structure: `message` *is* the whole plain line)
+ *
+ * 適用於原本就沒有「名稱 ＋ 文案」結構的族系（SP 傷害、吸取、純文字資訊、
+ * 掉落道具、施放失敗），文案由 battleUtils 的 `…Message` 建構器產生。
+ * For families that never had a "name + copy" structure (SP damage, drain, plain info, dropped
+ * item, failed cast); the copy comes from battleUtils' `…Message` builders.
+ *
+ * @param type - 行動型別 / action type
+ * @param unit - 行動單位（其 name 成為 source；缺省時無來源）/ acting unit (its name becomes the source; absent → no source)
+ * @param message - 整行純文字 / the whole plain line
+ * @param side - 隊伍側 / team side
+ * @param extra - 型別專屬欄位 / type-specific fields
+ * @returns 日誌條目 / log entry
+ */
+function logAction(
+  type: EnumActionType,
+  unit: IShowcaseUnit | undefined,
+  message: string,
+  side: EnumTeamSideUI,
+  extra: Partial<IBattleAction> = {}
+): IBattleAction {
+  return { type, source: unit?.name, message, side, ...extra };
+}
 
 function enterAction(unit: IShowcaseUnit): IBattleAction {
-  return {
-    type: EnumActionType.Enter,
-    source: unit.name,
+  return namedLogAction(EnumActionType.Enter, unit, getEnterBattlefieldText(unit.level), unit.side, {
     level: unit.level,
-    message: `${unit.name} Lv.${unit.level} enter the Battlefield.`,
-    side: unit.side,
     attribute: EnumAttributeType.Normal,
-  };
+  });
 }
 
-function skillAction(source: IShowcaseUnit, skill: ISkillIcon, side: EnumTeamSideUI): IBattleAction {
-  return {
-    type: EnumActionType.Skill,
-    source: source.name,
+function skillAction(unit: IShowcaseUnit, skill: ISkillIcon, side: EnumTeamSideUI): IBattleAction {
+  return logAction(EnumActionType.Skill, unit, buildActMessage(unit.name, skill.name), side, {
     skill,
-    message: `${source.name} ${skill.name}`,
-    side,
     attribute: EnumAttributeType.Dmg,
-  };
+  });
 }
 
-function attackAction(source: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction {
-  return {
-    type: EnumActionType.Attack,
-    source: source.name,
+function attackAction(unit: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction {
+  return logAction(EnumActionType.Attack, unit, buildActMessage(unit.name, SKILL_ATTACK.name), side, {
     skill: SKILL_ATTACK,
-    message: `${source.name} ${SKILL_ATTACK.name}`,
-    side,
     attribute: EnumAttributeType.Dmg,
-  };
+  });
 }
 
 function damageAction(
-  source: IShowcaseUnit,
-  target: IShowcaseUnit,
+  unit: IShowcaseUnit,
+  targetUnit: IShowcaseUnit,
   value: number,
-  valueChange: string,
+  valueChangeText: string,
   side: EnumTeamSideUI
 ): IBattleAction {
-  return {
-    type: EnumActionType.Damage,
-    source: source.name,
-    target: target.name,
+  return logAction(EnumActionType.Damage, unit, buildDamageMessage(value, targetUnit.name), side, {
+    target: targetUnit.name,
     value,
-    valueChange,
-    message: `${value} Damage to ${target.name}`,
-    side,
+    valueChangeText,
     attribute: EnumAttributeType.Dmg,
-  };
+  });
 }
 
-function protectAction(source: IShowcaseUnit, target: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction {
-  return {
-    type: EnumActionType.Protect,
-    source: source.name,
-    target: target.name,
-    message: `${source.name} protected ${target.name}!`,
-    side,
+function protectAction(unit: IShowcaseUnit, targetUnit: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction {
+  return logAction(EnumActionType.Protect, unit, buildProtectMessage(unit.name, targetUnit.name), side, {
+    target: targetUnit.name,
     attribute: EnumAttributeType.Support,
-  };
+  });
 }
 
-function castingAction(source: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction {
-  return {
-    type: EnumActionType.Casting,
-    source: source.name,
-    message: `${source.name} start casting.`,
-    side,
+function castingAction(unit: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction {
+  return namedLogAction(EnumActionType.Casting, unit, buildChargeText(), side, {
     attribute: EnumAttributeType.Charge,
-  };
+  });
 }
 
-function downAction(source: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction {
-  return {
-    type: EnumActionType.Down,
-    source: source.name,
-    message: `${source.name} down.`,
-    side,
+function downAction(unit: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction {
+  return logAction(EnumActionType.Down, unit, buildDownMessage(unit.name), side, {
     attribute: EnumAttributeType.Dmg,
-  };
+  });
 }
 
 /**
@@ -338,22 +376,18 @@ function downAction(source: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction 
  * decides the trailing " xN".
  */
 function magicCircleAction(
-  source: IShowcaseUnit,
+  unit: IShowcaseUnit,
   skill: ISkillIcon,
   kind: EnumMagicCircleKind,
   amount: number | undefined,
   side: EnumTeamSideUI
 ): IBattleAction {
   const magicCircle: IMagicCircleRecord = { kind, amount };
-  return {
-    type: EnumActionType.MagicCircle,
-    source: source.name,
+  return logAction(EnumActionType.MagicCircle, unit, buildMagicCircleMessage(unit.name, magicCircle), side, {
     skill,
     magicCircle,
-    message: buildMagicCircleMessage(source.name, magicCircle),
-    side,
     attribute: EnumAttributeType.Normal,
-  };
+  });
 }
 
 // ==================== 行動日誌 / Action logs ====================
@@ -409,19 +443,23 @@ const summonActions: IBattleAction[] = [
   enterAction(summonMage1),
   attackAction(summonGoblinAxe, EnumTeamSideUI.Left),
   damageAction(summonGoblinAxe, summonHero1, 148, '349 > 201', EnumTeamSideUI.Left),
-  {
-    type: EnumActionType.Summon,
-    source: summonMage1.name,
-    skill: SKILL_GRAVEYARD,
-    summoned: summonedUnits.map((unit) => ({
-      name: unit.name,
-      level: unit.level,
-      imageUrl: logAvatarUrl(unit.imageUrl),
-    })),
-    message: `${summonMage1.name} ${SKILL_GRAVEYARD.name}: ${summonedUnits[0].name} joined to the team.`,
-    side: EnumTeamSideUI.Right,
-    attribute: EnumAttributeType.Normal,
-  },
+  logAction(
+    EnumActionType.Summon,
+    summonMage1,
+    // 整行＝「施放者 技能」＋「首個召喚單位 joined to the team.」，兩段皆取自建構器
+    // The whole line is "caster skill" + "first summoned unit joined to the team.", both from builders
+    `${buildActMessage(summonMage1.name, SKILL_GRAVEYARD.name)}: ${buildSummonMessage(summonedUnits[0].name)}`,
+    EnumTeamSideUI.Right,
+    {
+      skill: SKILL_GRAVEYARD,
+      summoned: summonedUnits.map((unit) => ({
+        name: unit.name,
+        level: unit.level,
+        imageUrl: logAvatarUrl(unit.imageUrl),
+      })),
+      attribute: EnumAttributeType.Normal,
+    }
+  ),
   attackAction(summonedUnits[0], EnumTeamSideUI.Right),
   damageAction(summonedUnits[0], summonGoblinAxe, 89, '213 > 124', EnumTeamSideUI.Right),
 ];
@@ -463,42 +501,36 @@ const magicCircleActions: IBattleAction[] = [
 // ==================== 完整日誌訊息覆蓋 / Full log-message coverage ====================
 
 /**
- * 通用日誌行動（文案一律由 battleUtils 的建構器產生）
- * Generic log action (the copy always comes from the battleUtils builders)
- *
- * 型別決定版面與配色；只有要覆寫家族預設色時才傳 attribute，例如中毒解除在原始日誌
- * 沒有 span（Normal）、抗毒為 support。
- * The type decides the layout and the colour; `attribute` is passed only to override the
- * family default, e.g. a poison cure carries no span in the original log (Normal) while a
- * resist is support.
- */
-function logAction(
-  type: EnumActionType,
-  source: IShowcaseUnit | undefined,
-  message: string,
-  side: EnumTeamSideUI,
-  extra: Partial<IBattleAction> = {}
-): IBattleAction {
-  return { type, source: source?.name, message, side, ...extra };
-}
-
-/**
  * 完整日誌訊息覆蓋：原始日誌每一個訊息族系各示範一次
  * Full log-message coverage: one demonstration of every message family in the original log
  *
  * 對照 HOF/Class/Battle/Skill.php、HOF/Class/Skill/Effect.php 與 HOF/Class/Char/Battle/Effect.php
  * 的列印字串；配色由 battleUtils.getMessageClass 對應原始 basis.css 的 span class。
+ * 條目一律經兩個日誌建構器之一產出：有粗體主詞的族系走 namedLogAction（只給 `text`、
+ * 整行鏡像由唯一合併點補齊），沒有主詞結構的族系走 logAction（`message` 即整行）。
+ * 只有要覆寫家族預設色時才傳 attribute，例如中毒解除在原始日誌沒有 span（Normal）、
+ * 抗毒為 support。
  * Mirrors the printed strings of HOF/Class/Battle/Skill.php, HOF/Class/Skill/Effect.php and
  * HOF/Class/Char/Battle/Effect.php; battleUtils.getMessageClass maps each family to the span
- * class of the original basis.css.
+ * class of the original basis.css. Every entry comes out of one of two log builders:
+ * families with a bold subject use namedLogAction (only `text` is supplied, the whole-line
+ * mirror is filled in by the single join point) and families without one use logAction
+ * (`message` is the whole line). `attribute` is passed only to override the family default,
+ * e.g. a poison cure carries no span in the original log (Normal) while a resist is support.
  */
 const logMessagesActions: IBattleAction[] = [
   // ---- 蓄力開始（`start charging.`；文案由 castType 決定，不再硬編碼成 casting）----
   // Charge start (`start charging.`; the copy follows castType and is no longer hardcoded to casting)
-  logAction(EnumActionType.Casting, mage1, buildChargeMessage(EnumChargeKind.Charging), EnumTeamSideUI.Right, {
-    castType: EnumChargeKind.Charging,
-    attribute: EnumAttributeType.Charge,
-  }),
+  namedLogAction(
+    EnumActionType.Casting,
+    mage1,
+    buildChargeText(EnumChargeKind.Charging),
+    EnumTeamSideUI.Right,
+    {
+      castType: EnumChargeKind.Charging,
+      attribute: EnumAttributeType.Charge,
+    }
+  ),
 
   // ---- SP 傷害（`NSP Damage to target`，數值與 SP 之間無空格）----
   // SP damage (`NSP Damage to target`, no space between the value and "SP Damage")
@@ -512,16 +544,16 @@ const logMessagesActions: IBattleAction[] = [
 
   // ---- 回復 HP／SP（`name Recovered N HP`；HP→recover、SP→support）----
   // Recover HP / SP (`name Recovered N HP`; HP → recover, SP → support)
-  logAction(EnumActionType.Recover, healer1, buildRecoveredMessage(healer1.name, 84, 'HP'), EnumTeamSideUI.Left, {
+  namedLogAction(EnumActionType.Recover, healer1, buildRecoveredText(84, 'HP'), EnumTeamSideUI.Left, {
     value: 84,
     valueUnit: 'HP',
-    valueChange: '129 > 213',
+    valueChangeText: '129 > 213',
     attribute: EnumAttributeType.Recover,
   }),
-  logAction(EnumActionType.Recover, priest1, buildRecoveredMessage(priest1.name, 30, 'SP'), EnumTeamSideUI.Left, {
+  namedLogAction(EnumActionType.Recover, priest1, buildRecoveredText(30, 'SP'), EnumTeamSideUI.Left, {
     value: 30,
     valueUnit: 'SP',
-    valueChange: '60 > 90',
+    valueChangeText: '60 > 90',
     attribute: EnumAttributeType.Support,
   }),
 
@@ -556,41 +588,41 @@ const logMessagesActions: IBattleAction[] = [
 
   // ---- 持續回復（`gained SP regeneration +15%`）----
   // Regen (`gained SP regeneration +15%`)
-  logAction(
+  namedLogAction(
     EnumActionType.Regen,
     mage1,
-    buildRegenMessage(mage1.name, 'SP', 15),
+    buildRegenText('SP', 15),
     EnumTeamSideUI.Right,
     { valueUnit: 'SP', attribute: EnumAttributeType.Support }
   ),
 
   // ---- 自動回復（行首 `* `、數值加粗）/ Auto regenerate (leading `* `, bold value) ----
-  logAction(
+  namedLogAction(
     EnumActionType.Regen,
     hero1,
-    buildAutoRegenMessage(hero1.name, 'HP', 32),
+    buildAutoRegenText('HP', 32),
     EnumTeamSideUI.Left,
-    { value: 32, valueUnit: 'HP', prefix: '* ', attribute: EnumAttributeType.Recover }
+    { value: 32, valueUnit: 'HP', linePrefix: '* ', attribute: EnumAttributeType.Recover }
   ),
 
   // ---- 復活（`name <recover>revived</recover>!`；名稱預設色、只有 revived 上色）----
   // Revive (`name <recover>revived</recover>!`; the name keeps the default colour, only revived is coloured)
-  logAction(EnumActionType.Revive, hero1, 'revived!', EnumTeamSideUI.Right, {
+  namedLogAction(EnumActionType.Revive, hero1, 'revived!', EnumTeamSideUI.Right, {
     emphasis: 'revived',
     attribute: EnumAttributeType.Recover,
   }),
 
   // ---- 增益（quicked／casting shorted／barriered，support 色）----
   // Buff (quicked / casting shorted / barriered, support colour)
-  logAction(EnumActionType.Buff, mage1, buildNamedMessage(mage1.name, 'got barriered!'), EnumTeamSideUI.Right),
-  logAction(EnumActionType.Buff, hero1, buildNamedMessage(hero1.name, 'got quicked!'), EnumTeamSideUI.Right),
-  logAction(EnumActionType.Buff, mage1, buildNamedMessage(mage1.name, 'casting shorted!'), EnumTeamSideUI.Right),
+  namedLogAction(EnumActionType.Buff, mage1, 'got barriered!', EnumTeamSideUI.Right),
+  namedLogAction(EnumActionType.Buff, hero1, 'got quicked!', EnumTeamSideUI.Right),
+  namedLogAction(EnumActionType.Buff, mage1, 'casting shorted!', EnumTeamSideUI.Right),
 
   // ---- 減益（能力下降，原始日誌無 span）/ Debuff (stat down, no span in the original log) ----
-  logAction(
+  namedLogAction(
     EnumActionType.Debuff,
     goblinAxe,
-    buildNamedMessage(goblinAxe.name, 'STR down 10%'),
+    'STR down 10%',
     EnumTeamSideUI.Left
   ),
 
@@ -598,109 +630,112 @@ const logMessagesActions: IBattleAction[] = [
   // Poison: apply (spdmg) / per-turn damage (spdmg) / cure (no span) / resist (support)
   // ---- 中毒施加（`get <spdmg>poisoned</spdmg>!`；名稱預設色、只有 poisoned 上色）----
   // Poison apply (`get <spdmg>poisoned</spdmg>!`; the name keeps the default colour, only poisoned is coloured)
-  logAction(
+  namedLogAction(
     EnumActionType.Poison,
     goblinAxe,
     'get poisoned\u00a0!',
     EnumTeamSideUI.Left,
     { emphasis: 'poisoned', attribute: EnumAttributeType.Spdmg }
   ),
-  logAction(
+  namedLogAction(
     EnumActionType.Poison,
     goblinAxe,
-    buildNamedMessage(goblinAxe.name, 'got 12 damage by poison.'),
+    'got 12 damage by poison.',
     EnumTeamSideUI.Left,
-    { value: 12, valueChange: '1200 > 1050' }
+    { value: 12, valueChangeText: '1200 > 1050' }
   ),
-  logAction(
+  namedLogAction(
     EnumActionType.Poison,
     goblinAxe,
-    buildNamedMessage(goblinAxe.name, 'blocked poison.'),
-    EnumTeamSideUI.Left,
-    { attribute: EnumAttributeType.Normal }
-  ),
-  logAction(
-    EnumActionType.Poison,
-    goblinAxe,
-    buildPossessiveMessage(goblinAxe.name, 'poison has cured.'),
+    'blocked poison.',
     EnumTeamSideUI.Left,
     { attribute: EnumAttributeType.Normal }
   ),
-  logAction(
+  namedLogAction(
+    EnumActionType.Poison,
+    goblinAxe,
+    // 所有格片段由 buildPossessiveText 產出，整行鏡像仍由唯一合併點接出（不空格）
+    // The possessive fragment comes from buildPossessiveText and the mirror still from the single
+    // join point (no space)
+    buildPossessiveText('poison has cured.'),
+    EnumTeamSideUI.Left,
+    { attribute: EnumAttributeType.Normal }
+  ),
+  namedLogAction(
     EnumActionType.Poison,
     goblinWarriorA,
-    buildNamedMessage(goblinWarriorA.name, 'got PoisonResist!(50%)'),
+    'got PoisonResist!(50%)',
     EnumTeamSideUI.Left,
     { attribute: EnumAttributeType.Support }
   ),
   // ---- 自我中毒（無名稱、無 span；對照 5.4 `Got poisoned`）----
   // Self-poison (no name, no span; mirrors 5.4 `Got poisoned`)
-  logAction(EnumActionType.Poison, undefined, 'Got poisoned', EnumTeamSideUI.Left, {
+  namedLogAction(EnumActionType.Poison, undefined, 'Got poisoned', EnumTeamSideUI.Left, {
     attribute: EnumAttributeType.Normal,
   }),
 
   // ---- 屬性升降（`STR rise 10%`、上限升降，原始日誌無 span）----
   // Stat change (`STR rise 10%`, cap changes; no span in the original log)
-  logAction(
+  namedLogAction(
     EnumActionType.StatChange,
     hero1,
-    buildStatChangeMessage(hero1.name, 'STR', 'rise', 10),
+    buildStatChangeText('STR', 'rise', 10),
     EnumTeamSideUI.Right
   ),
-  logAction(
+  namedLogAction(
     EnumActionType.StatChange,
     hero1,
-    buildStatChangeMessage(hero1.name, 'ATK', 'rise', 100, '%', true),
+    buildStatChangeText('ATK', 'rise', 100, '%', true),
     EnumTeamSideUI.Right
   ),
-  logAction(
+  namedLogAction(
     EnumActionType.StatChange,
     mage1,
-    buildStatToMessage(mage1.name, 'MAXSP', 'extended', 400),
+    buildStatToText('MAXSP', 'extended', 400),
     EnumTeamSideUI.Right
   ),
-  logAction(
+  namedLogAction(
     EnumActionType.StatChange,
     goblinAxe,
-    buildStatToMessage(goblinAxe.name, 'MAXHP', 'down to', 150),
+    buildStatToText('MAXHP', 'down to', 150),
     EnumTeamSideUI.Left
   ),
 
   // ---- 位移（`moved to front.`、`moved to back.`、`knock backed!`、`goes forward.`）/ Movement ----
-  logAction(
+  namedLogAction(
     EnumActionType.Move,
     hero1,
-    buildNamedMessage(hero1.name, 'moved to front.'),
+    'moved to front.',
     EnumTeamSideUI.Right
   ),
-  logAction(
+  namedLogAction(
     EnumActionType.Move,
     goblinAxe,
-    buildNamedMessage(goblinAxe.name, 'moved to back.'),
+    'moved to back.',
     EnumTeamSideUI.Left
   ),
-  logAction(
+  namedLogAction(
     EnumActionType.Move,
     goblinAxe,
-    buildNamedMessage(goblinAxe.name, 'knock backed!'),
+    'knock backed!',
     EnumTeamSideUI.Left
   ),
-  logAction(
+  namedLogAction(
     EnumActionType.Move,
     goblinWarriorA,
-    buildNamedMessage(goblinWarriorA.name, 'goes forward.'),
+    'goes forward.',
     EnumTeamSideUI.Left
   ),
 
   // ---- 延遲（`name Delayed(15 >>> 25/100)`，對照 DelayByRate 括號輸出）----
   // Delay (`name Delayed(15 >>> 25/100)`, mirroring DelayByRate's parenthesised output)
-  logAction(EnumActionType.Delay, mage1, buildDelayMessage(mage1.name, 15, 25, 100), EnumTeamSideUI.Right),
+  namedLogAction(EnumActionType.Delay, mage1, buildDelayText(15, 25, 100), EnumTeamSideUI.Right),
 
   // ---- 犧牲（`name sacrifice 50 HP`）/ Sacrifice ----
-  logAction(
+  namedLogAction(
     EnumActionType.Sacrifice,
     hero1,
-    buildSacrificeMessage(hero1.name, 50),
+    buildSacrificeText(50),
     EnumTeamSideUI.Right,
     { value: 50, valueUnit: 'HP', attribute: EnumAttributeType.Dmg }
   ),
@@ -711,40 +746,57 @@ const logMessagesActions: IBattleAction[] = [
   logAction(
     EnumActionType.Fail,
     goblinAxe,
-    '(Weapon type doesnt match)',
+    // 失敗原因同時存進結構化欄位 failReason（供渲染端另起一行），message 只是整行鏡像
+    // The reason also lives in the structured `failReason` field (the renderer prints it on its
+    // own line) while `message` is only the whole-line mirror
+    buildFailMessage(goblinAxe.name, SKILL_FATAL_STAB.name, '(Weapon type doesnt match)'),
     EnumTeamSideUI.Left,
-    { skill: SKILL_FATAL_STAB, attribute: EnumAttributeType.Dmg }
+    {
+      skill: SKILL_FATAL_STAB,
+      failReason: '(Weapon type doesnt match)',
+      attribute: EnumAttributeType.Dmg,
+    }
   ),
+  // 純文字資訊：整行即文案（InfoMessage 不輸出粗體主詞，避免與狀態列重複名稱）
+  // Plain info: the whole line is the copy (InfoMessage prints no bold subject so the name is
+  // not repeated next to the status-row data)
   logAction(
     EnumActionType.Info,
     mage1,
-    buildNamedMessage(mage1.name, `failed to ${SKILL_SUMMON_LEVIATHAN.name}(SP shortage)`),
+    buildActionMessage({ source: mage1.name, text: `failed to ${SKILL_SUMMON_LEVIATHAN.name}(SP shortage)` }),
     EnumTeamSideUI.Right,
     { attribute: EnumAttributeType.Normal }
   ),
 
   // ---- 未命中（原始日誌 `Failed!`，無 span）/ Miss (the original `Failed!`, no span) ----
-  logAction(
+  namedLogAction(
     EnumActionType.Miss,
     goblinWarriorA,
-    buildNamedMessage(goblinWarriorA.name, 'Failed!'),
+    'Failed!',
     EnumTeamSideUI.Left
   ),
 
   // ---- 升級（`name LevelUp!`）/ Level up ----
-  logAction(EnumActionType.LevelUp, hero1, buildLevelUpMessage(hero1.name), EnumTeamSideUI.Right),
+  namedLogAction(EnumActionType.LevelUp, hero1, buildLevelUpText(), EnumTeamSideUI.Right),
 
   // ---- 掉落道具（`name dropped` 後接道具圖示＋`<b class="u">道具名</b>.`）----
   // Dropped item (`name dropped` followed by the item icon + `<b class="u">item name</b>.`)
-  logAction(EnumActionType.ItemDrop, goblinWarriorA, 'Magic Scroll', EnumTeamSideUI.Left, {
-    itemIconUrl: '/image/icon/item/item_018.png',
-  }),
+  logAction(
+    EnumActionType.ItemDrop,
+    goblinWarriorA,
+    buildItemDropMessage(goblinWarriorA.name, 'Magic Scroll'),
+    EnumTeamSideUI.Left,
+    {
+      itemName: 'Magic Scroll',
+      itemIconUrl: '/image/icon/item/item_018.png',
+    }
+  ),
 
   // ---- 退場（`name Lv.N leave the Battlefield.`，dmg 色）/ Leave the battlefield (dmg colour) ----
-  logAction(
+  namedLogAction(
     EnumActionType.Leave,
     goblinAxe,
-    '',
+    getEnterBattlefieldText(goblinAxe.level, true),
     EnumTeamSideUI.Left,
     { level: goblinAxe.level }
   ),
@@ -761,13 +813,13 @@ const logMessagesActions: IBattleAction[] = [
   logAction(
     EnumActionType.Info,
     goblinWarriorA,
-    buildNamedMessage(goblinWarriorA.name, "sunk in thought and couldn't act."),
+    buildActionMessage({ source: goblinWarriorA.name, text: "sunk in thought and couldn't act." }),
     EnumTeamSideUI.Left
   ),
   logAction(EnumActionType.Info, undefined, '(No more patterns)', EnumTeamSideUI.Left),
   // ---- HP/SP 交換（3 行區塊：exchanged rate of HP and SP. ＋ HP 行 ＋ SP 行）----
   // HP/SP exchange (3-line block: exchanged rate of HP and SP. + HP line + SP line)
-  logAction(EnumActionType.EnergyExchange, hero1, '', EnumTeamSideUI.Right, {
+  namedLogAction(EnumActionType.EnergyExchange, hero1, 'exchanged rate of HP and SP.', EnumTeamSideUI.Right, {
     energyExchange: {
       hpFrom: 500,
       hpFromRate: 50,

@@ -212,66 +212,99 @@ export function buildMagicCircleMessage(source?: string, record?: IMagicCircleRe
 
 // ==================== 原始日誌文案（單一事實來源）/ Original log copy (single source of truth) ====================
 //
+// 命名慣例 / Naming convention:
+//   buildXxxText    → 「粗體名稱之後的片段」（對應 IBattleAction.text），由唯一合併點
+//                     buildActionMessage 接成名行；例：buildRecoveredText、buildDelayText。
+//   buildXxxMessage → 「整行純文字」（對應 IBattleAction.message），本身已含名稱或根本沒有名稱；
+//                     例：buildDamageMessage、buildProtectMessage。
+//   buildXxxText    → the fragment after the bold name (IBattleAction.text), joined into the whole
+//                     line by the single join point buildActionMessage; e.g. buildRecoveredText.
+//   buildXxxMessage → the whole plain line (IBattleAction.message), already carrying the name or
+//                     having none at all; e.g. buildDamageMessage, buildProtectMessage.
+//
 // 以下建構器逐字對應 HOF/Class 的戰鬥日誌輸出；轉接層與展示資料都必須經由它們
-// 產生 message，文案因此只書寫一次。
-// The builders below mirror the battle-log output of HOF/Class word for word; the adapter
-// and the showcase data both go through them, so every string is written exactly once.
+// 產生文案，因此每個字串只書寫一次。
+// The builders below mirror the battle-log output of HOF/Class word for word; the adapter and
+// the showcase data both go through them, so every string is written exactly once.
 
 /**
- * 以「粗體名稱 ＋ 其後文字」組合訊息（多數日誌行的版面）
- * Compose a message from a bold name plus the text that follows (most log lines)
+ * 文案欄位輸入（source／text／message 的統一形狀）
+ * Copy-field input (the one shape shared by source / text / message)
+ */
+export interface IActionCopyInput {
+  /** 粗體主詞（名稱）/ the bold subject (name) */
+  source?: string;
+  /** 名稱之後的文案 / copy after the name */
+  text?: string;
+  /** 已是整行的文案（優先採用，跳過合併）/ pre-assembled whole line (wins; skips the join) */
+  message?: string;
+}
+
+/**
+ * 「主詞 ＋ 其後文案」的唯一合併點（單一事實來源）
+ * The single join point for "subject + the copy that follows" (single source of truth)
  *
- * 這是「名稱＋文字」唯一的合併點：轉接層以 composeAction 呼叫它產出純文字鏡像 message，
- * 結構化的 source／text 則原樣保留給渲染端，因此不存在再把結果切回去的程式碼。
- * This is the single join point for "name + text": composeAction calls it to produce the
+ * 轉接層的 composeAction 與展示資料的 namedLogAction 都呼叫它產出純文字鏡像 message，
+ * 結構化的 source／text 原樣保留給渲染端，因此不存在再把結果切回去的程式碼。
+ * Both the adapter's composeAction and the showcase data's namedLogAction call it to produce the
  * plain-text mirror `message`, while the structured source / text stay intact for the renderer,
  * so no code ever slices the result back apart.
  *
- * @param source - 單位名稱（缺省時整段即為文字）/ Unit name (the whole string is the text when absent)
- * @param text - 名稱之後的文字 / Text after the name
- * @returns 訊息文字 / Message text
+ * 接續規則只寫在這裡一份：一般片段以單一空格接續名稱；所有格片段 `'s …` 則直接接續
+ * （原始日誌為 `Name('bold') . "'s …"` 拼接）。
+ * The attachment rule exists only here: an ordinary fragment follows the name after one space,
+ * while a possessive fragment (`'s …`) attaches directly (the original log concatenates
+ * `Name('bold') . "'s …"`).
+ *
+ * @param input - 文案欄位 / copy fields
+ * @returns 整行純文字 / the whole plain line
  */
-export function buildNamedMessage(source: string | undefined, text: string): string {
-  return source ? `${source} ${text}` : text;
+export function buildActionMessage(input: IActionCopyInput): string {
+  if (input.message !== undefined) return input.message;
+  if (input.text === undefined) return input.source ?? '';
+  if (!input.source) return input.text;
+  const separator = input.text.startsWith("'s ") ? '' : ' ';
+  return `${input.source}${separator}${input.text}`;
 }
 
 /**
- * 所有格訊息（`name's poison has cured.`；名稱與 `'s` 之間不空格）
- * Possessive message (`name's poison has cured.`; no space between the name and `'s`)
+ * 所有格之後的文案片段（`'s poison has cured.`；名稱與 `'s` 之間不空格）
+ * Copy after the possessive marker (`'s poison has cured.`; no space before `'s`)
  *
- * 對應 Char/Battle/Effect.php 的 `Name('bold') . "'s …"` 拼接。
- * Mirrors the `Name('bold') . "'s …"` concatenation of Char/Battle/Effect.php.
+ * 對應 Char/Battle/Effect.php 的 `Name('bold') . "'s …"` 拼接；整行由 buildActionMessage
+ * 以不加空格的方式接續名稱。
+ * Mirrors the `Name('bold') . "'s …"` concatenation of Char/Battle/Effect.php; buildActionMessage
+ * attaches it to the name without a space.
  *
- * @param source - 單位名稱 / Unit name
  * @param text - 所有格之後的文字 / Text after the possessive
- * @returns 訊息文字 / Message text
+ * @returns 名稱之後的文案片段 / the fragment that follows the name
  */
-export function buildPossessiveMessage(source: string | undefined, text: string): string {
-  return source ? `${source}'s ${text}` : text;
+export function buildPossessiveText(text: string): string {
+  return `'s ${text}`;
 }
 
 /**
- * 取得「粗體名稱 ＋ 其後文字」的結構化組合（取代切割 message 的還原）
- * Get the structured "bold name + trailing text" pair (replaces slicing `message` back apart)
+ * 取得「粗體主詞 ＋ 其後文案」的結構化組合（取代切割 message 的還原）
+ * Get the structured "bold subject + trailing copy" pair (replaces slicing `message` back apart)
  *
- * 產生端經 composeAction 直接存入 source 與 text，渲染端只讀取欄位、不做字串手術，
- * 因此不會出現「先組成 `${source} ${text}` 再切回來」的多餘轉換。
- * The producer stores `source` and `text` straight through composeAction, so the renderer only
- * reads fields — there is no "join `${source} ${text}` then slice it back" conversion left.
+ * 產生端直接存入 source 與 text，渲染端只讀取欄位、不做字串手術，
+ * 因此不會出現「先組成整行再切回來」的多餘轉換。
+ * The producer stores `source` and `text` directly, so the renderer only reads fields — there is
+ * no "assemble a line then slice it back" conversion left.
  *
  * 未提供 text（外部匯入的舊資料等）時退回整段 message 且名稱不加粗，與原版
  * 「找不到名稱前綴就整段視為文字」的行為一致。
  * Without `text` (legacy data from elsewhere) the whole `message` is used with no bold name,
  * matching the original "no name prefix → the whole string is the text" behaviour.
  *
- * @param action - 行動（來源、名稱後文字、訊息）/ action (source, trailing text, message)
- * @returns 名稱與其後的文字 / the name and the text that follows
+ * @param action - 行動（來源、名稱後文案、整行訊息）/ action (source, trailing copy, whole line)
+ * @returns 粗體主詞與其後的文案 / the bold subject and the copy that follows
  */
 export function getNamedCopy(action: Pick<IBattleAction, 'source' | 'text' | 'message'>): {
-  name?: string;
+  subject?: string;
   text: string;
 } {
-  if (action.text !== undefined) return { name: action.source, text: action.text };
+  if (action.text !== undefined) return { subject: action.source, text: action.text };
   return { text: action.message };
 }
 
@@ -301,8 +334,8 @@ export function isProtectingGuard(
  * Value-change text input (a pre-assembled string or the before/after values)
  */
 export interface IValueChangeTextInput {
-  /** 預組好的變化描述（優先採用）/ Pre-assembled change copy (takes precedence) */
-  valueChange?: string;
+  /** 預組好的變化字串（優先採用；與 IBattleAction.valueChangeText 同名同義）/ Pre-assembled change string (wins; same name and meaning as IBattleAction.valueChangeText) */
+  valueChangeText?: string;
   /** 變化前（與 to 同時提供時組成 `from > to`）/ Before (pairs with `to` into `from > to`) */
   from?: number;
   /** 變化後 / After */
@@ -313,9 +346,9 @@ export interface IValueChangeTextInput {
  * 組出「(前 > 後)」的數值變化文字（單一事實來源）
  * Build the `(before > after)` value-change text (single source of truth)
  *
- * 優先採用預組字串 `valueChange`；否則在 `from`／`to` 齊備時組成 `from > to`；
+ * 優先採用預組字串 `valueChangeText`；否則在 `from`／`to` 齊備時組成 `from > to`；
  * 兩者皆無時回傳 undefined，渲染端據此輸出空內容（不會出現空括號）。
- * The pre-assembled `valueChange` wins; otherwise the `from > to` pair is built when both
+ * The pre-assembled `valueChangeText` wins; otherwise the `from > to` pair is built when both
  * ends are present; when neither exists `undefined` comes back so the renderer emits
  * nothing (never empty parentheses).
  *
@@ -327,13 +360,16 @@ export interface IValueChangeTextInput {
  * @returns 變化文字（無資料時 undefined）/ Change copy (undefined when there is none)
  */
 export function buildValueChangeText(input: IValueChangeTextInput): string | undefined {
-  if (input.valueChange !== undefined) return input.valueChange;
+  if (input.valueChangeText !== undefined) return input.valueChangeText;
   if (input.from !== undefined && input.to !== undefined) return `${input.from} > ${input.to}`;
   return undefined;
 }
 
-/** 蓄力／詠唱文案（`start charging.` / `start casting.`）/ Charge/casting copy */
-export function buildChargeMessage(castType?: EnumChargeKind): string {
+/**
+ * 蓄力／詠唱文案片段（`start charging.` / `start casting.`；粗體名稱由版面補上）
+ * Charge/casting fragment (`start charging.` / `start casting.`; the layout prints the bold name)
+ */
+export function buildChargeText(castType?: EnumChargeKind): string {
   return `start ${castType ?? EnumChargeKind.Casting}.`;
 }
 
@@ -342,9 +378,9 @@ export function buildSpDamageMessage(value: number, target?: string): string {
   return target ? `${value}SP Damage to ${target}` : `${value}SP Damage`;
 }
 
-/** 回復（`name Recovered N HP`）/ Recovery (`name Recovered N HP`) */
-export function buildRecoveredMessage(source: string | undefined, value: number, unit: string): string {
-  return buildNamedMessage(source, `Recovered ${value} ${unit}`);
+/** 回復文案片段（`Recovered N HP`；對應 IBattleAction.text）/ Recovery fragment (`Recovered N HP`) */
+export function buildRecoveredText(value: number, unit: string): string {
+  return `Recovered ${value} ${unit}`;
 }
 
 /** 吸取（`Drained N HP from target`）/ Drain (`Drained N HP from target`) */
@@ -352,32 +388,31 @@ export function buildDrainMessage(value: number, unit: string, target?: string):
   return target ? `Drained ${value} ${unit} from ${target}` : `Drained ${value} ${unit}`;
 }
 
-/** 持續回復（`name gained HP regeneration +N%`）/ Regen (`name gained HP regeneration +N%`) */
-export function buildRegenMessage(source: string | undefined, unit: string, value: number): string {
-  return buildNamedMessage(source, `gained ${unit} regeneration +${value}%`);
+/** 持續回復文案片段（`gained HP regeneration +N%`）/ Regen fragment (`gained HP regeneration +N%`) */
+export function buildRegenText(unit: string, value: number): string {
+  return `gained ${unit} regeneration +${value}%`;
 }
 
-/** 自動回復（`name Auto Regenerate N HP`）/ Auto regenerate (`name Auto Regenerate N HP`) */
-export function buildAutoRegenMessage(source: string | undefined, unit: string, value: number): string {
-  return buildNamedMessage(source, `Auto Regenerate ${value} ${unit}`);
+/** 自動回復文案片段（`Auto Regenerate N HP`）/ Auto-regenerate fragment (`Auto Regenerate N HP`) */
+export function buildAutoRegenText(unit: string, value: number): string {
+  return `Auto Regenerate ${value} ${unit}`;
 }
 
-/** 犧牲（`name sacrifice N HP`）/ Sacrifice (`name sacrifice N HP`) */
-export function buildSacrificeMessage(source: string | undefined, value: number): string {
-  return buildNamedMessage(source, `sacrifice ${value} HP`);
+/** 犧牲文案片段（`sacrifice N HP`）/ Sacrifice fragment (`sacrifice N HP`) */
+export function buildSacrificeText(value: number): string {
+  return `sacrifice ${value} HP`;
 }
 
-/** 升級（`name LevelUp!`）/ Level up (`name LevelUp!`) */
-export function buildLevelUpMessage(source: string | undefined): string {
-  return buildNamedMessage(source, 'LevelUp!');
+/** 升級文案片段（`LevelUp!`）/ Level-up fragment (`LevelUp!`) */
+export function buildLevelUpText(): string {
+  return 'LevelUp!';
 }
 
 /**
- * 屬性升降（`name STR rise 10%` / `name STR down 10%` / `name ATK rise to the maximum(100%)`）
- * Stat change (`name STR rise 10%` / `name STR down 10%` / `name ATK rise to the maximum(100%)`)
+ * 屬性升降文案片段（`STR rise 10%` / `STR down 10%` / `ATK rise to the maximum(100%)`）
+ * Stat-change fragment (`STR rise 10%` / `STR down 10%` / `ATK rise to the maximum(100%)`)
  */
-export function buildStatChangeMessage(
-  source: string | undefined,
+export function buildStatChangeText(
   stat: string,
   direction: 'rise' | 'down',
   value: number,
@@ -385,12 +420,11 @@ export function buildStatChangeMessage(
   atMaximum = false
 ): string {
   const tail = atMaximum ? `${direction} to the maximum(${value}${unit})` : `${direction} ${value}${unit}`;
-  return buildNamedMessage(source, `${stat} ${tail}`);
+  return `${stat} ${tail}`;
 }
 
-/** 上限升降（`name MAXHP(舊值) extended to 999` / `name MAXSP(舊值) down to 500`）/ Cap change */
-export function buildStatToMessage(
-  source: string | undefined,
+/** 上限升降文案片段（`MAXHP(舊值) extended to 999` / `MAXSP(舊值) down to 500`）/ Cap-change fragment */
+export function buildStatToText(
   stat: string,
   direction: 'extended' | 'down to',
   value: number,
@@ -405,40 +439,35 @@ export function buildStatToMessage(
   // With an old value it shows `(old) `, otherwise a single space, so both
   // `MAXHP extended to` and `MAXHP(500) extended to` match the original log verbatim.
   const lead = from !== undefined ? `(${from}) ` : ' ';
-  return buildNamedMessage(source, `${stat}${lead}${phrase} ${value}`);
+  return `${stat}${lead}${phrase} ${value}`;
 }
 
 /**
- * 行動後硬直（單一事實來源；對照 Skill.php 的 `Name Delayed` ＋ DelayByRate 的括號輸出）
- * Post-action delay (single source of truth; mirrors the `Name Delayed` of Skill.php plus the
- * parenthesised `(old >>> new/base)` that DelayByRate prints)
+ * 行動後硬直文案片段（單一事實來源；對照 Skill.php 的 `Name Delayed` ＋ DelayByRate 的括號輸出）
+ * Post-action delay fragment (single source of truth; mirrors the `Name Delayed` of Skill.php plus
+ * the parenthesised `(old >>> new/base)` that DelayByRate prints)
  *
- * 原始日誌：`GoblinAxe Delayed(15 >>> 25/100)`
- * Original log: `GoblinAxe Delayed(15 >>> 25/100)`
+ * 原始日誌整行為 `GoblinAxe Delayed(15 >>> 25/100)`，名稱由版面補上。
+ * The whole original line is `GoblinAxe Delayed(15 >>> 25/100)`; the layout prints the name.
  */
-export function buildDelayMessage(
-  source: string | undefined,
-  oldValue: number,
-  newValue: number,
-  base: number
-): string {
-  return buildNamedMessage(source, `Delayed(${oldValue} >>> ${newValue}/${base})`);
+export function buildDelayText(oldValue: number, newValue: number, base: number): string {
+  return `Delayed(${oldValue} >>> ${newValue}/${base})`;
 }
 
 /**
  * 施放行動（`name SkillName`；無技能時只印名稱）
  * Skill act (`name SkillName`; only the name prints without a skill)
  *
- * 名稱段沿用 buildNamedMessage，避免 actor 缺省時把 `undefined` 印進日誌。
- * The name segment reuses buildNamedMessage so an absent actor never prints `undefined`
- * into the log.
+ * 整行由唯一合併點 buildActionMessage 產出，actor 缺省時不會把 `undefined` 印進日誌。
+ * The whole line comes from the single join point buildActionMessage, so an absent actor never
+ * prints `undefined` into the log.
  *
  * @param source - 施放者名稱 / Caster name
  * @param skillName - 技能名稱（缺省時只輸出名稱）/ Skill name (only the name prints when absent)
- * @returns 訊息文字 / Message text
+ * @returns 整行純文字 / The whole plain line
  */
 export function buildActMessage(source: string | undefined, skillName?: string): string {
-  return skillName !== undefined ? buildNamedMessage(source, skillName) : source ?? '';
+  return skillName !== undefined ? buildActionMessage({ source, text: skillName }) : source ?? '';
 }
 
 /**
@@ -457,17 +486,21 @@ export function buildDamageMessage(value: number, target?: string): string {
  * 回復事件文案（`target Recovered N HP` / `N Heal`）
  * Heal event copy (`target Recovered N HP` / `N Heal`)
  *
- * 有目標時與 buildRecoveredMessage（展示側 `name Recovered N HP`）共用同一句型；
+ * 有目標時與 buildRecoveredText（展示側的 `Recovered N HP`）共用同一句型，
+ * 只是整行改由唯一合併點 buildActionMessage 接出；
  * 無目標時保留引擎的 `N Heal` 兜底文案。
- * With a target it shares buildRecoveredMessage's wording (`name Recovered N HP` on the display
- * side); without one the engine's `N Heal` fallback is kept.
+ * With a target it shares buildRecoveredText's wording (the display side's `Recovered N HP`),
+ * only assembled through the single join point buildActionMessage; without a target the engine's
+ * `N Heal` fallback is kept.
  *
  * @param value - 回復量 / Heal amount
  * @param target - 受療者名稱（缺省時省略名稱）/ Healed unit name (dropped when absent)
- * @returns 訊息文字 / Message text
+ * @returns 整行純文字 / The whole plain line
  */
 export function buildHealMessage(value: number, target?: string): string {
-  return target ? buildRecoveredMessage(target, value, 'HP') : `${value} Heal`;
+  return target
+    ? buildActionMessage({ source: target, text: buildRecoveredText(value, 'HP') })
+    : `${value} Heal`;
 }
 
 /**
@@ -509,6 +542,40 @@ export function buildDownMessage(name: string): string {
  */
 export function buildSummonMessage(targetName?: string, actorName?: string): string {
   return targetName ? `${targetName} joined to the team.` : `${actorName ?? ''} summon.`;
+}
+
+/**
+ * 掉落道具（`name dropped item.`；原始日誌為 `<b>name</b> dropped<img/>…<b>item</b>.`）
+ * Dropped item (`name dropped item.`; the original log is `<b>name</b> dropped<img/>…<b>item</b>.`)
+ *
+ * 道具名稱獨立存在結構化欄位 itemName，message 只是整行純文字鏡像。
+ * The item name lives in the structured `itemName` field; `message` is only the whole-line mirror.
+ *
+ * @param source - 掉落者名稱 / Dropper name
+ * @param itemName - 道具名稱 / Item name
+ * @returns 整行純文字 / The whole plain line
+ */
+export function buildItemDropMessage(source: string | undefined, itemName: string): string {
+  return source ? `${source} dropped ${itemName}.` : `${itemName}.`;
+}
+
+/**
+ * 施放失敗（`name Failed skill (reason)`；原始日誌第一行為 `名 Failed 技能`、第二行為原因）
+ * Failed cast (`name Failed skill (reason)`; the original log puts the name and skill on the first
+ * line and the reason on the second)
+ *
+ * 原因獨立存在結構化欄位 failReason，message 只是整行純文字鏡像。
+ * The reason lives in the structured `failReason` field; `message` is only the whole-line mirror.
+ *
+ * @param source - 施放者名稱 / Caster name
+ * @param skillName - 技能名稱 / Skill name
+ * @param reason - 失敗原因（含括號，可省略）/ Failure reason (already parenthesised, optional)
+ * @returns 整行純文字 / The whole plain line
+ */
+export function buildFailMessage(source?: string, skillName?: string, reason?: string): string {
+  const head = skillName ? `Failed ${skillName}` : 'Failed';
+  const line = source ? `${source} ${head}` : head;
+  return reason ? `${line} ${reason}` : line;
 }
 
 /** 訊息型別 → CSS class（單一事實來源）/ Action type → CSS class (single source of truth) */

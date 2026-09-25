@@ -166,22 +166,24 @@ describe('3.3 mapBattleEvent', () => {
 		expect(actions[0].type).toBe(EnumActionType.Skill);
 		expect(actions[0].source).toBe('Warrior');
 
-		// Cast 依 skill.type 決定文案（seed skill 2000 預設 casting）
+		// Cast 依 skill.type 決定文案（seed skill 2000 預設 casting）：
+		// text 是粗體名稱之後的片段，message 由唯一合併點接成整行（與渲染端一致）
 		expect(actions[1].type).toBe(EnumActionType.Casting);
 		expect(actions[1].source).toBe('Warrior');
-		expect(actions[1].message).toMatch(/^start (charging|casting)\.$/);
+		expect(actions[1].text).toMatch(/^start (charging|casting)\.$/);
+		expect(actions[1].message).toBe(`Warrior ${actions[1].text}`);
 
-		// Damage valueChange 格式 hpBefore > hpAfter
+		// Damage valueChangeText 格式 hpBefore > hpAfter
 		expect(actions[2].type).toBe(EnumActionType.Damage);
 		expect(actions[2].source).toBe('Warrior');
 		expect(actions[2].target).toBe('GoblinAxe');
 		expect(actions[2].value).toBe(42);
-		expect(actions[2].valueChange).toBe('200 > 158');
+		expect(actions[2].valueChangeText).toBe('200 > 158');
 		expect(actions[2].side).toBe(EnumTeamSideUI.Right);
 
-		// Heal 沿用 valueChange
+		// Heal 沿用 valueChangeText
 		expect(actions[3].type).toBe(EnumActionType.Heal);
-		expect(actions[3].valueChange).toBe('158 > 168');
+		expect(actions[3].valueChangeText).toBe('158 > 168');
 
 		// Guard（Barrier，actor === target）→ protect
 		expect(actions[4].message).toContain('barrier');
@@ -235,14 +237,18 @@ describe('3.3 mapBattleEvent', () => {
 			repo,
 		);
 		expect(charge.castType).toBe(EnumChargeKind.Charging);
-		expect(charge.message).toBe('start charging.');
+		// text＝名稱之後的片段、message＝唯一合併點接出的整行
+		// `text` = the fragment after the name, `message` = the whole line from the single join point
+		expect(charge.text).toBe('start charging.');
+		expect(charge.message).toBe('Warrior start charging.');
 
 		const cast = mapBattleEvent(
 			{ type: EnumBattleEventType.Cast, actor: '100', skill: 1000 },
 			lookup,
 			repo,
 		);
-		expect(cast.message).toMatch(/^start (charging|casting)\.$/);
+		expect(cast.text).toMatch(/^start (charging|casting)\.$/);
+		expect(cast.message).toBe(`Warrior ${cast.text}`);
 	});
 
 	it('unknown type without text falls back to a message containing the type', () => {
@@ -601,8 +607,8 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () => {
 			lookup,
 			repo,
 		);
-		// 只給 text → message 由 buildNamedMessage 合併，兩者同一份輸入、不會各自漂移
-		// Only `text` is given → composeAction joins it with buildNamedMessage, so both come from
+		// 只給 text → message 由 buildActionMessage 合併，兩者同一份輸入、不會各自漂移
+		// Only `text` is given → composeAction joins it with buildActionMessage, so both come from
 		// one input and cannot drift apart
 		const named = composeAction(ctx, { type: EnumActionType.Buff, text: 'got barriered!' });
 		expect(named.text).toBe('got barriered!');
@@ -764,7 +770,7 @@ describe('3.4b 展示資料組裝 / display data assembly', () => {
 		expect(data.rightTeam.units).toHaveLength(1);
 		expect(data.actions).toHaveLength(1);
 		expect(data.actions[0].message).toBe(`7 Damage to ${enemies[0].name}`);
-		expect(data.actions[0].valueChange).toBe('10 > 3');
+		expect(data.actions[0].valueChangeText).toBe('10 > 3');
 		// 沒有給快照 → snapshots 欄位省略 / no snapshots supplied → the field stays out
 		expect(data.snapshots).toBeUndefined();
 		// 我方（右隊）獲勝 / the allies (right team) win

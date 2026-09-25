@@ -22,7 +22,7 @@ import {
   getMessageClass,
   getNamedCopy,
   isProtectingGuard,
-  buildChargeMessage,
+  buildChargeText,
   buildValueChangeText,
 } from './battleUtils';
 
@@ -47,16 +47,16 @@ export interface IBattleActionProps {
  * here so callers never concatenate them by hand.
  */
 const ValueChange: React.FC<{
-  valueChange?: string;
+  valueChangeText?: string;
   from?: number;
   to?: number;
   who?: string;
   type?: EnumActionType;
-}> = ({ valueChange, from, to, who, type }) => {
+}> = ({ valueChangeText, from, to, who, type }) => {
   // 文字組裝委由 battleUtils.buildValueChangeText（單一事實來源，展示資料共用同一定義）
   // Copy assembly is delegated to battleUtils.buildValueChangeText (single source of truth,
   // shared definition with the showcase data)
-  const text = buildValueChangeText({ valueChange, from, to });
+  const text = buildValueChangeText({ valueChangeText, from, to });
   if (text === undefined) return null;
   const valClass = getValueChangeClass(type);
   return (
@@ -68,15 +68,15 @@ const ValueChange: React.FC<{
 };
 
 /**
- * 行動自帶的數值變化（`action.valueChange` → ValueChange）
- * The action's own value change (`action.valueChange` → ValueChange)
+ * 行動自帶的數值變化（`action.valueChangeText` → ValueChange）
+ * The action's own value change (`action.valueChangeText` → ValueChange)
  *
- * 各訊息組件只需傳入 action，不必重複組合 `valueChange`/`type` 兩個欄位。
- * Message components only pass the action, so the `valueChange` / `type` pair is never
+ * 各訊息組件只需傳入 action，不必重複組合 `valueChangeText`/`type` 兩個欄位。
+ * Message components only pass the action, so the `valueChangeText` / `type` pair is never
  * re-assembled at each call site.
  */
 const ActionValueChange: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <ValueChange valueChange={action.valueChange} type={action.type} />
+  <ValueChange valueChangeText={action.valueChangeText} type={action.type} />
 );
 
 /**
@@ -109,8 +109,8 @@ const ValueChanges: React.FC<{ changes?: IValueChangeRecord[]; type?: EnumAction
 const EnterMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
   <ActionLine
     className={`result ${getAttrClass(action.attribute)}`}
-    who={action.source}
-    message={getEnterBattlefieldText(action.level)}
+    subject={action.source}
+    body={getEnterBattlefieldText(action.level)}
   />
 );
 
@@ -121,8 +121,8 @@ const EnterMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
 const LeaveMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
   <ActionLine
     className="dmg"
-    who={action.source}
-    message={getEnterBattlefieldText(action.level, true)}
+    subject={action.source}
+    body={getEnterBattlefieldText(action.level, true)}
   />
 );
 
@@ -143,15 +143,25 @@ const SkillMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
   </div>
 );
 
-/** 行動訊息行 props（樣式欄位繼承自 IStyleProps）/ Action line props (style fields inherited from IStyleProps) */
+/**
+ * 行動訊息行 props（樣式欄位繼承自 IStyleProps）
+ * Action line props (style fields inherited from IStyleProps)
+ *
+ * 版面欄位即日誌列的四個位置，名稱一律沿用資料層（IBattleAction）的用語，
+ * 一個概念只有一個名字：linePrefix（行首前綴）／subject（粗體主詞）／
+ * body（主詞之後的主體節點）／children（列尾後綴）。
+ * The layout fields are the four slots of a log line and keep the vocabulary of the data layer
+ * (IBattleAction) so one concept has one name: linePrefix (head of the line) / subject (bold
+ * subject) / body (the node after the subject) / children (trailing suffix).
+ */
 type IActionLineProps = IStyleProps & {
-  /** 主詞之前的前置內容（與 who 無關，who 缺省時仍輸出）/ Content before the subject (independent of `who`, printed even when `who` is absent) */
-  preMessage?: React.ReactNode;
-  /** 加粗主詞（名稱等）/ Bold subject (name, etc.) */
-  who?: React.ReactNode;
-  /** 訊息內容（字串或任意合法節點）/ Message content (string or any valid node) */
-  message: React.ReactNode;
-  /** 訊息之後的後綴內容 / Suffix rendered after the message */
+  /** 行首前綴（與 subject 無關，subject 缺省時仍輸出；同 IBattleAction.linePrefix）/ Head-of-line prefix (independent of `subject`, printed even when `subject` is absent; same as IBattleAction.linePrefix) */
+  linePrefix?: React.ReactNode;
+  /** 粗體主詞（名稱等）/ Bold subject (name, etc.) */
+  subject?: React.ReactNode;
+  /** 主詞之後的主體節點（字串或任意合法節點）/ Body after the subject (string or any valid node) */
+  body: React.ReactNode;
+  /** 訊息之後的後綴內容 / Suffix rendered after the body */
   children?: React.ReactNode;
 }
 
@@ -159,21 +169,21 @@ type IActionLineProps = IStyleProps & {
  * 行動訊息行（單一事實來源）
  * Action log line (single source of truth)
  */
-export function ActionLine<R extends keyof IActionLineProps = 'message'>(
+export function ActionLine<R extends keyof IActionLineProps = 'body'>(
   props: ITSRequiredWith2<IActionLineProps, NoInfer<R>>
 ) {
-  const { preMessage, who, message, className, style, children } = props as IActionLineProps;
+  const { linePrefix, subject, body, className, style, children } = props as IActionLineProps;
 
   return (
     <span className={className} style={style}>
-      {preMessage ?? null}
-      {who != null ? (
+      {linePrefix ?? null}
+      {subject != null ? (
         <>
-          <span className="bold">{who}</span>
+          <span className="bold">{subject}</span>
           {' '}
         </>
       ) : null}
-      {message}
+      {body}
       {children ?? null}
     </span>
   );
@@ -205,11 +215,11 @@ const SummonMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
               className="summoned-unit-sprite"
             />
           )}
-          {/* 入隊句由 ActionLine 渲染（who＝名稱、message＝入隊文案），
+          {/* 入隊句由 ActionLine 渲染（subject＝名稱、body＝入隊文案），
               後綴 children 接續 EnterMessage 的入場句（單一事實來源）。
-              The join clause is rendered by ActionLine (who = name, message = join copy);
+              The join clause is rendered by ActionLine (subject = name, body = join copy);
               the follow-up enter clause comes from EnterMessage (single source of truth). */}
-          <ActionLine who={unit.name} message="joined to the team." className={attrClass}>
+          <ActionLine subject={unit.name} body="joined to the team." className={attrClass}>
             <br />
             <EnterMessage
               action={{ ...action, type: EnumActionType.Enter, source: unit.name, level: unit.level }}
@@ -245,12 +255,12 @@ const MagicCircleMessage: React.FC<{ action: IBattleAction }> = ({ action }) => 
   // the name in the default colour and only the action phrase (including ` xN`) is coloured;
   // the Fail kind has no caster so the whole string is just the phrase itself.
   if (kind === EnumMagicCircleKind.Fail) {
-    return <ActionLine className={cls} message={MAGIC_CIRCLE_PHRASE[kind]} />;
+    return <ActionLine className={cls} body={MAGIC_CIRCLE_PHRASE[kind]} />;
   }
   return (
     <ActionLine
-      who={action.source}
-      message={
+      subject={action.source}
+      body={
         <span className={cls}>
           {amount !== undefined
             ? `${MAGIC_CIRCLE_PHRASE[kind]} x${amount}`
@@ -270,23 +280,23 @@ interface INamedMessageProps extends IStyleProps {
  * 通用「粗體名稱 ＋ 其後文字」版面（單一事實來源）
  * Shared "bold name + trailing text" layout (single source of truth)
  *
- * 名稱與文字直接取自結構化的 source／text（getNamedCopy），不再把 message 切割還原；
- * 文案則一律由 battleUtils 的建構器在產生端組好，因此各家族訊息組件只需指定配色；
- * 行本身交給 ActionLine 組裝（前置、粗體名稱、文字、數值變化依序輸出）。
- * The name and the text come straight from the structured source / text (getNamedCopy) instead
- * of slicing `message` back apart; the copy itself is always assembled at production time by
- * battleUtils' builders, so each family component only has to pick a colour; the line itself is
- * assembled by ActionLine (prefix, bold name, text, value change in order).
+ * 主詞與文案直接取自結構化的 source／text（getNamedCopy），不再把 message 切割還原；
+ * 文案則一律由 battleUtils 的 `…Text` 建構器在產生端組好，因此各家族訊息組件只需指定配色；
+ * 行本身交給 ActionLine 組裝（行首前綴、粗體主詞、主體、數值變化依序輸出）。
+ * The subject and the copy come straight from the structured source / text (getNamedCopy)
+ * instead of slicing `message` back apart; the copy itself is always assembled at production time
+ * by battleUtils' `…Text` builders, so each family component only has to pick a colour; the line
+ * itself is assembled by ActionLine (line prefix, bold subject, body, value change in order).
  */
 const NamedMessage: React.FC<INamedMessageProps> = ({ action, className, style }) => {
-  const { name, text } = getNamedCopy(action);
+  const { subject, text } = getNamedCopy(action);
   return (
     <ActionLine
       className={className}
       style={style}
-      preMessage={action.prefix}
-      who={name}
-      message={
+      linePrefix={action.linePrefix}
+      subject={subject}
+      body={
         <>
           {text}
           <ActionValueChange action={action} />
@@ -337,7 +347,7 @@ interface INamedValueMessageProps extends IStyleProps {
  *
  * 行由 ActionLine 組裝，但 className/style 只掛在「前綴」與「數值區」兩個色塊上：
  * ActionLine 的外層 span 刻意不帶 class，才能維持名稱在色塊之外的配色。
- * ActionLine assembles the line, but className/style stay on the prefix and value colour
+ * ActionLine assembles the line, but className/style stay on the linePrefix and value colour
  * spans: the outer span deliberately carries no class, which is what keeps the name outside
  * the colour block.
  */
@@ -350,18 +360,18 @@ const NamedValueMessage: React.FC<INamedValueMessageProps> = ({
   if (action.value === undefined) {
     return <NamedMessage action={action} className={className} style={style} />;
   }
-  const name = action.type === EnumActionType.Heal ? action.target : action.source;
+  const subject = action.type === EnumActionType.Heal ? action.target : action.source;
   return (
     <ActionLine
-      who={name}
-      preMessage={
-        action.prefix ? (
+      subject={subject}
+      linePrefix={
+        action.linePrefix ? (
           <span className={className} style={style}>
-            {action.prefix}
+            {action.linePrefix}
           </span>
         ) : undefined
       }
-      message={
+      body={
         <>
           <span className={className} style={style}>
             {text}{' '}
@@ -470,14 +480,14 @@ const RecoverMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
  * Regeneration message (single source of truth)
  *
  * 兩種原始版面：`name gained HP regeneration +N%` 與每回合的
- * `* name Auto Regenerate N HP`（prefix 帶出行首星號、數值加粗）。
+ * `* name Auto Regenerate N HP`（linePrefix 帶出行首星號、數值加粗）。
  * Two original layouts: `name gained HP regeneration +N%` and the per-turn
- * `* name Auto Regenerate N HP` (the prefix carries the leading asterisk and the value is
+ * `* name Auto Regenerate N HP` (the linePrefix carries the leading asterisk and the value is
  * bold).
  */
 const RegenMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
   const cls = getMessageClass(action);
-  if (action.prefix !== undefined && action.value !== undefined) {
+  if (action.linePrefix !== undefined && action.value !== undefined) {
     // `* name Auto Regenerate N HP`：行首星號與「Auto Regenerate N HP」上色，名稱預設色。
     // `* name Auto Regenerate N HP`: the leading asterisk and "Auto Regenerate N HP" are
     // coloured while the name stays default.
@@ -487,11 +497,11 @@ const RegenMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
   // `name gained HP/SP regeneration +N%`: the name stays default and only "gained … +N%" is
   // coloured. 名稱與文字取自結構化欄位，無需切割 message。
   // The name and text come from the structured fields, so `message` is never sliced.
-  const { name, text } = getNamedCopy(action);
+  const { subject, text } = getNamedCopy(action);
   return (
     <ActionLine
-      who={name}
-      message={
+      subject={subject}
+      body={
         <>
           <span className={cls}>{text}</span>
           <ActionValueChange action={action} />
@@ -525,8 +535,8 @@ const EmphasizedMessage: React.FC<{
   const parts = (action.text ?? action.message).split(emphasis);
   return (
     <ActionLine
-      who={action.source}
-      message={
+      subject={action.source}
+      body={
         <>
           {parts[0]}
           <span className={className}>{emphasis}</span>
@@ -570,8 +580,8 @@ const PoisonMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
     return (
       <ActionLine
         className={getMessageClass(action)}
-        who={action.source}
-        message={
+        subject={action.source}
+        body={
           <>
             got{' '}
             <span className="bold">{action.value}</span> damage by poison.
@@ -597,8 +607,8 @@ const PoisonMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
 const SacrificeMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
   <ActionLine
     className={getMessageClass(action)}
-    who={action.source}
-    message={
+    subject={action.source}
+    body={
       <>
         sacrifice{' '}
         <span className="bold">{action.value}</span>
@@ -623,8 +633,8 @@ const FailMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
   <>
     <ActionLine
       className="u"
-      who={action.source}
-      message={
+      subject={action.source}
+      body={
         <>
           <span className="dmg"> Failed </span>
           to{' '}
@@ -640,10 +650,10 @@ const FailMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
         </>
       }
     />
-    {action.message && (
+    {action.failReason && (
       <>
         <br />
-        {action.message}
+        {action.failReason}
       </>
     )}
   </>
@@ -654,26 +664,27 @@ const FailMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
  * Dropped-item message (single source of truth)
  *
  * 原始日誌為 `<b>名</b> dropped<img/>` 後接 `<span class="bold u">道具名</span>.`；
- * message 即道具名稱，source 為掉落者。
+ * 道具名稱取結構化欄位 itemName、掉落者取 source，message 只是整行純文字鏡像。
  * The original log is `<b>name</b> dropped<img/>` followed by
- * `<span class="bold u">item name</span>.`; `message` holds the item name and `source` the dropper.
+ * `<span class="bold u">item name</span>.`; the item name comes from the structured `itemName`
+ * field and the dropper from `source`, while `message` is only the whole-line mirror.
  */
 const ItemDropMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
   <ActionLine
-    who={action.source}
-    message={
+    subject={action.source}
+    body={
       <>
         {action.source && ' dropped'}
         {action.itemIconUrl && (
           <SkillIcon
             iconUrl={action.itemIconUrl}
-            name={action.message}
+            name={action.itemName ?? ''}
             size={18}
             className="skill-icon"
           />
         )}
         <span className="u">
-          <span className="bold">{action.message}</span>
+          <span className="bold">{action.itemName}</span>
         </span>
         .
       </>
@@ -683,7 +694,7 @@ const ItemDropMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
 
 /** 純文字資訊（`Failed!`、`Damage x6!`、`heal x2!`）/ Plain info text */
 const InfoMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <ActionLine className={getMessageClass(action)} message={action.message} />
+  <ActionLine className={getMessageClass(action)} body={action.message} />
 );
 
 /**
@@ -701,8 +712,8 @@ const EnergyExchangeMessage: React.FC<{ action: IBattleAction }> = ({ action }) 
   if (!r) return <span className="bold">{action.source}</span>;
   return (
     <ActionLine
-      who={action.source}
-      message={
+      subject={action.source}
+      body={
         <>
           exchanged rate of HP and SP.
           <br />
@@ -733,8 +744,8 @@ const ProtectMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
   if (isProtectingGuard(action.source, action.target)) {
     return (
       <ActionLine
-        who={action.source}
-        message={
+        subject={action.source}
+        body={
           <>
             protected{' '}
             <span className="bold">{action.target}</span>!
@@ -743,7 +754,7 @@ const ProtectMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
       />
     );
   }
-  return <ActionLine message={action.message} />;
+  return <ActionLine body={action.message} />;
 };
 
 /**
@@ -760,22 +771,22 @@ interface IStatusMessageProps extends IStylePropsRequired<'className'> {
  * Casting/down/default message (single source of truth)
  */
 const StatusMessage: React.FC<IStatusMessageProps> = ({ action, className, suffix, style }) => (
-  <ActionLine className={className} style={style} who={action.source} message={suffix} />
+  <ActionLine className={className} style={style} subject={action.source} body={suffix} />
 );
 
 /**
  * 蓄力/詠唱訊息（單一事實來源）
  * Charge/casting message (single source of truth)
  *
- * 文案由 buildChargeMessage 依 castType 決定，修正過去硬編碼「start casting.」
+ * 文案由 buildChargeText 依 castType 決定，修正過去硬編碼「start casting.」
  * 導致物理蓄力（start charging.）誤顯示為詠唱的缺陷；castType 缺省時維持詠唱，
  * 既有展示資料行為不變。
- * The copy comes from buildChargeMessage keyed on castType, fixing the defect where the
+ * The copy comes from buildChargeText keyed on castType, fixing the defect where the
  * hardcoded "start casting." showed a physical charge (start charging.) as a cast. An absent
  * castType still reads as casting, so existing showcase data behaves as before.
  */
 const CastingMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <StatusMessage action={action} className="charge" suffix={buildChargeMessage(action.castType)} />
+  <StatusMessage action={action} className="charge" suffix={buildChargeText(action.castType)} />
 );
 
 // ==================== 行動內容路由 / Action content router ====================
@@ -839,7 +850,7 @@ function renderActionContent(action: IBattleAction): React.ReactNode {
     case EnumActionType.Info:
       return <InfoMessage action={action} />;
     default:
-      return <ActionLine className={getAttrClass(action.attribute)} message={action.message} />;
+      return <ActionLine className={getAttrClass(action.attribute)} body={action.message} />;
   }
 }
 
