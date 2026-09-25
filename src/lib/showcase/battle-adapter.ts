@@ -383,10 +383,16 @@ export function resolveEventContext(
 export type IEventMapper = (ev: IBattleEvent, ctx: IEventContext) => IBattleAction;
 
 /**
- * 轉接器填寫的欄位：type／message 必填，其餘覆寫 composeAction 的預設值
- * Fields a mapper fills: type / message are required, the rest override composeAction's defaults
+ * 轉接器填寫的欄位：type 必填，其餘覆寫 composeAction 的預設值
+ * Fields a mapper fills: type is required, the rest override composeAction's defaults
+ *
+ * 「粗體名稱 ＋ 其後文字」版面只要給 `text`，message 由 composeAction 以 buildNamedMessage
+ * 合併一次（純文字鏡像）；其餘版面直接給 message。
+ * The "bold name + trailing text" layout only needs `text` — composeAction joins it into
+ * `message` once through buildNamedMessage (a plain-text mirror); every other layout supplies
+ * `message` itself.
  */
-export type IActionFields = Pick<IBattleAction, 'type' | 'message'> & Partial<IBattleAction>;
+export type IActionFields = Pick<IBattleAction, 'type'> & Partial<IBattleAction>;
 
 /**
  * 組裝各型別共用的欄位（單一事實來源）
@@ -397,21 +403,33 @@ export type IActionFields = Pick<IBattleAction, 'type' | 'message'> & Partial<IB
  * source / target / side / skill come from the context and attribute defaults to Normal; a mapper
  * only states what differs, so a new type can never drop the side or the skill name.
  *
+ * `text` 與 `message` 的關係只在此處定義一次：給 text 時以 buildNamedMessage 合併出
+ * 純文字鏡像 message，兩者由同一份輸入得出，不會各自漂移。
+ * The `text` / `message` relationship is defined exactly once here: when `text` is given,
+ * buildNamedMessage produces the plain-text mirror `message`, and both come from the same input
+ * so they cannot drift apart.
+ *
  * @param ctx - 轉接上下文 / adapter context
  * @param fields - 型別專屬欄位 / type-specific fields
  * @returns 日誌條目 / log entry
  */
 export function composeAction(ctx: IEventContext, fields: IActionFields): IBattleAction {
+	const source = fields.source ?? ctx.actor.name;
+	// 給 text 時在此合併一次；渲染端只讀 source／text，不會再切割 message
+	// Joined here once when `text` is given; renderers read source / text and never slice message
+	const message =
+		fields.message ??
+		(fields.text !== undefined ? buildNamedMessage(source, fields.text) : '');
 	const base: IBattleAction = {
 		type: fields.type,
-		message: fields.message,
-		source: ctx.actor.name,
+		message,
+		source,
 		target: ctx.target.name,
 		side: ctx.side,
 		attribute: EnumAttributeType.Normal,
 		skill: ctx.skillName ? { name: ctx.skillName } : undefined,
 	};
-	return { ...base, ...fields };
+	return { ...base, ...fields, message };
 }
 
 // ==================== 個別事件轉接器 / Per-event mappers ====================
@@ -556,11 +574,11 @@ const mapMagicCircle: IEventMapper = (ev, ctx) => {
 	});
 };
 
-/** Buff → 增益（text＝原始日誌文案，缺省時退回通用文案）/ Buff (text = the original phrase, generic copy when absent) */
+/** Buff → 增益（text＝原始日誌文案，缺省時退回通用文案；message 由 composeAction 合併）/ Buff (text = the original phrase, generic copy when absent; composeAction joins the message) */
 const mapBuff: IEventMapper = (ev, ctx) =>
 	composeAction(ctx, {
 		type: EnumActionType.Buff,
-		message: buildNamedMessage(ctx.actor.name, ev.text ?? DEFAULT_EVENT_TEXT.buff),
+		text: ev.text ?? DEFAULT_EVENT_TEXT.buff,
 		attribute: EnumAttributeType.Support,
 	});
 
@@ -568,7 +586,7 @@ const mapBuff: IEventMapper = (ev, ctx) =>
 const mapDebuff: IEventMapper = (ev, ctx) =>
 	composeAction(ctx, {
 		type: EnumActionType.Debuff,
-		message: buildNamedMessage(ctx.actor.name, ev.text ?? DEFAULT_EVENT_TEXT.debuff),
+		text: ev.text ?? DEFAULT_EVENT_TEXT.debuff,
 	});
 
 /** Poison → 中毒（來源＝中毒單位、側別優先取目標側）/ Poison (source = the poisoned unit, side prefers the target) */
@@ -578,7 +596,7 @@ const mapPoison: IEventMapper = (ev, ctx) => {
 		type: EnumActionType.Poison,
 		source: name,
 		side: ctx.target.side ?? ctx.side,
-		message: buildNamedMessage(name, ev.text ?? DEFAULT_EVENT_TEXT.poison),
+		text: ev.text ?? DEFAULT_EVENT_TEXT.poison,
 		attribute: EnumAttributeType.Spdmg,
 	});
 };
@@ -587,7 +605,7 @@ const mapPoison: IEventMapper = (ev, ctx) => {
 const mapMiss: IEventMapper = (ev, ctx) =>
 	composeAction(ctx, {
 		type: EnumActionType.Miss,
-		message: buildNamedMessage(ctx.actor.name, ev.text ?? DEFAULT_EVENT_TEXT.miss),
+		text: ev.text ?? DEFAULT_EVENT_TEXT.miss,
 	});
 
 /** Info → 純文字資訊（text 即完整訊息，無名稱無 span）/ Info (text is the whole message: no name, no span) */

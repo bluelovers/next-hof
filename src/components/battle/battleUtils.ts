@@ -221,6 +221,12 @@ export function buildMagicCircleMessage(source?: string, record?: IMagicCircleRe
  * 以「粗體名稱 ＋ 其後文字」組合訊息（多數日誌行的版面）
  * Compose a message from a bold name plus the text that follows (most log lines)
  *
+ * 這是「名稱＋文字」唯一的合併點：轉接層以 composeAction 呼叫它產出純文字鏡像 message，
+ * 結構化的 source／text 則原樣保留給渲染端，因此不存在再把結果切回去的程式碼。
+ * This is the single join point for "name + text": composeAction calls it to produce the
+ * plain-text mirror `message`, while the structured source / text stay intact for the renderer,
+ * so no code ever slices the result back apart.
+ *
  * @param source - 單位名稱（缺省時整段即為文字）/ Unit name (the whole string is the text when absent)
  * @param text - 名稱之後的文字 / Text after the name
  * @returns 訊息文字 / Message text
@@ -245,24 +251,49 @@ export function buildPossessiveMessage(source: string | undefined, text: string)
 }
 
 /**
- * 把訊息拆回「粗體名稱」與其後的文字（單一事實來源）
- * Split a message back into the bold name and the text that follows (single source of truth)
+ * 取得「粗體名稱 ＋ 其後文字」的結構化組合（取代切割 message 的還原）
+ * Get the structured "bold name + trailing text" pair (replaces slicing `message` back apart)
  *
- * 文案一律由 buildNamedMessage 以 `${source} ${text}` 建立，因此以 source 前綴切分即可
- * 還原兩段，不需要額外欄位；找不到前綴時整段視為文字（名稱不加粗）。
- * Copy is always built as `${source} ${text}` by buildNamedMessage, so slicing on the source
- * prefix recovers both parts without an extra field; when the prefix is missing the whole
- * string is treated as the text (no bold name).
+ * 產生端經 composeAction 直接存入 source 與 text，渲染端只讀取欄位、不做字串手術，
+ * 因此不會出現「先組成 `${source} ${text}` 再切回來」的多餘轉換。
+ * The producer stores `source` and `text` straight through composeAction, so the renderer only
+ * reads fields — there is no "join `${source} ${text}` then slice it back" conversion left.
+ *
+ * 未提供 text（外部匯入的舊資料等）時退回整段 message 且名稱不加粗，與原版
+ * 「找不到名稱前綴就整段視為文字」的行為一致。
+ * Without `text` (legacy data from elsewhere) the whole `message` is used with no bold name,
+ * matching the original "no name prefix → the whole string is the text" behaviour.
+ *
+ * @param action - 行動（來源、名稱後文字、訊息）/ action (source, trailing text, message)
+ * @returns 名稱與其後的文字 / the name and the text that follows
  */
-export function splitNamedMessage(action: Pick<IBattleAction, 'source' | 'message'>): {
+export function getNamedCopy(action: Pick<IBattleAction, 'source' | 'text' | 'message'>): {
   name?: string;
   text: string;
 } {
-  const { source, message } = action;
-  if (source && message.startsWith(source)) {
-    return { name: source, text: message.slice(source.length) };
-  }
-  return { text: message };
+  if (action.text !== undefined) return { name: action.source, text: action.text };
+  return { text: action.message };
+}
+
+/**
+ * 是否為「守護他人」版面（與 buildProtectMessage 的分支同一判定）
+ * Whether this is the "guarded someone else" layout (the very rule buildProtectMessage branches on)
+ *
+ * 文案建構器與渲染端共用此判定，兩者不會因分支條件不同而漂移，
+ * 因此 ProtectMessage 直接以 source／target 組版，無需再切割 message 找回名稱與目標。
+ * The copy builder and the renderer share this rule so their branches cannot drift, which is why
+ * ProtectMessage lays the line out from source / target directly instead of cutting `message`
+ * open to recover the name and the guarded unit.
+ *
+ * @param source - 來源單位 / source unit
+ * @param target - 被守護單位 / guarded unit
+ * @returns 是否走守護分支 / true when the guarding branch applies
+ */
+export function isProtectingGuard(
+  source: string | undefined,
+  target: string | undefined,
+): target is string {
+  return Boolean(source) && Boolean(target) && source !== target;
 }
 
 /**
@@ -443,14 +474,19 @@ export function buildHealMessage(value: number, target?: string): string {
  * 守護（`actor protected target!`；同單位或缺目標時改印攔截文案）
  * Guard (`actor protected target!`; the interception copy prints when same-unit or targetless)
  *
+ * 分支條件只寫在 isProtectingGuard 一份，渲染端 ProtectMessage 用同一判定組版。
+ * The branch rule exists only in isProtectingGuard; the renderer ProtectMessage lays out the
+ * line with the very same rule.
+ *
  * @param actor - 攜帶守護的單位 / Guarding unit
  * @param target - 被守護單位（與 actor 相同或缺省時走兜底文案）/ Guarded unit (same as actor or absent → fallback)
  * @returns 訊息文字 / Message text
  */
 export function buildProtectMessage(actor?: string, target?: string): string {
-  return actor && target && actor !== target
-    ? `${actor} protected ${target}!`
-    : `${actor ?? 'Unknown'} blocked the attack with barrier!`;
+  if (isProtectingGuard(actor, target)) {
+    return `${actor} protected ${target}!`;
+  }
+  return `${actor ?? 'Unknown'} blocked the attack with barrier!`;
 }
 
 /**

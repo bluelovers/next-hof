@@ -191,9 +191,12 @@ describe('3.3 mapBattleEvent', () => {
 		expect(actions[5].source).toBe('GoblinAxe');
 		expect(actions[5].side).toBe(EnumTeamSideUI.Left);
 
-		// Poison → poison，來源＝中毒單位（文案由 buildNamedMessage 組出）
-		// Poison → poison with the poisoned unit as the source (copy built by buildNamedMessage)
+		// Poison → poison，來源＝中毒單位；text 保留結構化文案，message 由 composeAction 合併
+		// Poison → poison with the poisoned unit as the source; `text` keeps the structured copy
+		// while composeAction joins `message`
 		expect(actions[6].type).toBe(EnumActionType.Poison);
+		expect(actions[6].source).toBe('GoblinAxe');
+		expect(actions[6].text).toBe('poisoned');
 		expect(actions[6].message).toBe('GoblinAxe poisoned');
 	});
 
@@ -590,6 +593,53 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () => {
 		expect(over.attribute).toBe(EnumAttributeType.Dmg);
 		// 未覆寫的欄位仍來自上下文 / fields the mapper omits still come from the context
 		expect(over.target).toBe('GoblinAxe');
+	});
+
+	it('composeAction joins text into the message exactly once', () => {
+		const ctx = resolveEventContext(
+			{ type: EnumBattleEventType.Buff, actor: '100' },
+			lookup,
+			repo,
+		);
+		// 只給 text → message 由 buildNamedMessage 合併，兩者同一份輸入、不會各自漂移
+		// Only `text` is given → composeAction joins it with buildNamedMessage, so both come from
+		// one input and cannot drift apart
+		const named = composeAction(ctx, { type: EnumActionType.Buff, text: 'got barriered!' });
+		expect(named.text).toBe('got barriered!');
+		expect(named.message).toBe('Warrior got barriered!');
+		expect(named.source).toBe('Warrior');
+
+		// 明確給 message 時以其為準（傷害、守護等非「名稱＋文字」版面）
+		// An explicit `message` wins (damage, guard and the other non "name + text" layouts)
+		const explicit = composeAction(ctx, { type: EnumActionType.Info, message: 'plain' });
+		expect(explicit.text).toBeUndefined();
+		expect(explicit.message).toBe('plain');
+	});
+
+	it('named families keep structured text for the renderer', () => {
+		const events: IBattleEvent[] = [
+			{ type: EnumBattleEventType.Buff, actor: '100' },
+			{ type: EnumBattleEventType.Debuff, actor: '100' },
+			{ type: EnumBattleEventType.Miss, actor: '100' },
+			{ type: EnumBattleEventType.Poison, target: '1000' },
+		];
+		const actions = events.map((ev) => mapBattleEvent(ev, lookup, repo));
+
+		// 渲染端只讀 source／text，不必把 message 切開；message 只是純文字鏡像
+		// The renderer reads source / text only and never cuts `message` open; `message` is just
+		// the plain-text mirror
+		expect(actions.map((a) => a.text)).toEqual([
+			'gained buff.',
+			'got debuffed.',
+			'Failed!',
+			'get poisoned!',
+		]);
+		expect(actions.map((a) => a.message)).toEqual([
+			'Warrior gained buff.',
+			'Warrior got debuffed.',
+			'Warrior Failed!',
+			'GoblinAxe get poisoned!',
+		]);
 	});
 
 	it('registers exactly one mapper for every EnumBattleEventType member', () => {

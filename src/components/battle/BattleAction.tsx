@@ -20,7 +20,8 @@ import {
   MAGIC_CIRCLE_PHRASE,
   getMagicCircleClass,
   getMessageClass,
-  splitNamedMessage,
+  getNamedCopy,
+  isProtectingGuard,
   buildChargeMessage,
   buildValueChangeText,
 } from './battleUtils';
@@ -269,15 +270,16 @@ interface INamedMessageProps extends IStyleProps {
  * 通用「粗體名稱 ＋ 其後文字」版面（單一事實來源）
  * Shared "bold name + trailing text" layout (single source of truth)
  *
- * 名稱與文字由 splitNamedMessage 從 message 還原，文案則一律由 battleUtils 的建構器
- * 產生，因此各家族訊息組件只需指定配色；行本身交給 ActionLine 組裝（前置、粗體名稱、
- * 文字、數值變化依序輸出）。
- * splitNamedMessage recovers the name and the text from `message`, and battleUtils'
- * builders always produce the copy, so each family component only has to pick a colour;
- * the line itself is assembled by ActionLine (prefix, bold name, text, value change in order).
+ * 名稱與文字直接取自結構化的 source／text（getNamedCopy），不再把 message 切割還原；
+ * 文案則一律由 battleUtils 的建構器在產生端組好，因此各家族訊息組件只需指定配色；
+ * 行本身交給 ActionLine 組裝（前置、粗體名稱、文字、數值變化依序輸出）。
+ * The name and the text come straight from the structured source / text (getNamedCopy) instead
+ * of slicing `message` back apart; the copy itself is always assembled at production time by
+ * battleUtils' builders, so each family component only has to pick a colour; the line itself is
+ * assembled by ActionLine (prefix, bold name, text, value change in order).
  */
 const NamedMessage: React.FC<INamedMessageProps> = ({ action, className, style }) => {
-  const { name, text } = splitNamedMessage(action);
+  const { name, text } = getNamedCopy(action);
   return (
     <ActionLine
       className={className}
@@ -483,8 +485,9 @@ const RegenMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
   }
   // `name gained HP/SP regeneration +N%`：名稱預設色，僅「gained … +N%」上色。
   // `name gained HP/SP regeneration +N%`: the name stays default and only "gained … +N%" is
-  // coloured.
-  const { name, text } = splitNamedMessage(action);
+  // coloured. 名稱與文字取自結構化欄位，無需切割 message。
+  // The name and text come from the structured fields, so `message` is never sliced.
+  const { name, text } = getNamedCopy(action);
   return (
     <ActionLine
       who={name}
@@ -502,11 +505,15 @@ const RegenMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
  * 強調片段訊息（單一事實來源）
  * Emphasised-segment message (single source of truth)
  *
- * 把 message 依 emphasis 切成「前段＋強調段＋後段」，只有強調段上色，名稱維持預設色；
- * 復活（`revived!` → recover）與中毒施加（`poisoned` → spdmg）共用此版面。
- * Splits `message` on `emphasis` into before / emphasised / after and colours only the
- * emphasised segment while the name keeps the default colour; revive (`revived!` → recover)
- * and the poison apply line (`poisoned` → spdmg) share this layout.
+ * 依 emphasis 把「名稱之後的文字」切成「前段＋強調段＋後段」，只有強調段上色，名稱維持
+ * 預設色；復活（`revived!` → recover）與中毒施加（`poisoned` → spdmg）共用此版面。
+ * 切割的對象是結構化的 text（純文字鏡像 message 只做備援），因此名稱不會被切進段落裡、
+ * 也不會在行首重複印出。
+ * The text after the name is sliced on `emphasis` into before / emphasised / after, colouring
+ * only the emphasised segment while the name keeps the default colour; revive (`revived!` →
+ * recover) and the poison apply line (`poisoned` → spdmg) share this layout. The slice target is
+ * the structured `text` (the plain-text mirror `message` is only a fallback), so the bold name
+ * never falls inside a segment and cannot print twice at the head of the line.
  */
 const EmphasizedMessage: React.FC<{
   action: IBattleAction;
@@ -515,7 +522,7 @@ const EmphasizedMessage: React.FC<{
   /** 強調片段的 CSS class / CSS class of the emphasised segment */
   className: string;
 }> = ({ action, emphasis = action.emphasis ?? 'revived', className }) => {
-  const parts = action.message.split(emphasis);
+  const parts = (action.text ?? action.message).split(emphasis);
   return (
     <ActionLine
       who={action.source}
@@ -715,17 +722,22 @@ const EnergyExchangeMessage: React.FC<{ action: IBattleAction }> = ({ action }) 
  * 對照 Battle.php：`printf('%s protected %s!')` 無任何 span，故維持預設色（不依 attribute 上色）。
  * Mirrors Battle.php's `printf('%s protected %s!')`, which has no span at all, so the line stays
  * the default colour (it is NOT coloured by `attribute`).
+ *
+ * 版面直接由結構化的 source／target 組成（判定與文案建構器共用 isProtectingGuard），
+ * 不再切割 message 找回名稱與目標；只有「攔截」版面維持整行原樣輸出。
+ * The layout is built straight from the structured source / target (the rule is shared with the
+ * copy builder via isProtectingGuard), so `message` is never cut open to recover the name and
+ * the guarded unit; only the "interception" variant prints the whole line as-is.
  */
 const ProtectMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
-  const parts = action.message.split('protected');
-  if (parts.length === 2) {
+  if (isProtectingGuard(action.source, action.target)) {
     return (
       <ActionLine
-        who={parts[0].trim()}
+        who={action.source}
         message={
           <>
             protected{' '}
-            <span className="bold">{parts[1].trim().replace('!', '')}</span>!
+            <span className="bold">{action.target}</span>!
           </>
         }
       />

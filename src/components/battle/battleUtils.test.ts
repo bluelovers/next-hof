@@ -12,7 +12,8 @@ import {
 	SPRITE_CORPSE_URL_REV,
 	buildNamedMessage,
 	buildPossessiveMessage,
-	splitNamedMessage,
+	getNamedCopy,
+	isProtectingGuard,
 	buildChargeMessage,
 	buildDelayMessage,
 	buildSpDamageMessage,
@@ -312,31 +313,65 @@ describe('resolveSegmentSprites', () => {
 });
 
 describe('原始日誌文案與配色 / original log copy and colours', () => {
-	it('buildNamedMessage + splitNamedMessage round-trip the bold name', () => {
-		const message = buildNamedMessage('Hero1', 'got barriered!');
-		expect(message).toBe('Hero1 got barriered!');
-		expect(splitNamedMessage({ source: 'Hero1', message })).toEqual({
-			name: 'Hero1',
-			text: ' got barriered!',
-		});
+	it('buildNamedMessage is the single join point for name and text', () => {
+		expect(buildNamedMessage('Hero1', 'got barriered!')).toBe('Hero1 got barriered!');
+		// 缺名稱時整段即文字（名稱不加粗，也不會印出 undefined）
+		// Without a name the whole string is the text (no bold name, and no `undefined` printed)
+		expect(buildNamedMessage(undefined, 'got barriered!')).toBe('got barriered!');
+		expect(buildNamedMessage('', 'got barriered!')).toBe('got barriered!');
+		// 所有格屬同類版面：名稱與 `'s` 之間不空格
+		// The possessive is the same family: no space between the name and `'s`
+		expect(buildPossessiveMessage('GoblinAxe', 'poison has cured.')).toBe(
+			"GoblinAxe's poison has cured.",
+		);
+		expect(buildPossessiveMessage(undefined, 'poison has cured.')).toBe('poison has cured.');
 	});
 
-	it('buildPossessiveMessage keeps the name and the possessive joined', () => {
-		const message = buildPossessiveMessage('GoblinAxe', 'poison has cured.');
-		expect(message).toBe("GoblinAxe's poison has cured.");
-		// 名稱與 `'s` 之間不空格，切分後文字以 `'` 開頭
-		// No space between the name and `'s`, so the split text starts with `'`
-		expect(splitNamedMessage({ source: 'GoblinAxe', message })).toEqual({
-			name: 'GoblinAxe',
-			text: "'s poison has cured.",
-		});
+	it('getNamedCopy reads the structured parts instead of slicing the message', () => {
+		// 產生端存入 source／text → 渲染端直接取用，完全沒有「組字串再切割」的轉換
+		// The producer stores source / text → the renderer reads them back directly: no
+		// "join a string then slice it" conversion anywhere
+		expect(
+			getNamedCopy({
+				source: 'Hero1',
+				text: 'got barriered!',
+				message: buildNamedMessage('Hero1', 'got barriered!'),
+			}),
+		).toEqual({ name: 'Hero1', text: 'got barriered!' });
+		// 所有格文案同樣以結構化欄位保存（`'s` 屬於名稱之後的文字）
+		// The possessive copy is stored the same way (`'s` belongs to the text after the name)
+		expect(
+			getNamedCopy({
+				source: 'GoblinAxe',
+				text: "'s poison has cured.",
+				message: buildPossessiveMessage('GoblinAxe', 'poison has cured.'),
+			}),
+		).toEqual({ name: 'GoblinAxe', text: "'s poison has cured." });
 	});
 
-	it('splitNamedMessage keeps the whole line when there is no matching name', () => {
-		expect(splitNamedMessage({ message: 'Failed!' })).toEqual({ text: 'Failed!' });
-		expect(splitNamedMessage({ source: 'Hero1', message: 'Someone else down.' })).toEqual({
+	it('getNamedCopy falls back to the whole line when no text is supplied', () => {
+		// 沒有 text（外部匯入的舊資料）→ 整段視為文字、名稱不加粗
+		// Without `text` (legacy data from elsewhere) the whole line is the text and no name is bolded
+		expect(getNamedCopy({ message: 'Failed!' })).toEqual({ text: 'Failed!' });
+		expect(getNamedCopy({ source: 'Hero1', message: 'Someone else down.' })).toEqual({
 			text: 'Someone else down.',
 		});
+	});
+
+	it('isProtectingGuard shares the copy builder branch rule', () => {
+		expect(isProtectingGuard('Warrior', 'Mage')).toBe(true);
+		expect(isProtectingGuard('Warrior', 'Warrior')).toBe(false);
+		expect(isProtectingGuard('Warrior', undefined)).toBe(false);
+		expect(isProtectingGuard(undefined, 'Mage')).toBe(false);
+		expect(isProtectingGuard(undefined, undefined)).toBe(false);
+		// 同一判定同時驅動文案與版面 → 兩者不會漂移
+		// One rule drives both the copy and the layout → the two cannot drift apart
+		expect(isProtectingGuard('Warrior', 'Mage')).toBe(
+			buildProtectMessage('Warrior', 'Mage').includes('protected'),
+		);
+		expect(isProtectingGuard('Warrior', 'Warrior')).toBe(
+			buildProtectMessage('Warrior', 'Warrior').includes('protected'),
+		);
 	});
 
 	it('buildChargeMessage picks the copy from the charge kind', () => {

@@ -289,8 +289,26 @@ export interface IBattleAction {
 	 * Decorative prefix before the name (such as the leading `* ` of an Auto Regenerate line)
 	 */
 	prefix?: string;
-	/** 訊息文字 / Message text */
+	/**
+	 * 訊息文字（純文字鏡像：供測試、無障礙與非互動消費端讀取）
+	 * Message text (plain-text mirror: for tests, accessibility and non-interactive consumers)
+	 *
+	 * 「粗體名稱 ＋ 其後文字」版面的 message 由組裝點以 buildNamedMessage 合併一次，
+	 * 渲染端一律改讀結構化的 source／text，不會再把此字串切割還原。
+	 * The copy of the "bold name + trailing text" layout is joined exactly once at assembly by
+	 * buildNamedMessage; renderers read the structured source / text instead and never slice this
+	 * string back apart.
+	 */
 	message: string;
+	/**
+	 * 粗體名稱之後的文字（與 source 組成結構化版面，取代「組字串 → 再切割」）
+	 * Text after the bold name (structured layout that replaces "join a string → slice it back")
+	 *
+	 * 產生端直接存入這兩段，NamedMessage／RegenMessage 直接輸出，無需任何字串手術。
+	 * The producer stores both parts and NamedMessage / RegenMessage emit them directly, with no
+	 * string surgery at all.
+	 */
+	text?: string;
 	/** 隊伍側 (用於顯示在哪一欄) / Team side */
 	side?: EnumTeamSideUI;
 	/** 訊息類型 / Message attribute type */
