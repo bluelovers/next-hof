@@ -394,6 +394,87 @@ export function buildDelayMessage(
   return buildNamedMessage(source, `Delayed(${oldValue} >>> ${newValue}/${base})`);
 }
 
+/**
+ * 施放行動（`name SkillName`；無技能時只印名稱）
+ * Skill act (`name SkillName`; only the name prints without a skill)
+ *
+ * 名稱段沿用 buildNamedMessage，避免 actor 缺省時把 `undefined` 印進日誌。
+ * The name segment reuses buildNamedMessage so an absent actor never prints `undefined`
+ * into the log.
+ *
+ * @param source - 施放者名稱 / Caster name
+ * @param skillName - 技能名稱（缺省時只輸出名稱）/ Skill name (only the name prints when absent)
+ * @returns 訊息文字 / Message text
+ */
+export function buildActMessage(source: string | undefined, skillName?: string): string {
+  return skillName !== undefined ? buildNamedMessage(source, skillName) : source ?? '';
+}
+
+/**
+ * 傷害（`N Damage to target` / `N Damage`）
+ * Damage (`N Damage to target` / `N Damage`)
+ *
+ * @param value - 傷害值 / Damage value
+ * @param target - 目標名稱（缺省時省略 ` to target`）/ Target name (the ` to target` part drops when absent)
+ * @returns 訊息文字 / Message text
+ */
+export function buildDamageMessage(value: number, target?: string): string {
+  return target ? `${value} Damage to ${target}` : `${value} Damage`;
+}
+
+/**
+ * 回復事件文案（`target Recovered N HP` / `N Heal`）
+ * Heal event copy (`target Recovered N HP` / `N Heal`)
+ *
+ * 有目標時與 buildRecoveredMessage（展示側 `name Recovered N HP`）共用同一句型；
+ * 無目標時保留引擎的 `N Heal` 兜底文案。
+ * With a target it shares buildRecoveredMessage's wording (`name Recovered N HP` on the display
+ * side); without one the engine's `N Heal` fallback is kept.
+ *
+ * @param value - 回復量 / Heal amount
+ * @param target - 受療者名稱（缺省時省略名稱）/ Healed unit name (dropped when absent)
+ * @returns 訊息文字 / Message text
+ */
+export function buildHealMessage(value: number, target?: string): string {
+  return target ? buildRecoveredMessage(target, value, 'HP') : `${value} Heal`;
+}
+
+/**
+ * 守護（`actor protected target!`；同單位或缺目標時改印攔截文案）
+ * Guard (`actor protected target!`; the interception copy prints when same-unit or targetless)
+ *
+ * @param actor - 攜帶守護的單位 / Guarding unit
+ * @param target - 被守護單位（與 actor 相同或缺省時走兜底文案）/ Guarded unit (same as actor or absent → fallback)
+ * @returns 訊息文字 / Message text
+ */
+export function buildProtectMessage(actor?: string, target?: string): string {
+  return actor && target && actor !== target
+    ? `${actor} protected ${target}!`
+    : `${actor ?? 'Unknown'} blocked the attack with barrier!`;
+}
+
+/**
+ * 倒下（`name down.`）/ Death (`name down.`)
+ *
+ * @param name - 倒下單位名稱 / Name of the fallen unit
+ * @returns 訊息文字 / Message text
+ */
+export function buildDownMessage(name: string): string {
+  return `${name} down.`;
+}
+
+/**
+ * 召喚入隊（`target joined to the team.`；無對象時退回施放者召喚句）
+ * Summon join (`target joined to the team.`; the caster's summon line prints without a target)
+ *
+ * @param targetName - 被召喚單位名稱 / Summoned unit name
+ * @param actorName - 施放者名稱 / Caster name
+ * @returns 訊息文字 / Message text
+ */
+export function buildSummonMessage(targetName?: string, actorName?: string): string {
+  return targetName ? `${targetName} joined to the team.` : `${actorName ?? ''} summon.`;
+}
+
 /** 訊息型別 → CSS class（單一事實來源）/ Action type → CSS class (single source of truth) */
 const MESSAGE_CLASS: Partial<Record<EnumActionType, string>> = {
   [EnumActionType.Damage]: 'dmg',

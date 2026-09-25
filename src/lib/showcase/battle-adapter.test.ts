@@ -4,7 +4,7 @@ import { EnumState, MAX_CHAR } from '#/lib/game/constants';
 import { RNG } from '#/lib/game/core/rng';
 import { createSeedRepository, SEED } from '#/lib/game/data/seed-data';
 import { newChar, newMon } from '#/lib/game/character/factory';
-import { EnumBattleEventType } from '#/lib/game/types';
+import { EnumBattleEventType, EnumSkillDamageType } from '#/lib/game/types';
 import type { IBattleEvent, ISkillDef } from '#/lib/game/types';
 import type { IDataRepository } from '#/lib/game/data/repository';
 import { SPRITE_PLACEHOLDER_URL } from './sprite-map';
@@ -12,6 +12,7 @@ import {
 	EnumTeamSideUI,
 	EnumUnitStatus,
 	EnumActionType,
+	EnumAttributeType,
 	EnumMagicCircleKind,
 	EnumChargeKind,
 } from '#/components/battle/enums';
@@ -19,13 +20,24 @@ import { EnumPosition } from '#/lib/game/constants';
 import {
 	DEFAULT_ALLY_TEAM_NAME,
 	DEFAULT_ENEMY_TEAM_NAME,
+	DEFAULT_EVENT_TEXT,
+	EVENT_MAPPERS,
+	buildDisplayData,
 	buildPositionRoster,
 	buildResultData,
 	buildShowcaseTeams,
 	buildTeam,
 	buildUnitLookup,
+	chargeKindOf,
+	composeAction,
+	computeSideDamage,
 	mapBattleEvent,
+	mapUnknownEvent,
+	parseDefNo,
+	resolveEventContext,
+	resolveRef,
 	runShowcaseBattle,
+	validateShowcaseInput,
 	type IUnitLookup,
 } from './battle-adapter';
 
@@ -513,5 +525,200 @@ describe('3.5 buildSprites / buildPositionRoster', () => {
 				expect(s.flipped).toBe(true);
 			}
 		}
+	});
+});
+
+// ==================== 3.3b 事件轉接的組裝元件 ====================
+// Task 3.3b: composable pieces of the event adapter
+describe('3.3b 事件轉接的組裝元件 / event adapter composition', () => {
+	const lookup: IUnitLookup = new Map<number, { name: string; side: EnumTeamSideUI }>([
+		[100, { name: 'Warrior', side: EnumTeamSideUI.Right }],
+		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left }],
+	]);
+	const repo = createSeedRepository();
+
+	it('resolveEventContext resolves actor, target, side and skill in one pass', () => {
+		const ctx = resolveEventContext(
+			{ type: EnumBattleEventType.Damage, actor: '100', target: '1000', skill: 1000 },
+			lookup,
+			repo,
+		);
+		expect(ctx.actor).toEqual({ name: 'Warrior', side: EnumTeamSideUI.Right });
+		expect(ctx.target).toEqual({ name: 'GoblinAxe', side: EnumTeamSideUI.Left });
+		// 歸屬側別優先取 actor（Damage 的施作者側）/ the owning side prefers the actor (the damage dealer)
+		expect(ctx.side).toBe(EnumTeamSideUI.Right);
+		expect(ctx.skillDef).toEqual(repo.getSkill(1000));
+		expect(ctx.skillName).toBe(repo.getSkill(1000)?.name);
+		expect(ctx.repo).toBe(repo);
+	});
+
+	it('resolveEventContext leaves side undefined when neither end is in the lookup', () => {
+		const ctx = resolveEventContext({ type: EnumBattleEventType.Info, actor: '9999' }, lookup, repo);
+		expect(ctx.actor).toEqual({ name: '9999' });
+		expect(ctx.side).toBeUndefined();
+		expect(ctx.skillName).toBeUndefined();
+	});
+
+	it('resolveRef keeps the raw no string for unknown refs and {} for absent ones', () => {
+		expect(resolveRef('100', lookup)).toEqual({ name: 'Warrior', side: EnumTeamSideUI.Right });
+		expect(resolveRef('9999', lookup)).toEqual({ name: '9999' });
+		expect(resolveRef(undefined, lookup)).toEqual({});
+	});
+
+	it('composeAction fills the shared fields and honours per-type overrides', () => {
+		const ctx = resolveEventContext(
+			{ type: EnumBattleEventType.Damage, actor: '100', target: '1000' },
+			lookup,
+			repo,
+		);
+		const base = composeAction(ctx, { type: EnumActionType.Info, message: 'hello' });
+		expect(base.source).toBe('Warrior');
+		expect(base.target).toBe('GoblinAxe');
+		expect(base.side).toBe(EnumTeamSideUI.Right);
+		expect(base.attribute).toBe(EnumAttributeType.Normal);
+		expect(base.message).toBe('hello');
+
+		const over = composeAction(ctx, {
+			type: EnumActionType.Down,
+			message: 'GoblinAxe down.',
+			source: 'GoblinAxe',
+			side: EnumTeamSideUI.Left,
+			attribute: EnumAttributeType.Dmg,
+		});
+		expect(over.source).toBe('GoblinAxe');
+		expect(over.side).toBe(EnumTeamSideUI.Left);
+		expect(over.attribute).toBe(EnumAttributeType.Dmg);
+		// 未覆寫的欄位仍來自上下文 / fields the mapper omits still come from the context
+		expect(over.target).toBe('GoblinAxe');
+	});
+
+	it('registers exactly one mapper for every EnumBattleEventType member', () => {
+		const types = Object.values(EnumBattleEventType);
+		expect(types.length).toBeGreaterThan(0);
+		for (const type of types) {
+			expect(EVENT_MAPPERS[type], `missing mapper for ${type}`).toBeTypeOf('function');
+		}
+		expect(Object.keys(EVENT_MAPPERS)).toHaveLength(types.length);
+	});
+
+	it('runs a single mapper straight from the table', () => {
+		const ev: IBattleEvent = {
+			type: EnumBattleEventType.Damage,
+			actor: '100',
+			target: '1000',
+			value: 42,
+			hpBefore: 200,
+			hpAfter: 158,
+		};
+		const mapper = EVENT_MAPPERS[EnumBattleEventType.Damage];
+		expect(mapper).toBeTypeOf('function');
+		const ctx = resolveEventContext(ev, lookup, repo);
+		expect(mapper?.(ev, ctx)).toEqual(mapBattleEvent(ev, lookup, repo));
+	});
+
+	it('falls back to mapUnknownEvent for an unregistered type', () => {
+		const ev = { type: 'nonsense' as EnumBattleEventType, actor: '100', target: '1000' };
+		expect(EVENT_MAPPERS[ev.type]).toBeUndefined();
+
+		const action = mapBattleEvent(ev, lookup, repo);
+		expect(action.type).toBe(EnumActionType.Result);
+		expect(action.message).toContain('nonsense');
+		expect(action).toEqual(mapUnknownEvent(ev, resolveEventContext(ev, lookup, repo)));
+	});
+
+	it('exposes the fallback copy for text-less events', () => {
+		expect(DEFAULT_EVENT_TEXT).toEqual({
+			buff: 'gained buff.',
+			debuff: 'got debuffed.',
+			poison: 'get poisoned!',
+			miss: 'Failed!',
+		});
+	});
+
+	it('parseDefNo keeps numeric refs and drops the rest', () => {
+		expect(parseDefNo('1000')).toBe(1000);
+		expect(parseDefNo('GoblinAxe')).toBeUndefined();
+		expect(parseDefNo(undefined)).toBeUndefined();
+	});
+
+	it('chargeKindOf marks only physical skills as charging', () => {
+		const physical = { no: 1, name: 'Slash', type: EnumSkillDamageType.Physical } as ISkillDef;
+		const magic = { no: 2, name: 'Fireball', type: EnumSkillDamageType.Magic } as ISkillDef;
+		expect(chargeKindOf(physical)).toBe(EnumChargeKind.Charging);
+		expect(chargeKindOf(magic)).toBe(EnumChargeKind.Casting);
+		// 缺技能定義（查無／事件沒帶 skill）→ casting / absent definition → casting
+		expect(chargeKindOf(undefined)).toBe(EnumChargeKind.Casting);
+	});
+});
+
+// ==================== 3.4b 展示資料組裝 ====================
+// Task 3.4b: display-data assembly
+describe('3.4b 展示資料組裝 / display data assembly', () => {
+	const lookup: IUnitLookup = new Map<number, { name: string; side: EnumTeamSideUI }>([
+		[100, { name: 'Warrior', side: EnumTeamSideUI.Right }],
+		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left }],
+	]);
+
+	it('computeSideDamage sums only the events whose actor belongs to that side', () => {
+		const events: IBattleEvent[] = [
+			{ type: EnumBattleEventType.Damage, actor: '100', value: 10 },
+			{ type: EnumBattleEventType.Damage, actor: '1000', value: 4 },
+			{ type: EnumBattleEventType.Heal, actor: '100', value: 99 },
+			{ type: EnumBattleEventType.Damage, actor: '9999', value: 7 },
+		];
+		expect(computeSideDamage(events, lookup, EnumTeamSideUI.Right)).toBe(10);
+		expect(computeSideDamage(events, lookup, EnumTeamSideUI.Left)).toBe(4);
+		expect(computeSideDamage(undefined, lookup, EnumTeamSideUI.Right)).toBe(0);
+	});
+
+	it('validateShowcaseInput rejects an empty or oversized party and an empty encounter', () => {
+		expect(() => validateShowcaseInput({ charNos: [], monNos: [1000] })).toThrow(/Party size/);
+		expect(() => validateShowcaseInput({ charNos: [100], monNos: [] })).toThrow(
+			/at least one monster/,
+		);
+		expect(MAX_CHAR).toBeGreaterThan(0);
+		expect(() =>
+			validateShowcaseInput({ charNos: new Array<number>(MAX_CHAR + 1).fill(100), monNos: [1000] }),
+		).toThrow(/Party size/);
+		expect(() => validateShowcaseInput({ charNos: [100], monNos: [1000] })).not.toThrow();
+	});
+
+	it('buildDisplayData assembles teams, actions and result from supplied members and events', () => {
+		const repo = createSeedRepository();
+		const { allies, enemies } = buildShowcaseTeams([100], [1000], repo, new RNG(5));
+		const events: IBattleEvent[] = [
+			{
+				type: EnumBattleEventType.Damage,
+				actor: '100',
+				target: '1000',
+				value: 7,
+				hpBefore: 10,
+				hpAfter: 3,
+			},
+		];
+
+		const data = buildDisplayData({
+			// 只需頁面層欄位，不必重跑整場戰鬥 / only page-level fields, no need to run a whole battle
+			input: { title: 'Custom', allyTeamName: 'Alpha' },
+			allies,
+			enemies,
+			repo,
+			events,
+			outcome: EnumOutcome.Win,
+		});
+
+		expect(data.title).toBe('Custom');
+		expect(data.leftTeam.name).toBe(DEFAULT_ENEMY_TEAM_NAME);
+		expect(data.rightTeam.name).toBe('Alpha');
+		expect(data.leftTeam.units).toHaveLength(1);
+		expect(data.rightTeam.units).toHaveLength(1);
+		expect(data.actions).toHaveLength(1);
+		expect(data.actions[0].message).toBe(`7 Damage to ${enemies[0].name}`);
+		expect(data.actions[0].valueChange).toBe('10 > 3');
+		// 沒有給快照 → snapshots 欄位省略 / no snapshots supplied → the field stays out
+		expect(data.snapshots).toBeUndefined();
+		// 我方（右隊）獲勝 / the allies (right team) win
+		expect(data.result?.winner).toBe('Alpha');
+		expect(data.result?.winnerSide).toBe(EnumTeamSideUI.Right);
 	});
 });

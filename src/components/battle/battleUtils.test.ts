@@ -18,6 +18,12 @@ import {
 	buildSpDamageMessage,
 	buildStatChangeMessage,
 	buildStatToMessage,
+	buildActMessage,
+	buildDamageMessage,
+	buildHealMessage,
+	buildProtectMessage,
+	buildDownMessage,
+	buildSummonMessage,
 	buildValueChangeText,
 	getMessageClass,
 } from './battleUtils';
@@ -407,5 +413,43 @@ describe('原始日誌文案與配色 / original log copy and colours', () => {
 		// Poison accepts an attribute override (support for resist, none for cure)
 		expect(of(EnumActionType.Poison, { attribute: EnumAttributeType.Support })).toBe('support');
 		expect(of(EnumActionType.Poison, { attribute: EnumAttributeType.Normal })).toBe('');
+	});
+});
+
+describe('事件家族的原始日誌文案 / original log copy per event family', () => {
+	it('buildActMessage joins caster and skill, or the caster alone', () => {
+		expect(buildActMessage('Warrior', 'Fireball')).toBe('Warrior Fireball');
+		expect(buildActMessage('Warrior')).toBe('Warrior');
+		// 缺施放者時沿用 buildNamedMessage，不把 undefined 印進日誌
+		// Without a caster buildNamedMessage takes over so `undefined` never reaches the log
+		expect(buildActMessage(undefined, 'Fireball')).toBe('Fireball');
+		expect(buildActMessage(undefined)).toBe('');
+	});
+
+	it('buildDamageMessage keeps the `to target` clause only when a target exists', () => {
+		expect(buildDamageMessage(42, 'GoblinAxe')).toBe('42 Damage to GoblinAxe');
+		expect(buildDamageMessage(42)).toBe('42 Damage');
+	});
+
+	it('buildHealMessage shares buildRecoveredMessage wording and keeps the `N Heal` fallback', () => {
+		expect(buildHealMessage(30, 'Warrior')).toBe('Warrior Recovered 30 HP');
+		expect(buildHealMessage(30)).toBe('30 Heal');
+	});
+
+	it('buildProtectMessage separates guarding someone else from blocking alone', () => {
+		expect(buildProtectMessage('Warrior', 'Mage')).toBe('Warrior protected Mage!');
+		// 同單位或缺目標 → 攔截文案 / same unit or no target → the interception copy
+		expect(buildProtectMessage('Warrior', 'Warrior')).toBe(
+			'Warrior blocked the attack with barrier!',
+		);
+		expect(buildProtectMessage('Warrior')).toBe('Warrior blocked the attack with barrier!');
+		expect(buildProtectMessage()).toBe('Unknown blocked the attack with barrier!');
+	});
+
+	it('buildDownMessage and buildSummonMessage keep the original wording', () => {
+		expect(buildDownMessage('Warrior')).toBe('Warrior down.');
+		expect(buildSummonMessage('Slime')).toBe('Slime joined to the team.');
+		expect(buildSummonMessage(undefined, 'Warrior')).toBe('Warrior summon.');
+		expect(buildSummonMessage()).toBe(' summon.');
 	});
 });

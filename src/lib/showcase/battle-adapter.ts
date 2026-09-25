@@ -32,7 +32,18 @@ import type {
 	ITeamFinalStats,
 	ITeamSide,
 } from '#/components/battle/types';
-import { buildMagicCircleMessage, buildNamedMessage, buildChargeMessage, buildValueChangeText } from '#/components/battle/battleUtils';
+import {
+	buildActMessage,
+	buildChargeMessage,
+	buildDamageMessage,
+	buildDownMessage,
+	buildHealMessage,
+	buildMagicCircleMessage,
+	buildNamedMessage,
+	buildProtectMessage,
+	buildSummonMessage,
+	buildValueChangeText,
+} from '#/components/battle/battleUtils';
 import {
 	computeBattleSpritePositions,
 	groupBattleChars,
@@ -198,8 +209,8 @@ export function buildUnitLookup(
 	return lookup;
 }
 
-/** 事件角色解析結果 / Resolved event participant */
-interface IResolvedRef {
+/** 事件角色解析結果（轉接上下文的元件，供測試直接比對）/ Resolved event participant (a building block of the context, directly assertable in tests) */
+export interface IResolvedRef {
 	/** 名稱（查無時為原始 no 字串；未提供時 undefined）/ name (raw no when unknown; undefined if absent) */
 	name?: string;
 	/** 隊伍側（查無時 undefined）/ team side (undefined when unknown) */
@@ -207,10 +218,10 @@ interface IResolvedRef {
 }
 
 /**
- * 將事件的 actor/target no 字串解析為名稱與側別
- * Resolve an event actor/target no string into a name and side
+ * 將事件的 actor/target no 字串解析為名稱與側別（查無時名稱退回原始 no 字串）
+ * Resolve an event actor/target no string into a name and side (unknown refs keep the raw no string)
  */
-function resolveRef(key: string | undefined, lookup: IUnitLookup): IResolvedRef {
+export function resolveRef(key: string | undefined, lookup: IUnitLookup): IResolvedRef {
 	if (key === undefined) return {};
 	const info = lookup.get(Number(key));
 	return { name: info?.name ?? key, side: info?.side };
@@ -253,6 +264,17 @@ function magicCircleAmount(def: ISkillDef | undefined, kind: EnumMagicCircleKind
  * 事件轉接：IBattleEvent → IBattleAction（任務 3.3）
  * Event adapter: IBattleEvent → IBattleAction (task 3.3)
  *
+ * 分層組裝（可組裝、可逐段測試）：
+ * 1. resolveEventContext — 與型別無關的前置解析（actor／target／skill／歸屬側別）只做一次；
+ * 2. composeAction      — 預填共同欄位（source／target／side／attribute／skill），轉接器只寫差異；
+ * 3. EVENT_MAPPERS      — 型別 → 轉接器對照表，新增型別只需註冊一筆，未註冊者走 mapUnknownEvent。
+ * Layered composition (composable and testable piecewise):
+ * 1. resolveEventContext resolves the type-independent facts (actor / target / skill / side) once;
+ * 2. composeAction fills the shared fields (source / target / side / attribute / skill) so a mapper
+ * only states what differs;
+ * 3. EVENT_MAPPERS is the type → mapper table: a new type needs a single entry, and anything
+ * unregistered falls through to mapUnknownEvent.
+ *
  * 對應：Act→skill、Cast→casting、Charge→casting(charging)、Damage→damage、Heal→heal、
  * Guard→protect、Death→down、Summon→summon、MagicCircle→magiccircle、Buff→buff、
  * Debuff→debuff、Poison→poison、Miss→miss、Info→info，
@@ -262,254 +284,378 @@ function magicCircleAmount(def: ISkillDef | undefined, kind: EnumMagicCircleKind
  * Debuff→debuff, Poison→poison, Miss→miss, Info→info; unknown types fall back to type
  * 'result' + a message so N events → N entries.
  */
+
+/**
+ * 事件未帶 text 時的兜底文案（單一事實來源）
+ * Fallback copy for events that carry no text (single source of truth)
+ *
+ * 原始日誌的通用句型；事件帶 text 時一律以 text 為準。
+ * The original log's generic phrases; an event-supplied `text` always wins.
+ */
+export const DEFAULT_EVENT_TEXT: Readonly<{
+	buff: string;
+	debuff: string;
+	poison: string;
+	miss: string;
+}> = {
+	buff: 'gained buff.',
+	debuff: 'got debuffed.',
+	poison: 'get poisoned!',
+	miss: 'Failed!',
+};
+
+/**
+ * 解析事件欄位中的 def no（缺省或非數字時 undefined）
+ * Parse a def no out of an event field (undefined when absent or not a number)
+ *
+ * @param key - 事件的 no 欄位（字串）/ the event's no field (string)
+ * @returns def no / def no
+ */
+export function parseDefNo(key: string | undefined): number | undefined {
+	if (key === undefined) return undefined;
+	const no = Number(key);
+	return Number.isNaN(no) ? undefined : no;
+}
+
+/**
+ * 依技能定義決定蓄力種類（Physical → charging，其餘含缺省 → casting）
+ * Decide the charge kind from a skill definition (Physical → charging; otherwise, incl. absent, casting)
+ *
+ * Cast 事件與快照單位的 (charging)/(casting) 標示共用此判定，避免兩處各自實作而漂移。
+ * The Cast event and the snapshot unit's (charging)/(casting) marker share this rule so the two
+ * cannot drift apart.
+ *
+ * @param def - 技能定義（可省略）/ skill definition (optional)
+ * @returns 蓄力種類 / charge kind
+ */
+export function chargeKindOf(def?: ISkillDef): EnumChargeKind {
+	return def?.type === EnumSkillDamageType.Physical ? EnumChargeKind.Charging : EnumChargeKind.Casting;
+}
+
+/** 事件轉接上下文（每個事件解析一次，所有轉接器共用）/ Event adapter context (resolved once per event, shared by every mapper) */
+export interface IEventContext {
+	/** 行動者 / actor */
+	actor: IResolvedRef;
+	/** 目標 / target */
+	target: IResolvedRef;
+	/** 行動歸屬側別：優先 actor，其次 target（Death 只有 target）/ owning side: actor first, target fallback */
+	side?: ITeamSide;
+	/** 關聯技能定義（事件未帶 skill 編號或查無時 undefined）/ related skill definition */
+	skillDef?: ISkillDef;
+	/** 關聯技能名稱（＝skillDef?.name）/ related skill name (= skillDef?.name) */
+	skillName?: string;
+	/** 資料倉儲（def 查表；未提供 repo 時 undefined）/ data repository (def lookups; undefined without repo) */
+	repo?: IDataRepository;
+}
+
+/**
+ * 解析事件的 actor／target／skill 與歸屬側別，組成轉接上下文
+ * Resolve an event's actor / target / skill and owning side into the adapter context
+ *
+ * 前置解析集中於此：轉接器不再各自查表，型別再多也不會重複解析或漏掉側別。
+ * The front-loaded resolution lives here: mappers never re-query the lookup, so no matter how many
+ * types exist, nothing resolves twice or drops the side.
+ *
+ * @param ev - 引擎事件 / engine event
+ * @param lookup - no → 單位查詢表 / no → unit lookup
+ * @param repo - 資料倉儲（僅用於查技能定義）/ data repository (skill definitions only)
+ * @returns 轉接上下文 / adapter context
+ */
+export function resolveEventContext(
+	ev: IBattleEvent,
+	lookup: IUnitLookup,
+	repo?: IDataRepository,
+): IEventContext {
+	const actor = resolveRef(ev.actor, lookup);
+	const target = resolveRef(ev.target, lookup);
+	const skillDef = ev.skill !== undefined ? repo?.getSkill(ev.skill) : undefined;
+	return {
+		actor,
+		target,
+		side: actor.side ?? target.side,
+		skillDef,
+		skillName: skillDef?.name,
+		repo,
+	};
+}
+
+/** 單一事件轉接器（事件＋上下文 → 一條日誌）/ Single event mapper (event + context → one log entry) */
+export type IEventMapper = (ev: IBattleEvent, ctx: IEventContext) => IBattleAction;
+
+/**
+ * 轉接器填寫的欄位：type／message 必填，其餘覆寫 composeAction 的預設值
+ * Fields a mapper fills: type / message are required, the rest override composeAction's defaults
+ */
+export type IActionFields = Pick<IBattleAction, 'type' | 'message'> & Partial<IBattleAction>;
+
+/**
+ * 組裝各型別共用的欄位（單一事實來源）
+ * Assemble the fields every type shares (single source of truth)
+ *
+ * source／target／side／skill 由上下文預填、attribute 預設 Normal；轉接器只宣告差異，
+ * 因此新增型別不會漏掉側別或技能名稱。
+ * source / target / side / skill come from the context and attribute defaults to Normal; a mapper
+ * only states what differs, so a new type can never drop the side or the skill name.
+ *
+ * @param ctx - 轉接上下文 / adapter context
+ * @param fields - 型別專屬欄位 / type-specific fields
+ * @returns 日誌條目 / log entry
+ */
+export function composeAction(ctx: IEventContext, fields: IActionFields): IBattleAction {
+	const base: IBattleAction = {
+		type: fields.type,
+		message: fields.message,
+		source: ctx.actor.name,
+		target: ctx.target.name,
+		side: ctx.side,
+		attribute: EnumAttributeType.Normal,
+		skill: ctx.skillName ? { name: ctx.skillName } : undefined,
+	};
+	return { ...base, ...fields };
+}
+
+// ==================== 個別事件轉接器 / Per-event mappers ====================
+// 每個轉接器都是純函式（ev + ctx），可經 EVENT_MAPPERS 單獨呼叫與測試。
+// Every mapper is a pure function (ev + ctx) and can be called and tested on its own
+// through EVENT_MAPPERS.
+
+/** Act → 技能行動（`name SkillName`；無技能時只印名稱）/ Act → skill action (`name SkillName`; name only without a skill) */
+const mapAct: IEventMapper = (_ev, ctx) =>
+	composeAction(ctx, {
+		type: EnumActionType.Skill,
+		message: buildActMessage(ctx.actor.name, ctx.skillName),
+	});
+
+/** Cast → 詠唱／蓄力（Physical 技能 → charging，其餘 → casting）/ Cast → charge line (Physical → charging, otherwise casting) */
+const mapCast: IEventMapper = (_ev, ctx) => {
+	const castType = chargeKindOf(ctx.skillDef);
+	return composeAction(ctx, {
+		type: EnumActionType.Casting,
+		message: buildChargeMessage(castType),
+		attribute: EnumAttributeType.Charge,
+		castType,
+	});
+};
+
+/**
+ * Charge → 蓄力開始（文案與 castType 固定 charging，與 Cast 分開）
+ * Charge → charge start (both copy and castType are fixed to charging, kept apart from Cast)
+ *
+ * Charge 事件本身即「貯め開始」，引擎目前尚無生產點。
+ * The Charge event *is* "charge start"; the engine has no producer yet.
+ */
+const mapCharge: IEventMapper = (_ev, ctx) =>
+	composeAction(ctx, {
+		type: EnumActionType.Casting,
+		message: buildChargeMessage(EnumChargeKind.Charging),
+		attribute: EnumAttributeType.Charge,
+		castType: EnumChargeKind.Charging,
+	});
+
+/** Damage → 傷害（valueChange＝`前 > 後`；無 hp 資訊時退回 `by 攻擊者`）/ Damage (valueChange = `before > after`; `by attacker` without hp info) */
+const mapDamage: IEventMapper = (ev, ctx) => {
+	const value = ev.value ?? 0;
+	return composeAction(ctx, {
+		type: EnumActionType.Damage,
+		value,
+		valueChange:
+			buildValueChangeText({ from: ev.hpBefore, to: ev.hpAfter }) ??
+			(ctx.actor.name ? `by ${ctx.actor.name}` : undefined),
+		message: buildDamageMessage(value, ctx.target.name),
+		attribute: EnumAttributeType.Dmg,
+		hpBefore: ev.hpBefore,
+		hpAfter: ev.hpAfter,
+	});
+};
+
+/** Heal → 回復（valueChange＝`前 > 後`、固定 HP 單位）/ Heal (valueChange = `before > after`, HP unit) */
+const mapHeal: IEventMapper = (ev, ctx) => {
+	const value = ev.value ?? 0;
+	return composeAction(ctx, {
+		type: EnumActionType.Heal,
+		value,
+		valueUnit: 'HP',
+		valueChange: buildValueChangeText({ from: ev.hpBefore, to: ev.hpAfter }),
+		message: buildHealMessage(value, ctx.target.name),
+		attribute: EnumAttributeType.Recover,
+		hpBefore: ev.hpBefore,
+		hpAfter: ev.hpAfter,
+	});
+};
+
+/** Guard → 守護（同單位或缺目標時改印攔截文案）/ Guard (interception copy when same-unit or targetless) */
+const mapGuard: IEventMapper = (_ev, ctx) =>
+	composeAction(ctx, {
+		type: EnumActionType.Protect,
+		message: buildProtectMessage(ctx.actor.name, ctx.target.name),
+		attribute: EnumAttributeType.Support,
+	});
+
+/** Death → 倒下（來源＝倒下者、側別＝目標側）/ Death (source = the fallen unit, side = the target's side) */
+const mapDeath: IEventMapper = (_ev, ctx) => {
+	const name = ctx.target.name ?? 'Unknown';
+	return composeAction(ctx, {
+		type: EnumActionType.Down,
+		source: name,
+		side: ctx.target.side,
+		message: buildDownMessage(name),
+		attribute: EnumAttributeType.Dmg,
+	});
+};
+
+/** Summon → 召喚（target＝被召喚 def no、value＝等級、圖依 def no 查怪物表）/ Summon (target = summoned def no, value = level, image from the mon table) */
+const mapSummon: IEventMapper = (ev, ctx) => {
+	// 召喚事件契約（引擎目前尚無生產點，見 #/lib/game/types 的 EnumBattleEventType.Summon）：
+	// target＝被召喚單位的 def no、value＝其等級；圖片依 def no 查 sprite-map 怪物表。
+	// Summon event contract (the engine has no producer yet; see EnumBattleEventType.Summon in
+	// #/lib/game/types): target = the summoned unit's def no, value = its level; the image comes
+	// from sprite-map's monster table by that def no.
+	const summonedNo = parseDefNo(ev.target);
+	const summoned: ISummonedUnit[] = ctx.target.name
+		? [
+				{
+					name: ctx.target.name,
+					level: ev.value,
+					imageUrl: summonedNo !== undefined && ctx.repo?.getMon(summonedNo)
+						? getMonSpriteUrl(summonedNo)
+						: undefined,
+				},
+			]
+		: [];
+	return composeAction(ctx, {
+		type: EnumActionType.Summon,
+		summoned,
+		message: buildSummonMessage(ctx.target.name, ctx.actor.name),
+	});
+};
+
+/**
+ * MagicCircle → 魔方陣紀錄（種類由技能定義判定、數量優先取 event.value）
+ * MagicCircle → magic-circle record (kind from the skill definition, amount prefers event.value)
+ *
+ * 魔方陣事件契約（引擎目前尚無生產點，見 #/lib/game/types 的 EnumBattleEventType.MagicCircle）：
+ *   skill＝施放的技能編號，用以判定是哪一種 MagicCircle* 效果（同 PHP 依 $skill[...] 分支）；
+ *   value＝變更數量，缺省時取技能定義的對應欄位值。
+ * 配色不經 attribute：由紀錄種類經 getMagicCircleClass 決定（單一事實來源）。
+ * Magic-circle event contract (the engine has no producer yet; see
+ * EnumBattleEventType.MagicCircle in #/lib/game/types): skill = the cast skill no, used to decide
+ * which MagicCircle* effect fired (PHP branches on $skill[...] the same way); value = the amount,
+ * falling back to the matching skill-definition field. The colour does not travel on `attribute`:
+ * it comes from the record kind via getMagicCircleClass (single source of truth).
+ */
+const mapMagicCircle: IEventMapper = (ev, ctx) => {
+	const kind = resolveMagicCircleKind(ctx.skillDef);
+	const magicCircle: IMagicCircleRecord = {
+		kind,
+		amount: ev.value ?? magicCircleAmount(ctx.skillDef, kind),
+	};
+	return composeAction(ctx, {
+		type: EnumActionType.MagicCircle,
+		magicCircle,
+		message: buildMagicCircleMessage(ctx.actor.name, magicCircle),
+	});
+};
+
+/** Buff → 增益（text＝原始日誌文案，缺省時退回通用文案）/ Buff (text = the original phrase, generic copy when absent) */
+const mapBuff: IEventMapper = (ev, ctx) =>
+	composeAction(ctx, {
+		type: EnumActionType.Buff,
+		message: buildNamedMessage(ctx.actor.name, ev.text ?? DEFAULT_EVENT_TEXT.buff),
+		attribute: EnumAttributeType.Support,
+	});
+
+/** Debuff → 減益（原始日誌無 span，沿用預設色）/ Debuff (no span in the original log, default colour) */
+const mapDebuff: IEventMapper = (ev, ctx) =>
+	composeAction(ctx, {
+		type: EnumActionType.Debuff,
+		message: buildNamedMessage(ctx.actor.name, ev.text ?? DEFAULT_EVENT_TEXT.debuff),
+	});
+
+/** Poison → 中毒（來源＝中毒單位、側別優先取目標側）/ Poison (source = the poisoned unit, side prefers the target) */
+const mapPoison: IEventMapper = (ev, ctx) => {
+	const name = ctx.target.name ?? ctx.actor.name;
+	return composeAction(ctx, {
+		type: EnumActionType.Poison,
+		source: name,
+		side: ctx.target.side ?? ctx.side,
+		message: buildNamedMessage(name, ev.text ?? DEFAULT_EVENT_TEXT.poison),
+		attribute: EnumAttributeType.Spdmg,
+	});
+};
+
+/** Miss → 未命中（text＝原始日誌文案）/ Miss (text = the original phrase) */
+const mapMiss: IEventMapper = (ev, ctx) =>
+	composeAction(ctx, {
+		type: EnumActionType.Miss,
+		message: buildNamedMessage(ctx.actor.name, ev.text ?? DEFAULT_EVENT_TEXT.miss),
+	});
+
+/** Info → 純文字資訊（text 即完整訊息，無名稱無 span）/ Info (text is the whole message: no name, no span) */
+const mapInfo: IEventMapper = (ev, ctx) =>
+	composeAction(ctx, { type: EnumActionType.Info, message: ev.text ?? '' });
+
+/**
+ * 事件型別 → 轉接器對照表（單一事實來源；可組裝、可列舉、可逐型別測試）
+ * Event type → mapper table (single source of truth; composable, enumerable, testable per type)
+ *
+ * EnumBattleEventType 的 14 種型別皆已註冊；未註冊（或型別遭竄改）時 mapBattleEvent 走
+ * mapUnknownEvent，保證 N 個事件 → N 條日誌。
+ * All 14 EnumBattleEventType members are registered; anything unregistered (or a tampered type)
+ * goes through mapUnknownEvent in mapBattleEvent, guaranteeing N events → N entries.
+ */
+export const EVENT_MAPPERS: Readonly<Partial<Record<EnumBattleEventType, IEventMapper>>> = {
+	[EnumBattleEventType.Act]: mapAct,
+	[EnumBattleEventType.Cast]: mapCast,
+	[EnumBattleEventType.Charge]: mapCharge,
+	[EnumBattleEventType.Damage]: mapDamage,
+	[EnumBattleEventType.Heal]: mapHeal,
+	[EnumBattleEventType.Guard]: mapGuard,
+	[EnumBattleEventType.Death]: mapDeath,
+	[EnumBattleEventType.Summon]: mapSummon,
+	[EnumBattleEventType.MagicCircle]: mapMagicCircle,
+	[EnumBattleEventType.Buff]: mapBuff,
+	[EnumBattleEventType.Debuff]: mapDebuff,
+	[EnumBattleEventType.Poison]: mapPoison,
+	[EnumBattleEventType.Miss]: mapMiss,
+	[EnumBattleEventType.Info]: mapInfo,
+};
+
+/**
+ * 未註冊事件型別的兜底轉接器（單一事實來源）
+ * Fallback mapper for unregistered event types (single source of truth)
+ *
+ * 事件自帶 text 時直接採用；否則以 `名稱 型別 目標` 組出可讀文字，型別本身也留在訊息裡
+ * 便於除錯。
+ * An event-supplied `text` is used verbatim; otherwise `name type target` is assembled, keeping
+ * the raw type inside the copy for easier debugging.
+ *
+ * @param ev - 引擎事件 / engine event
+ * @param ctx - 轉接上下文 / adapter context
+ * @returns 日誌條目（type 恆為 Result）/ log entry (type is always Result)
+ */
+export function mapUnknownEvent(ev: IBattleEvent, ctx: IEventContext): IBattleAction {
+	const message =
+		ev.text ??
+		`${ctx.actor.name ?? ''} ${ev.type}${ctx.target.name ? ` ${ctx.target.name}` : ''}`.trim();
+	return composeAction(ctx, { type: EnumActionType.Result, message });
+}
+
+/**
+ * 事件轉接入口：解析上下文 → 查表 → 未註冊走兜底
+ * Event adapter entry: resolve context → table lookup → unregistered falls back
+ *
+ * @param ev - 引擎事件 / engine event
+ * @param lookup - no → 單位查詢表 / no → unit lookup
+ * @param repo - 資料倉儲（技能定義／怪物圖）/ data repository (skill definitions / monster images)
+ * @returns 展示用日誌條目 / display log entry
+ */
 export function mapBattleEvent(
 	ev: IBattleEvent,
 	lookup: IUnitLookup,
 	repo?: IDataRepository,
 ): IBattleAction {
-	const actor = resolveRef(ev.actor, lookup);
-	const target = resolveRef(ev.target, lookup);
-	/** 行動歸屬側別：優先 actor，其次 target（Death 只有 target）/ owning side: actor first, target fallback */
-	const side = actor.side ?? target.side;
-	const skillDef = ev.skill !== undefined ? repo?.getSkill(ev.skill) : undefined;
-	const skillName = skillDef?.name;
-
-	switch (ev.type) {
-		case EnumBattleEventType.Act: {
-			return {
-				type: EnumActionType.Skill,
-				source: actor.name,
-				target: target.name,
-				skill: skillName ? { name: skillName } : undefined,
-				message: skillName ? `${actor.name} ${skillName}` : actor.name ?? '',
-				side,
-				attribute: EnumAttributeType.Normal,
-			};
-		}
-		case EnumBattleEventType.Cast: {
-			const verb = skillDef?.type === EnumSkillDamageType.Physical ? EnumChargeKind.Charging : EnumChargeKind.Casting;
-			return {
-				type: EnumActionType.Casting,
-				source: actor.name,
-				message: buildChargeMessage(verb),
-				side,
-				attribute: EnumAttributeType.Charge,
-				castType: verb,
-				skill: skillName ? { name: skillName } : undefined,
-			};
-		}
-		case EnumBattleEventType.Damage: {
-			const value = ev.value ?? 0;
-			const valueChange =
-				buildValueChangeText({ from: ev.hpBefore, to: ev.hpAfter }) ??
-				(actor.name ? `by ${actor.name}` : undefined);
-			const message = target.name ? `${value} Damage to ${target.name}` : `${value} Damage`;
-			return {
-				type: EnumActionType.Damage,
-				source: actor.name,
-				target: target.name,
-				value,
-				valueChange,
-				message,
-				side,
-				attribute: EnumAttributeType.Dmg,
-				hpBefore: ev.hpBefore,
-				hpAfter: ev.hpAfter,
-				skill: skillName ? { name: skillName } : undefined,
-			};
-		}
-		case EnumBattleEventType.Heal: {
-			const value = ev.value ?? 0;
-			const valueChange = buildValueChangeText({ from: ev.hpBefore, to: ev.hpAfter });
-			const message = target.name
-				? `${target.name} Recovered ${value} HP`
-				: `${value} Heal`;
-			return {
-				type: EnumActionType.Heal,
-				source: actor.name,
-				target: target.name,
-				value,
-				valueUnit: 'HP',
-				valueChange,
-				message,
-				side,
-				attribute: EnumAttributeType.Recover,
-				hpBefore: ev.hpBefore,
-				hpAfter: ev.hpAfter,
-				skill: skillName ? { name: skillName } : undefined,
-			};
-		}
-		case EnumBattleEventType.Guard: {
-			const message =
-				actor.name && target.name && actor.name !== target.name
-					? `${actor.name} protected ${target.name}!`
-					: `${actor.name ?? 'Unknown'} blocked the attack with barrier!`;
-			return {
-				type: EnumActionType.Protect,
-				source: actor.name,
-				target: target.name,
-				message,
-				side,
-				attribute: EnumAttributeType.Support,
-			};
-		}
-		case EnumBattleEventType.Death: {
-			const name = target.name ?? 'Unknown';
-			return {
-				type: EnumActionType.Down,
-				source: name,
-				target: target.name,
-				message: `${name} down.`,
-				side: target.side,
-				attribute: EnumAttributeType.Dmg,
-			};
-		}
-		case EnumBattleEventType.Summon: {
-			// 召喚事件契約（引擎目前尚無生產點，見 #/lib/game/types 的 EnumBattleEventType.Summon）：
-			// target＝被召喚單位的 def no、value＝其等級；圖片依 def no 查 sprite-map 怪物表。
-			// Summon event contract (the engine has no producer yet; see EnumBattleEventType.Summon in
-			// #/lib/game/types): target = the summoned unit's def no, value = its level; the image comes
-			// from sprite-map's monster table by that def no.
-			const rawNo = ev.target !== undefined ? Number(ev.target) : undefined;
-			const summonedNo = rawNo !== undefined && !Number.isNaN(rawNo) ? rawNo : undefined;
-			const summoned: ISummonedUnit[] = target.name
-				? [
-						{
-							name: target.name,
-							level: ev.value,
-							imageUrl: summonedNo !== undefined && repo?.getMon(summonedNo)
-								? getMonSpriteUrl(summonedNo)
-								: undefined,
-						},
-					]
-				: [];
-			return {
-				type: EnumActionType.Summon,
-				source: actor.name,
-				target: target.name,
-				skill: skillName ? { name: skillName } : undefined,
-				summoned,
-				message: target.name ? `${target.name} joined to the team.` : `${actor.name ?? ''} summon.`,
-				side,
-				attribute: EnumAttributeType.Normal,
-			};
-		}
-		case EnumBattleEventType.MagicCircle: {
-			// 魔方陣事件契約（引擎目前尚無生產點，見 #/lib/game/types 的 EnumBattleEventType.MagicCircle）：
-			//   skill＝施放的技能編號，用以判定是哪一種 MagicCircle* 效果（同 PHP 依 $skill[...] 分支）；
-			//   value＝變更數量，缺省時取技能定義的對應欄位值。
-			// 配色不經 attribute：由紀錄種類經 getMagicCircleClass 決定（單一事實來源）。
-			// Magic-circle event contract (the engine has no producer yet; see
-			// EnumBattleEventType.MagicCircle in #/lib/game/types): skill = the cast skill no,
-			// used to decide which MagicCircle* effect fired (PHP branches on $skill[...] the
-			// same way); value = the amount, falling back to the matching skill-definition
-			// field. The colour does not travel on `attribute`: it comes from the record kind
-			// via getMagicCircleClass (single source of truth).
-			const kind = resolveMagicCircleKind(skillDef);
-			const magicCircle: IMagicCircleRecord = {
-				kind,
-				amount: ev.value ?? magicCircleAmount(skillDef, kind),
-			};
-			return {
-				type: EnumActionType.MagicCircle,
-				source: actor.name,
-				target: target.name,
-				skill: skillName ? { name: skillName } : undefined,
-				magicCircle,
-				message: buildMagicCircleMessage(actor.name, magicCircle),
-				side,
-				attribute: EnumAttributeType.Normal,
-			};
-		}
-		case EnumBattleEventType.Charge: {
-			// 蓄力開始契約（引擎目前尚無生產點）：Charge 事件本身即「貯め開始」，
-			// 文案與 castType 皆固定為 charging，與 Cast（依技能型別判斷）分開。
-			// Charge-start contract (the engine has no producer yet): the Charge event *is*
-			// "charge start", so both the copy and castType are fixed to charging, kept apart
-			// from Cast (which decides by skill type).
-			return {
-				type: EnumActionType.Casting,
-				source: actor.name,
-				message: buildChargeMessage(EnumChargeKind.Charging),
-				side,
-				attribute: EnumAttributeType.Charge,
-				castType: EnumChargeKind.Charging,
-				skill: skillName ? { name: skillName } : undefined,
-			};
-		}
-		case EnumBattleEventType.Buff: {
-			// 增益契約：text＝原始日誌文案（如 `got barriered!`／`STR rise 10%`），缺省時退回通用文案
-			// Buff contract: text = the original log phrase (e.g. `got barriered!` / `STR rise 10%`);
-			// generic copy is the fallback
-			return {
-				type: EnumActionType.Buff,
-				source: actor.name,
-				message: buildNamedMessage(actor.name, ev.text ?? 'gained buff.'),
-				side,
-				attribute: EnumAttributeType.Support,
-			};
-		}
-		case EnumBattleEventType.Debuff: {
-			// 減益契約：text＝原始日誌文案（如 `STR down 10%`）；原始日誌無 span，故沿用預設色
-			// Debuff contract: text = the original log phrase (e.g. `STR down 10%`); the original
-			// log carries no span for it, so the default colour is kept
-			return {
-				type: EnumActionType.Debuff,
-				source: actor.name,
-				message: buildNamedMessage(actor.name, ev.text ?? 'got debuffed.'),
-				side,
-				attribute: EnumAttributeType.Normal,
-			};
-		}
-		case EnumBattleEventType.Poison: {
-			// 中毒契約：target＝中毒單位、text＝原始日誌文案（`get poisoned!`／`blocked poison.` 等）
-			// Poison contract: target = the poisoned unit, text = the original log phrase
-			// (`get poisoned!` / `blocked poison.` / …)
-			const name = target.name ?? actor.name;
-			return {
-				type: EnumActionType.Poison,
-				source: name,
-				message: buildNamedMessage(name, ev.text ?? 'get poisoned!'),
-				side: target.side ?? side,
-				attribute: EnumAttributeType.Spdmg,
-			};
-		}
-		case EnumBattleEventType.Miss: {
-			// 未命中契約：text＝原始日誌文案（`Failed!`／`No target.Failed!`）
-			// Miss contract: text = the original log phrase (`Failed!` / `No target.Failed!`)
-			return {
-				type: EnumActionType.Miss,
-				source: actor.name,
-				message: buildNamedMessage(actor.name, ev.text ?? 'Failed!'),
-				side,
-				attribute: EnumAttributeType.Normal,
-			};
-		}
-		case EnumBattleEventType.Info: {
-			// 一般資訊契約：text 即完整訊息（原始日誌無名稱、無 span）
-			// Info contract: text is the whole message (no name and no span in the original log)
-			return {
-				type: EnumActionType.Info,
-				source: actor.name,
-				message: ev.text ?? '',
-				side,
-				attribute: EnumAttributeType.Normal,
-			};
-		}
-		default: {
-			const message =
-				ev.text ??
-				`${actor.name ?? ''} ${ev.type}${target.name ? ` ${target.name}` : ''}`.trim();
-			return {
-				type: EnumActionType.Result,
-				source: actor.name,
-				target: target.name,
-				message,
-				side,
-				attribute: EnumAttributeType.Normal,
-			};
-		}
-	}
+	const ctx = resolveEventContext(ev, lookup, repo);
+	return (EVENT_MAPPERS[ev.type] ?? mapUnknownEvent)(ev, ctx);
 }
 
 /** 結果轉接輸入 / Result adapter input */
@@ -571,6 +717,33 @@ export function computeTeamHpStats(units: readonly ITeamHpUnit[]): {
 }
 
 /**
+ * 彙總某一側造成的傷害（單一事實來源）
+ * Sum the damage dealt by one side (single source of truth)
+ *
+ * 只累計 Damage 事件，且 actor 經 no → lookup 反查後的側別須相符；查詢表缺漏時該筆不計。
+ * Only Damage events accumulate, and only when the actor's side — looked up from no via the
+ * lookup — matches; entries missing from the lookup are skipped.
+ *
+ * @param events - 事件日誌（可省略）/ event log (optional)
+ * @param lookup - no → 單位查詢表（可省略）/ no → unit lookup (optional)
+ * @param side - 要統計的側別 / side to tally
+ * @returns 傷害總和 / total damage
+ */
+export function computeSideDamage(
+	events: readonly IBattleEvent[] | undefined,
+	lookup: IUnitLookup | undefined,
+	side: ITeamSide,
+): number {
+	let total = 0;
+	for (const ev of events ?? []) {
+		if (ev.type !== EnumBattleEventType.Damage) continue;
+		const info = ev.actor !== undefined ? lookup?.get(Number(ev.actor)) : undefined;
+		if (info?.side === side) total += ev.value ?? 0;
+	}
+	return total;
+}
+
+/**
  * 建立單隊最終統計（hpRemain／alive／totalUnits／totalDamage／totalMaxHp）
  * Build one team's final stats (hpRemain/alive/totalUnits/totalDamage/totalMaxHp)
  */
@@ -585,13 +758,7 @@ function buildTeamStats(
 	const hp = computeTeamHpStats(
 		members.map((c) => ({ hp: c.HP, maxHp: c.MAXHP, dead: c.STATE === EnumState.Dead })),
 	);
-	let totalDamage = 0;
-	for (const ev of events ?? []) {
-		if (ev.type !== EnumBattleEventType.Damage) continue;
-		const info = ev.actor !== undefined ? lookup?.get(Number(ev.actor)) : undefined;
-		if (info?.side === side) totalDamage += ev.value ?? 0;
-	}
-	return { ...hp, totalDamage };
+	return { ...hp, totalDamage: computeSideDamage(events, lookup, side) };
 }
 
 /**
@@ -668,6 +835,26 @@ export function buildSprites(
 }
 
 /**
+ * 快照單位的蓄力種類（無倉儲／無預期技能／查無技能時 undefined）
+ * A snapshot unit's charge kind (undefined without a repo, without an expected skill, or when unknown)
+ *
+ * 與 Cast 事件共用 chargeKindOf，(charging)/(casting) 的判定只有一份。
+ * Shares chargeKindOf with the Cast event so the (charging)/(casting) rule exists exactly once.
+ *
+ * @param repo - 資料倉儲 / data repository
+ * @param expectSkill - 預期施放的技能編號 / expected skill no
+ * @returns 蓄力種類（非蓄力中時 undefined）/ charge kind (undefined when not charging)
+ */
+function snapshotChargeKind(
+	repo: IDataRepository | undefined,
+	expectSkill: number | null | undefined,
+): EnumChargeKind | undefined {
+	if (!repo || expectSkill === null || expectSkill === undefined) return undefined;
+	const sk = repo.getSkill(expectSkill);
+	return sk ? chargeKindOf(sk) : undefined;
+}
+
+/**
  * 從快照轉換為展示側快照 / Convert engine snapshot to display snapshot
  *
  * 側別直接取自引擎快照的 `team`（不再經由 no → lookup 推導）；單位以實例 uid 識別。
@@ -685,12 +872,6 @@ function toSnapshotDisplay(snap: IBattleSnapshot, repo?: IDataRepository): IBatt
 			// def no → 精靈圖（角色表優先，怪物表次之）/ def no → sprite image (char table first, then mon)
 			const unitNo = Number(u.no);
 			const imageUrl = repo ? spriteUrlFor(unitNo, !repo.getCharBase(unitNo)) : undefined;
-			// 依 skill.type 決定 (charging)/(casting)
-			let chargeKind: EnumChargeKind | undefined;
-			if (u.expectSkill !== null && u.expectSkill !== undefined && repo) {
-				const sk = repo.getSkill(u.expectSkill);
-				if (sk) chargeKind = sk.type === EnumSkillDamageType.Physical ? EnumChargeKind.Charging : EnumChargeKind.Casting;
-			}
 			return {
 				unitUuid: u.unitUuid,
 				name: u.name,
@@ -703,9 +884,109 @@ function toSnapshotDisplay(snap: IBattleSnapshot, repo?: IDataRepository): IBatt
 				maxSp: u.maxSp,
 				dead,
 				status: dead ? EnumUnitStatus.Down : undefined,
-				chargeKind,
+				// 依 skill.type 決定 (charging)/(casting)
+				// (charging)/(casting) decided by skill.type
+				chargeKind: snapshotChargeKind(repo, u.expectSkill),
 			};
 		}),
+	};
+}
+
+/**
+ * 檢查展示戰鬥輸入（單一事實來源，可獨立測試）
+ * Validate the showcase battle input (single source of truth, independently testable)
+ *
+ * 我方須為 1..MAX_CHAR 人、敵方至少 1 隻；違反時拋出中英並列的錯誤訊息。
+ * Allies must number 1..MAX_CHAR and the encounter needs at least one monster; violations throw
+ * a bilingual error.
+ *
+ * @param input - 轉接層輸入（僅需 charNos／monNos）/ adapter input (charNos / monNos only)
+ */
+export function validateShowcaseInput(input: Pick<IShowcaseBattleInput, 'charNos' | 'monNos'>): void {
+	if (input.charNos.length < 1 || input.charNos.length > MAX_CHAR) {
+		throw new Error(
+			`Party size must be 1..${MAX_CHAR}: got ${input.charNos.length} / 隊伍人數須為 1–${MAX_CHAR} 人`,
+		);
+	}
+	if (input.monNos.length < 1) {
+		throw new Error('Encounter needs at least one monster / encounter 至少要有 1 隻怪物');
+	}
+}
+
+/**
+ * 展示資料的頁面層欄位（title／time／隊名；IShowcaseBattleInput 結構相容此型別）
+ * Page-level display fields (title / time / team names; IShowcaseBattleInput structurally satisfies this)
+ *
+ * 組裝展示資料不需要知道隊伍編號（charNos／monNos），只吃頁面層欄位，
+ * 因此可用假資料直接組出完整展示資料。
+ * Assembling display data does not need the party picks (charNos / monNos), only the page-level
+ * fields, so fabricated data can produce a complete display payload.
+ */
+export interface IDisplayDataMeta extends IBattleDisplayMeta {
+	/** 我方隊名（預設 DEFAULT_ALLY_TEAM_NAME）/ ally team name (default DEFAULT_ALLY_TEAM_NAME) */
+	allyTeamName?: string;
+	/** 敵方隊名（預設 DEFAULT_ENEMY_TEAM_NAME）/ enemy team name (default DEFAULT_ENEMY_TEAM_NAME) */
+	enemyTeamName?: string;
+}
+
+/** 展示資料組裝輸入 / Display-data assembly input */
+export interface IDisplayDataInput {
+	/** 頁面層欄位（title／time／隊名）/ page-level fields (title / time / team names) */
+	input: IDisplayDataMeta;
+	/** 我方（右隊）最終成員（含中途召喚）/ final ally members (mid-battle summons included) */
+	allies: readonly Character[];
+	/** 敵方（左隊）最終成員 / final enemy members */
+	enemies: readonly Character[];
+	/** 資料倉儲（def 查表與精靈圖）/ data repository (def lookups and sprite images) */
+	repo: IDataRepository;
+	/** 引擎事件日誌 / engine event log */
+	events: readonly IBattleEvent[];
+	/** 引擎快照（缺省或空陣列時不輸出 snapshots）/ engine snapshots (omitted when absent or empty) */
+	snapshots?: readonly IBattleSnapshot[];
+	/** 引擎判定（供 result 轉接）/ engine outcome (feeds the result adapter) */
+	outcome: EnumOutcome;
+}
+
+/**
+ * 組裝 IBattleDisplayData（可獨立呼叫；以假事件／假快照即可單獨測試）
+ * Assemble IBattleDisplayData (callable on its own; testable with fabricated events/snapshots)
+ *
+ * 與引擎執行分離：給定成員、事件與快照即可組出完整展示資料，展示層測試因此不必真的跑一整場。
+ * Kept apart from the engine run: given members, events and snapshots it builds the full display
+ * data, so display-layer tests do not have to run a real battle.
+ */
+export function buildDisplayData(args: IDisplayDataInput): IBattleDisplayData {
+	const allyTeamName = args.input.allyTeamName ?? DEFAULT_ALLY_TEAM_NAME;
+	const enemyTeamName = args.input.enemyTeamName ?? DEFAULT_ENEMY_TEAM_NAME;
+	const lookup = buildUnitLookup(args.allies, args.enemies);
+	const snapshots: IBattleSnapshotDisplay[] = (args.snapshots ?? []).map((s) =>
+		toSnapshotDisplay(s, args.repo),
+	);
+	return {
+		title: args.input.title ?? DEFAULT_SHOWCASE_TITLE,
+		time: args.input.time,
+		// 側別對齊原版：左=敵方，右=我方
+		// Side matches original: left = enemies, right = allies
+		leftTeam: buildTeam(enemyTeamName, args.enemies, EnumTeamSideUI.Left),
+		rightTeam: buildTeam(allyTeamName, args.allies, EnumTeamSideUI.Right),
+		battlefield: {
+			backgroundImageUrl: SHOWCASE_BATTLEFIELD_BG,
+			backgroundType: 'grass',
+			width: SPRITE_LAYOUT_WIDTH,
+			height: SPRITE_LAYOUT_HEIGHT,
+		},
+		sprites: buildSprites(args.allies, args.enemies),
+		actions: args.events.map((ev) => mapBattleEvent(ev, lookup, args.repo)),
+		result: buildResultData({
+			outcome: args.outcome,
+			allyTeamName,
+			enemyTeamName,
+			enemyMembers: args.enemies,
+			allyMembers: args.allies,
+			events: args.events,
+			lookup,
+		}),
+		snapshots: snapshots.length > 0 ? snapshots : undefined,
 	};
 }
 
@@ -715,16 +996,19 @@ function toSnapshotDisplay(snap: IBattleSnapshot, repo?: IDataRepository): IBatt
  *
  * 即時結算：同步呼叫 Battle.run() 跑完整場（毫秒級），無逐步播放。
  * Settles in one shot: calls Battle.run() synchronously to completion (millisecond-scale).
+ *
+ * 分工（每一段都能單獨呼叫與測試）：
+ * validateShowcaseInput 驗證輸入 → buildShowcaseTeams 建隊 → Battle.run() 跑引擎 →
+ * buildDisplayData 組裝展示資料。
+ * Division of labour (every step can be called and tested on its own): validateShowcaseInput
+ * checks the input → buildShowcaseTeams builds the teams → Battle.run() runs the engine →
+ * buildDisplayData assembles the display data.
+ *
+ * @param input - 展示戰鬥輸入 / showcase battle input
+ * @returns 展示資料與引擎判定 / display data plus the engine outcome
  */
 export function runShowcaseBattle(input: IShowcaseBattleInput): IShowcaseBattleOutcome {
-	if (input.charNos.length < 1 || input.charNos.length > MAX_CHAR) {
-		throw new Error(
-			`Party size must be 1..${MAX_CHAR}: got ${input.charNos.length} / 隊伍人數須為 1–${MAX_CHAR} 人`,
-		);
-	}
-	if (input.monNos.length < 1) {
-		throw new Error('Encounter needs at least one monster / encounter 至少要有 1 隻怪物');
-	}
+	validateShowcaseInput(input);
 
 	const repo = createSeedRepository();
 	const rng = new RNG(input.seed ?? DEFAULT_SHOWCASE_SEED);
@@ -744,44 +1028,18 @@ export function runShowcaseBattle(input: IShowcaseBattleInput): IShowcaseBattleO
 	});
 	const engineResult = battle.run();
 
-	const allyTeamName = input.allyTeamName ?? DEFAULT_ALLY_TEAM_NAME;
-	const enemyTeamName = input.enemyTeamName ?? DEFAULT_ENEMY_TEAM_NAME;
-
-	// 以「戰鬥結束後的隊伍成員」為準（含中途加入的召喚物），而非開戰前的初始陣列
-	// Use the post-battle team members (summons that joined mid-battle included),
-	// not just the initial pre-battle arrays.
-	const finalAllies = battle.teams[EnumTeamSide.Team0].members;
-	const finalEnemies = battle.teams[EnumTeamSide.Team1].members;
-
-	const lookup = buildUnitLookup(finalAllies, finalEnemies);
-	const snapshots: IBattleSnapshotDisplay[] = battle.snapshots.map((s) => toSnapshotDisplay(s, repo));
-
-	const data: IBattleDisplayData = {
-		title: input.title ?? DEFAULT_SHOWCASE_TITLE,
-		time: input.time,
-		// 側別對齊原版：左=敵方，右=我方
-		// Side matches original: left=enemies, right=allies
-		leftTeam: buildTeam(enemyTeamName, finalEnemies, EnumTeamSideUI.Left),
-		rightTeam: buildTeam(allyTeamName, finalAllies, EnumTeamSideUI.Right),
-		battlefield: {
-			backgroundImageUrl: SHOWCASE_BATTLEFIELD_BG,
-			backgroundType: 'grass',
-			width: SPRITE_LAYOUT_WIDTH,
-			height: SPRITE_LAYOUT_HEIGHT,
-		},
-		sprites: buildSprites(finalAllies, finalEnemies),
-		actions: battle.log.map((ev) => mapBattleEvent(ev, lookup, repo)),
-		result: buildResultData({
-			outcome: engineResult.outcome,
-			allyTeamName,
-			enemyTeamName,
-			enemyMembers: finalEnemies,
-			allyMembers: finalAllies,
-			events: battle.log,
-			lookup,
-		}),
-		snapshots: snapshots.length > 0 ? snapshots : undefined,
-	};
+	const data = buildDisplayData({
+		input,
+		// 以「戰鬥結束後的隊伍成員」為準（含中途加入的召喚物），而非開戰前的初始陣列
+		// Use the post-battle team members (summons that joined mid-battle included),
+		// not just the initial pre-battle arrays.
+		allies: battle.teams[EnumTeamSide.Team0].members,
+		enemies: battle.teams[EnumTeamSide.Team1].members,
+		repo,
+		events: battle.log,
+		snapshots: battle.snapshots,
+		outcome: engineResult.outcome,
+	});
 
 	return {
 		data,
