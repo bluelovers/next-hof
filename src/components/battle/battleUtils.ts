@@ -265,6 +265,42 @@ export function splitNamedMessage(action: Pick<IBattleAction, 'source' | 'messag
   return { text: message };
 }
 
+/**
+ * 數值變化文字的輸入（預組字串或變化前後值）
+ * Value-change text input (a pre-assembled string or the before/after values)
+ */
+export interface IValueChangeTextInput {
+  /** 預組好的變化描述（優先採用）/ Pre-assembled change copy (takes precedence) */
+  valueChange?: string;
+  /** 變化前（與 to 同時提供時組成 `from > to`）/ Before (pairs with `to` into `from > to`) */
+  from?: number;
+  /** 變化後 / After */
+  to?: number;
+}
+
+/**
+ * 組出「(前 > 後)」的數值變化文字（單一事實來源）
+ * Build the `(before > after)` value-change text (single source of truth)
+ *
+ * 優先採用預組字串 `valueChange`；否則在 `from`／`to` 齊備時組成 `from > to`；
+ * 兩者皆無時回傳 undefined，渲染端據此輸出空內容（不會出現空括號）。
+ * The pre-assembled `valueChange` wins; otherwise the `from > to` pair is built when both
+ * ends are present; when neither exists `undefined` comes back so the renderer emits
+ * nothing (never empty parentheses).
+ *
+ * BattleAction 的 ValueChange 與 showcase 轉接層共用此函式，格式只書寫一次。
+ * BattleAction's ValueChange and the showcase adapter share this helper, so the format is
+ * written exactly once.
+ *
+ * @param input - 變化文字輸入 / Value-change input
+ * @returns 變化文字（無資料時 undefined）/ Change copy (undefined when there is none)
+ */
+export function buildValueChangeText(input: IValueChangeTextInput): string | undefined {
+  if (input.valueChange !== undefined) return input.valueChange;
+  if (input.from !== undefined && input.to !== undefined) return `${input.from} > ${input.to}`;
+  return undefined;
+}
+
 /** 蓄力／詠唱文案（`start charging.` / `start casting.`）/ Charge/casting copy */
 export function buildChargeMessage(castType?: EnumChargeKind): string {
   return `start ${castType ?? EnumChargeKind.Casting}.`;

@@ -5,15 +5,14 @@
  * 顯示單一技能/攻擊/行動的日誌條目（含召喚 Summon 與魔方陣 MagicCircle）
  * Displays a single skill/attack/action log entry (summon and magic circle included)
  */
-import React from 'react';
+import React, { Fragment } from 'react';
 import type { IBattleAction, IValueChangeRecord } from './types';
 import './BattleAction.css';
 import '#/components/shared/SharedBase.css';
 import { SkillIcon } from '#/components/shared/SkillIcon';
 import type { IStyleProps, IStylePropsRequired, ITSRequiredWith2 } from '#/components/shared/types';
 import { CharacterSprite } from '#/components/characters/CharacterSprite';
-import { EnumSpriteVariant, EnumMagicCircleKind } from './enums';
-import { EnumActionType } from './enums';
+import { EnumActionType, EnumMagicCircleKind, EnumSpriteVariant } from './enums';
 import {
   getAttrClass,
   getValueChangeClass,
@@ -23,6 +22,7 @@ import {
   getMessageClass,
   splitNamedMessage,
   buildChargeMessage,
+  buildValueChangeText,
 } from './battleUtils';
 
 /** 戰鬥行動屬性 / Battle action props */
@@ -52,12 +52,10 @@ const ValueChange: React.FC<{
   who?: string;
   type?: EnumActionType;
 }> = ({ valueChange, from, to, who, type }) => {
-  const text =
-    valueChange !== undefined
-      ? valueChange
-      : from !== undefined && to !== undefined
-        ? `${from} > ${to}`
-        : undefined;
+  // 文字組裝委由 battleUtils.buildValueChangeText（單一事實來源，展示資料共用同一定義）
+  // Copy assembly is delegated to battleUtils.buildValueChangeText (single source of truth,
+  // shared definition with the showcase data)
+  const text = buildValueChangeText({ valueChange, from, to });
   if (text === undefined) return null;
   const valClass = getValueChangeClass(type);
   return (
@@ -67,6 +65,18 @@ const ValueChange: React.FC<{
     </span>
   );
 };
+
+/**
+ * 行動自帶的數值變化（`action.valueChange` → ValueChange）
+ * The action's own value change (`action.valueChange` → ValueChange)
+ *
+ * 各訊息組件只需傳入 action，不必重複組合 `valueChange`/`type` 兩個欄位。
+ * Message components only pass the action, so the `valueChange` / `type` pair is never
+ * re-assembled at each call site.
+ */
+const ActionValueChange: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <ValueChange valueChange={action.valueChange} type={action.type} />
+);
 
 /**
  * 多重數值變化列表（單一事實來源；內部統一委託 ValueChange）
@@ -83,10 +93,10 @@ const ValueChanges: React.FC<{ changes?: IValueChangeRecord[]; type?: EnumAction
 }) => (
   <>
     {changes?.map((vc, i) => (
-      <>
-        {((i > 0) ? ' ' : null)}
-        <ValueChange key={i} from={vc.from} to={vc.to} who={vc.who} type={type} />
-      </>
+      <Fragment key={`${vc.who ?? ''}-${vc.from}-${vc.to}-${i}`}>
+        {i > 0 ? ' ' : null}
+        <ValueChange from={vc.from} to={vc.to} who={vc.who} type={type} />
+      </Fragment>
     ))}
   </>
 );
@@ -277,12 +287,30 @@ const NamedMessage: React.FC<INamedMessageProps> = ({ action, className, style }
       message={
         <>
           {text}
-          <ValueChange valueChange={action.valueChange} type={action.type} />
+          <ActionValueChange action={action} />
         </>
       }
     />
   );
 };
+
+/**
+ * 標準「名稱 ＋ 文字」日誌（配色依 getMessageClass）
+ * Standard "name + text" log (colour from getMessageClass)
+ *
+ * Buff（`got quicked!`／`casting shorted!`／`got barriered!`）、Debuff（能力下降）、
+ * StatChange（`STR rise 10%`、`MAXHP extended to 999`）、Move（`moved to front.`／
+ * `knock backed!`）、Delay（`name delayed N.`）、Miss／LevelUp（`Failed!`／`name LevelUp!`）
+ * 在原始日誌都是同一版面，只有配色由 getMessageClass 決定，故共用此單一組件。
+ * Buff (`got quicked!` / `casting shorted!` / `got barriered!`), debuff (stat down),
+ * stat change (`STR rise 10%`, `MAXHP extended to 999`), move (`moved to front.`,
+ * `knock backed!`), delay (`name delayed N.`), miss and level up (`Failed!`,
+ * `name LevelUp!`) all use the same layout in the original log and differ only by colour,
+ * which getMessageClass supplies, so they share this single component.
+ */
+const NamedLogMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <NamedMessage action={action} className={getMessageClass(action)} />
+);
 
 /** 「粗體名稱 ＋ 文字 ＋ 粗體數值 ＋ 單位」版面 props（樣式欄位繼承自 IStyleProps）/ Named-value layout props (style fields inherited from IStyleProps) */
 interface INamedValueMessageProps extends IStyleProps {
@@ -317,7 +345,9 @@ const NamedValueMessage: React.FC<INamedValueMessageProps> = ({
   style,
   text,
 }) => {
-  if (action.value === undefined) return <NamedMessage action={action} className={className} style={style} />;
+  if (action.value === undefined) {
+    return <NamedMessage action={action} className={className} style={style} />;
+  }
   const name = action.type === EnumActionType.Heal ? action.target : action.source;
   return (
     <ActionLine
@@ -336,7 +366,7 @@ const NamedValueMessage: React.FC<INamedValueMessageProps> = ({
             <span className="bold">{action.value}</span>
             {action.valueUnit && ` ${action.valueUnit}`}
           </span>
-          <ValueChange valueChange={action.valueChange} type={action.type} />
+          <ActionValueChange action={action} />
         </>
       }
     />
@@ -344,45 +374,70 @@ const NamedValueMessage: React.FC<INamedValueMessageProps> = ({
 };
 
 /**
+ * 「數值 ＋ 標籤 ＋ to target ＋ 數值變化」版面（單一事實來源）
+ * "value + label + to target + value change" layout (single source of truth)
+ *
+ * 傷害與 SP 傷害共用：色塊只涵蓋「數值＋標籤」，`to target` 與 `(前 > 後)` 維持預設色
+ * （色塊在 `to` 之前結束）；標籤自帶與數值間的間距，故 SP Damage 與數值之間沒有空格。
+ * Damage and SP damage share it: the colour span covers only "value + label" while
+ * `to target` and `(from > to)` stay default (the span ends before "to"); the label carries
+ * its own spacing, so "SP Damage" sits flush against the value.
+ */
+const ValueToTargetMessage: React.FC<{
+  action: IBattleAction;
+  /** 色塊 class / colour class of the value span */
+  className: string;
+  /** 數值後的標籤（含與數值間的間距）/ label after the value (its spacing included) */
+  label: string;
+}> = ({ action, className, label }) => (
+  <>
+    <span className={className}>
+      <span className="bold">{action.value}</span>{label}
+    </span>
+    {action.target && <> to <span className="bold">{action.target}</span></>}
+    <ActionValueChange action={action} />
+  </>
+);
+
+/**
+ * 傷害訊息（`<b>N</b> Damage to <b>target</b>`）
+ * Damage message (`<b>N</b> Damage to <b>target</b>`)
+ *
+ * 色塊＝dmg ＋ 屬性色；標籤前保留一個空格，與原始日誌的 `N Damage` 逐字一致。
+ * Colour = dmg + attribute; the label keeps its leading space to match the original
+ * `N Damage` word for word.
+ */
+const DamageMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <ValueToTargetMessage
+    action={action}
+    className={`dmg ${getAttrClass(action.attribute)}`.trim()}
+    label=" Damage"
+  />
+);
+
+/**
  * SP 傷害訊息（單一事實來源）
  * SP damage message (single source of truth)
  *
- * 原始日誌：`<b>N</b>SP Damage to <b>target</b>`，數值與「SP Damage」之間無空格。
+ * 原始日誌：`<b>N</b>SP Damage to <b>target</b>`，數值與「SP Damage」之間無空格；
+ * 僅數值與「SP Damage」上 spdmg 色，`to target` 與 `(前 > 後)` 維持預設色。
  * Original log: `<b>N</b>SP Damage to <b>target</b>` with no space between the value and
- * "SP Damage".
+ * "SP Damage"; only the value and "SP Damage" are spdmg while `to target` and
+ * `(from > to)` stay default (the colour span ends before "to").
  */
-const SpDamageMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
-  const cls = getMessageClass(action);
-  // 原始日誌：`<b>N</b>SP Damage to <b>target</b>`，僅數值與「SP Damage」上 spdmg 色，
-  // `to target` 與 `(前 > 後)` 維持預設色（色塊在 `to` 之前結束）。
-  // Original log: `<b>N</b>SP Damage to <b>target</b>` — only the value and "SP Damage" are
-  // spdmg, while `to target` and `(from > to)` stay default (the colour span ends before "to").
-  return (
-    <>
-      <span className={cls}>
-        <span className="bold">{action.value}</span>SP Damage
-      </span>
-      {action.target && <> to <span className="bold">{action.target}</span></>}
-      <ValueChange valueChange={action.valueChange} type={action.type} />
-    </>
-  );
-};
+const SpDamageMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <ValueToTargetMessage action={action} className={getMessageClass(action)} label="SP Damage" />
+);
 
-/**
- * 吸取訊息（單事實來源）
- * Drain message (single source of truth)
- *
- * 原始日誌：`Drained <b>N</b> HP from <b>target</b>`（行首無施放者名稱）。
- * Original log: `Drained <b>N</b> HP from <b>target</b>` (no caster name at the head).
- */
 /**
  * 吸取訊息（單一事實來源）
  * Drain message (single source of truth)
  *
  * 原始日誌：`Drained <b>N</b> HP from <b>target</b>(targetFrom > targetTo)<b>who</b>(whoFrom > whoTo)`，
- * 支援任意數量的 `who(n1->n2)` 數值變化；who 缺省時只印 `(n1 > n2)`。
- * Original log: `Drained <b>N</b> HP from <b>target</b>(tFrom > tTo)<b>who</b>(wFrom > wTo)`,
- * supporting any number of `who(n1->n2)` value changes; when `who` is absent only `(n1 > n2)` prints.
+ * 行首無施放者名稱，並支援任意數量的 `who(n1->n2)` 數值變化；who 缺省時只印 `(n1 > n2)`。
+ * Original log: `Drained <b>N</b> HP from <b>target</b>(tFrom > tTo)<b>who</b>(wFrom > wTo)`
+ * (no caster name at the head) and it supports any number of `who(n1->n2)` value changes;
+ * when `who` is absent only `(n1 > n2)` prints.
  */
 const DrainMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
   const cls = getMessageClass(action);
@@ -436,7 +491,39 @@ const RegenMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
       message={
         <>
           <span className={cls}>{text}</span>
-          <ValueChange valueChange={action.valueChange} type={action.type} />
+          <ActionValueChange action={action} />
+        </>
+      }
+    />
+  );
+};
+
+/**
+ * 強調片段訊息（單一事實來源）
+ * Emphasised-segment message (single source of truth)
+ *
+ * 把 message 依 emphasis 切成「前段＋強調段＋後段」，只有強調段上色，名稱維持預設色；
+ * 復活（`revived!` → recover）與中毒施加（`poisoned` → spdmg）共用此版面。
+ * Splits `message` on `emphasis` into before / emphasised / after and colours only the
+ * emphasised segment while the name keeps the default colour; revive (`revived!` → recover)
+ * and the poison apply line (`poisoned` → spdmg) share this layout.
+ */
+const EmphasizedMessage: React.FC<{
+  action: IBattleAction;
+  /** 強調片段（缺省取 action.emphasis，再缺省 'revived'）/ emphasised segment (falls back to action.emphasis, then 'revived') */
+  emphasis?: string;
+  /** 強調片段的 CSS class / CSS class of the emphasised segment */
+  className: string;
+}> = ({ action, emphasis = action.emphasis ?? 'revived', className }) => {
+  const parts = action.message.split(emphasis);
+  return (
+    <ActionLine
+      who={action.source}
+      message={
+        <>
+          {parts[0]}
+          <span className={className}>{emphasis}</span>
+          {parts[1]}
         </>
       }
     />
@@ -451,30 +538,8 @@ const RegenMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
  * Mirrors Char/Battle/Effect.php: the name keeps the default colour and only `revived!`
  * is wrapped in the recover colour.
  */
-const ReviveMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
-  const parts = action.message.split(action.emphasis ?? 'revived');
-  return (
-    <ActionLine
-      who={action.source}
-      message={
-        <>
-          {parts[0]}
-          <span className="recover">{action.emphasis ?? 'revived'}</span>
-          {parts[1]}
-        </>
-      }
-    />
-  );
-};
-
-/** 增益訊息（`got quicked!`／`casting shorted!`／`got barriered!`）/ Buff message */
-const BuffMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <NamedMessage action={action} className={getMessageClass(action)} />
-);
-
-/** 減益訊息（能力下降；原始日誌無 span，沿用預設色）/ Debuff message (no span in the original log) */
-const DebuffMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <NamedMessage action={action} className={getMessageClass(action)} />
+const ReviveMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <EmphasizedMessage action={action} className="recover" />
 );
 
 /**
@@ -489,19 +554,7 @@ const DebuffMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
  */
 const PoisonMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
   if (action.emphasis) {
-    const parts = action.message.split(action.emphasis);
-    return (
-      <ActionLine
-        who={action.source}
-        message={
-          <>
-            {parts[0]}
-            <span className="spdmg">{action.emphasis}</span>
-            {parts[1]}
-          </>
-        }
-      />
-    );
+    return <EmphasizedMessage action={action} className="spdmg" />;
   }
   // 每回合中毒傷害（4.7）：整行 spdmg，數值加粗，並附 `(前 > 後)`。
   // Per-turn poison damage (4.7): the whole line is spdmg, the value is bold, and the
@@ -515,7 +568,7 @@ const PoisonMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
           <>
             got{' '}
             <span className="bold">{action.value}</span> damage by poison.
-            <ValueChange valueChange={action.valueChange} type={action.type} />
+            <ActionValueChange action={action} />
           </>
         }
       />
@@ -523,21 +576,6 @@ const PoisonMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
   }
   return <NamedMessage action={action} className={getMessageClass(action)} />;
 };
-
-/** 屬性升降訊息（`STR rise 10%`、`MAXHP extended to 999`）/ Stat-change message */
-const StatChangeMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <NamedMessage action={action} className={getMessageClass(action)} />
-);
-
-/** 位移訊息（`moved to front.`、`knock backed!`）/ Movement message */
-const MoveMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <NamedMessage action={action} className={getMessageClass(action)} />
-);
-
-/** 延遲訊息（`name delayed N.`）/ Delay message (`name delayed N.`) */
-const DelayMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <NamedMessage action={action} className={getMessageClass(action)} />
-);
 
 /**
  * 犧牲訊息（`name sacrifice N HP`，整行 dmg 色）
@@ -558,7 +596,7 @@ const SacrificeMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
         sacrifice{' '}
         <span className="bold">{action.value}</span>
         {action.valueUnit && ` ${action.valueUnit}`}
-        <ValueChange valueChange={action.valueChange} type={action.type} />
+        <ActionValueChange action={action} />
       </>
     }
   />
@@ -602,16 +640,6 @@ const FailMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
       </>
     )}
   </>
-);
-
-/** 未命中訊息（`Failed!`；原始日誌無 span，沿用預設色）/ Miss message (`Failed!`, no span in the original log) */
-const MissMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <NamedMessage action={action} className={getMessageClass(action)} />
-);
-
-/** 升級訊息（`name LevelUp!`）/ Level-up message (`name LevelUp!`) */
-const LevelUpMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <NamedMessage action={action} className={getMessageClass(action)} />
 );
 
 /**
@@ -681,33 +709,6 @@ const EnergyExchangeMessage: React.FC<{ action: IBattleAction }> = ({ action }) 
 };
 
 /**
- * 傷害訊息（單一事實來源）
- * Damage message (single source of truth)
- *
- * 原始日誌：`<b>N</b> Damage to <b>target</b>`——僅數值與「Damage」上 dmg 色，`to target`
- * 與 `(前 > 後)` 維持預設色（色塊在 `to` 之前結束）。
- * Original log: `<b>N</b> Damage to <b>target</b>` — only the value and "Damage" are dmg, while
- * `to target` and `(from > to)` stay default (the colour span ends before "to").
- */
-const ValueMessage: React.FC<{
-  action: IBattleAction;
-  typeClass: string;
-  label: string;
-}> = ({ action, typeClass, label }) => {
-  const attrClass = getAttrClass(action.attribute);
-  const cls = `${typeClass} ${attrClass}`.trim();
-  return (
-    <>
-      <span className={cls}>
-        <span className="bold">{action.value}</span> {label}
-      </span>
-      {action.target && <> to <span className="bold">{action.target}</span></>}
-      <ValueChange valueChange={action.valueChange} type={action.type} />
-    </>
-  );
-};
-
-/**
  * 保護訊息（單一事實來源）
  * Protect message (single source of truth)
  *
@@ -773,64 +774,57 @@ const CastingMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
  */
 function renderActionContent(action: IBattleAction): React.ReactNode {
   switch (action.type) {
-    case 'enter':
+    case EnumActionType.Enter:
       return <EnterMessage action={action} />;
-    case 'summon':
+    case EnumActionType.Summon:
       return <SummonMessage action={action} />;
-    case 'magiccircle':
+    case EnumActionType.MagicCircle:
       return <MagicCircleMessage action={action} />;
-    case 'skill':
-    case 'attack':
+    case EnumActionType.Skill:
+    case EnumActionType.Attack:
       return <SkillMessage action={action} />;
-    case 'damage':
-      return <ValueMessage action={action} typeClass="dmg" label="Damage" />;
-    case 'heal':
-      // 原始回復文案為 "Recovered N HP/SP"，與 'recover' 共用 Partial 上色版面。
-      // The original recovery copy is "Recovered N HP/SP", so heals share the Recover layout.
+    case EnumActionType.Damage:
+      return <DamageMessage action={action} />;
+    // 原始回復文案為 "Recovered N HP/SP"，Heal 與 'recover' 共用 Partial 上色版面。
+    // The original recovery copy is "Recovered N HP/SP", so Heal shares the Recover layout.
+    case EnumActionType.Heal:
+    case EnumActionType.Recover:
       return <RecoverMessage action={action} />;
-    case 'protect':
+    case EnumActionType.Protect:
       return <ProtectMessage action={action} />;
-    case 'casting':
+    case EnumActionType.Casting:
       return <CastingMessage action={action} />;
-    case 'down':
+    case EnumActionType.Down:
       return <StatusMessage action={action} className="dmg" suffix="down." />;
-    case 'spdamage':
+    case EnumActionType.SpDamage:
       return <SpDamageMessage action={action} />;
-    case 'recover':
-      return <RecoverMessage action={action} />;
-    case 'drain':
+    case EnumActionType.Drain:
       return <DrainMessage action={action} />;
-    case 'regen':
+    case EnumActionType.Regen:
       return <RegenMessage action={action} />;
-    case 'revive':
+    case EnumActionType.Revive:
       return <ReviveMessage action={action} />;
-    case 'buff':
-      return <BuffMessage action={action} />;
-    case 'debuff':
-      return <DebuffMessage action={action} />;
-    case 'poison':
+    case EnumActionType.Buff:
+    case EnumActionType.Debuff:
+    case EnumActionType.StatChange:
+    case EnumActionType.Move:
+    case EnumActionType.Delay:
+    case EnumActionType.Miss:
+    case EnumActionType.LevelUp:
+      return <NamedLogMessage action={action} />;
+    case EnumActionType.Poison:
       return <PoisonMessage action={action} />;
-    case 'statchange':
-      return <StatChangeMessage action={action} />;
-    case 'move':
-      return <MoveMessage action={action} />;
-    case 'delay':
-      return <DelayMessage action={action} />;
-    case 'sacrifice':
+    case EnumActionType.Sacrifice:
       return <SacrificeMessage action={action} />;
-    case 'fail':
+    case EnumActionType.Fail:
       return <FailMessage action={action} />;
-    case 'miss':
-      return <MissMessage action={action} />;
-    case 'levelup':
-      return <LevelUpMessage action={action} />;
-    case 'itemdrop':
+    case EnumActionType.ItemDrop:
       return <ItemDropMessage action={action} />;
-    case 'energyexchange':
+    case EnumActionType.EnergyExchange:
       return <EnergyExchangeMessage action={action} />;
-    case 'leave':
+    case EnumActionType.Leave:
       return <LeaveMessage action={action} />;
-    case 'info':
+    case EnumActionType.Info:
       return <InfoMessage action={action} />;
     default:
       return <ActionLine className={getAttrClass(action.attribute)} message={action.message} />;

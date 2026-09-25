@@ -32,7 +32,7 @@ import type {
 	ITeamFinalStats,
 	ITeamSide,
 } from '#/components/battle/types';
-import { buildMagicCircleMessage, buildNamedMessage, buildChargeMessage } from '#/components/battle/battleUtils';
+import { buildMagicCircleMessage, buildNamedMessage, buildChargeMessage, buildValueChangeText } from '#/components/battle/battleUtils';
 import {
 	computeBattleSpritePositions,
 	groupBattleChars,
@@ -301,11 +301,8 @@ export function mapBattleEvent(
 		case EnumBattleEventType.Damage: {
 			const value = ev.value ?? 0;
 			const valueChange =
-				ev.hpBefore !== undefined && ev.hpAfter !== undefined
-					? `${ev.hpBefore} > ${ev.hpAfter}`
-					: actor.name
-						? `by ${actor.name}`
-						: undefined;
+				buildValueChangeText({ from: ev.hpBefore, to: ev.hpAfter }) ??
+				(actor.name ? `by ${actor.name}` : undefined);
 			const message = target.name ? `${value} Damage to ${target.name}` : `${value} Damage`;
 			return {
 				type: EnumActionType.Damage,
@@ -323,10 +320,7 @@ export function mapBattleEvent(
 		}
 		case EnumBattleEventType.Heal: {
 			const value = ev.value ?? 0;
-			const valueChange =
-				ev.hpBefore !== undefined && ev.hpAfter !== undefined
-					? `${ev.hpBefore} > ${ev.hpAfter}`
-					: undefined;
+			const valueChange = buildValueChangeText({ from: ev.hpBefore, to: ev.hpAfter });
 			const message = target.name
 				? `${target.name} Recovered ${value} HP`
 				: `${value} Heal`;

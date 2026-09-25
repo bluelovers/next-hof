@@ -18,6 +18,7 @@ import {
 	buildSpDamageMessage,
 	buildStatChangeMessage,
 	buildStatToMessage,
+	buildValueChangeText,
 	getMessageClass,
 } from './battleUtils';
 import {
@@ -359,6 +360,21 @@ describe('原始日誌文案與配色 / original log copy and colours', () => {
 
 	it('buildDelayMessage mirrors the DelayByRate parentheses', () => {
 		expect(buildDelayMessage('GoblinAxe', 15, 25, 100)).toBe('GoblinAxe Delayed(15 >>> 25/100)');
+	});
+
+	it('buildValueChangeText prefers the pre-assembled copy, then the from/to pair', () => {
+		// 預組字串優先（例如轉接層產出的 `200 > 158`）
+		// The pre-assembled copy wins (such as the adapter's `200 > 158`)
+		expect(buildValueChangeText({ valueChange: '200 > 158' })).toBe('200 > 158');
+		expect(buildValueChangeText({ valueChange: '200 > 158', from: 1, to: 2 })).toBe('200 > 158');
+		// 沒有預組字串時以 from/to 組出 `from > to`
+		// Without a pre-assembled copy the `from > to` pair is built
+		expect(buildValueChangeText({ from: 200, to: 158 })).toBe('200 > 158');
+		// 兩端須齊備：只有 from 或只有 to 時回傳 undefined（渲染端不印出空括號）
+		// Both ends are required: `from` alone or `to` alone yields undefined (no empty parentheses)
+		expect(buildValueChangeText({ from: 200 })).toBeUndefined();
+		expect(buildValueChangeText({ to: 158 })).toBeUndefined();
+		expect(buildValueChangeText({})).toBeUndefined();
 	});
 
 	it('getMessageClass maps each family to the original span class', () => {
