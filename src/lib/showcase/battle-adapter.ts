@@ -537,6 +537,46 @@ export interface IResultDataInput {
 }
 
 /**
+ * 單隊 HP 統計的最小單位形狀（Character 與展示用 IBattleUnit 皆可映射至此）
+ * Minimal unit shape for one-team HP stats (both Character and showcase IBattleUnit map to this)
+ */
+export interface ITeamHpUnit {
+	/** 目前 HP / current HP */
+	hp: number;
+	/** 最大 HP / max HP */
+	maxHp: number;
+	/** 是否陣亡 / whether downed */
+	dead: boolean;
+}
+
+/**
+ * 由單位清單計算隊伍 HP 統計（hpRemain／totalMaxHp／alive／totalUnits）
+ * Compute a team's HP stats (hpRemain / totalMaxHp / alive / totalUnits) from a unit list.
+ *
+ * 抽離自 runShowcaseBattle → buildResultData → buildTeamStats，供展示資料與引擎共用同一套計算，
+ * 確保「HP remain」的分母（totalMaxHp）永遠存在且與畫面上顯示的單位一致。
+ * Extracted from runShowcaseBattle → buildResultData → buildTeamStats so the showcase data and
+ * the engine share one computation, guaranteeing the "HP remain" denominator (totalMaxHp) is
+ * always present and matches the units shown on screen.
+ */
+export function computeTeamHpStats(units: readonly ITeamHpUnit[]): {
+	hpRemain: number;
+	totalMaxHp: number;
+	alive: number;
+	totalUnits: number;
+} {
+	let hpRemain = 0;
+	let totalMaxHp = 0;
+	let alive = 0;
+	for (const u of units) {
+		hpRemain += Math.max(0, u.hp);
+		totalMaxHp += u.maxHp;
+		if (!u.dead) alive++;
+	}
+	return { hpRemain, totalMaxHp, alive, totalUnits: units.length };
+}
+
+/**
  * 建立單隊最終統計（hpRemain／alive／totalUnits／totalDamage／totalMaxHp）
  * Build one team's final stats (hpRemain/alive/totalUnits/totalDamage/totalMaxHp)
  */
@@ -546,21 +586,18 @@ function buildTeamStats(
 	events: readonly IBattleEvent[] | undefined,
 	lookup: IUnitLookup | undefined,
 ): ITeamFinalStats {
-	let hpRemain = 0;
-	let alive = 0;
-	let totalMaxHp = 0;
-	for (const c of members) {
-		hpRemain += Math.max(0, c.HP);
-		totalMaxHp += c.MAXHP;
-		if (c.STATE !== EnumState.Dead) alive++;
-	}
+	// HP 統計抽離為共用邏輯（展示資料亦使用 computeTeamHpStats）
+	// HP stats extracted into the shared helper (the showcase data also uses computeTeamHpStats)
+	const hp = computeTeamHpStats(
+		members.map((c) => ({ hp: c.HP, maxHp: c.MAXHP, dead: c.STATE === EnumState.Dead })),
+	);
 	let totalDamage = 0;
 	for (const ev of events ?? []) {
 		if (ev.type !== EnumBattleEventType.Damage) continue;
 		const info = ev.actor !== undefined ? lookup?.get(Number(ev.actor)) : undefined;
 		if (info?.side === side) totalDamage += ev.value ?? 0;
 	}
-	return { hpRemain, alive, totalUnits: members.length, totalDamage, totalMaxHp };
+	return { ...hp, totalDamage };
 }
 
 /**

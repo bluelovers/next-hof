@@ -59,6 +59,7 @@ import {
   buildStatToMessage,
 } from '#/components/battle/battleUtils';
 import { EnumPosition } from '#/lib/game/constants';
+import { computeTeamHpStats, type ITeamHpUnit } from '#/lib/showcase/battle-adapter';
 
 // ==================== 常數 / Constants ====================
 
@@ -856,31 +857,55 @@ interface IBattleDataOverrides {
 }
 
 /**
+ * 展示單位（IBattleUnit）→ 隊伍 HP 統計輸入
+ * Showcase unit (IBattleUnit) → team HP-stats input
+ */
+function toHpUnit(u: IBattleUnit): ITeamHpUnit {
+  return { hp: u.hp, maxHp: u.maxHp, dead: u.status === EnumUnitStatus.Down };
+}
+
+/**
  * 組裝完整戰鬥資料（隊伍與精靈由單位定義派生）
  * Assemble complete battle display data (teams and sprites derive from the unit definitions)
  */
 function createBattleData(units: IShowcaseUnit[], overrides: IBattleDataOverrides = {}): IBattleDisplayData {
-  const { leftUnits, rightUnits, sprites, actions, snapshots } = overrides;
+  const leftUnits = overrides.leftUnits ?? statusUnits(unitsOfSide(units, EnumTeamSideUI.Left));
+  const rightUnits = overrides.rightUnits ?? statusUnits(unitsOfSide(units, EnumTeamSideUI.Right));
+  const { sprites, actions, snapshots } = overrides;
+
+  // 戰鬥結果以「實際顯示的單位」為準，確保 HP remain 分母（totalMaxHp）與畫面上的單位一致；
+  // totalDamage／totalExp／funds 等僅引擎可產出的欄位仍沿用撰寫值（BATTLE_RESULT）。
+  // The battle result is derived from the actually displayed units so the HP remain denominator
+  // (totalMaxHp) matches the on-screen units; only engine-only fields (totalDamage/totalExp/funds)
+  // keep their authored values (BATTLE_RESULT).
+  const result: IBattleResult | undefined =
+    'result' in overrides
+      ? overrides.result
+      : {
+          winner: BATTLE_RESULT.winner,
+          isDraw: BATTLE_RESULT.isDraw,
+          leftTeam: { ...BATTLE_RESULT.leftTeam, ...computeTeamHpStats(leftUnits.map(toHpUnit)) },
+          rightTeam: { ...BATTLE_RESULT.rightTeam, ...computeTeamHpStats(rightUnits.map(toHpUnit)) },
+        };
+
   return {
     title: BATTLE_TITLE,
     time: BATTLE_TIME,
     leftTeam: {
       name: LEFT_TEAM_NAME,
-      units: leftUnits ?? statusUnits(unitsOfSide(units, EnumTeamSideUI.Left)),
+      units: leftUnits,
       side: EnumTeamSideUI.Left,
     },
     rightTeam: {
       name: RIGHT_TEAM_NAME,
-      units: rightUnits ?? statusUnits(unitsOfSide(units, EnumTeamSideUI.Right)),
+      units: rightUnits,
       side: EnumTeamSideUI.Right,
     },
     battlefield: BATTLEFIELD,
     sprites: sprites ?? battleSprites(units),
     actions: actions ?? battleActions,
     snapshots,
-    // 顯式傳入 undefined 時沿用覆寫值（解構預設值吃不到 undefined）
-    // Honour an explicitly-passed undefined (destructuring defaults swallow it)
-    result: 'result' in overrides ? overrides.result : BATTLE_RESULT,
+    result,
   };
 }
 
