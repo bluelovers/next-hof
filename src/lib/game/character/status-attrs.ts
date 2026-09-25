@@ -112,8 +112,18 @@ export const STATUS_ATTR_TABLE: Record<IStatusAttr, IStatusAttrEntry> = {
 	DEX: { get: (c) => c.DEX, set: (c, v) => { c.DEX = v; }, plus: plusAttr((c) => c.DEX, (c, v) => { c.DEX = v; }) },
 	SPD: { get: (c) => c.SPD, set: (c, v) => { c.SPD = v; }, plus: plusAttr((c) => c.SPD, (c, v) => { c.SPD = v; }) },
 	LUK: { get: (c) => c.LUK, set: (c, v) => { c.LUK = v; }, plus: plusAttr((c) => c.LUK, (c, v) => { c.LUK = v; }) },
-	ATK: { get: (c) => c.atk[EnumAtkSlot.Phys], set: (c, v) => { c.atk[EnumAtkSlot.Phys] = v; } },
-	MATK: { get: (c) => c.atk[EnumAtkSlot.Mag], set: (c, v) => { c.atk[EnumAtkSlot.Mag] = v; } },
+	// ATK/MATK 增益無 MAX_STATUS_MAXIMUM 上限（對齊原始 UpATK/UpMATK：單純 round(orig*(1+n/100))）。
+	// ATK/MATK buffs have NO MAX_STATUS_MAXIMUM cap (mirrors original UpATK/UpMATK: plain round(orig*(1+n/100))).
+	ATK: {
+		get: (c) => c.atk[EnumAtkSlot.Phys],
+		set: (c, v) => { c.atk[EnumAtkSlot.Phys] = v; },
+		up: (c, n) => { c.atk[EnumAtkSlot.Phys] = Math.round(c.atk[EnumAtkSlot.Phys] * (1 + n / 100)); },
+	},
+	MATK: {
+		get: (c) => c.atk[EnumAtkSlot.Mag],
+		set: (c, v) => { c.atk[EnumAtkSlot.Mag] = v; },
+		up: (c, n) => { c.atk[EnumAtkSlot.Mag] = Math.round(c.atk[EnumAtkSlot.Mag] * (1 + n / 100)); },
+	},
 	DEF: {
 		/** DEF 掛在物理%減傷槽 / DEF maps to the physical-% reduction slot */
 		get: (c) => c.def[EnumDefSlot.PhysPct],
@@ -138,8 +148,24 @@ export const STATUS_ATTR_TABLE: Record<IStatusAttr, IStatusAttrEntry> = {
 		/** 自定減益：現值乘以 (1-n/100) / custom down: multiplies current value by (1-n/100) */
 		down: (c, n) => { c.def[EnumDefSlot.MagPct] = Math.round(c.def[EnumDefSlot.MagPct] * (1 - n / 100)); },
 	},
-	MAXHP: { get: (c) => c.MAXHP, set: (c, v) => { c.MAXHP = v; }, plus: plusAttr((c) => c.MAXHP, (c, v) => { c.MAXHP = v; }) },
-	MAXSP: { get: (c) => c.MAXSP, set: (c, v) => { c.MAXSP = v; }, plus: plusAttr((c) => c.MAXSP, (c, v) => { c.MAXSP = v; }) },
+	// MAXHP/MAXSP 增益無 MAX_STATUS_MAXIMUM 上限（對齊原始 UpMAXHP/UpMAXSP）。
+	// MAXHP/MAXSP buffs have NO MAX_STATUS_MAXIMUM cap (mirrors original UpMAXHP/UpMAXSP).
+	// 減益須夾制當前 HP/SP：上限降低時同步壓低現值（對齊原始 DownMAXHP/DownMAXSP）。
+	// Debuffs clamp current HP/SP: when the cap drops, the current value is lowered too (mirrors original DownMAXHP/DownMAXSP).
+	MAXHP: {
+		get: (c) => c.MAXHP,
+		set: (c, v) => { c.MAXHP = v; },
+		up: (c, n) => { c.MAXHP = Math.round(c.MAXHP * (1 + n / 100)); },
+		down: (c, n) => { const v = Math.round(c.MAXHP * (1 - n / 100)); c.MAXHP = v; if (c.HP > v) c.HP = v; },
+		plus: plusAttr((c) => c.MAXHP, (c, v) => { c.MAXHP = v; }),
+	},
+	MAXSP: {
+		get: (c) => c.MAXSP,
+		set: (c, v) => { c.MAXSP = v; },
+		up: (c, n) => { c.MAXSP = Math.round(c.MAXSP * (1 + n / 100)); },
+		down: (c, n) => { const v = Math.round(c.MAXSP * (1 - n / 100)); c.MAXSP = v; if (c.SP > v) c.SP = v; },
+		plus: plusAttr((c) => c.MAXSP, (c, v) => { c.MAXSP = v; }),
+	},
 };
 
 /**

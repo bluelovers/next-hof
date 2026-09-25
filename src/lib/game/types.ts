@@ -390,8 +390,8 @@ export enum EnumSkillDamageType {
  * adding a status attribute updates this type automatically — no hand-maintained copy inside
  * ISkillDef (SSoT / type traceability).
  *
- * statusChanges 命中 UPMAP 鍵時，以 % 作用於「使用者」。
- * When statusChanges hits a UPMAP key, the % value is applied to the *user*.
+ * statusChanges 命中 UPMAP 鍵時，以 % 作用於「目標」（對齊原始 StatusChanges 全部作用在 $target）。
+ * When statusChanges hits a UPMAP key, the % value is applied to the *target* (mirrors original StatusChanges applying everything to $target).
  */
 export type ISkillUpFields = Partial<Record<`Up${IStatusAttr}`, number>>;
 
@@ -420,14 +420,15 @@ export type ISkillDownFields = Partial<Record<`Down${IStatusAttr}`, number>>;
  *
  * 欄位消費狀態（本 repo）/ Field consumption status (this repo):
  * - 戰鬥引擎實際讀取：sp, type, target, pow, inf, charge, support, invalid,
- *   passive, poison, CurePoison, HpRegen, SpRegen, HealBonus, pierce,
+ *   passive, poison, poisonResist, CurePoison, HpRegen, SpRegen, HealBonus, pierce,
+ *   knockback, move, umove, sacrifice,
  *   Up* 與 Down* 與 Plus* 系列
  *   actually read by the battle engine: sp, type, target, pow, inf, charge, support,
- *   invalid, passive, poison, CurePoison, HpRegen, SpRegen, HealBonus, pierce,
- *   and the Up*, Down*, Plus* families
+ *   invalid, passive, poison, poisonResist, CurePoison, HpRegen, SpRegen, HealBonus, pierce,
+ *   knockback, move, umove, sacrifice, and the Up*, Down*, Plus* families
  * - hit 目前引擎未讀取（資料層保留）
  *   hit is not read by the engine (kept for the data layer)
- * - 其餘欄位（delay, stiff, knockback, move, umove, quick, sacrifice, limit, summon,
+ * - 其餘欄位（delay, stiff, quick, limit, summon,
  *   revive, SpRecoveryRate, MagicCircle*, priority, learn, exp, img）目前僅供資料層保留
  *   remaining fields are currently kept in the data layer only
  */
@@ -496,9 +497,9 @@ export interface ISkillDef extends ICompBonuses, ISkillUpFields, ISkillDownField
 	/** 回復加成（被動技能時由 passive.ts 累加至 SPECIAL.HealBonus）/ heal bonus (passive.ts accumulates it into SPECIAL.HealBonus for passive skills) */
 	HealBonus?: number;
 	/**
-	 * 永久加算 Plus*（無 %）：作用於使用者，僅 PLUSMAP 已註冊屬性生效。
+	 * 永久加算 Plus*（無 %）：作用於目標（對齊原始 StatusChanges 全部作用在 $target），僅 PLUSMAP 已註冊屬性生效。
 	 * statusChanges 依鍵名前綴分派至 UPMAP/DOWNMAP/PLUSMAP，本欄位承載 PLUSMAP 分支。
-	 * Permanent flat Plus* bonus (no %): applied to the user; only PLUSMAP-registered stats take effect.
+	 * Permanent flat Plus* bonus (no %): applied to the target (mirrors original StatusChanges applying everything to $target); only PLUSMAP-registered stats take effect.
 	 * statusChanges dispatches by key prefix to UPMAP/DOWNMAP/PLUSMAP; this field feeds the PLUSMAP branch.
 	 *
 	 * 有意保留顯式欄位而非由 IStatusAttr 衍生：PLUSMAP 只註冊六維＋MAXHP/MAXSP，
@@ -513,23 +514,25 @@ export interface ISkillDef extends ICompBonuses, ISkillUpFields, ISkillDownField
 	pierce?: number;
 	/** 行動延遲 %（目前僅資料層保留）/ action delay % (data-layer only) */
 	delay?: number;
-	/** 擊退率 %（目前僅資料層保留；語意為逼退至後排）/ knockback % (data-layer only; means forcing the target to the back row) */
+	/** 擊退率 %（引擎已讀取：statusChanges 將目標逼退至後排）/ knockback % (engine reads: statusChanges forces the target to the back row) */
 	knockback?: number;
 	/** 施毒機率 %（statusChanges 呼叫 getPoison）/ poison chance % (statusChanges calls getPoison) */
 	poison?: number;
+	/** 抗毒增益 %（statusChanges 呼叫 getPoisonResist，對應原始技能 1220 AntiPoisoning）/ poison-resist gain % (statusChanges calls getPoisonResist, mirrors skill 1220 AntiPoisoning) */
+	poisonResist?: number;
 	/** 召喚怪物編號或其陣列 / summon monster number or array of numbers */
 	summon?: number | number[];
-	/** 施放後自身移動方向（目前僅資料層保留，引擎未讀取）/ self movement direction after casting (data-layer only; not read by the engine) */
+	/** 施放後自身移動方向（引擎已讀取：statusChanges 將目標移至指定站位）/ self movement direction after casting (engine reads: statusChanges moves the target to the specified row) */
 	move?: EnumPosition;
 	/** 可使用之武器型別限制（Partial 鍵集合，目前僅資料層保留）/ allowed weapon-type restriction (partial key set; data-layer only) */
 	limit?: Partial<Record<EnumWeaponType, boolean>>;
-	/** 使用後移動方向（目前僅資料層保留）/ post-use movement direction (data-layer only) */
+	/** 使用後移動方向（引擎已讀取：Battle.UseSkill 使用後將使用者移至指定站位）/ post-use movement direction (engine reads: Battle.UseSkill moves the user after casting) */
 	umove?: EnumPosition;
 	/** 為真時視為被動技能，由 passive.ts 在戰鬥初始化時累加補正 / truthy = passive skill; passive.ts accumulates its bonuses at battle setup */
 	passive?: number;
 	/** 快速行動標記（目前僅資料層保留）/ quick-action flag (data-layer only) */
 	quick?: number;
-	/** 犧牲比例 %（消耗自身 HP；目前僅資料層保留）/ sacrifice % (costs own HP; data-layer only) */
+	/** 犧牲比例 %（消耗自身 HP；引擎已讀取：Battle.UseSkill 施法前犧牲使用者 HP）/ sacrifice % (costs own HP; engine reads: Battle.UseSkill sacrifices user HP before casting) */
 	sacrifice?: number;
 	/**
 	 * 解毒標記 / cure-poison flag

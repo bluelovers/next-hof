@@ -136,15 +136,19 @@ export function getStateTextClass(
  * 依戰鬥行動類型取得數值變化 CSS 類別
  * Get the CSS class for a value-change from an action type
  *
- * 傷害/倒下 → 'dmg'，治療 → 'recover'，其餘 → ''。
- * Damage/down → 'dmg', heal → 'recover', others → ''.
+ * 原始日誌對 `(前 > 後)` 括號的配色並不一致：Damage／Heal／Recover／Drain 的括號都印在
+ * 顏色 span 之外（預設色）；唯獨中毒傷害（4.7）的括號落在 spdmg span 之內（紫色）。
+ * 故僅 Poison 回傳 'spdmg'，其餘一律回傳 ''（預設色），以對齊原始日誌。
+ * The original log is inconsistent about the `(from > to)` parentheses: for Damage / Heal /
+ * Recover / Drain they print outside the colour span (default colour), but poison damage
+ * (4.7) keeps them inside the spdmg span (purple). So only Poison returns 'spdmg'; every
+ * other family returns '' (default) to mirror the original.
  *
  * @param type - 行動類型 / Action type
  * @returns CSS class 字串 / CSS class string
  */
 export function getValueChangeClass(type?: EnumActionType): string {
-  if (type === EnumActionType.Damage || type === EnumActionType.Down) return 'dmg';
-  if (type === EnumActionType.Heal) return 'recover';
+  if (type === EnumActionType.Poison) return 'spdmg';
   return '';
 }
 
@@ -391,6 +395,7 @@ const MESSAGE_CLASS: Partial<Record<EnumActionType, string>> = {
 export function getMessageClass(action: IBattleAction): string {
   switch (action.type) {
     case EnumActionType.Recover:
+    case EnumActionType.Heal:
     case EnumActionType.Drain:
     case EnumActionType.Regen:
       return action.valueUnit === 'SP' ? 'support' : 'recover';

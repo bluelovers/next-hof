@@ -1,7 +1,9 @@
 // 角色戰鬥狀態與效果 / Character battle status & effects
 // 對應 docs/log/battle/02 §3.4, §3.5, §6 與 docs/log/battle/05 §6。
+// 並移植原始 HOF/Class/Char/Battle/Effect.php 的 GetPoisonResist / SacrificeHp。
+// Also ports GetPoisonResist / SacrificeHp from HOF/Class/Char/Battle/Effect.php.
 
-import { EnumState } from '../constants';
+import { EnumState, EnumPosition } from '../constants';
 import type { Character } from './Character';
 import type { RNG } from '../core/rng';
 
@@ -92,6 +94,50 @@ export function poisonDamage(char: Character): number {
 	const before = char.HP;
 	const after = char.HP - dmg;
 	char.HP = after < 1 ? 1 : after; // 不會致死
+	return before - char.HP;
+}
+
+/**
+ * 取得中毒抗性：剩餘空間的 no% 累加至 SPECIAL.PoisonResist（對齊原始 GetPoisonResist）。
+ * Gain poison resistance: add no% of the remaining room (100 - current) to SPECIAL.PoisonResist
+ * (mirrors original GetPoisonResist).
+ *
+ * 原始公式 / original formula:
+ *   Add = round( (100 - PoisonResist) * (no / 100) )
+ *   PoisonResist += Add
+ *
+ * 由 statusChanges 在技能帶 `poisonResist` 欄位時呼叫（對應原始技能 1220 AntiPoisoning）。
+ * Called by statusChanges when a skill carries the `poisonResist` field (mirrors skill 1220 AntiPoisoning).
+ *
+ * @returns 新的 PoisonResist 值 / the new PoisonResist value
+ */
+export function getPoisonResist(char: Character, no: number): number {
+	const add = Math.round((100 - char.SPECIAL.PoisonResist) * (no / 100));
+	char.SPECIAL.PoisonResist += add;
+	return char.SPECIAL.PoisonResist;
+}
+
+/**
+ * HP 犧牲（對齊原始 SacrificeHp，由技能 `sacrifice` 欄位觸發、作用於使用者）。
+ * Sacrifice HP (mirrors original SacrificeHp, triggered by the skill `sacrifice` field, applied to the user).
+ *
+ * 原始公式 / original formula:
+ *   SelfDamage = ceil( MAXHP * (rate / 100) )
+ *   if (POSITION != Front) SelfDamage *= 2   // 後衛犧牲翻倍
+ *   HpDamage( SelfDamage )                    // 純扣血，可致死（無玩家保護）
+ *
+ * 注意：原始 SacrificeHp 呼叫的是 HpDamage（純減血、可致死），故這裡直接扣血而不走 hpDamage 的玩家保護。
+ * Note: the original SacrificeHp calls the plain HpDamage (can be fatal), so this subtracts directly
+ * instead of going through hpDamage's player-protection path.
+ *
+ * @returns 實際損失的 HP / the HP actually lost
+ */
+export function sacrificeHp(char: Character, rate: number): number {
+	if (!rate) return 0;
+	let selfDamage = Math.ceil(char.MAXHP * (rate / 100));
+	if (char.POSITION !== EnumPosition.Front) selfDamage *= 2; // 後衛犧牲翻倍
+	const before = char.HP;
+	char.HP = Math.max(0, char.HP - selfDamage); // 純扣血、可致死
 	return before - char.HP;
 }
 

@@ -335,6 +335,7 @@ export function mapBattleEvent(
 				source: actor.name,
 				target: target.name,
 				value,
+				valueUnit: 'HP',
 				valueChange,
 				message,
 				side,

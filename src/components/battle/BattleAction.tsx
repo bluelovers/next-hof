@@ -183,17 +183,24 @@ const SummonMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
 const MagicCircleMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
   const kind = action.magicCircle?.kind ?? EnumMagicCircleKind.Draw;
   const amount = action.magicCircle?.amount;
-  const withName = kind !== EnumMagicCircleKind.Fail;
+  const cls = getMagicCircleClass(kind);
+  // 原始日誌（`draw`/`erased enemy` 於 Skill/Effect.php、`use` 於 Battle/Skill.php）：
+  // 名稱保持預設色，只有動作文案（含 ` xN`）上色；Fail 種類沒有施放者，整段即文案本身。
+  // The original log (draw/erased enemy in Skill/Effect.php, use in Battle/Skill.php) keeps
+  // the name in the default colour and only the action phrase (including ` xN`) is coloured;
+  // the Fail kind has no caster so the whole string is just the phrase itself.
+  if (kind === EnumMagicCircleKind.Fail) {
+    return <span className={cls}>{MAGIC_CIRCLE_PHRASE[kind]}</span>;
+  }
   return (
-    <span className={getMagicCircleClass(kind)}>
-      {withName && action.source && (
-        <>
-          <span className="bold">{action.source}</span>{' '}
-        </>
-      )}
-      {MAGIC_CIRCLE_PHRASE[kind]}
-      {withName && amount !== undefined && ` x${amount}`}
-    </span>
+    <>
+      {action.source && <span className="bold">{action.source}</span>}
+      <span className={cls}>
+        {amount !== undefined
+          ? ` ${MAGIC_CIRCLE_PHRASE[kind]} x${amount}`
+          : ` ${MAGIC_CIRCLE_PHRASE[kind]}`}
+      </span>
+    </>
   );
 };
 
@@ -219,8 +226,16 @@ const NamedMessage: React.FC<{ action: IBattleAction; className?: string }> = ({
 };
 
 /**
- * 「粗體名稱 ＋ 文字 ＋ 粗體數值 ＋ 單位」版面（Recovered／Sacrifice／Auto Regenerate）
- * "bold name + text + bold value + unit" layout (Recovered / Sacrifice / Auto Regenerate)
+ * 「粗體名稱 ＋ 文字 ＋ 粗體數值 ＋ 單位」版面（Recovered／Heal／Auto Regenerate）
+ * "bold name + text + bold value + unit" layout (Recovered / Heal / Auto Regenerate)
+ *
+ * 對照原始日誌：名稱保持預設色，只有「text 數值 單位」上色（`name Recovered N HP`、
+ * `* name Auto Regenerate N HP`），故名稱在色塊之外。heal 類型的名稱取受療者（target）
+ * 而非施療者（source），與 `name Recovered N HP` 的語意一致。
+ * Mirrors the original log: the name keeps the default colour and only "text value unit" is
+ * coloured (`name Recovered N HP`, `* name Auto Regenerate N HP`), so the name sits outside
+ * the colour span. For `heal` the name is the healed unit (`target`), not the healer
+ * (`source`), matching `name Recovered N HP`.
  *
  * 缺少 value 時退回 NamedMessage（直接輸出 message，保證文案不丟失）。
  * Falls back to NamedMessage when `value` is absent so the copy is never dropped.
@@ -231,14 +246,18 @@ const NamedValueMessage: React.FC<{ action: IBattleAction; className?: string; t
   text,
 }) => {
   if (action.value === undefined) return <NamedMessage action={action} className={className} />;
+  const name = action.type === EnumActionType.Heal ? action.target : action.source;
   return (
-    <span className={className}>
-      {action.prefix}
-      <span className="bold">{action.source}</span> {text}{' '}
-      <span className="bold">{action.value}</span>
-      {action.valueUnit && ` ${action.valueUnit}`}
+    <>
+      {action.prefix && <span className={className}>{action.prefix}</span>}
+      {name && <span className="bold">{name}</span>}{' '}
+      <span className={className}>
+        {text}{' '}
+        <span className="bold">{action.value}</span>
+        {action.valueUnit && ` ${action.valueUnit}`}
+      </span>
       <ValueChange valueChange={action.valueChange} type={action.type} />
-    </span>
+    </>
   );
 };
 
@@ -250,17 +269,22 @@ const NamedValueMessage: React.FC<{ action: IBattleAction; className?: string; t
  * Original log: `<b>N</b>SP Damage to <b>target</b>` with no space between the value and
  * "SP Damage".
  */
-const SpDamageMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <span className={getMessageClass(action)}>
-    <span className="bold">{action.value}</span>SP Damage
-    {action.target && (
-      <>
-        {' '}to <span className="bold">{action.target}</span>
-      </>
-    )}
-    <ValueChange valueChange={action.valueChange} type={action.type} />
-  </span>
-);
+const SpDamageMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
+  const cls = getMessageClass(action);
+  // 原始日誌：`<b>N</b>SP Damage to <b>target</b>`，僅數值與「SP Damage」上 spdmg 色，
+  // `to target` 與 `(前 > 後)` 維持預設色（色塊在 `to` 之前結束）。
+  // Original log: `<b>N</b>SP Damage to <b>target</b>` — only the value and "SP Damage" are
+  // spdmg, while `to target` and `(from > to)` stay default (the colour span ends before "to").
+  return (
+    <>
+      <span className={cls}>
+        <span className="bold">{action.value}</span>SP Damage
+      </span>
+      {action.target && <> to <span className="bold">{action.target}</span></>}
+      <ValueChange valueChange={action.valueChange} type={action.type} />
+    </>
+  );
+};
 
 /**
  * 吸取訊息（單事實來源）
@@ -278,19 +302,24 @@ const SpDamageMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
  * Original log: `Drained <b>N</b> HP from <b>target</b>(tFrom > tTo)<b>who</b>(wFrom > wTo)`,
  * supporting any number of `who(n1->n2)` value changes; when `who` is absent only `(n1 > n2)` prints.
  */
-const DrainMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <span className={getMessageClass(action)}>
-    Drained{' '}
-    <span className="bold">{action.value ?? 0}</span>
-    {action.valueUnit && ` ${action.valueUnit}`}
-    {action.target && (
-      <>
-        {' '}from <span className="bold">{action.target}</span>
-      </>
-    )}
-    <ValueChanges changes={action.valueChanges} type={action.type} />
-  </span>
-);
+const DrainMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
+  const cls = getMessageClass(action);
+  // 原始日誌：`Drained <b>N</b> HP from <b>target</b>(…)`——僅吸取數值與單位上色，
+  // `Drained`／`from target`／`(n1 > n2)` 維持預設色。
+  // Original log: `Drained <b>N</b> HP from <b>target</b>(…)` — only the drained value and
+  // unit are coloured; `Drained`, `from target` and `(n1 > n2)` stay default.
+  return (
+    <>
+      Drained{' '}
+      <span className={cls}>
+        <span className="bold">{action.value ?? 0}</span>
+        {action.valueUnit && ` ${action.valueUnit}`}
+      </span>
+      {action.target && <> from <span className="bold">{action.target}</span></>}
+      <ValueChanges changes={action.valueChanges} type={action.type} />
+    </>
+  );
+};
 
 /** 回復訊息（`name Recovered N HP`）/ Recovery message (`name Recovered N HP`) */
 const RecoverMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
@@ -308,10 +337,24 @@ const RecoverMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
  * bold).
  */
 const RegenMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
+  const cls = getMessageClass(action);
   if (action.prefix !== undefined && action.value !== undefined) {
-    return <NamedValueMessage action={action} className={getMessageClass(action)} text="Auto Regenerate" />;
+    // `* name Auto Regenerate N HP`：行首星號與「Auto Regenerate N HP」上色，名稱預設色。
+    // `* name Auto Regenerate N HP`: the leading asterisk and "Auto Regenerate N HP" are
+    // coloured while the name stays default.
+    return <NamedValueMessage action={action} className={cls} text="Auto Regenerate" />;
   }
-  return <NamedMessage action={action} className={getMessageClass(action)} />;
+  // `name gained HP/SP regeneration +N%`：名稱預設色，僅「gained … +N%」上色。
+  // `name gained HP/SP regeneration +N%`: the name stays default and only "gained … +N%" is
+  // coloured.
+  const { name, text } = splitNamedMessage(action);
+  return (
+    <>
+      {name && <span className="bold">{name}</span>}
+      <span className={cls}>{text}</span>
+      <ValueChange valueChange={action.valueChange} type={action.type} />
+    </>
+  );
 };
 
 /**
@@ -396,9 +439,23 @@ const DelayMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
   <NamedMessage action={action} className={getMessageClass(action)} />
 );
 
-/** 犧牲訊息（`name sacrifice N HP`）/ Sacrifice message (`name sacrifice N HP`) */
+/**
+ * 犧牲訊息（`name sacrifice N HP`，整行 dmg 色）
+ * Sacrifice message (`name sacrifice N HP`, the whole line is dmg)
+ *
+ * 對照 Skill/Effect.php：`<span class="dmg"><b>角色名</b> sacrifice <b>N</b> HP</span>`，
+ * 名稱位於色塊「之內」，故整行上色（與 Recover／Drain 名稱在色塊「之外」不同）。
+ * Mirrors Skill/Effect.php's `<span class="dmg"><b>name</b> sacrifice <b>N</b> HP</span>`:
+ * the name sits INSIDE the colour span, so the whole line is coloured (unlike Recover/Drain
+ * where the name stays outside the span).
+ */
 const SacrificeMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <NamedValueMessage action={action} className={getMessageClass(action)} text="sacrifice" />
+  <span className={getMessageClass(action)}>
+    <span className="bold">{action.source}</span> sacrifice{' '}
+    <span className="bold">{action.value}</span>
+    {action.valueUnit && ` ${action.valueUnit}`}
+    <ValueChange valueChange={action.valueChange} type={action.type} />
+  </span>
 );
 
 /**
@@ -505,8 +562,13 @@ const EnergyExchangeMessage: React.FC<{ action: IBattleAction }> = ({ action }) 
 };
 
 /**
- * 傷害/治療訊息（單一事實來源）
- * Damage/heal message (single source of truth)
+ * 傷害訊息（單一事實來源）
+ * Damage message (single source of truth)
+ *
+ * 原始日誌：`<b>N</b> Damage to <b>target</b>`——僅數值與「Damage」上 dmg 色，`to target`
+ * 與 `(前 > 後)` 維持預設色（色塊在 `to` 之前結束）。
+ * Original log: `<b>N</b> Damage to <b>target</b>` — only the value and "Damage" are dmg, while
+ * `to target` and `(from > to)` stay default (the colour span ends before "to").
  */
 const ValueMessage: React.FC<{
   action: IBattleAction;
@@ -514,31 +576,37 @@ const ValueMessage: React.FC<{
   label: string;
 }> = ({ action, typeClass, label }) => {
   const attrClass = getAttrClass(action.attribute);
+  const cls = `${typeClass} ${attrClass}`.trim();
   return (
-    <span className={`${typeClass} ${attrClass}`}>
-      <span className="bold">{action.value}</span> {label}
+    <>
+      <span className={cls}>
+        <span className="bold">{action.value}</span> {label}
+      </span>
       {action.target && <> to <span className="bold">{action.target}</span></>}
       <ValueChange valueChange={action.valueChange} type={action.type} />
-    </span>
+    </>
   );
 };
 
 /**
  * 保護訊息（單一事實來源）
  * Protect message (single source of truth)
+ *
+ * 對照 Battle.php：`printf('%s protected %s!')` 無任何 span，故維持預設色（不依 attribute 上色）。
+ * Mirrors Battle.php's `printf('%s protected %s!')`, which has no span at all, so the line stays
+ * the default colour (it is NOT coloured by `attribute`).
  */
 const ProtectMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
-  const attrClass = getAttrClass(action.attribute);
   const parts = action.message.split('protected');
   if (parts.length === 2) {
     return (
-      <span className={attrClass}>
+      <span>
         <span className="bold">{parts[0].trim()}</span> protected{' '}
         <span className="bold">{parts[1].trim().replace('!', '')}</span>!
       </span>
     );
   }
-  return <span className={attrClass}>{action.message}</span>;
+  return <span>{action.message}</span>;
 };
 
 /**
@@ -590,7 +658,9 @@ function renderActionContent(action: IBattleAction): React.ReactNode {
     case 'damage':
       return <ValueMessage action={action} typeClass="dmg" label="Damage" />;
     case 'heal':
-      return <ValueMessage action={action} typeClass="recover" label="Heal" />;
+      // 原始回復文案為 "Recovered N HP/SP"，與 'recover' 共用 Partial 上色版面。
+      // The original recovery copy is "Recovered N HP/SP", so heals share the Recover layout.
+      return <RecoverMessage action={action} />;
     case 'protect':
       return <ProtectMessage action={action} />;
     case 'casting':

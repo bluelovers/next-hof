@@ -9,7 +9,7 @@ import {
 } from '../constants';
 import { Character, charIdToString } from '../character/Character';
 import { setBattleVariable } from '../character/battle-variable';
-import { autoRegeneration, poisonDamage } from '../character/status';
+import { autoRegeneration, poisonDamage, sacrificeHp } from '../character/status';
 import { getSkill } from '../skill/Skill';
 import { applySkill } from '../skill/effect';
 import { BattleTeam } from '../team/BattleTeam';
@@ -216,6 +216,16 @@ export class Battle implements IBattleConfig {
 		if (skill.sp > 0 && actor.SP < need) return;
 		if (skill.sp > 0) actor.SP -= need;
 
+		// 技能 `sacrifice`：施法前犧牲自身 HP（對齊原始 Skill.php:142，作用於使用者、每次施法一次）。
+		// Skill `sacrifice`: self HP cost before casting (mirrors original Skill.php:142, on the user, once per cast).
+		if (skill.sacrifice) {
+			sacrificeHp(actor, skill.sacrifice);
+			if (actor.HP <= 0 && actor.STATE !== EnumState.Dead) {
+				actor.STATE = EnumState.Dead;
+				this.log.push({ type: EnumBattleEventType.Death, target: charIdToString(actor.no) });
+			}
+		}
+
 		// 實際施放技能，計為一次行動
 		this.log.push({ type: EnumBattleEventType.Act, actor: charIdToString(actor.no), skill: skillNo });
 
@@ -233,6 +243,10 @@ export class Battle implements IBattleConfig {
 				this.log.push({ type: EnumBattleEventType.Death, target: charIdToString(realTarget.no) });
 			}
 		}
+
+		// 使用後使用者移動方向（對齊原始 Skill.php:206 umove，每次施法一次）。
+		// Post-use user movement (mirrors original Skill.php:206 umove, once per cast).
+		if (skill.umove) actor.POSITION = skill.umove;
 	}
 
 	/** 執行單一單位的回合 / Run one unit's turn
