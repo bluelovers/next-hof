@@ -10,6 +10,7 @@ import type { IBattleAction, IValueChangeRecord } from './types';
 import './BattleAction.css';
 import '#/components/shared/SharedBase.css';
 import { SkillIcon } from '#/components/shared/SkillIcon';
+import type { IStyleProps } from '#/components/shared/types';
 import { CharacterSprite } from '#/components/characters/CharacterSprite';
 import { EnumSpriteVariant, EnumMagicCircleKind } from './enums';
 import { EnumActionType } from './enums';
@@ -23,7 +24,6 @@ import {
   splitNamedMessage,
   buildChargeMessage,
 } from './battleUtils';
-import type { CSSProperties } from 'react';
 
 /** 戰鬥行動屬性 / Battle action props */
 export interface IBattleActionProps {
@@ -142,17 +142,16 @@ const SkillMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
  * summon-join clause and similar lines share one shape; `message` accepts any valid node
  * (string or DOM/component) and `children` appends after the message (e.g. an enter clause).
  */
-const ActionLine: React.FC<{
-  /** 加粗主詞（名稱等）/ Bold subject (name, etc.) */
-  who: React.ReactNode;
-  /** 訊息內容（字串或任意合法節點）/ Message content (string or any valid node) */
-  message: React.ReactNode;
-  /** 外層 class（屬性配色等）/ Outer class (attribute colour, etc.) */
-  className?: string;
-  style?: CSSProperties;
-  /** 訊息之後的後綴內容 / Suffix rendered after the message */
-  children?: React.ReactNode;
-}> = ({ who, message, className, style, children }) => (
+const ActionLine: React.FC<
+  IStyleProps & {
+    /** 加粗主詞（名稱等）/ Bold subject (name, etc.) */
+    who: React.ReactNode;
+    /** 訊息內容（字串或任意合法節點）/ Message content (string or any valid node) */
+    message: React.ReactNode;
+    /** 訊息之後的後綴內容 / Suffix rendered after the message */
+    children?: React.ReactNode;
+  }
+> = ({ who, message, className, style, children }) => (
   <span className={className} style={style}>
     <span className="bold">{who}</span> {message}
     {children ?? null}
@@ -248,10 +247,10 @@ const MagicCircleMessage: React.FC<{ action: IBattleAction }> = ({ action }) => 
  * splitNamedMessage recovers the name and the text from `message`, and battleUtils'
  * builders always produce the copy, so each family component only has to pick a colour.
  */
-const NamedMessage: React.FC<{ action: IBattleAction; className?: string }> = ({ action, className }) => {
+const NamedMessage: React.FC<{ action: IBattleAction } & IStyleProps> = ({ action, className, style }) => {
   const { name, text } = splitNamedMessage(action);
   return (
-    <span className={className}>
+    <span className={className} style={style}>
       {action.prefix}
       {name && <span className="bold">{name}</span>}
       {text}
@@ -275,18 +274,19 @@ const NamedMessage: React.FC<{ action: IBattleAction; className?: string }> = ({
  * 缺少 value 時退回 NamedMessage（直接輸出 message，保證文案不丟失）。
  * Falls back to NamedMessage when `value` is absent so the copy is never dropped.
  */
-const NamedValueMessage: React.FC<{ action: IBattleAction; className?: string; text: string }> = ({
+const NamedValueMessage: React.FC<{ action: IBattleAction; text: string } & IStyleProps> = ({
   action,
   className,
+  style,
   text,
 }) => {
-  if (action.value === undefined) return <NamedMessage action={action} className={className} />;
+  if (action.value === undefined) return <NamedMessage action={action} className={className} style={style} />;
   const name = action.type === EnumActionType.Heal ? action.target : action.source;
   return (
     <>
-      {action.prefix && <span className={className}>{action.prefix}</span>}
+      {action.prefix && <span className={className} style={style}>{action.prefix}</span>}
       {name && <span className="bold">{name}</span>}{' '}
-      <span className={className}>
+      <span className={className} style={style}>
         {text}{' '}
         <span className="bold">{action.value}</span>
         {action.valueUnit && ` ${action.valueUnit}`}

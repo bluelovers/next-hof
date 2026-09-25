@@ -6,6 +6,7 @@ import type { CSSProperties } from 'react';
 import type { ITSRequireAtLeastOne } from 'ts-type';
 import type { EnumSpriteLabelPlacement } from './enums';
 import type { ISpriteImageSize } from './spriteImageSizes';
+import type { IStyleProps } from '#/components/shared/types';
 import {
 	EnumTeamSideUI,
 	EnumTeamSideClass,
@@ -89,7 +90,7 @@ export interface IBattleTeam extends IUnitList<IBattleUnit> {
 }
 
 /** 戰場精靈 / Battlefield sprite */
-export interface IBattleSprite {
+export interface IBattleSprite extends IStyleProps {
 	/**
 	 * 戰鬥單位實例唯一識別碼（Character.unitUuid；同時作為 DOM id 用於定位/選取）
 	 * Battle-unit instance uid (Character.unitUuid; also used as the DOM id for
@@ -112,14 +113,6 @@ export interface IBattleSprite {
 	imageSize?: ISpriteImageSize;
 	/** 角色名稱 / Character name */
 	name?: string;
-	/**
-	 * 附加到精靈圖層的 CSS class（與元件本身的基礎 class 併存，兩者不會互相取代）
-	 * Extra CSS class on the sprite layer (kept alongside the component's base class;
-	 * neither replaces the other)
-	 */
-	className?: string;
-	/** 精靈圖層自訂樣式（可複寫或追加） / Custom sprite layer style */
-	style?: CSSProperties;
 	/** 名稱標籤自訂樣式（可複寫或追加） / Custom name label style */
 	labelStyle?: CSSProperties;
 	/** 名稱標籤演算法（角色上方 / 下方；預設 below） / Name-label placement */

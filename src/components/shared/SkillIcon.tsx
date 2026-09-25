@@ -9,17 +9,16 @@
  * logic in BattleAction.tsx and SkillCard.tsx.
  */
 import React from 'react';
+import type { IStyleProps } from '#/components/shared/types';
 
 /** SkillIcon 屬性 / SkillIcon props */
-export interface ISkillIconProps {
+export interface ISkillIconProps extends IStyleProps {
   /** 圖示 URL / Icon URL */
   iconUrl?: string | null;
   /** 技能名稱（用於 alt 和佔位符首字）/ Skill name (for alt and placeholder initial) */
   name: string;
   /** 圖示尺寸（px）/ Icon size in pixels */
   size?: number;
-  /** 額外 CSS class / Additional CSS class */
-  className?: string;
 }
 
 /**
@@ -31,6 +30,7 @@ export const SkillIcon: React.FC<ISkillIconProps> = ({
   name,
   size = 18,
   className = '',
+  style,
 }) => {
   if (iconUrl) {
     return (
@@ -39,7 +39,7 @@ export const SkillIcon: React.FC<ISkillIconProps> = ({
         src={iconUrl}
         alt={name}
         title={name}
-        style={{ width: size, height: size }}
+        style={{ width: size, height: size, ...style }}
       />
     );
   }
@@ -60,6 +60,7 @@ export const SkillIcon: React.FC<ISkillIconProps> = ({
         textAlign: 'center',
         lineHeight: `${size}px`,
         fontSize: size * 0.55,
+        ...style,
       }}
     >
       {name.charAt(0)}

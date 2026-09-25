@@ -26,8 +26,8 @@ import {
 	resolveCorpsePolicy,
 	type ICorpsePolicy,
 	type ICorpseSpec,
-	type ICorpseStyle,
 } from '#/lib/game/battle/corpse-policy';
+import type { CSSProperties } from 'react';
 import {
 	groupBattleChars,
 	computeBattleSpritePositions,
@@ -35,6 +35,7 @@ import {
 } from '#/components/battle/computeSpritePositions';
 import { getSpriteImageSize } from '#/components/battle/spriteImageSizes';
 import { SPRITE_CORPSE_URL } from '#/components/battle/battleUtils';
+import { ITSPickExtra } from 'ts-type';
 import './BattleCorpsePolicy.css';
 
 /**
@@ -85,7 +86,7 @@ interface ICorpseSpecControls {
 	/** 附加 CSS class（空白＝無）/ extra CSS class (blank = none) */
 	className: string;
 	/** inline style（空物件＝無）/ inline style (empty object = none) */
-	style: ICorpseStyle;
+	style: CSSProperties;
 }
 
 /**
@@ -209,7 +210,7 @@ interface ICorpsePolicyDemoArgs {
 	/** 物件規格：附加 CSS class（樣式定義於同名 .css，未定義時無視覺效果） */
 	corpseClassName: string;
 	/** 物件規格：inline style（與 class 同名屬性時，inline 勝出） */
-	corpseStyle: ICorpseStyle;
+	corpseStyle: CSSProperties;
 }
 
 /** 示範單位 / demo units */

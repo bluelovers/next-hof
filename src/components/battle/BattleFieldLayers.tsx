@@ -11,7 +11,6 @@
  * when omitted, background and sprites share the same width/height.
  */
 import React from 'react';
-import type { CSSProperties } from 'react';
 import type {
   IBattleSprite,
   IBattleFieldConfig,
@@ -25,9 +24,10 @@ import type { ISpriteImageSize } from './spriteImageSizes';
 import { BattleFieldSpriteFrame } from './BattleFieldSpriteFrame';
 import { BattleFieldMagicCircle } from './BattleFieldMagicCircle';
 import { EnumBattleFieldBgScale, EnumBattleFieldVAlign } from '#/components/battle/enums';
+import type { IStyleProps } from '#/components/shared/types';
 
 /** 戰場圖層屬性（標籤開關共用 IBattleSpriteLabelOptions）/ Battlefield layers props (label toggle from the shared IBattleSpriteLabelOptions) */
-export interface IBattleFieldLayersProps extends IBattleSpriteLabelOptions {
+export interface IBattleFieldLayersProps extends IBattleSpriteLabelOptions, IStyleProps {
   /** 精靈列表 / Sprite list */
   sprites: IBattleSprite[];
   /** 戰場配置 / Battlefield config */
@@ -40,8 +40,6 @@ export interface IBattleFieldLayersProps extends IBattleSpriteLabelOptions {
   bgSize?: IBattleFieldBgSize;
   /** 角色精靈框垂直對齊方式（預設 bottom） / Sprite frame vertical alignment (default bottom) */
   valign?: IBattleFieldVAlign;
-  /** 自訂樣式（可複寫或追加至背景圖層） / Custom style (override or append to background layer) */
-  style?: CSSProperties;
 }
 
 /**
@@ -102,6 +100,7 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
   bgSize,
   valign = EnumBattleFieldVAlign.Bottom,
   style,
+  className,
 }) => {
   // 角色排版尺寸：選填，未提供時使用預設值（保持原有設計）
   // Sprite layout size: optional, fall back to defaults when omitted
@@ -135,7 +134,7 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
   };
 
   return (
-    <div style={bgStyle}>
+    <div className={className} style={bgStyle}>
       {/* 魔方陣圖層（繪製於角色精靈之下，對應 PHP exec_css 的魔方陣渲染） / Magic-circle layers (drawn beneath sprites; mirrors PHP exec_css) */}
       {config.magicCircles?.map((mc, i) => (
         <BattleFieldMagicCircle key={i} magicCircle={mc} width={width} height={height} />

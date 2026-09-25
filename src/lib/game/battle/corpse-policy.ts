@@ -6,17 +6,7 @@
 // Each level may be a boolean (simple switch) or an object (detailed spec); the more
 // specific level wins as a whole (fields are NOT merged across levels).
 
-/**
- * 屍體圖層的 inline style（鍵＝CSS 屬性名，值＝字串或數值）
- * Inline style for the corpse layer (CSS property → value)
- *
- * 刻意採寬鬆 record 而非 React 的 CSSProperties，讓資料層（引擎／種子資料）不必依賴
- * React 型別；顯示層再把整包樣式併入精靈圖層的 style（CSSProperties）。
- * Deliberately a loose record rather than React's CSSProperties so the data layer
- * (engine / seed data) never depends on React types; the display layer merges the whole
- * bag into the sprite layer's style (CSSProperties).
- */
-export type ICorpseStyle = Record<string, string | number>;
+import type { IStyleProps } from '#/components/shared/types';
 
 /**
  * 屍體呈現規格（`corpse` 寫成物件時的進階設定）
@@ -40,23 +30,13 @@ export type ICorpseStyle = Record<string, string | number>;
  * NOTE: inline style outranks a CSS class; if both `style` and `className` set the same
  * property (e.g. `filter`), `style` wins.
  */
-export interface ICorpseSpec {
+export interface ICorpseSpec extends IStyleProps {
 	/**
 	 * 屍體圖路徑（省略或空字串＝依原圖目錄自動挑選正向／鏡像屍體圖）
 	 * Corpse image path (omitted or empty = auto-pick the forward/mirrored corpse by the
 	 * original image's directory)
 	 */
 	imageUrl?: string;
-	/**
-	 * 附加到屍體圖層的 CSS class（與精靈既有 class 併存）
-	 * Extra CSS class added to the corpse layer (kept alongside the sprite's own classes)
-	 */
-	className?: string;
-	/**
-	 * 併入屍體圖層的 inline style（覆寫精靈同名屬性）
-	 * Inline style merged into the corpse layer (overrides same-named sprite style)
-	 */
-	style?: ICorpseStyle;
 }
 
 /**

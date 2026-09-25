@@ -26,9 +26,10 @@ import type { IBattleSprite, IBattleSpriteLabelOptions } from './types';
 import { BattleFieldSpriteLabel } from './BattleFieldSpriteLabel';
 import { useSpriteLabelRegistry, type ISpriteLabelRegistry, type ISpriteLabelComputeInput } from './useSpriteLabelRegistry';
 import './BattleFieldSpriteLayers.css';
+import type { IStyleProps } from '#/components/shared/types';
 
 /** 戰場精靈圖層屬性（標籤開關共用 IBattleSpriteLabelOptions）/ Battlefield sprite layers props (label toggle from the shared IBattleSpriteLabelOptions) */
-export interface IBattleFieldSpriteLayersProps extends IBattleSpriteLabelOptions {
+export interface IBattleFieldSpriteLayersProps extends IBattleSpriteLabelOptions, IStyleProps {
   /** 精靈列表 / Sprite list */
   sprites: IBattleSprite[];
   /**
@@ -40,8 +41,6 @@ export interface IBattleFieldSpriteLayersProps extends IBattleSpriteLabelOptions
   width: number;
   /** 畫布高度 / Canvas height */
   height: number;
-  /** 自訂樣式（可複寫或追加至每個精靈圖層） / Custom style (override or append to every sprite layer) */
-  style?: CSSProperties;
 }
 
 /**
@@ -58,7 +57,7 @@ function buildSpriteLayers(
   props: IBattleFieldSpriteLayersProps,
   registry: ISpriteLabelRegistry,
 ): React.ReactNode[] {
-  const { sprites, width, height, showSpriteLabels, style } = props;
+  const { sprites, width, height, showSpriteLabels, style, className } = props;
 
   return sprites.map((sprite, index) => {
     const flipClass = sprite.flipped ? 'flip-h' : '';
@@ -95,7 +94,7 @@ function buildSpriteLayers(
     return (
       <div
         key={sprite.unitUuid ?? index}
-        className={layerClass}
+        className={[layerClass, className].filter(Boolean).join(' ')}
         id={sprite.unitUuid}
         style={mergedStyle}
       >

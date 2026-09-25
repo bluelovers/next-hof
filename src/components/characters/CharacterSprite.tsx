@@ -11,6 +11,7 @@
 import React from 'react';
 import { EnumSpriteVariant, EnumSpriteSize } from '#/components/battle/enums';
 import './CharacterSprite.css';
+import type { IStyleProps } from '#/components/shared/types';
 
 /** 顯示模式 / Display variant */
 export type ISpriteVariant = EnumSpriteVariant;
@@ -19,7 +20,7 @@ export type ISpriteVariant = EnumSpriteVariant;
 export type ISpriteSize = EnumSpriteSize;
 
 /** 單個精靈屬性 / Single sprite props */
-export interface ICharacterSpriteProps {
+export interface ICharacterSpriteProps extends IStyleProps {
   /** 精靈圖片 URL / Sprite image URL */
   url: string;
   /** 顯示模式 / Display variant */
@@ -32,10 +33,6 @@ export interface ICharacterSpriteProps {
   border?: boolean;
   /** alt 文字 / Alt text */
   alt?: string;
-  /** 自訂行內樣式 / Custom inline style */
-  style?: React.CSSProperties;
-  /** 額外 CSS 類名 / Additional CSS class */
-  className?: string;
 }
 
 /**

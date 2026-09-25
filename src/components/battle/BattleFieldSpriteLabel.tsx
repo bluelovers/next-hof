@@ -30,6 +30,7 @@ import {
 } from './labelPosition';
 import './BattleFieldSpriteLabel.css';
 import { EnumSpriteLabelPlacement } from '#/components/battle/enums';
+import type { IStyleProps } from '#/components/shared/types';
 
 // 將純邏輯工具重新匯出，使 BattleFieldSpriteLabel 模組同時提供組件與標籤定位邏輯
 // Re-export the pure logic tool so the BattleFieldSpriteLabel module exposes both the
@@ -55,7 +56,7 @@ export type {
 } from './labelPosition';
 
 /** 戰場精靈名稱標籤屬性 / Battlefield sprite name label props */
-export interface IBattleFieldSpriteLabelProps {
+export interface IBattleFieldSpriteLabelProps extends IStyleProps {
   /** 名稱 / Name */
   name: string;
   /** X 軸位置（角色圖像左上角 x） / X position (character image top-left x) */
@@ -78,8 +79,6 @@ export interface IBattleFieldSpriteLabelProps {
   labelSize?: ISpriteImageSize;
   /** 標籤與角色圖像間距 / Gap between label and character */
   gap?: number;
-  /** 自訂樣式（可複寫或追加） / Custom style (override or append) */
-  style?: CSSProperties;
   /**
    * 所屬精靈是否翻轉（flip-h）
    * Whether the owning sprite is flipped (flip-h)
@@ -125,6 +124,7 @@ export const BattleFieldSpriteLabel: React.FC<IBattleFieldSpriteLabelProps> = ({
   labelSize,
   gap,
   style,
+  className,
   flipped,
   position,
 }) => {
@@ -169,7 +169,7 @@ export const BattleFieldSpriteLabel: React.FC<IBattleFieldSpriteLabelProps> = ({
 
   return (
     <div
-      className="sprite-label"
+      className={className ? `sprite-label ${className}` : 'sprite-label'}
       style={{ ...baseStyle, ...style }}
     >
       {name}

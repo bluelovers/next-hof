@@ -13,14 +13,12 @@ import React from 'react';
 import type { EnumTeamSideClass } from './enums';
 import './BattleSidePanel.css';
 import '#/components/shared/SharedBase.css';
+import type { IStyleProps } from '#/components/shared/types';
 
 /** 隊伍側邊面板屬性 / Team side panel props */
-export interface IBattleSidePanelProps {
+export interface IBattleSidePanelProps extends IStyleProps {
   /** 隊伍側邊類別 / Team side CSS class */
   sideClass: EnumTeamSideClass;
-  /** 附加 class（沿用標準 React 命名；例如 BattleResult 的 result-stats）
-   * Extra class (standard React naming; e.g. BattleResult's result-stats) */
-  className?: string;
   /** 面板內容 / Panel content */
   children: React.ReactNode;
 }
@@ -35,9 +33,10 @@ export interface IBattleSidePanelProps {
 export const BattleSidePanel: React.FC<IBattleSidePanelProps> = ({
   sideClass,
   className,
+  style,
   children,
 }) => (
-  <div className={`teams ${sideClass}${className ? ` ${className}` : ''}`}>
+  <div className={`teams ${sideClass}${className ? ` ${className}` : ''}`} style={style}>
     {children}
   </div>
 );
