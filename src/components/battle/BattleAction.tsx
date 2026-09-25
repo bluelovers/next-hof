@@ -24,7 +24,6 @@ import {
   splitNamedMessage,
   buildChargeMessage,
 } from './battleUtils';
-import type { ITSRequiredWith } from 'ts-type';
 
 /** 戰鬥行動屬性 / Battle action props */
 export interface IBattleActionProps {
@@ -96,23 +95,24 @@ const ValueChanges: React.FC<{ changes?: IValueChangeRecord[]; type?: EnumAction
  * 入場訊息（單一事實來源）
  * Enter battlefield message (single source of truth)
  */
-const EnterMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
-  const attrClass = getAttrClass(action.attribute);
-  return (
-    <span className={`result ${attrClass}`}>
-      <span className="bold">{action.source}</span> {getEnterBattlefieldText(action.level)}
-    </span>
-  );
-};
+const EnterMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
+  <ActionLine
+    className={`result ${getAttrClass(action.attribute)}`}
+    who={action.source}
+    message={getEnterBattlefieldText(action.level)}
+  />
+);
 
 /**
  * 退場訊息（`name Lv.N leave the Battlefield.`，dmg 色；對照 Battle.php）
  * Leave message (`name Lv.N leave the Battlefield.`, dmg colour; mirrors Battle.php)
  */
 const LeaveMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <span className="dmg">
-    <span className="bold">{action.source}</span> {getEnterBattlefieldText(action.level, true)}
-  </span>
+  <ActionLine
+    className="dmg"
+    who={action.source}
+    message={getEnterBattlefieldText(action.level, true)}
+  />
 );
 
 /**
@@ -133,7 +133,8 @@ const SkillMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
 );
 
 /** 行動訊息行 props（樣式欄位繼承自 IStyleProps）/ Action line props (style fields inherited from IStyleProps) */
-interface IActionLineProps extends IStyleProps {
+type IActionLineProps = IStyleProps & {
+  /** 主詞之前的前置內容（與 who 無關，who 缺省時仍輸出）/ Content before the subject (independent of `who`, printed even when `who` is absent) */
   preMessage?: React.ReactNode;
   /** 加粗主詞（名稱等）/ Bold subject (name, etc.) */
   who?: React.ReactNode;
@@ -146,24 +147,17 @@ interface IActionLineProps extends IStyleProps {
 /**
  * 行動訊息行（單一事實來源）
  * Action log line (single source of truth)
- *
- * 統一「加粗主詞（who）＋ 訊息（message）＋ 可選後綴（children）」的結構，
- * 供召喚入隊句等共用；message 接受任意合法節點（字串或 DOM/元件），
- * 後綴 children 用於在訊息之後接續其他內容（如入場句）。
- * Unifies the "bold subject (who) + message + optional suffix (children)" structure so the
- * summon-join clause and similar lines share one shape; `message` accepts any valid node
- * (string or DOM/component) and `children` appends after the message (e.g. an enter clause).
  */
-export function ActionLine<R extends keyof IActionLineProps = never>(
-  props: ITSRequiredWith2<IActionLineProps, R>
+export function ActionLine<R extends keyof IActionLineProps = 'message'>(
+  props: ITSRequiredWith2<IActionLineProps, NoInfer<R>>
 ) {
   const { preMessage, who, message, className, style, children } = props as IActionLineProps;
 
   return (
     <span className={className} style={style}>
+      {preMessage ?? null}
       {who != null ? (
         <>
-          {preMessage ?? null}
           <span className="bold">{who}</span>
           {' '}
         </>
@@ -240,17 +234,19 @@ const MagicCircleMessage: React.FC<{ action: IBattleAction }> = ({ action }) => 
   // the name in the default colour and only the action phrase (including ` xN`) is coloured;
   // the Fail kind has no caster so the whole string is just the phrase itself.
   if (kind === EnumMagicCircleKind.Fail) {
-    return <span className={cls}>{MAGIC_CIRCLE_PHRASE[kind]}</span>;
+    return <ActionLine className={cls} message={MAGIC_CIRCLE_PHRASE[kind]} />;
   }
   return (
-    <>
-      {action.source && <span className="bold">{action.source}</span>}
-      <span className={cls}>
-        {amount !== undefined
-          ? ` ${MAGIC_CIRCLE_PHRASE[kind]} x${amount}`
-          : ` ${MAGIC_CIRCLE_PHRASE[kind]}`}
-      </span>
-    </>
+    <ActionLine
+      who={action.source}
+      message={
+        <span className={cls}>
+          {amount !== undefined
+            ? `${MAGIC_CIRCLE_PHRASE[kind]} x${amount}`
+            : MAGIC_CIRCLE_PHRASE[kind]}
+        </span>
+      }
+    />
   );
 };
 
@@ -264,19 +260,27 @@ interface INamedMessageProps extends IStyleProps {
  * Shared "bold name + trailing text" layout (single source of truth)
  *
  * 名稱與文字由 splitNamedMessage 從 message 還原，文案則一律由 battleUtils 的建構器
- * 產生，因此各家族訊息組件只需指定配色。
+ * 產生，因此各家族訊息組件只需指定配色；行本身交給 ActionLine 組裝（前置、粗體名稱、
+ * 文字、數值變化依序輸出）。
  * splitNamedMessage recovers the name and the text from `message`, and battleUtils'
- * builders always produce the copy, so each family component only has to pick a colour.
+ * builders always produce the copy, so each family component only has to pick a colour;
+ * the line itself is assembled by ActionLine (prefix, bold name, text, value change in order).
  */
 const NamedMessage: React.FC<INamedMessageProps> = ({ action, className, style }) => {
   const { name, text } = splitNamedMessage(action);
   return (
-    <span className={className} style={style}>
-      {action.prefix}
-      {name && <span className="bold">{name}</span>}
-      {text}
-      <ValueChange valueChange={action.valueChange} type={action.type} />
-    </span>
+    <ActionLine
+      className={className}
+      style={style}
+      preMessage={action.prefix}
+      who={name}
+      message={
+        <>
+          {text}
+          <ValueChange valueChange={action.valueChange} type={action.type} />
+        </>
+      }
+    />
   );
 };
 
@@ -300,6 +304,12 @@ interface INamedValueMessageProps extends IStyleProps {
  *
  * 缺少 value 時退回 NamedMessage（直接輸出 message，保證文案不丟失）。
  * Falls back to NamedMessage when `value` is absent so the copy is never dropped.
+ *
+ * 行由 ActionLine 組裝，但 className/style 只掛在「前綴」與「數值區」兩個色塊上：
+ * ActionLine 的外層 span 刻意不帶 class，才能維持名稱在色塊之外的配色。
+ * ActionLine assembles the line, but className/style stay on the prefix and value colour
+ * spans: the outer span deliberately carries no class, which is what keeps the name outside
+ * the colour block.
  */
 const NamedValueMessage: React.FC<INamedValueMessageProps> = ({
   action,
@@ -310,16 +320,26 @@ const NamedValueMessage: React.FC<INamedValueMessageProps> = ({
   if (action.value === undefined) return <NamedMessage action={action} className={className} style={style} />;
   const name = action.type === EnumActionType.Heal ? action.target : action.source;
   return (
-    <>
-      {action.prefix && <span className={className} style={style}>{action.prefix}</span>}
-      {name && <span className="bold">{name}</span>}{' '}
-      <span className={className} style={style}>
-        {text}{' '}
-        <span className="bold">{action.value}</span>
-        {action.valueUnit && ` ${action.valueUnit}`}
-      </span>
-      <ValueChange valueChange={action.valueChange} type={action.type} />
-    </>
+    <ActionLine
+      who={name}
+      preMessage={
+        action.prefix ? (
+          <span className={className} style={style}>
+            {action.prefix}
+          </span>
+        ) : undefined
+      }
+      message={
+        <>
+          <span className={className} style={style}>
+            {text}{' '}
+            <span className="bold">{action.value}</span>
+            {action.valueUnit && ` ${action.valueUnit}`}
+          </span>
+          <ValueChange valueChange={action.valueChange} type={action.type} />
+        </>
+      }
+    />
   );
 };
 
@@ -411,11 +431,15 @@ const RegenMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
   // coloured.
   const { name, text } = splitNamedMessage(action);
   return (
-    <>
-      {name && <span className="bold">{name}</span>}
-      <span className={cls}>{text}</span>
-      <ValueChange valueChange={action.valueChange} type={action.type} />
-    </>
+    <ActionLine
+      who={name}
+      message={
+        <>
+          <span className={cls}>{text}</span>
+          <ValueChange valueChange={action.valueChange} type={action.type} />
+        </>
+      }
+    />
   );
 };
 
@@ -430,12 +454,16 @@ const RegenMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
 const ReviveMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
   const parts = action.message.split(action.emphasis ?? 'revived');
   return (
-    <span>
-      {action.source && <span className="bold">{action.source}</span>}{' '}
-      {parts[0]}
-      <span className="recover">{action.emphasis ?? 'revived'}</span>
-      {parts[1]}
-    </span>
+    <ActionLine
+      who={action.source}
+      message={
+        <>
+          {parts[0]}
+          <span className="recover">{action.emphasis ?? 'revived'}</span>
+          {parts[1]}
+        </>
+      }
+    />
   );
 };
 
@@ -463,12 +491,16 @@ const PoisonMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
   if (action.emphasis) {
     const parts = action.message.split(action.emphasis);
     return (
-      <span>
-        {action.source && <span className="bold">{action.source}</span>}{' '}
-        {parts[0]}
-        <span className="spdmg">{action.emphasis}</span>
-        {parts[1]}
-      </span>
+      <ActionLine
+        who={action.source}
+        message={
+          <>
+            {parts[0]}
+            <span className="spdmg">{action.emphasis}</span>
+            {parts[1]}
+          </>
+        }
+      />
     );
   }
   // 每回合中毒傷害（4.7）：整行 spdmg，數值加粗，並附 `(前 > 後)`。
@@ -476,11 +508,17 @@ const PoisonMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
   // `(from > to)` is appended.
   if (action.value !== undefined) {
     return (
-      <span className={getMessageClass(action)}>
-        {action.source && <span className="bold">{action.source}</span>} got{' '}
-        <span className="bold">{action.value}</span> damage by poison.
-        <ValueChange valueChange={action.valueChange} type={action.type} />
-      </span>
+      <ActionLine
+        className={getMessageClass(action)}
+        who={action.source}
+        message={
+          <>
+            got{' '}
+            <span className="bold">{action.value}</span> damage by poison.
+            <ValueChange valueChange={action.valueChange} type={action.type} />
+          </>
+        }
+      />
     );
   }
   return <NamedMessage action={action} className={getMessageClass(action)} />;
@@ -512,12 +550,18 @@ const DelayMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
  * where the name stays outside the span).
  */
 const SacrificeMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <span className={getMessageClass(action)}>
-    <span className="bold">{action.source}</span> sacrifice{' '}
-    <span className="bold">{action.value}</span>
-    {action.valueUnit && ` ${action.valueUnit}`}
-    <ValueChange valueChange={action.valueChange} type={action.type} />
-  </span>
+  <ActionLine
+    className={getMessageClass(action)}
+    who={action.source}
+    message={
+      <>
+        sacrifice{' '}
+        <span className="bold">{action.value}</span>
+        {action.valueUnit && ` ${action.valueUnit}`}
+        <ValueChange valueChange={action.valueChange} type={action.type} />
+      </>
+    }
+  />
 );
 
 /**
@@ -532,20 +576,25 @@ const SacrificeMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
  */
 const FailMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
   <>
-    <span className="u">
-      <span className="bold">{action.source}</span>
-      <span className="dmg"> Failed </span>
-      to{' '}
-      {action.skill && (
-        <SkillIcon
-          iconUrl={action.skill.iconUrl}
-          name={action.skill.name}
-          size={18}
-          className="skill-icon"
-        />
-      )}
-      {action.skill?.name}
-    </span>
+    <ActionLine
+      className="u"
+      who={action.source}
+      message={
+        <>
+          <span className="dmg"> Failed </span>
+          to{' '}
+          {action.skill && (
+            <SkillIcon
+              iconUrl={action.skill.iconUrl}
+              name={action.skill.name}
+              size={18}
+              className="skill-icon"
+            />
+          )}
+          {action.skill?.name}
+        </>
+      }
+    />
     {action.message && (
       <>
         <br />
@@ -575,27 +624,31 @@ const LevelUpMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
  * `<span class="bold u">item name</span>.`; `message` holds the item name and `source` the dropper.
  */
 const ItemDropMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <span>
-    {action.source && <span className="bold">{action.source}</span>}
-    {action.source && ' dropped'}
-    {action.itemIconUrl && (
-      <SkillIcon
-        iconUrl={action.itemIconUrl}
-        name={action.message}
-        size={18}
-        className="skill-icon"
-      />
-    )}
-    <span className="u">
-      <span className="bold">{action.message}</span>
-    </span>
-    .
-  </span>
+  <ActionLine
+    who={action.source}
+    message={
+      <>
+        {action.source && ' dropped'}
+        {action.itemIconUrl && (
+          <SkillIcon
+            iconUrl={action.itemIconUrl}
+            name={action.message}
+            size={18}
+            className="skill-icon"
+          />
+        )}
+        <span className="u">
+          <span className="bold">{action.message}</span>
+        </span>
+        .
+      </>
+    }
+  />
 );
 
 /** 純文字資訊（`Failed!`、`Damage x6!`、`heal x2!`）/ Plain info text */
 const InfoMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <span className={getMessageClass(action)}>{action.message}</span>
+  <ActionLine className={getMessageClass(action)} message={action.message} />
 );
 
 /**
@@ -612,14 +665,18 @@ const EnergyExchangeMessage: React.FC<{ action: IBattleAction }> = ({ action }) 
   const r = action.energyExchange;
   if (!r) return <span className="bold">{action.source}</span>;
   return (
-    <span>
-      {action.source && <span className="bold">{action.source}</span>}{' '}
-      exchanged rate of HP and SP.
-      <br />
-      HP: {r.hpFrom}({r.hpFromRate}%) to {r.hpTo}({r.hpToRate}%)
-      <br />
-      SP: {r.spFrom}({r.spFromRate}%) to {r.spTo}({r.spToRate}%)
-    </span>
+    <ActionLine
+      who={action.source}
+      message={
+        <>
+          exchanged rate of HP and SP.
+          <br />
+          HP: {r.hpFrom}({r.hpFromRate}%) to {r.hpTo}({r.hpToRate}%)
+          <br />
+          SP: {r.spFrom}({r.spFromRate}%) to {r.spTo}({r.spToRate}%)
+        </>
+      }
+    />
   );
 };
 
@@ -662,13 +719,18 @@ const ProtectMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
   const parts = action.message.split('protected');
   if (parts.length === 2) {
     return (
-      <span>
-        <span className="bold">{parts[0].trim()}</span> protected{' '}
-        <span className="bold">{parts[1].trim().replace('!', '')}</span>!
-      </span>
+      <ActionLine
+        who={parts[0].trim()}
+        message={
+          <>
+            protected{' '}
+            <span className="bold">{parts[1].trim().replace('!', '')}</span>!
+          </>
+        }
+      />
     );
   }
-  return <span>{action.message}</span>;
+  return <ActionLine message={action.message} />;
 };
 
 /**
@@ -685,9 +747,7 @@ interface IStatusMessageProps extends IStylePropsRequired<'className'> {
  * Casting/down/default message (single source of truth)
  */
 const StatusMessage: React.FC<IStatusMessageProps> = ({ action, className, suffix, style }) => (
-  <span className={className} style={style}>
-    <span className="bold">{action.source}</span> {suffix}
-  </span>
+  <ActionLine className={className} style={style} who={action.source} message={suffix} />
 );
 
 /**
@@ -773,7 +833,7 @@ function renderActionContent(action: IBattleAction): React.ReactNode {
     case 'info':
       return <InfoMessage action={action} />;
     default:
-      return <span className={getAttrClass(action.attribute)}>{action.message}</span>;
+      return <ActionLine className={getAttrClass(action.attribute)} message={action.message} />;
   }
 }
 

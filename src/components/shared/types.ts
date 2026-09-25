@@ -10,6 +10,21 @@
 import type { CSSProperties } from 'react';
 import type { ITSPickExtra } from 'ts-type';
 
+/**
+ * 以 K 指定必填欄位、其餘欄位維持原修飾的物件型別（供元件 props 使用）
+ * Object type with the keys in K promoted to required while the rest keep their modifiers
+ * (for component props)
+ *
+ * `K` 省略（never）＝回傳原型別；給定 K＝該鍵升級必填、其餘不變。
+ * Omitting `K` (`never`) returns the original type; a given `K` makes those keys required
+ * and leaves the rest untouched.
+ *
+ * ⚠ 作為 JSX 元件 props 型別時，泛型參數須以 `NoInfer` 包覆（見 BattleAction.ActionLine）：
+ * 否則 TypeScript 會從呼叫端推論 K，把呼叫方傳入的選填值（如 `action.source`）誤判為必填。
+ * ⚠ When used as a JSX component's props type, wrap the generic in `NoInfer` (see
+ * BattleAction.ActionLine): otherwise TypeScript infers `K` from the call site and flags the
+ * optional values passed in (e.g. `action.source`) as missing required properties.
+ */
 export type ITSRequiredWith2<T, K extends keyof T = never> = [K] extends [never]
   ? T
   : Omit<T, K> & Required<Pick<T, K>>;
