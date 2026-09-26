@@ -5,6 +5,7 @@
 import type { CSSProperties } from 'react';
 import type { ITSRequireAtLeastOne } from 'ts-type';
 import type { EnumSpriteLabelPlacement } from './enums';
+import type { IValueChangeInputCore01 } from './battleUtilsElem';
 import type { ISpriteImageSize } from './spriteImageSizes';
 import type { IStyleProps } from '#/components/shared/types';
 import {
@@ -247,12 +248,13 @@ export interface IEnergyExchangeRecord {
  * 數值變化紀錄（type＝Drain 等「多重 who」場景使用）
  * Value-change record (used for multi-"who" scenes such as Drain)
  *
- * 對照 Skill/Effect.php 的 `Drained N HP from 敵人(1500 > 1200)我方(800 > 1100)`：
- * 每筆記錄描述「某個 who 的數值由 from 變為 to」，who 缺省時只印 `(from > to)`
- * （例如 `from 敵人` 已帶出名稱，其變化即省略 who）。
- * Mirrors Skill/Effect.php's `Drained N HP from enemy(1500 > 1200)ally(800 > 1100)`:
- * each record says "who's value went from→to"; when `who` is absent only `(from > to)`
+ * 對照 Skill/Effect.php 的 `Drained N HP from 敵人(1500 => 1200)我方(800 => 1100)`：
+ * 每筆記錄描述「某個 who 的數值由 from 變為 to」，who 缺省時只印 `(from → to)`
+ * （例如 `from 敵人` 已帶出名稱，其變化即省略 who）；兩端之間的符號由渲染端決定。
+ * Mirrors Skill/Effect.php's `Drained N HP from enemy(1500 => 1200)ally(800 => 1100)`:
+ * each record says "who's value went from→to"; when `who` is absent only `(from → to)`
  * is printed (e.g. after `from enemy` the name is already shown, so its change drops the who).
+ * The symbol between the ends is decided by the renderer.
  */
 export interface IValueChangeRecord {
 	/** 誰的數值變化（缺省時只印括號；非缺省時以粗體名牌呈現）/ Whose value changed (omitted → parentheses only) */
@@ -276,17 +278,23 @@ export interface IBattleAction {
 	/** 數值 / Value */
 	value?: number;
 	/**
-	 * 預組好的數值變化字串（`349 > 167`；與結構化清單 valueChanges 對舉）
-	 * Pre-assembled value-change string (`349 > 167`; the counterpart of the structured
-	 * `valueChanges` list)
+	 * 結構化數值變化（`{ from, to }`；資料階段的標準供給方式）
+	 * Structured value change (`{ from, to }`; the normal way the data stage supplies it)
 	 *
-	 * 兩者刻意不同名：單數＝一段預組文字、複數＝ IValueChangeRecord 清單，
-	 * 避免只差一個 s 卻是完全不同的型別。
-	 * Deliberately distinct names: the singular is one pre-assembled string while the plural is
-	 * an IValueChangeRecord list, so a single letter does not hide a completely different type.
+	 * 兩端之間的符號（`⭢`／`↗`／`↘`／`⏳↘`）由渲染端依 type 判定，資料端不預先拼字串。
+	 * The symbol between the ends (`⭢` / `↗` / `↘` / `⏳↘`) is decided by the renderer from
+	 * `type`, so producers never pre-assemble the string.
+	 */
+	valueChange?: IValueChangeInputCore01;
+	/**
+	 * 預組好的數值變化字串（如 `by 攻擊者`；供上游逐字鏡像的文字使用）
+	 * Pre-assembled value-change string (such as `by attacker`; for verbatim upstream copy)
+	 *
+	 * 優先於 valueChange：一旦提供就原樣輸出，符號規則不再介入。
+	 * Wins over `valueChange`: once present it prints as-is and the symbol rules stay out of it.
 	 */
 	valueChangeText?: string;
-	/** 多重數值變化（Drain 等「who(n1->n2)」場景；who 缺省時只印括號）/ Multi value changes (Drain's "who(n1->n2)"; parentheses only when who is absent) */
+	/** 多重數值變化（Drain 等「who(from→to)」場景；who 缺省時只印括號）/ Multi value changes (Drain's "who(from→to)"; parentheses only when who is absent) */
 	valueChanges?: IValueChangeRecord[];
 	/**
 	 * 數值單位（Recovered／Drain／Sacrifice 等的 HP・SP・% 尾碼）

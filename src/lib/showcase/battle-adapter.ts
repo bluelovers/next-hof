@@ -42,7 +42,6 @@ import {
 	buildMagicCircleMessage,
 	buildProtectMessage,
 	buildSummonMessage,
-	buildValueChangeText,
 } from '#/components/battle/battleUtils';
 import {
 	computeBattleSpritePositions,
@@ -468,15 +467,24 @@ const mapCharge: IEventMapper = (_ev, ctx) =>
 		castType: EnumChargeKind.Charging,
 	});
 
-/** Damage → 傷害（valueChangeText＝`前 > 後`；無 hp 資訊時退回 `by 攻擊者`）/ Damage (valueChangeText = `before > after`; `by attacker` without hp info) */
+/**
+ * Damage → 傷害（有前後 HP 時供給結構化 valueChange、升降符號交給版面；
+ * 沒有 hp 資訊才退回預組的 `by 攻擊者`）
+ * Damage (structured `valueChange` when the before/after HP is known and the direction symbol
+ * is left to the layout; only without hp info does it fall back to the pre-assembled
+ * `by attacker`)
+ */
 const mapDamage: IEventMapper = (ev, ctx) => {
 	const value = ev.value ?? 0;
+	const hasHp = ev.hpBefore !== undefined && ev.hpAfter !== undefined;
 	return composeAction(ctx, {
 		type: EnumActionType.Damage,
 		value,
-		valueChangeText:
-			buildValueChangeText({ from: ev.hpBefore, to: ev.hpAfter }) ??
-			(ctx.actor.name ? `by ${ctx.actor.name}` : undefined),
+		// 兩者刻意互斥：結構化資料到位時不寫預組文字，否則符號規則會被繞過
+		// Deliberately mutually exclusive: no pre-assembled copy when the structured data is there,
+		// otherwise the symbol rules would be bypassed
+		valueChange: hasHp ? { from: ev.hpBefore, to: ev.hpAfter } : undefined,
+		valueChangeText: hasHp ? undefined : ctx.actor.name ? `by ${ctx.actor.name}` : undefined,
 		message: buildDamageMessage(value, ctx.target.name),
 		attribute: EnumAttributeType.Dmg,
 		hpBefore: ev.hpBefore,
@@ -484,14 +492,17 @@ const mapDamage: IEventMapper = (ev, ctx) => {
 	});
 };
 
-/** Heal → 回復（valueChangeText＝`前 > 後`、固定 HP 單位）/ Heal (valueChangeText = `before > after`, HP unit) */
+/**
+ * Heal → 回復（結構化 valueChange、固定 HP 單位）
+ * Heal (structured `valueChange`, HP unit)
+ */
 const mapHeal: IEventMapper = (ev, ctx) => {
 	const value = ev.value ?? 0;
 	return composeAction(ctx, {
 		type: EnumActionType.Heal,
 		value,
 		valueUnit: 'HP',
-		valueChangeText: buildValueChangeText({ from: ev.hpBefore, to: ev.hpAfter }),
+		valueChange: { from: ev.hpBefore, to: ev.hpAfter },
 		message: buildHealMessage(value, ctx.target.name),
 		attribute: EnumAttributeType.Recover,
 		hpBefore: ev.hpBefore,

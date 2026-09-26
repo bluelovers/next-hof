@@ -15,7 +15,6 @@ import {
 	getNamedCopy,
 	isProtectingGuard,
 	buildChargeText,
-	buildDelayText,
 	buildSpDamageMessage,
 	buildStatChangeText,
 	buildStatToText,
@@ -27,9 +26,12 @@ import {
 	buildSummonMessage,
 	buildItemDropMessage,
 	buildFailMessage,
-	buildValueChangeText,
+	buildTeamGoldMessage,
+	buildValueChangeFromDelay,
+	EnumLogCopy,
 	getMessageClass,
 } from './battleUtils';
+import { buildValueChange, getValueChangeSymbol, VALUE_CHANGE_SYMBOL } from './battleUtilsElem';
 import {
 	EnumActionType,
 	EnumAttributeType,
@@ -423,26 +425,54 @@ describe('原始日誌文案與配色 / original log copy and colours', () => {
 		);
 	});
 
-	it('buildDelayText mirrors the DelayByRate parentheses', () => {
-		expect(buildDelayText(15, 25, 100)).toBe('Delayed(15 >>> 25/100)');
-		expect(buildActionMessage({ source: 'GoblinAxe', text: buildDelayText(15, 25, 100) })).toBe(
-			'GoblinAxe Delayed(15 >>> 25/100)',
+	it('delay keeps the copy in the data and the change structured', () => {
+		// 固定文案只由 EnumLogCopy.Delay 持有：整行由唯一合併點用成員接出，輸入端不重打字串
+		// The fixed copy is owned solely by EnumLogCopy.Delay: the single join point builds the
+		// whole line from the member, so no input retypes the string
+		expect(buildActionMessage({ source: 'GoblinAxe', text: EnumLogCopy.Delay })).toBe(
+			'GoblinAxe Delayed',
 		);
+		// 前後值交給 buildValueChangeFromDelay（含 Delay 型別），符號交給版面
+		// The ends go to buildValueChangeFromDelay (type included) and the symbol to the layout
+		expect(buildValueChangeFromDelay(15, 25, 100)).toEqual({
+			from: 15,
+			to: '25/100',
+			type: EnumActionType.Delay,
+		});
 	});
 
-	it('buildValueChangeText prefers the pre-assembled string, then the from/to pair', () => {
-		// 預組字串優先（例如轉接層產出的 `200 > 158`）
-		// The pre-assembled string wins (such as the adapter's `200 > 158`)
-		expect(buildValueChangeText({ valueChangeText: '200 > 158' })).toBe('200 > 158');
-		expect(buildValueChangeText({ valueChangeText: '200 > 158', from: 1, to: 2 })).toBe('200 > 158');
-		// 沒有預組字串時以 from/to 組出 `from > to`
-		// Without a pre-assembled copy the `from > to` pair is built
-		expect(buildValueChangeText({ from: 200, to: 158 })).toBe('200 > 158');
-		// 兩端須齊備：只有 from 或只有 to 時回傳 undefined（渲染端不印出空括號）
-		// Both ends are required: `from` alone or `to` alone yields undefined (no empty parentheses)
-		expect(buildValueChangeText({ from: 200 })).toBeUndefined();
-		expect(buildValueChangeText({ to: 158 })).toBeUndefined();
-		expect(buildValueChangeText({})).toBeUndefined();
+	it('getValueChangeSymbol decides the symbol by type, then direction, then default', () => {
+		// 型別優先：Delay 固定 ⏳↘（變化後是比率字串，比不出升降）
+		// The action type wins: Delay is always ⏳↘ (its `to` is a rate, so no direction can be told)
+		expect(getValueChangeSymbol(buildValueChangeFromDelay(15, 25, 100))).toBe(
+			VALUE_CHANGE_SYMBOL.delay,
+		);
+		expect(
+			getValueChangeSymbol({ from: 15, to: 10, type: EnumActionType.Delay }),
+		).toBe(VALUE_CHANGE_SYMBOL.delay);
+		// 升降：↗ 上升、↘ 下降、持平 ⭢
+		// Direction: ↗ rising, ↘ falling, ⭢ when equal
+		expect(getValueChangeSymbol({ from: 129, to: 213 })).toBe(VALUE_CHANGE_SYMBOL.rise);
+		expect(
+			getValueChangeSymbol({ from: 349, to: 167, type: EnumActionType.Damage }),
+		).toBe(VALUE_CHANGE_SYMBOL.fall);
+		expect(getValueChangeSymbol({ from: 100, to: 100 })).toBe(VALUE_CHANGE_SYMBOL.default);
+		// 非數字端點無從判定 → 預設 ⭢
+		// Non-numeric ends cannot be compared → the default ⭢
+		expect(getValueChangeSymbol({ from: 'A', to: 'B' })).toBe(VALUE_CHANGE_SYMBOL.default);
+	});
+
+	it('buildValueChange prefers the pre-assembled copy and yields nothing without data', () => {
+		// 預組字串優先（符號規則不介入）
+		// The pre-assembled string wins (the symbol rules stay out of it)
+		expect(buildValueChange({ valueChangeText: 'by GoblinAxe', from: 1, to: 2 })).toBe(
+			'by GoblinAxe',
+		);
+		// 兩者皆無 → null（渲染端輸出空內容，不出現空括號）
+		// Neither present → null (the renderer emits nothing, never empty parentheses)
+		expect(
+			buildValueChange({ valueChangeText: undefined, from: undefined, to: undefined }),
+		).toBeNull();
 	});
 
 	it('getMessageClass maps each family to the original span class', () => {
@@ -509,6 +539,14 @@ describe('事件家族的原始日誌文案 / original log copy per event family
 		);
 		expect(buildFailMessage('GoblinAxe', 'FatalStab')).toBe('GoblinAxe Failed FatalStab');
 		expect(buildFailMessage(undefined)).toBe('Failed');
+	});
+
+	it('buildTeamGoldMessage groups the figure the way the original log prints it', () => {
+		// 千分位是這批資訊文案唯一的格式邏輯，分錯就與原始日誌的數字不一致
+		// The thousands separator is the only formatting logic in these info lines; the wrong
+		// grouping would stop matching the figures in the original log
+		expect(buildTeamGoldMessage('TestTeam', 1500)).toBe('TestTeam Get 1,500.');
+		expect(buildTeamGoldMessage('TestTeam', 1234567)).toBe('TestTeam Get 1,234,567.');
 	});
 
 	it('buildProtectMessage separates guarding someone else from blocking alone', () => {

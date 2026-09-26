@@ -23,8 +23,9 @@ import {
   getNamedCopy,
   isProtectingGuard,
   buildChargeText,
-  buildValueChangeText,
 } from './battleUtils';
+import type { ITSRequireAtLeastOne } from 'ts-type';
+import { buildValueChange, IValueChangeInput } from './battleUtilsElem';
 
 /** 戰鬥行動屬性 / Battle action props */
 export interface IBattleActionProps {
@@ -38,55 +39,67 @@ export interface IBattleActionProps {
  * 值變化描述（單一事實來源）
  * Value change description (single source of truth)
  *
- * 同時支援「預組好的字串」與「n1→n2」兩種輸入；who 缺省時只印 `(n1 > n2)`，提供時以
- * 粗體名牌呈現（`who(n1 > n2)`），兩者皆無前導空白以對齊原始日誌。括號與數值變化內容
- * 一律由此處組裝，呼叫方無需自行拼接。
- * Supports both a pre-assembled string and an n1→n2 pair; `who` is optional and, when
- * present, is shown as a bold label (`who(n1 > n2)`). Either way has no leading space,
- * mirroring the original log. The parentheses and the change copy are always assembled
- * here so callers never concatenate them by hand.
+ * 版面直接交給 ActionLine：`linePrefix` 給出與前方文案之間的間距、`subject` 是可省略的
+ * 粗體名牌（`who`）、`body` 是括號與變化值，因此不再自行組裝 span 與名牌。
+ * The layout is delegated to ActionLine: `linePrefix` supplies the gap from the copy in front,
+ * `subject` is the optional bold label (`who`) and `body` is the parentheses plus the changed
+ * value, so this component no longer assembles a span or the bold label by hand.
+ *
+ * 同時支援「預組好的字串」與「from／to 兩端」兩種輸入；括號、符號與變化值一律交給
+ * battleUtilsElem.buildValueChange，符號（⭢／↗／↘／⏳↘）只書寫一次。
+ * Supports both a pre-assembled string and a from/to pair; the parentheses, the symbol and the
+ * value all come from battleUtilsElem.buildValueChange, so the symbol (⭢ / ↗ / ↘ / ⏳↘) is
+ * written exactly once.
  */
-const ValueChange: React.FC<{
-  valueChangeText?: string;
-  from?: number;
-  to?: number;
+const ValueChange: React.FC<IValueChangeInput & {
   who?: string;
   type?: EnumActionType;
-}> = ({ valueChangeText, from, to, who, type }) => {
-  // 文字組裝委由 battleUtils.buildValueChangeText（單一事實來源，展示資料共用同一定義）
-  // Copy assembly is delegated to battleUtils.buildValueChangeText (single source of truth,
-  // shared definition with the showcase data)
-  const text = buildValueChangeText({ valueChangeText, from, to });
-  if (text === undefined) return null;
-  const valClass = getValueChangeClass(type);
+}> = (props) => {
+  // 符號與變化值委由 battleUtilsElem.buildValueChange（單一事實來源，展示資料共用同一定義）
+  // The symbol and the value are delegated to battleUtilsElem.buildValueChange (single source of
+  // truth, shared definition with the showcase data)
+  const text = buildValueChange(props);
+  if (text == null) return null;
   return (
-    <span className={valClass}>
-      {who && <span className="bold">{who}</span>}
-      ({text})
-    </span>
+    <ActionLine
+      className={getValueChangeClass(props.type)}
+      linePrefix=" "
+      subject={props.who}
+    >
+      （{text}）
+    </ActionLine>
   );
 };
 
 /**
- * 行動自帶的數值變化（`action.valueChangeText` → ValueChange）
- * The action's own value change (`action.valueChangeText` → ValueChange)
+ * 行動自帶的數值變化（`action.valueChange` → ValueChange）
+ * The action's own value change (`action.valueChange` → ValueChange)
  *
- * 各訊息組件只需傳入 action，不必重複組合 `valueChangeText`/`type` 兩個欄位。
- * Message components only pass the action, so the `valueChangeText` / `type` pair is never
- * re-assembled at each call site.
+ * 結構化的 `valueChange`（含 Delay 的 `⏳↘` 型別提示）與預組的 `valueChangeText` 一併交給
+ * ValueChange 判定優先順序；各訊息組件只需傳入 action，不必重複組合欄位。
+ * The structured `valueChange` (with the `⏳↘` hint of Delay's type) and the pre-assembled
+ * `valueChangeText` are both handed to ValueChange, which decides the precedence; message
+ * components only pass the action, so the fields are never re-assembled at each call site.
  */
 const ActionValueChange: React.FC<{ action: IBattleAction }> = ({ action }) => (
-  <ValueChange valueChangeText={action.valueChangeText} type={action.type} />
+  <ValueChange
+    {...action.valueChange}
+    valueChangeText={action.valueChangeText}
+    type={action.valueChange?.type ?? action.type}
+  />
 );
 
 /**
  * 多重數值變化列表（單一事實來源；內部統一委託 ValueChange）
  * Multi value-change list (single source of truth; delegates to ValueChange internally)
  *
- * 對照 Skill/Effect.php 的 `Drained N HP from 敵人(1500 > 1200)我方(800 > 1100)`：每一筆
- * IValueChangeRecord 委託 ValueChange 渲染，本元件不自行組裝括號或名牌。
- * Mirrors Skill/Effect.php's multi-(who(n1>n2)) drain line; each IValueChangeRecord is
- * delegated to ValueChange, so this component never assembles the parentheses or labels.
+ * 對照 Skill/Effect.php 的 `Drained N HP from 敵人(1500 => 1200)我方(800 => 1100)`：每一筆
+ * IValueChangeRecord 委託 ValueChange 渲染，本元件不自行組裝括號、名牌或分隔間距
+ * （間距由 ValueChange 的 linePrefix 統一給出，符號由 getValueChangeSymbol 決定）。
+ * Mirrors Skill/Effect.php's multi-(who(n1→n2)) drain line; each IValueChangeRecord is
+ * delegated to ValueChange, so this component never assembles the parentheses, the labels or
+ * the separating gap (the gap comes from ValueChange's linePrefix and the symbol from
+ * getValueChangeSymbol).
  */
 const ValueChanges: React.FC<{ changes?: IValueChangeRecord[]; type?: EnumActionType }> = ({
   changes,
@@ -95,7 +108,6 @@ const ValueChanges: React.FC<{ changes?: IValueChangeRecord[]; type?: EnumAction
   <>
     {changes?.map((vc, i) => (
       <Fragment key={`${vc.who ?? ''}-${vc.from}-${vc.to}-${i}`}>
-        {i > 0 ? ' ' : null}
         <ValueChange from={vc.from} to={vc.to} who={vc.who} type={type} />
       </Fragment>
     ))}
@@ -159,17 +171,18 @@ type IActionLineProps = IStyleProps & {
   linePrefix?: React.ReactNode;
   /** 粗體主詞（名稱等）/ Bold subject (name, etc.) */
   subject?: React.ReactNode;
+} & ITSRequireAtLeastOne<{
   /** 主詞之後的主體節點（字串或任意合法節點）/ Body after the subject (string or any valid node) */
-  body: React.ReactNode;
+  body?: React.ReactNode;
   /** 訊息之後的後綴內容 / Suffix rendered after the body */
   children?: React.ReactNode;
-}
+}>
 
 /**
  * 行動訊息行（單一事實來源）
  * Action log line (single source of truth)
  */
-export function ActionLine<R extends keyof IActionLineProps = 'body'>(
+export function ActionLine<R extends keyof IActionLineProps = never>(
   props: ITSRequiredWith2<IActionLineProps, NoInfer<R>>
 ) {
   const { linePrefix, subject, body, className, style, children } = props as IActionLineProps;
@@ -389,10 +402,10 @@ const NamedValueMessage: React.FC<INamedValueMessageProps> = ({
  * 「數值 ＋ 標籤 ＋ to target ＋ 數值變化」版面（單一事實來源）
  * "value + label + to target + value change" layout (single source of truth)
  *
- * 傷害與 SP 傷害共用：色塊只涵蓋「數值＋標籤」，`to target` 與 `(前 > 後)` 維持預設色
+ * 傷害與 SP 傷害共用：色塊只涵蓋「數值＋標籤」，`to target` 與 `(前 後)` 維持預設色
  * （色塊在 `to` 之前結束）；標籤自帶與數值間的間距，故 SP Damage 與數值之間沒有空格。
  * Damage and SP damage share it: the colour span covers only "value + label" while
- * `to target` and `(from > to)` stay default (the span ends before "to"); the label carries
+ * `to target` and `(from symbol to)` stay default (the span ends before "to"); the label carries
  * its own spacing, so "SP Damage" sits flush against the value.
  */
 const ValueToTargetMessage: React.FC<{
@@ -432,10 +445,10 @@ const DamageMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
  * SP damage message (single source of truth)
  *
  * 原始日誌：`<b>N</b>SP Damage to <b>target</b>`，數值與「SP Damage」之間無空格；
- * 僅數值與「SP Damage」上 spdmg 色，`to target` 與 `(前 > 後)` 維持預設色。
+ * 僅數值與「SP Damage」上 spdmg 色，`to target` 與 `(前 後)` 維持預設色。
  * Original log: `<b>N</b>SP Damage to <b>target</b>` with no space between the value and
  * "SP Damage"; only the value and "SP Damage" are spdmg while `to target` and
- * `(from > to)` stay default (the colour span ends before "to").
+ * `(from symbol to)` stay default (the colour span ends before "to").
  */
 const SpDamageMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
   <ValueToTargetMessage action={action} className={getMessageClass(action)} label="SP Damage" />
@@ -445,18 +458,20 @@ const SpDamageMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
  * 吸取訊息（單一事實來源）
  * Drain message (single source of truth)
  *
- * 原始日誌：`Drained <b>N</b> HP from <b>target</b>(targetFrom > targetTo)<b>who</b>(whoFrom > whoTo)`，
- * 行首無施放者名稱，並支援任意數量的 `who(n1->n2)` 數值變化；who 缺省時只印 `(n1 > n2)`。
- * Original log: `Drained <b>N</b> HP from <b>target</b>(tFrom > tTo)<b>who</b>(wFrom > wTo)`
- * (no caster name at the head) and it supports any number of `who(n1->n2)` value changes;
- * when `who` is absent only `(n1 > n2)` prints.
+ * 原始日誌：`Drained <b>N</b> HP from <b>target</b>(targetFrom => targetTo)<b>who</b>(whoFrom => whoTo)`，
+ * 行首無施放者名稱，並支援任意數量的 `who(n1→n2)` 數值變化；who 缺省時只印 `(n1→n2)`
+ * （符號改由 getValueChangeSymbol 決定，原始 `=>` 不再寫死在版面上）。
+ * Original log: `Drained <b>N</b> HP from <b>target</b>(tFrom => tTo)<b>who</b>(wFrom => wTo)`
+ * (no caster name at the head) and it supports any number of `who(n1→n2)` value changes;
+ * when `who` is absent only `(n1→n2)` prints (the symbol comes from getValueChangeSymbol, so
+ * the original `=>` is no longer hard-coded in the layout).
  */
 const DrainMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
   const cls = getMessageClass(action);
   // 原始日誌：`Drained <b>N</b> HP from <b>target</b>(…)`——僅吸取數值與單位上色，
-  // `Drained`／`from target`／`(n1 > n2)` 維持預設色。
+  // `Drained`／`from target`／`(n1→n2)` 維持預設色。
   // Original log: `Drained <b>N</b> HP from <b>target</b>(…)` — only the drained value and
-  // unit are coloured; `Drained`, `from target` and `(n1 > n2)` stay default.
+  // unit are coloured; `Drained`, `from target` and `(n1→n2)` stay default.
   return (
     <>
       Drained{' '}
@@ -573,9 +588,9 @@ const PoisonMessage: React.FC<{ action: IBattleAction }> = ({ action }) => {
   if (action.emphasis) {
     return <EmphasizedMessage action={action} className="spdmg" />;
   }
-  // 每回合中毒傷害（4.7）：整行 spdmg，數值加粗，並附 `(前 > 後)`。
+  // 每回合中毒傷害（4.7）：整行 spdmg，數值加粗，並附 `(前 後)`。
   // Per-turn poison damage (4.7): the whole line is spdmg, the value is bold, and the
-  // `(from > to)` is appended.
+  // `(from symbol to)` is appended.
   if (action.value !== undefined) {
     return (
       <ActionLine

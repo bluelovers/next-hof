@@ -173,17 +173,18 @@ describe('3.3 mapBattleEvent', () => {
 		expect(actions[1].text).toMatch(/^start (charging|casting)\.$/);
 		expect(actions[1].message).toBe(`Warrior ${actions[1].text}`);
 
-		// Damage valueChangeText 格式 hpBefore > hpAfter
+		// Damage 供給結構化 valueChange（hpBefore → hpAfter），兩端符號交給渲染端決定
+		// Damage supplies a structured valueChange (hpBefore → hpAfter) and leaves the symbol to the renderer
 		expect(actions[2].type).toBe(EnumActionType.Damage);
 		expect(actions[2].source).toBe('Warrior');
 		expect(actions[2].target).toBe('GoblinAxe');
 		expect(actions[2].value).toBe(42);
-		expect(actions[2].valueChangeText).toBe('200 > 158');
+		expect(actions[2].valueChange).toEqual({ from: 200, to: 158 });
 		expect(actions[2].side).toBe(EnumTeamSideUI.Right);
 
-		// Heal 沿用 valueChangeText
+		// Heal 同樣供給結構化 valueChange / Heal supplies the structured valueChange too
 		expect(actions[3].type).toBe(EnumActionType.Heal);
-		expect(actions[3].valueChangeText).toBe('158 > 168');
+		expect(actions[3].valueChange).toEqual({ from: 158, to: 168 });
 
 		// Guard（Barrier，actor === target）→ protect
 		expect(actions[4].message).toContain('barrier');
@@ -770,7 +771,7 @@ describe('3.4b 展示資料組裝 / display data assembly', () => {
 		expect(data.rightTeam.units).toHaveLength(1);
 		expect(data.actions).toHaveLength(1);
 		expect(data.actions[0].message).toBe(`7 Damage to ${enemies[0].name}`);
-		expect(data.actions[0].valueChangeText).toBe('10 > 3');
+		expect(data.actions[0].valueChange).toEqual({ from: 10, to: 3 });
 		// 沒有給快照 → snapshots 欄位省略 / no snapshots supplied → the field stays out
 		expect(data.snapshots).toBeUndefined();
 		// 我方（右隊）獲勝 / the allies (right team) win

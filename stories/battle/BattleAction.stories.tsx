@@ -10,6 +10,10 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { BattleActionDarkDecorator } from '../decorators';
 import { BattleAction } from '../../src/components/battle/BattleAction';
 import type { IBattleAction } from '../../src/components/battle/types';
+import {
+  buildDamageMessage,
+  buildHealMessage,
+} from '#/components/battle/battleUtils';
 
 const meta: Meta<typeof BattleAction> = {
   title: 'Battle/Atoms/BattleAction',
@@ -60,8 +64,11 @@ export const DamageDealt: Story = {
       source: 'GoblinWarrior(B)',
       target: 'Hero1',
       value: 182,
-      valueChangeText: '349 > 167',
-      message: '182 Damage to Hero1(349 > 167)',
+      // 前後值只寫數字，兩端之間的符號（↘ 下降）由渲染端唯一組出；message 是同一件事的純文字鏡像
+      // Only the numbers are written: the renderer builds the symbol between them (↘ falling)
+      // once, and `message` is the plain-text mirror of the same fact
+      valueChange: { from: 349, to: 167 },
+      message: buildDamageMessage(182, 'Hero1'),
       attribute: 'dmg',
     },
   } as StoryArgs,
@@ -142,8 +149,8 @@ export const HealAction: Story = {
       source: 'Priest1',
       target: 'Hero1',
       value: 120,
-      valueChangeText: '1 > 121',
-      message: '120 Heal to Hero1(1 > 121)',
+      valueChange: { from: 1, to: 121 },
+      message: buildHealMessage(120, 'Hero1'),
       attribute: 'recover',
     },
   } as StoryArgs,
@@ -155,9 +162,9 @@ export const LogSequence: Story = {
     <div>
       <BattleAction action={{ type: 'skill', source: 'GoblinWarrior(B)', skill: { name: 'FatalStab', iconUrl: '/image/icon/skill/skill_074z.png' }, message: 'GoblinWarrior(B) FatalStab', attribute: 'dmg' } as IBattleAction} />
       <BattleAction action={{ type: 'protect', source: 'Hero1', target: 'Priest1', message: 'Hero1 protected Priest1!', attribute: 'support' } as IBattleAction} />
-      <BattleAction action={{ type: 'damage', source: 'GoblinWarrior(B)', target: 'Hero1', value: 182, valueChangeText: '349 > 167', message: '182 Damage to Hero1(349 > 167)', attribute: 'dmg' } as IBattleAction} />
+      <BattleAction action={{ type: 'damage', source: 'GoblinWarrior(B)', target: 'Hero1', value: 182, valueChange: { from: 349, to: 167 }, message: buildDamageMessage(182, 'Hero1'), attribute: 'dmg' } as IBattleAction} />
       <BattleAction action={{ type: 'attack', source: 'GoblinAxe', skill: { name: 'Attack', iconUrl: '/image/icon/skill/skill_042.png' }, message: 'GoblinAxe Attack', attribute: 'dmg' } as IBattleAction} />
-      <BattleAction action={{ type: 'damage', source: 'GoblinAxe', target: 'Healer1', value: 44, valueChangeText: '213 > 169', message: '44 Damage to Healer1(213 > 169)', attribute: 'dmg' } as IBattleAction} />
+      <BattleAction action={{ type: 'damage', source: 'GoblinAxe', target: 'Healer1', value: 44, valueChange: { from: 213, to: 169 }, message: buildDamageMessage(44, 'Healer1'), attribute: 'dmg' } as IBattleAction} />
     </div>
   ),
 };

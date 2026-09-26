@@ -20,6 +20,7 @@ import type {
   IBattleUnit,
   IMagicCircleRecord,
 } from './types';
+import { IValueChangeInputCore01 } from './battleUtilsElem';
 
 /** 條狀顏色高閾值（> 此值為高血量色） / Bar high threshold */
 const BAR_HIGH_THRESHOLD = 60;
@@ -136,10 +137,10 @@ export function getStateTextClass(
  * 依戰鬥行動類型取得數值變化 CSS 類別
  * Get the CSS class for a value-change from an action type
  *
- * 原始日誌對 `(前 > 後)` 括號的配色並不一致：Damage／Heal／Recover／Drain 的括號都印在
+ * 原始日誌對 `(前 符號 後)` 括號的配色並不一致：Damage／Heal／Recover／Drain 的括號都印在
  * 顏色 span 之外（預設色）；唯獨中毒傷害（4.7）的括號落在 spdmg span 之內（紫色）。
  * 故僅 Poison 回傳 'spdmg'，其餘一律回傳 ''（預設色），以對齊原始日誌。
- * The original log is inconsistent about the `(from > to)` parentheses: for Damage / Heal /
+ * The original log is inconsistent about the `(from symbol to)` parentheses: for Damage / Heal /
  * Recover / Drain they print outside the colour span (default colour), but poison damage
  * (4.7) keeps them inside the spdmg span (purple). So only Poison returns 'spdmg'; every
  * other family returns '' (default) to mirror the original.
@@ -214,18 +215,90 @@ export function buildMagicCircleMessage(source?: string, record?: IMagicCircleRe
 //
 // 命名慣例 / Naming convention:
 //   buildXxxText    → 「粗體名稱之後的片段」（對應 IBattleAction.text），由唯一合併點
-//                     buildActionMessage 接成名行；例：buildRecoveredText、buildDelayText。
+//                     buildActionMessage 接成名行；例：buildRecoveredText、buildStatChangeText。
 //   buildXxxMessage → 「整行純文字」（對應 IBattleAction.message），本身已含名稱或根本沒有名稱；
 //                     例：buildDamageMessage、buildProtectMessage。
+//   EnumLogCopy     → 無參數可變的固定文案，以列舉成員持有；資料端只引用成員，
+//                     不得把原始日誌字串寫成字面值，也不設零參數建構器。
 //   buildXxxText    → the fragment after the bold name (IBattleAction.text), joined into the whole
-//                     line by the single join point buildActionMessage; e.g. buildRecoveredText.
+//                     line by the single join point buildActionMessage; e.g. buildRecoveredText,
+//                     buildStatChangeText.
 //   buildXxxMessage → the whole plain line (IBattleAction.message), already carrying the name or
 //                     having none at all; e.g. buildDamageMessage, buildProtectMessage.
+//   EnumLogCopy     → fixed copy with nothing to vary, held by enum members; the data only
+//                     references them — original-log strings are never spelled out as literals,
+//                     and no zero-argument builder is created for them.
 //
-// 以下建構器逐字對應 HOF/Class 的戰鬥日誌輸出；轉接層與展示資料都必須經由它們
-// 產生文案，因此每個字串只書寫一次。
-// The builders below mirror the battle-log output of HOF/Class word for word; the adapter and
-// the showcase data both go through them, so every string is written exactly once.
+// 以下建構器與 EnumLogCopy 逐字對應 HOF/Class 的戰鬥日誌輸出；轉接層與展示資料都必須經由
+// 它們產生文案，因此每個字串只書寫一次。
+// The builders and EnumLogCopy below mirror the battle-log output of HOF/Class word for word;
+// the adapter and the showcase data both go through them, so every string is written exactly once.
+
+/**
+ * 原始日誌的固定文案（單一事實來源；成員值＝逐字對應 HOF/Class 的輸出）
+ * Fixed original-log copy (single source of truth; member values mirror HOF/Class word for word)
+ *
+ * 只收「無參數可變」的固定文案：展示資料與轉接層引用成員，不在別處重打字串（對照 Skill.php 的
+ * `Name Delayed`、Effect.php 的 `moved to front.` 等）。帶值的文案一律走下方的 buildXxx 建構器。
+ * Only copy with nothing to vary lives here: the showcase data and the adapter reference the members
+ * and never retype the strings elsewhere (cf. Skill.php's `Name Delayed`, Effect.php's
+ * `moved to front.`, …). Copy carrying a value always goes through the buildXxx builders below.
+ */
+export enum EnumLogCopy {
+  // ---- 復活・增益 / Revive & buff ----
+  /** 復活（`name revived!`）/ revive (`name revived!`) */
+  Revived = 'revived!',
+  /** 障壁（`name got barriered!`）/ barrier (`name got barriered!`) */
+  Barriered = 'got barriered!',
+  /** 加速（`name got quicked!`）/ quick (`name got quicked!`) */
+  Quicked = 'got quicked!',
+  /** 施法縮短（`name casting shorted!`）/ casting shorted (`name casting shorted!`) */
+  CastingShorted = 'casting shorted!',
+
+  // ---- 中毒 / Poison ----
+  /** 中毒施加（`name get poisoned !`，` ` 為 NBSP）/ poison applied (`name get poisoned !`) */
+  PoisonApplied = 'get poisoned\u00a0!',
+  /** 抗毒（`name blocked poison.`）/ poison resisted (`name blocked poison.`) */
+  PoisonBlocked = 'blocked poison.',
+  /** 自我中毒（`Got poisoned`，無名稱）/ self-poison (`Got poisoned`, unnamed) */
+  PoisonSelf = 'Got poisoned',
+
+  // ---- 位移 / Movement ----
+  /** 移至前方 / moved to the front */
+  MoveToFront = 'moved to front.',
+  /** 移至後方 / moved to the back */
+  MoveToBack = 'moved to back.',
+  /** 擊退（`knock backed!`）/ knocked back (`knock backed!`) */
+  KnockBacked = 'knock backed!',
+  /** 前進（`goes forward.`）/ goes forward (`goes forward.`) */
+  GoesForward = 'goes forward.',
+
+  // ---- 延遲・未命中・升級 / Delay, miss & level up ----
+  /** 延遲（Skill.php `Name Delayed`）/ delay (Skill.php's `Name Delayed`) */
+  Delay = 'Delayed',
+  /** 未命中（`name Failed!`）/ miss (`name Failed!`) */
+  Miss = 'Failed!',
+  /** 升級（`name LevelUp!`）/ level up (`name LevelUp!`) */
+  LevelUp = 'LevelUp!',
+
+  // ---- 純文字資訊 / Plain info ----
+  /** 無目標（`No target.Failed!`）/ no target (`No target.Failed!`) */
+  InfoNoTarget = 'No target.Failed!',
+  /** 攻擊消失（`Attack has disappeared.`）/ attack gone (`Attack has disappeared.`) */
+  InfoAttackGone = 'Attack has disappeared.',
+  /** 値過大補正（`※値が大きすぎて補正されました。`）/ value capped (`※値が大きすぎて補正されました。`) */
+  InfoOverCap = '※値が大きすぎて補正されました。',
+  /** 戰鬥回合延長（`battle turns extended.`）/ battle turns extended (`battle turns extended.`) */
+  InfoBattleTurns = 'battle turns extended.',
+  /** 無更多型態（`(No more patterns)`）/ no more patterns (`(No more patterns)`) */
+  InfoNoMorePatterns = '(No more patterns)',
+  /** 思考中未行動（名稱之後的片段）/ sunk in thought and could not act (fragment after the name) */
+  InfoSunkInThought = "sunk in thought and couldn't act.",
+
+  // ---- HP/SP 交換 / HP/SP exchange ----
+  /** 交換比率（名稱之後的片段）/ exchanged rate (fragment after the name) */
+  EnergyExchange = 'exchanged rate of HP and SP.',
+}
 
 /**
  * 文案欄位輸入（source／text／message 的統一形狀）
@@ -330,42 +403,6 @@ export function isProtectingGuard(
 }
 
 /**
- * 數值變化文字的輸入（預組字串或變化前後值）
- * Value-change text input (a pre-assembled string or the before/after values)
- */
-export interface IValueChangeTextInput {
-  /** 預組好的變化字串（優先採用；與 IBattleAction.valueChangeText 同名同義）/ Pre-assembled change string (wins; same name and meaning as IBattleAction.valueChangeText) */
-  valueChangeText?: string;
-  /** 變化前（與 to 同時提供時組成 `from > to`）/ Before (pairs with `to` into `from > to`) */
-  from?: number;
-  /** 變化後 / After */
-  to?: number;
-}
-
-/**
- * 組出「(前 > 後)」的數值變化文字（單一事實來源）
- * Build the `(before > after)` value-change text (single source of truth)
- *
- * 優先採用預組字串 `valueChangeText`；否則在 `from`／`to` 齊備時組成 `from > to`；
- * 兩者皆無時回傳 undefined，渲染端據此輸出空內容（不會出現空括號）。
- * The pre-assembled `valueChangeText` wins; otherwise the `from > to` pair is built when both
- * ends are present; when neither exists `undefined` comes back so the renderer emits
- * nothing (never empty parentheses).
- *
- * BattleAction 的 ValueChange 與 showcase 轉接層共用此函式，格式只書寫一次。
- * BattleAction's ValueChange and the showcase adapter share this helper, so the format is
- * written exactly once.
- *
- * @param input - 變化文字輸入 / Value-change input
- * @returns 變化文字（無資料時 undefined）/ Change copy (undefined when there is none)
- */
-export function buildValueChangeText(input: IValueChangeTextInput): string | undefined {
-  if (input.valueChangeText !== undefined) return input.valueChangeText;
-  if (input.from !== undefined && input.to !== undefined) return `${input.from} > ${input.to}`;
-  return undefined;
-}
-
-/**
  * 蓄力／詠唱文案片段（`start charging.` / `start casting.`；粗體名稱由版面補上）
  * Charge/casting fragment (`start charging.` / `start casting.`; the layout prints the bold name)
  */
@@ -403,11 +440,6 @@ export function buildSacrificeText(value: number): string {
   return `sacrifice ${value} HP`;
 }
 
-/** 升級文案片段（`LevelUp!`）/ Level-up fragment (`LevelUp!`) */
-export function buildLevelUpText(): string {
-  return 'LevelUp!';
-}
-
 /**
  * 屬性升降文案片段（`STR rise 10%` / `STR down 10%` / `ATK rise to the maximum(100%)`）
  * Stat-change fragment (`STR rise 10%` / `STR down 10%` / `ATK rise to the maximum(100%)`)
@@ -443,15 +475,30 @@ export function buildStatToText(
 }
 
 /**
- * 行動後硬直文案片段（單一事實來源；對照 Skill.php 的 `Name Delayed` ＋ DelayByRate 的括號輸出）
- * Post-action delay fragment (single source of truth; mirrors the `Name Delayed` of Skill.php plus
- * the parenthesised `(old >>> new/base)` that DelayByRate prints)
+ * 延遲的結構化數值變化（單一事實來源）
+ * Structured value change for a delay (single source of truth)
  *
- * 原始日誌整行為 `GoblinAxe Delayed(15 >>> 25/100)`，名稱由版面補上。
- * The whole original line is `GoblinAxe Delayed(15 >>> 25/100)`; the layout prints the name.
+ * 回傳資料端要存的 {from, to}：`from` 是變更前的硬直、`to` 是「新值/基準」比率字串；
+ * 型別一併標為 Delay，兩端之間的符號因此固定由版面印成 `⏳↘`。
+ * Returns the {from, to} the data stage stores: `from` is the delay before the change and
+ * `to` is the "new/base" rate string; the type is marked Delay so the layout always prints
+ * `⏳↘` between the ends.
+ *
+ * @param oldValue - 變化前的硬直 / delay before the change
+ * @param newValue - 變化後的硬直 / delay after the change
+ * @param base - 基準（分母）/ the base (the denominator)
+ * @returns 結構化數值變化 / the structured value change
  */
-export function buildDelayText(oldValue: number, newValue: number, base: number): string {
-  return `Delayed(${oldValue} >>> ${newValue}/${base})`;
+export function buildValueChangeFromDelay(
+  oldValue: number,
+  newValue: number,
+  base: number
+): IValueChangeInputCore01 {
+  return {
+    from: oldValue,
+    to: `${newValue}/${base}`,
+    type: EnumActionType.Delay,
+  };
 }
 
 /**
@@ -576,6 +623,68 @@ export function buildFailMessage(source?: string, skillName?: string, reason?: s
   const head = skillName ? `Failed ${skillName}` : 'Failed';
   const line = source ? `${source} ${head}` : head;
   return reason ? `${line} ${reason}` : line;
+}
+
+/**
+ * 每回合中毒傷害片段（`got 12 damage by poison.`）
+ * Per-turn poison damage fragment (`got 12 damage by poison.`)
+ *
+ * 版面 PoisonMessage 以結構化 value 組出同一行，此處是供 message 使用的純文字鏡像。
+ * The layout (PoisonMessage) builds the same line from the structured value; this is the
+ * plain-text mirror that `message` uses.
+ *
+ * @param value - 本回合傷害 / this turn's damage
+ * @returns 名稱之後的片段 / the fragment after the name
+ */
+export function buildPoisonDamageText(value: number): string {
+  return `got ${value} damage by poison.`;
+}
+
+/**
+ * 抗毒片段（`got PoisonResist!(50%)`）/ Poison-resist fragment (`got PoisonResist!(50%)`)
+ *
+ * @param rate - 抵抗率（%）/ resist rate (%)
+ * @returns 名稱之後的片段 / the fragment after the name
+ */
+export function buildPoisonResistText(rate: number): string {
+  return `got PoisonResist!(${rate}%)`;
+}
+
+/**
+ * 連擊傷害資訊整行（`Damage x6!`；無名稱）/ Damage-count info line (`Damage x6!`, unnamed)
+ *
+ * @param count - 傷害次數 / number of hits
+ * @returns 整行純文字 / the whole plain line
+ */
+export function buildDamageCountMessage(count: number): string {
+  return `Damage x${count}!`;
+}
+
+/**
+ * 存活者經驗值資訊整行（`Alives get 250exps.`；無名稱）
+ * Survivors' exp info line (`Alives get 250exps.`, unnamed)
+ *
+ * @param exp - 獲得的經驗值 / experience gained
+ * @returns 整行純文字 / the whole plain line
+ */
+export function buildAliveExpsMessage(exp: number): string {
+  return `Alives get ${exp}exps.`;
+}
+
+/**
+ * 隊伍金幣資訊整行（`TestTeam Get 1,500.`；無名稱）
+ * Team gold info line (`TestTeam Get 1,500.`, unnamed)
+ *
+ * 金額在此加上千分位，與原始日誌的數字格式一致；資料端只給數值。
+ * The amount is grouped with thousands separators here so the figure matches the original log;
+ * the data stage only supplies the number.
+ *
+ * @param team - 隊伍名稱 / team name
+ * @param gold - 金額 / the amount
+ * @returns 整行純文字 / the whole plain line
+ */
+export function buildTeamGoldMessage(team: string, gold: number): string {
+  return `${team} Get ${gold.toLocaleString('en-US')}.`;
 }
 
 /** 訊息型別 → CSS class（單一事實來源）/ Action type → CSS class (single source of truth) */

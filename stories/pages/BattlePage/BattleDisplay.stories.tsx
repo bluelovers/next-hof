@@ -124,9 +124,7 @@ export const WithSummon: Story = {
       description: {
         story:
           'Mage1 施放 GraveYard（skill 2464，3 體召喚）：召喚條目顯示施放者＋技能與每隻木乃伊的「joined to the team / enter the Battlefield」，' +
-          '木乃伊不在開場入場列，第二段快照起才出現在 HP/SP 狀態與戰場上。\n' +
-          'Mage1 casts GraveYard (skill 2464, summon 3): the log entry shows the caster, the skill and each mummy\'s "joined to the team / enter the Battlefield", ' +
-          'while the mummies stay out of the opening entrance rows and appear in the HP/SP status and on the field from the second snapshot onward.',
+          '木乃伊不在開場入場列，第二段快照起才出現在 HP/SP 狀態與戰場上。'
       },
     },
   },
@@ -144,9 +142,7 @@ export const WithMagicCircle: Story = {
       description: {
         story:
           '魔方陣相關紀錄：draw（描繪己方，support 色）／erased enemy（消除敵方，dmg 色）／use（消耗代價，charge 色）／failed!（魔方陣不足，dmg 色），' +
-          '文案與配色取自原始日誌字串。\n' +
-          'Magic-circle records: draw (own circles, support colour) / erased enemy (enemy circles, dmg colour) / use (skill cost, charge colour) / ' +
-          'failed! (not enough circles, dmg colour), with the copy and colours taken verbatim from the original log.',
+          '文案與配色取自原始日誌字串。'
       },
     },
   },
@@ -163,19 +159,7 @@ export const WithLogMessages: Story = {
     docs: {
       description: {
         story:
-          '原始日誌（HOF/Class）的每個訊息族系各示範一次：蓄力 start charging.、SP 傷害、Recovered、Drained、持續回復與 Auto Regenerate、' +
-          'revived、增益 quicked/casting shorted/barriered、減益 STR down、中毒四種（施加／傷害／解除／抗毒）、屬性升降與上限升降（含舊值）、' +
-          '位移 moved to front/back、knock backed、goes forward、延遲 Delayed(15 >>> 25/100)、sacrifice、施放失敗（武器不符／SP 不足）、' +
-          'miss、LevelUp、掉落道具、退場 leave the Battlefield，以及純文字資訊（Damage x6!、No target.Failed!、Attack has disappeared.、' +
-          '補正提示、battle turns extended.、Alives get exps.、隊伍 Get 金錢、sunk in thought、exchanged rate of HP and SP.）。' +
-          '文案與配色逐字取自原始日誌字串與 basis.css。\n' +
-          'One demonstration of every message family in the original log (HOF/Class): charge start, SP damage, Recovered, Drained, regen and ' +
-          'Auto Regenerate, revived, the three buffs, a stat debuff, the four poison lines (apply / damage / cure / resist), stat and cap changes ' +
-          '(with the old value), movement (front / back / knock backed / goes forward), delay Delayed(15 >>> 25/100), sacrifice, the ' +
-          'failed-to-cast lines (weapon mismatch styled, SP shortage unstyled), miss, LevelUp, dropped item, leave the Battlefield, plus plain ' +
-          'info text (Damage x6!, No target.Failed!, Attack has disappeared., the over-cap correction note, battle turns extended., Alives get ' +
-          'exps., team Get money, sunk in thought, exchanged rate of HP and SP.). Copy and colours are taken verbatim from the original log ' +
-          'strings and basis.css.',
+          '每個訊息族系各示範一次'
       },
     },
   },

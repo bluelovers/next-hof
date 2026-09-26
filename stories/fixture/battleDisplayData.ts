@@ -47,16 +47,18 @@ import {
 import {
   buildActionMessage,
   buildActMessage,
+  buildAliveExpsMessage,
   buildAutoRegenText,
   buildChargeText,
+  buildDamageCountMessage,
   buildDamageMessage,
-  buildDelayText,
   buildDownMessage,
   buildDrainMessage,
   buildFailMessage,
   buildItemDropMessage,
-  buildLevelUpText,
   buildMagicCircleMessage,
+  buildPoisonDamageText,
+  buildPoisonResistText,
   buildPossessiveText,
   buildProtectMessage,
   buildRecoveredText,
@@ -66,6 +68,9 @@ import {
   buildStatChangeText,
   buildStatToText,
   buildSummonMessage,
+  buildTeamGoldMessage,
+  buildValueChangeFromDelay,
+  EnumLogCopy,
   getEnterBattlefieldText,
 } from '#/components/battle/battleUtils';
 import { EnumPosition } from '#/lib/game/constants';
@@ -333,17 +338,29 @@ function attackAction(unit: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction 
   });
 }
 
+/**
+ * 傷害日誌（`value` ＋「前後 HP」的結構化變化）
+ * Damage log (`value` plus the structured before / after HP)
+ *
+ * 數值變化只給數字，兩端之間的符號（下降時 `↘`）由渲染端 buildValueChange 唯一決定，
+ * 此處與呼叫端都不再預先組出任何變化字串。
+ * The value change is given as numbers only: the symbol between the ends (`↘` when it falls)
+ * is decided by the renderer's buildValueChange, so neither this function nor its callers ever
+ * pre-build a change string.
+ *
+ * @param hp - 變化前後的 HP（from ＝ 變化前、to ＝ 變化後）/ HP before (`from`) and after (`to`)
+ */
 function damageAction(
   unit: IShowcaseUnit,
   targetUnit: IShowcaseUnit,
   value: number,
-  valueChangeText: string,
+  hp: { from: number; to: number },
   side: EnumTeamSideUI
 ): IBattleAction {
   return logAction(EnumActionType.Damage, unit, buildDamageMessage(value, targetUnit.name), side, {
     target: targetUnit.name,
     value,
-    valueChangeText,
+    valueChange: hp,
     attribute: EnumAttributeType.Dmg,
   });
 }
@@ -413,23 +430,23 @@ const battleActions: IBattleAction[] = [
   // ---- GoblinWarrior(B) FatalStab -> Hero1（保護 Priest1）/ protects Priest1 ----
   skillAction(goblinWarriorB, SKILL_FATAL_STAB, EnumTeamSideUI.Left),
   protectAction(hero1, priest1, EnumTeamSideUI.Left),
-  damageAction(goblinWarriorB, hero1, 182, '349 > 167', EnumTeamSideUI.Left),
+  damageAction(goblinWarriorB, hero1, 182, { from: 349, to: 167 }, EnumTeamSideUI.Left),
 
   // ---- GoblinWarrior(A) FatalStab -> Hero1（保護 Healer1）/ protects Healer1 ----
   skillAction(goblinWarriorA, SKILL_FATAL_STAB, EnumTeamSideUI.Left),
   protectAction(hero1, healer1, EnumTeamSideUI.Left),
-  damageAction(goblinWarriorA, hero1, 166, '167 > 1', EnumTeamSideUI.Left),
+  damageAction(goblinWarriorA, hero1, 166, { from: 167, to: 1 }, EnumTeamSideUI.Left),
 
   // ---- GoblinAxe Attack -> Healer1 ----
   attackAction(goblinAxe, EnumTeamSideUI.Left),
-  damageAction(goblinAxe, healer1, 44, '213 > 169', EnumTeamSideUI.Left),
+  damageAction(goblinAxe, healer1, 44, { from: 213, to: 169 }, EnumTeamSideUI.Left),
 
   // ---- Mage1 詠唱後被擊倒 / Mage1 casts, then falls ----
   castingAction(mage1, EnumTeamSideUI.Right),
   attackAction(goblinWarriorB, EnumTeamSideUI.Left),
-  damageAction(goblinWarriorB, mage1, 48, '49 > 1', EnumTeamSideUI.Left),
+  damageAction(goblinWarriorB, mage1, 48, { from: 49, to: 1 }, EnumTeamSideUI.Left),
   attackAction(goblinWarriorA, EnumTeamSideUI.Left),
-  damageAction(goblinWarriorA, mage1, 40, '1 > -39', EnumTeamSideUI.Left),
+  damageAction(goblinWarriorA, mage1, 40, { from: 1, to: -39 }, EnumTeamSideUI.Left),
   downAction(mage1, EnumTeamSideUI.Left),
 ];
 
@@ -442,7 +459,7 @@ const summonActions: IBattleAction[] = [
   enterAction(summonHero1),
   enterAction(summonMage1),
   attackAction(summonGoblinAxe, EnumTeamSideUI.Left),
-  damageAction(summonGoblinAxe, summonHero1, 148, '349 > 201', EnumTeamSideUI.Left),
+  damageAction(summonGoblinAxe, summonHero1, 148, { from: 349, to: 201 }, EnumTeamSideUI.Left),
   logAction(
     EnumActionType.Summon,
     summonMage1,
@@ -461,7 +478,7 @@ const summonActions: IBattleAction[] = [
     }
   ),
   attackAction(summonedUnits[0], EnumTeamSideUI.Right),
-  damageAction(summonedUnits[0], summonGoblinAxe, 89, '213 > 124', EnumTeamSideUI.Right),
+  damageAction(summonedUnits[0], summonGoblinAxe, 89, { from: 213, to: 124 }, EnumTeamSideUI.Right),
 ];
 
 // ==================== 魔方陣紀錄日誌 / Magic-circle record log ====================
@@ -547,13 +564,13 @@ const logMessagesActions: IBattleAction[] = [
   namedLogAction(EnumActionType.Recover, healer1, buildRecoveredText(84, 'HP'), EnumTeamSideUI.Left, {
     value: 84,
     valueUnit: 'HP',
-    valueChangeText: '129 > 213',
+    valueChange: { from: 129, to: 213 },
     attribute: EnumAttributeType.Recover,
   }),
   namedLogAction(EnumActionType.Recover, priest1, buildRecoveredText(30, 'SP'), EnumTeamSideUI.Left, {
     value: 30,
     valueUnit: 'SP',
-    valueChangeText: '60 > 90',
+    valueChange: { from: 60, to: 90 },
     attribute: EnumAttributeType.Support,
   }),
 
@@ -607,22 +624,24 @@ const logMessagesActions: IBattleAction[] = [
 
   // ---- 復活（`name <recover>revived</recover>!`；名稱預設色、只有 revived 上色）----
   // Revive (`name <recover>revived</recover>!`; the name keeps the default colour, only revived is coloured)
-  namedLogAction(EnumActionType.Revive, hero1, 'revived!', EnumTeamSideUI.Right, {
+  namedLogAction(EnumActionType.Revive, hero1, EnumLogCopy.Revived, EnumTeamSideUI.Right, {
     emphasis: 'revived',
     attribute: EnumAttributeType.Recover,
   }),
 
   // ---- 增益（quicked／casting shorted／barriered，support 色）----
   // Buff (quicked / casting shorted / barriered, support colour)
-  namedLogAction(EnumActionType.Buff, mage1, 'got barriered!', EnumTeamSideUI.Right),
-  namedLogAction(EnumActionType.Buff, hero1, 'got quicked!', EnumTeamSideUI.Right),
-  namedLogAction(EnumActionType.Buff, mage1, 'casting shorted!', EnumTeamSideUI.Right),
+  namedLogAction(EnumActionType.Buff, mage1, EnumLogCopy.Barriered, EnumTeamSideUI.Right),
+  namedLogAction(EnumActionType.Buff, hero1, EnumLogCopy.Quicked, EnumTeamSideUI.Right),
+  namedLogAction(EnumActionType.Buff, mage1, EnumLogCopy.CastingShorted, EnumTeamSideUI.Right),
 
   // ---- 減益（能力下降，原始日誌無 span）/ Debuff (stat down, no span in the original log) ----
+  // 文案模板由 buildStatChangeText 持有，資料端只給統計項目・方向・數值
+  // The template lives in buildStatChangeText; the data only supplies the stat, direction and value
   namedLogAction(
     EnumActionType.Debuff,
     goblinAxe,
-    'STR down 10%',
+    buildStatChangeText('STR', 'down', 10),
     EnumTeamSideUI.Left
   ),
 
@@ -633,21 +652,21 @@ const logMessagesActions: IBattleAction[] = [
   namedLogAction(
     EnumActionType.Poison,
     goblinAxe,
-    'get poisoned\u00a0!',
+    EnumLogCopy.PoisonApplied,
     EnumTeamSideUI.Left,
     { emphasis: 'poisoned', attribute: EnumAttributeType.Spdmg }
   ),
   namedLogAction(
     EnumActionType.Poison,
     goblinAxe,
-    'got 12 damage by poison.',
+    buildPoisonDamageText(12),
     EnumTeamSideUI.Left,
-    { value: 12, valueChangeText: '1200 > 1050' }
+    { value: 12, valueChange: { from: 1200, to: 1050 } }
   ),
   namedLogAction(
     EnumActionType.Poison,
     goblinAxe,
-    'blocked poison.',
+    EnumLogCopy.PoisonBlocked,
     EnumTeamSideUI.Left,
     { attribute: EnumAttributeType.Normal }
   ),
@@ -664,13 +683,13 @@ const logMessagesActions: IBattleAction[] = [
   namedLogAction(
     EnumActionType.Poison,
     goblinWarriorA,
-    'got PoisonResist!(50%)',
+    buildPoisonResistText(50),
     EnumTeamSideUI.Left,
     { attribute: EnumAttributeType.Support }
   ),
   // ---- 自我中毒（無名稱、無 span；對照 5.4 `Got poisoned`）----
   // Self-poison (no name, no span; mirrors 5.4 `Got poisoned`)
-  namedLogAction(EnumActionType.Poison, undefined, 'Got poisoned', EnumTeamSideUI.Left, {
+  namedLogAction(EnumActionType.Poison, undefined, EnumLogCopy.PoisonSelf, EnumTeamSideUI.Left, {
     attribute: EnumAttributeType.Normal,
   }),
 
@@ -705,31 +724,40 @@ const logMessagesActions: IBattleAction[] = [
   namedLogAction(
     EnumActionType.Move,
     hero1,
-    'moved to front.',
+    EnumLogCopy.MoveToFront,
     EnumTeamSideUI.Right
   ),
   namedLogAction(
     EnumActionType.Move,
     goblinAxe,
-    'moved to back.',
+    EnumLogCopy.MoveToBack,
     EnumTeamSideUI.Left
   ),
   namedLogAction(
     EnumActionType.Move,
     goblinAxe,
-    'knock backed!',
+    EnumLogCopy.KnockBacked,
     EnumTeamSideUI.Left
   ),
   namedLogAction(
     EnumActionType.Move,
     goblinWarriorA,
-    'goes forward.',
+    EnumLogCopy.GoesForward,
     EnumTeamSideUI.Left
   ),
 
-  // ---- 延遲（`name Delayed(15 >>> 25/100)`，對照 DelayByRate 括號輸出）----
-  // Delay (`name Delayed(15 >>> 25/100)`, mirroring DelayByRate's parenthesised output)
-  namedLogAction(EnumActionType.Delay, mage1, buildDelayText(15, 25, 100), EnumTeamSideUI.Right),
+  // ---- 延遲（`name Delayed （15 ⏳↘ 25/100）`，對照 Skill.php 的 `Name Delayed` 與
+  // DelayByRate 括號輸出）----
+  // Delay (`name Delayed (15 ⏳↘ 25/100)`, mirroring Skill.php's `Name Delayed` and
+  // DelayByRate's parenthesised output)
+  // 名稱後的固定文案只由 battleUtils.EnumLogCopy.Delay 持有，此處引用成員、不重打字串；
+  // 前後值交給結構化資料，括號與 `⏳↘` 由渲染端組出。
+  // The fixed copy after the name is owned solely by battleUtils.EnumLogCopy.Delay: this side
+  // references the member instead of retyping it; the ends go to the structured value and the
+  // renderer builds the parentheses and the `⏳↘`.
+  namedLogAction(EnumActionType.Delay, mage1, EnumLogCopy.Delay, EnumTeamSideUI.Right, {
+    valueChange: buildValueChangeFromDelay(15, 25, 100),
+  }),
 
   // ---- 犧牲（`name sacrifice 50 HP`）/ Sacrifice ----
   namedLogAction(
@@ -772,12 +800,12 @@ const logMessagesActions: IBattleAction[] = [
   namedLogAction(
     EnumActionType.Miss,
     goblinWarriorA,
-    'Failed!',
+    EnumLogCopy.Miss,
     EnumTeamSideUI.Left
   ),
 
   // ---- 升級（`name LevelUp!`）/ Level up ----
-  namedLogAction(EnumActionType.LevelUp, hero1, buildLevelUpText(), EnumTeamSideUI.Right),
+  namedLogAction(EnumActionType.LevelUp, hero1, EnumLogCopy.LevelUp, EnumTeamSideUI.Right),
 
   // ---- 掉落道具（`name dropped` 後接道具圖示＋`<b class="u">道具名</b>.`）----
   // Dropped item (`name dropped` followed by the item icon + `<b class="u">item name</b>.`)
@@ -803,23 +831,23 @@ const logMessagesActions: IBattleAction[] = [
 
   // ---- 純文字資訊（無名稱、無 span；對照 4.8 / 6.7 / 3.3 / 7.4 / 7.5 / 3.2 等）----
   // Plain info text (no name, no span; mirrors 4.8 / 6.7 / 3.3 / 7.4 / 7.5 / 3.2, …)
-  logAction(EnumActionType.Info, undefined, 'Damage x6!', EnumTeamSideUI.Left),
-  logAction(EnumActionType.Info, undefined, 'No target.Failed!', EnumTeamSideUI.Left),
-  logAction(EnumActionType.Info, undefined, 'Attack has disappeared.', EnumTeamSideUI.Left),
-  logAction(EnumActionType.Info, undefined, '※値が大きすぎて補正されました。', EnumTeamSideUI.Left),
-  logAction(EnumActionType.Info, undefined, 'battle turns extended.', EnumTeamSideUI.Left),
-  logAction(EnumActionType.Info, undefined, 'Alives get 250exps.', EnumTeamSideUI.Left),
-  logAction(EnumActionType.Info, undefined, 'TestTeam Get 1,500.', EnumTeamSideUI.Left),
+  logAction(EnumActionType.Info, undefined, buildDamageCountMessage(6), EnumTeamSideUI.Left),
+  logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoNoTarget, EnumTeamSideUI.Left),
+  logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoAttackGone, EnumTeamSideUI.Left),
+  logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoOverCap, EnumTeamSideUI.Left),
+  logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoBattleTurns, EnumTeamSideUI.Left),
+  logAction(EnumActionType.Info, undefined, buildAliveExpsMessage(250), EnumTeamSideUI.Left),
+  logAction(EnumActionType.Info, undefined, buildTeamGoldMessage('TestTeam', 1500), EnumTeamSideUI.Left),
   logAction(
     EnumActionType.Info,
     goblinWarriorA,
-    buildActionMessage({ source: goblinWarriorA.name, text: "sunk in thought and couldn't act." }),
+    buildActionMessage({ source: goblinWarriorA.name, text: EnumLogCopy.InfoSunkInThought }),
     EnumTeamSideUI.Left
   ),
-  logAction(EnumActionType.Info, undefined, '(No more patterns)', EnumTeamSideUI.Left),
+  logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoNoMorePatterns, EnumTeamSideUI.Left),
   // ---- HP/SP 交換（3 行區塊：exchanged rate of HP and SP. ＋ HP 行 ＋ SP 行）----
   // HP/SP exchange (3-line block: exchanged rate of HP and SP. + HP line + SP line)
-  namedLogAction(EnumActionType.EnergyExchange, hero1, 'exchanged rate of HP and SP.', EnumTeamSideUI.Right, {
+  namedLogAction(EnumActionType.EnergyExchange, hero1, EnumLogCopy.EnergyExchange, EnumTeamSideUI.Right, {
     energyExchange: {
       hpFrom: 500,
       hpFromRate: 50,
