@@ -27,7 +27,8 @@ import { EnumBattleEventType } from '../types';
  * 事件分類（兩類涵蓋所有戰鬥紀錄）/ Event class (two classes cover every battle record)
  * 列舉 / enumeration
  */
-export enum EnumEventClass {
+export enum EnumEventClass
+{
 	/** 技能事件：依附某次技能執行 / skill event: attached to one skill execution */
 	Skill = 'skill',
 	/** 一般事件：不依附技能 / general event: not attached to a skill */
@@ -44,7 +45,8 @@ export enum EnumEventClass {
  * (knockback, sacrifice, delay …) are left out and are not reported by detection either, so we
  * never surface a system that can never carry a record.
  */
-export enum EnumSkillEffect {
+export enum EnumSkillEffect
+{
 	/** 傷害系統（非支援技能的 calcBasicDamage 路線）/ damage system (calcBasicDamage path of non-support skills) */
 	Damage = 'damage',
 	/** 恢復系統（support 回復與 HpRegen／SpRegen）/ heal system (support heal plus HpRegen / SpRegen) */
@@ -108,7 +110,8 @@ export const EVENT_EFFECT: Readonly<Partial<Record<EnumBattleEventType, EnumSkil
  * @param ev - 引擎事件 / engine event
  * @returns 事件分類 / event class
  */
-export function classifyBattleEvent(ev: IBattleEvent): EnumEventClass {
+export function classifyBattleEvent(ev: IBattleEvent): EnumEventClass
+{
 	if (ev.skill === undefined) return EnumEventClass.General;
 	return SKILL_START_TYPES.has(ev.type) || EVENT_EFFECT[ev.type] !== undefined
 		? EnumEventClass.Skill
@@ -128,17 +131,25 @@ export function classifyBattleEvent(ev: IBattleEvent): EnumEventClass {
  * @param skill - 技能定義 / skill definition
  * @returns 效果清單（可能為空）/ effect list (may be empty)
  */
-export function detectSkillEffects(skill: ISkillDef): EnumSkillEffect[] {
+export function detectSkillEffects(skill: ISkillDef): EnumSkillEffect[]
+{
 	const found: EnumSkillEffect[] = [];
-	const add = (effect: EnumSkillEffect): void => {
+	const add = (effect: EnumSkillEffect): void =>
+	{
 		if (!found.includes(effect)) found.push(effect);
 	};
 
 	// 傷害／恢復路線：本引擎對非支援技能一律走 calcBasicDamage（無 revive 特例）。
 	// Damage / heal path: the engine always routes non-support skills through calcBasicDamage
 	// (there is no revive special case in this port).
-	if (skill.support) add(EnumSkillEffect.Heal);
-	else add(EnumSkillEffect.Damage);
+	if (skill.support)
+	{
+		add(EnumSkillEffect.Heal);
+	}
+	else
+	{
+		add(EnumSkillEffect.Damage);
+	}
 	if (skill.HpRegen || skill.SpRegen) add(EnumSkillEffect.Heal);
 	if (skill.poison || skill.CurePoison || skill.poisonResist) add(EnumSkillEffect.Poison);
 	if (skill.summon) add(EnumSkillEffect.Summon);
@@ -147,14 +158,21 @@ export function detectSkillEffects(skill: ISkillDef): EnumSkillEffect[] {
 		skill.MagicCircleDelete ||
 		skill.MagicCircleDeleteTeam ||
 		skill.MagicCircleDeleteEnemy
-	) add(EnumSkillEffect.MagicCircle);
+	)
+	{
+		add(EnumSkillEffect.MagicCircle);
+	}
 
 	// Up*／Plus* → 增益、Down* → 減益：與 statusChanges 的分派表共用 UPMAP／DOWNMAP／PLUSMAP。
 	// Up* / Plus* → buff, Down* / debuff: shares UPMAP / DOWNMAP / PLUSMAP with statusChanges.
-	for (const key of Object.keys(skill)) {
+	for (const key of Object.keys(skill))
+	{
 		const n = (skill as unknown as Record<string, unknown>)[key];
 		if (typeof n !== 'number') continue;
-		if (UPMAP[key] || PLUSMAP[key]) add(EnumSkillEffect.Buff);
+		if (UPMAP[key] || PLUSMAP[key])
+		{
+			add(EnumSkillEffect.Buff);
+		}
 		else if (DOWNMAP[key]) add(EnumSkillEffect.Debuff);
 	}
 	return found;
@@ -165,7 +183,8 @@ export function detectSkillEffects(skill: ISkillDef): EnumSkillEffect[] {
  * Follow-up event derived by an effect system (never enters Battle.log; added by the engine after dispatch)
  * 列舉 / enumeration
  */
-export enum EnumFollowUpType {
+export enum EnumFollowUpType
+{
 	/** 入場事件（召喚系統處理完召喚紀錄後觸發）/ entry event (emitted after the summon system processes a summon record) */
 	Enter = 'enter',
 }
@@ -177,7 +196,8 @@ export enum EnumFollowUpType {
  * 保留來源紀錄以便回溯（source 即觸發它的那一筆召喚紀錄）。
  * Keeps the source record for traceability (the summon record that triggered it).
  */
-export interface IEngineFollowUp {
+export interface IEngineFollowUp
+{
 	/** 後續事件種類 / follow-up kind */
 	type: EnumFollowUpType;
 	/** 觸發的來源紀錄 / the source record that triggered it */
@@ -192,7 +212,8 @@ export interface IEngineFollowUp {
  * 一個效果系統在某次技能執行中處理到的內容 / What one effect system processed during a skill execution
  * 介面 / interface
  */
-export interface ISkillDispatch {
+export interface ISkillDispatch
+{
 	/** 效果系統 / effect system */
 	effect: EnumSkillEffect;
 	/** 系統處理到的原始紀錄（原樣保留）/ raw records handled by the system (kept verbatim) */
@@ -205,7 +226,8 @@ export interface ISkillDispatch {
  * 技能事件（「角色A 對 B 使用了技能」及其效果分派）/ Skill event ("A used a skill on B" plus its effect dispatch)
  * 介面 / interface
  */
-export interface ISkillEvent {
+export interface ISkillEvent
+{
 	/** 分類（恆為 skill）/ class (always skill) */
 	class: EnumEventClass.Skill;
 	/** 技能執行紀錄（Act／Cast／Charge；缺席時取第一筆帶 skill 的紀錄）/ execution record (Act / Cast / Charge; the first skill-carrying record when absent) */
@@ -224,7 +246,8 @@ export interface ISkillEvent {
  * 一般事件（不依附技能的紀錄）/ General event (a record not attached to a skill)
  * 介面 / interface
  */
-export interface IGeneralEvent {
+export interface IGeneralEvent
+{
 	/** 分類（恆為 general）/ class (always general) */
 	class: EnumEventClass.General;
 	/** 原始紀錄（原樣保留）/ raw record (kept verbatim) */
@@ -238,7 +261,8 @@ export type IBattleEventRecord = ISkillEvent | IGeneralEvent;
  * 引擎選項 / Engine options
  * 介面 / interface
  */
-export interface IEventEngineOptions {
+export interface IEventEngineOptions
+{
 	/**
 	 * 技能定義查詢（省略時不偵測效果，effects 為空陣列）
 	 * Skill definition lookup (omitted = no detection; `effects` stays empty)
@@ -247,7 +271,8 @@ export interface IEventEngineOptions {
 }
 
 /** 建立一筆技能事件（含效果偵測）/ Open one skill event (with effect detection) */
-function newSkillEvent(ev: IBattleEvent & { skill: number }, getSkill?: IEventEngineOptions['getSkill']): ISkillEvent {
+function newSkillEvent(ev: IBattleEvent & { skill: number }, getSkill?: IEventEngineOptions['getSkill']): ISkillEvent
+{
 	const def = getSkill?.(ev.skill);
 	return {
 		class: EnumEventClass.Skill,
@@ -260,10 +285,17 @@ function newSkillEvent(ev: IBattleEvent & { skill: number }, getSkill?: IEventEn
 }
 
 /** 把紀錄掛進指定效果系統的分派桶（沒有就開一桶）/ Bucket one record under its effect system (opening the bucket when needed) */
-function dispatchRecord(event: ISkillEvent, effect: EnumSkillEffect, ev: IBattleEvent): void {
+function dispatchRecord(event: ISkillEvent, effect: EnumSkillEffect, ev: IBattleEvent): void
+{
 	const bucket = event.dispatch.find((d) => d.effect === effect);
-	if (bucket) bucket.records.push(ev);
-	else event.dispatch.push({ effect, records: [ev], followUps: [] });
+	if (bucket)
+	{
+		bucket.records.push(ev);
+	}
+	else
+	{
+		event.dispatch.push({ effect, records: [ev], followUps: [] });
+	}
 }
 
 /**
@@ -275,10 +307,13 @@ function dispatchRecord(event: ISkillEvent, effect: EnumSkillEffect, ev: IBattle
  * Added after dispatch only, never written back to Battle.log — the display still builds its entry
  * line from the summon record via SummonMessage, so nothing renders twice.
  */
-function appendFollowUps(event: ISkillEvent): void {
-	for (const bucket of event.dispatch) {
+function appendFollowUps(event: ISkillEvent): void
+{
+	for (const bucket of event.dispatch)
+	{
 		if (bucket.effect !== EnumSkillEffect.Summon) continue;
-		for (const ev of bucket.records) {
+		for (const ev of bucket.records)
+		{
 			bucket.followUps.push({ type: EnumFollowUpType.Enter, source: ev, unit: ev.target, level: ev.value });
 		}
 	}
@@ -307,22 +342,26 @@ function appendFollowUps(event: ISkillEvent): void {
 export function runEventEngine(
 	events: readonly IBattleEvent[],
 	options: IEventEngineOptions = {},
-): IBattleEventRecord[] {
+): IBattleEventRecord[]
+{
 	const records: IBattleEventRecord[] = [];
 	let current: ISkillEvent | undefined;
 
-	for (const ev of events) {
+	for (const ev of events)
+	{
 		const cls = classifyBattleEvent(ev);
 		const skillNo = ev.skill;
 		// 分類已保證技能事件必帶 skill；此處僅為型別收窄。
 		// The classifier already guarantees a skill event carries a skill; this only narrows the type.
-		if (cls !== EnumEventClass.Skill || skillNo === undefined) {
+		if (cls !== EnumEventClass.Skill || skillNo === undefined)
+		{
 			records.push({ class: EnumEventClass.General, event: ev });
 			continue;
 		}
 
 		const startsSkill = SKILL_START_TYPES.has(ev.type);
-		if (!current || startsSkill || current.skill !== skillNo) {
+		if (!current || startsSkill || current.skill !== skillNo)
+		{
 			current = newSkillEvent({ ...ev, skill: skillNo }, options.getSkill);
 			records.push(current);
 		}
@@ -333,7 +372,8 @@ export function runEventEngine(
 		if (effect !== undefined) dispatchRecord(current, effect, ev);
 	}
 
-	for (const record of records) {
+	for (const record of records)
+	{
 		if (record.class === EnumEventClass.Skill) appendFollowUps(record);
 	}
 	return records;

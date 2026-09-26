@@ -24,7 +24,8 @@ const ENEMY_TABLE: Record<number, [number, number]> = {
  * party 夾至 1–5 查表；top_level ≤ 5 取下限，否則在 [min, max] 內隨機。
  * Clamps party to 1–5 for the table; top_level ≤ 5 takes the minimum, otherwise rolls in [min, max].
  */
-export function EnemyNumber(party: number, topLevel: number, rng: RNG): number {
+export function EnemyNumber(party: number, topLevel: number, rng: RNG): number
+{
 	const p = Math.min(Math.max(party, 1), 5);
 	const [minN, maxN] = ENEMY_TABLE[p];
 	if (topLevel <= 5) return minN;
@@ -44,9 +45,11 @@ export function EnemyParty(
 	monsterList: IWeightedEntry<number>[],
 	topLevel: number,
 	rng: RNG,
-): Character[] {
+): Character[]
+{
 	const enemies: Character[] = [];
-	for (let i = 0; i < amount; i++) {
+	for (let i = 0; i < amount; i++)
+	{
 		const no = weightedPick(monsterList, rng);
 		if (no === undefined) break;
 		const def = repo.getMon(no);

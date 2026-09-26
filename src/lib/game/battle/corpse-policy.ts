@@ -30,7 +30,8 @@ import type { IStyleProps } from '#/components/shared/types';
  * NOTE: inline style outranks a CSS class; if both `style` and `className` set the same
  * property (e.g. `filter`), `style` wins.
  */
-export interface ICorpseSpec extends IStyleProps {
+export interface ICorpseSpec extends IStyleProps
+{
 	/**
 	 * 屍體圖路徑（省略或空字串＝依原圖目錄自動挑選正向／鏡像屍體圖）
 	 * Corpse image path (omitted or empty = auto-pick the forward/mirrored corpse by the
@@ -69,7 +70,8 @@ export type ICorpsePolicy = boolean | ICorpseSpec;
  * - `IBattleSnapshotDisplayUnit` (display side, carries the resolved value)
  * - `Character` is constrained via `implements ICharCore`
  */
-export interface ICorpsePolicyField {
+export interface ICorpsePolicyField
+{
 	/**
 	 * 死亡後是否留下屍體 / Whether this unit leaves a corpse on death
 	 *
@@ -115,7 +117,8 @@ export function resolveCorpsePolicy(
 	characterCorpse: ICorpsePolicy | undefined,
 	teamCorpse: ICorpsePolicy | undefined,
 	battleCorpse: ICorpsePolicy | undefined,
-): ICorpsePolicy {
+): ICorpsePolicy
+{
 	return characterCorpse ?? teamCorpse ?? battleCorpse ?? false;
 }
 
@@ -131,6 +134,7 @@ export function resolveCorpsePolicy(
  * @param policy 屍體政策值 / corpse policy value
  * @returns 物件規格（非物件時為 undefined）/ the object spec (undefined when not an object)
  */
-export function corpseSpecOf(policy: ICorpsePolicy | undefined): ICorpseSpec | undefined {
+export function corpseSpecOf(policy: ICorpsePolicy | undefined): ICorpseSpec | undefined
+{
 	return policy !== null && typeof policy === 'object' ? policy : undefined;
 }

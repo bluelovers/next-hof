@@ -13,8 +13,10 @@ import { EnumBattleEventType } from '../types';
 
 const repo = createSeedRepository();
 
-describe('Battle engine (9.1)', () => {
-	it('DelayValue = sqrt(SPD)+DELAY_BASE and SPD 100 acts before SPD 25', () => {
+describe('Battle engine (9.1)', () =>
+{
+	it('DelayValue = sqrt(SPD)+DELAY_BASE and SPD 100 acts before SPD 25', () =>
+	{
 		const rng = new RNG(1);
 		const c100 = new Character({
 			no: 1, name: 'a', types: [EnumCharType.Char], level: 1,
@@ -31,8 +33,10 @@ describe('Battle engine (9.1)', () => {
 	});
 });
 
-describe('Battle action (9.2)', () => {
-	it('a normal attack reduces target HP and a dead actor stops acting', () => {
+describe('Battle action (9.2)', () =>
+{
+	it('a normal attack reduces target HP and a dead actor stops acting', () =>
+	{
 		const rng = new RNG(1);
 		const attacker = newChar({ ...repo.getCharBase(100)!, str: 200 }, repo, rng);
 		const target = newMon(repo.getMon(1000)!, repo, rng);
@@ -47,7 +51,8 @@ describe('Battle action (9.2)', () => {
 	});
 });
 
-describe('Battle event producers (9.6)', () => {
+describe('Battle event producers (9.6)', () =>
+{
 	/**
 	 * 私有倉庫：createSeedRepository 回傳 IDataRepository 介面，注入自訂技能需要具體型別；
 	 * 每個測試各自建立，不污染共用 repo。
@@ -56,7 +61,8 @@ describe('Battle event producers (9.6)', () => {
 	 */
 	const createLocalRepo = (): InMemoryRepository => createSeedRepository() as InMemoryRepository;
 
-	it('a summon skill joins the summoned unit and records summon + magic circle', () => {
+	it('a summon skill joins the summoned unit and records summon + magic circle', () =>
+	{
 		// 倉庫自行加技能：不污染共用 repo / add the skill to a private repo so the shared one stays clean
 		const localRepo = createLocalRepo();
 		localRepo.addSkill({
@@ -84,7 +90,8 @@ describe('Battle event producers (9.6)', () => {
 		]);
 	});
 
-	it('an unknown summon monster number produces no record and joins nobody', () => {
+	it('an unknown summon monster number produces no record and joins nobody', () =>
+	{
 		const localRepo = createLocalRepo();
 		localRepo.addSkill({
 			no: 9002, name: 'SummonGhost', sp: 0, type: EnumSkillDamageType.Physical,
@@ -101,7 +108,8 @@ describe('Battle event producers (9.6)', () => {
 		expect(battle.log.some((e) => e.type === EnumBattleEventType.Summon)).toBe(false);
 	});
 
-	it('per-turn poison damage is logged without a skill number (general-event material)', () => {
+	it('per-turn poison damage is logged without a skill number (general-event material)', () =>
+	{
 		const rng = new RNG(4);
 		const actor = newChar({ ...repo.getCharBase(100)! }, repo, rng);
 		const enemy = newMon(repo.getMon(1000)!, repo, rng);
@@ -118,8 +126,10 @@ describe('Battle event producers (9.6)', () => {
 	});
 });
 
-describe('Battle result (9.4)', () => {
-	it('enemy wipeout → Team0 wins', () => {
+describe('Battle result (9.4)', () =>
+{
+	it('enemy wipeout → Team0 wins', () =>
+	{
 		const rng = new RNG(1);
 		const attacker = newChar({ ...repo.getCharBase(100)!, str: 200 }, repo, rng);
 		const target = newMon(repo.getMon(1000)!, repo, rng);
@@ -129,7 +139,8 @@ describe('Battle result (9.4)', () => {
 		expect(res.turns).toBeGreaterThan(0);
 	});
 
-	it('unwinnable battle times out to a draw', () => {
+	it('unwinnable battle times out to a draw', () =>
+	{
 		const rng = new RNG(2);
 		const repo2 = createSeedRepository();
 		const d1 = new Character({
@@ -146,8 +157,10 @@ describe('Battle result (9.4)', () => {
 	});
 });
 
-describe('Integration 2v2 (11.1)', () => {
-	it('fixed seed yields a deterministic winner and a structured event log', () => {
+describe('Integration 2v2 (11.1)', () =>
+{
+	it('fixed seed yields a deterministic winner and a structured event log', () =>
+	{
 		const rng = new RNG(12345);
 		const timeService = new GameTime();
 		const p1 = newChar({ ...repo.getCharBase(100)!, str: 200 }, repo, rng);
@@ -175,8 +188,10 @@ describe('Integration 2v2 (11.1)', () => {
 	});
 });
 
-describe('corpse policy inheritance (battle > team > character)', () => {
-	it('snapshot units carry the correct team side (Team0 / Team1)', () => {
+describe('corpse policy inheritance (battle > team > character)', () =>
+{
+	it('snapshot units carry the correct team side (Team0 / Team1)', () =>
+	{
 		const rng = new RNG(5);
 		const ally = newChar({ ...repo.getCharBase(100)!, str: 5000 }, repo, rng);
 		const enemy = newMon(repo.getMon(1000)!, repo, rng);
@@ -189,7 +204,8 @@ describe('corpse policy inheritance (battle > team > character)', () => {
 		expect(byId.get(enemy.unitUuid)!.team).toBe(EnumTeamSide.Team1);
 	});
 
-	it('resolves character > battle and defaults to no corpse', () => {
+	it('resolves character > battle and defaults to no corpse', () =>
+	{
 		const rng = new RNG(3);
 		const strong = { ...repo.getCharBase(100)!, str: 5000 };
 		// 角色級 true：即使戰鬥級 false 仍留屍體
@@ -212,7 +228,8 @@ describe('corpse policy inheritance (battle > team > character)', () => {
 		expect(byId.get(vanishes.unitUuid)!.corpse).toBe(false);
 	});
 
-	it('team-level overrides battle-level; unset battle-level defaults to false', () => {
+	it('team-level overrides battle-level; unset battle-level defaults to false', () =>
+	{
 		const rng = new RNG(4);
 		const strong = { ...repo.getCharBase(100)!, str: 5000 };
 		const ally = newChar(strong, repo, rng);
@@ -239,7 +256,8 @@ describe('corpse policy inheritance (battle > team > character)', () => {
 		expect([...byId2.values()].every((u) => u.corpse === false)).toBe(true);
 	});
 
-	it('carries an object corpse spec (image / class / style) into the snapshot', () => {
+	it('carries an object corpse spec (image / class / style) into the snapshot', () =>
+	{
 		const rng = new RNG(6);
 		const strong = { ...repo.getCharBase(100)!, str: 5000 };
 		const spec = {

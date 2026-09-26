@@ -12,15 +12,16 @@ import { buildAppUrl } from '#/components/config/AppConfig';
 import './HuntSubNav.css';
 
 /** HuntSubNav 屬性 / HuntSubNav props */
-export interface IHuntSubNavProps {
-  /** 導航項目列表 / Nav items */
-  items?: INavLink[];
+export interface IHuntSubNavProps
+{
+	/** 導航項目列表 / Nav items */
+	items?: INavLink[];
 }
 
 /** 預設子導航項目 / Default sub-nav items */
 const DEFAULT_ITEMS: INavLink[] = [
-  { label: 'CommonMonster', href: buildAppUrl('/battle/list_common'), active: true },
-  { label: 'UnionMonster', href: buildAppUrl('/battle/list_union') },
+	{ label: 'CommonMonster', href: buildAppUrl('/battle/list_common'), active: true },
+	{ label: 'UnionMonster', href: buildAppUrl('/battle/list_union') },
 ];
 
 /**
@@ -28,15 +29,16 @@ const DEFAULT_ITEMS: INavLink[] = [
  * HuntSubNav component
  */
 export const HuntSubNav: React.FC<IHuntSubNavProps> = ({
-  items = DEFAULT_ITEMS,
-}) => {
-  return (
-    <div className="hunt-subnav">
-      <NavList
-        links={items}
-        separator={<span className="subnav-separator"> / </span>}
-        linkClassName="hunt-subnav-link"
-      />
-    </div>
-  );
+	items = DEFAULT_ITEMS,
+}) =>
+{
+	return (
+		<div className="hunt-subnav">
+			<NavList
+				links={items}
+				separator={<span className="subnav-separator"> / </span>}
+				linkClassName="hunt-subnav-link"
+			/>
+		</div>
+	);
 };

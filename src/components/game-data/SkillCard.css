@@ -11,120 +11,137 @@
 
 /* ==================== 技能卡片容器 / Skill card container ==================== */
 
-.g-skill {
-  display: inline-block;
-  padding: 1px 0;
-  font-size: 12px;
+.g-skill
+{
+	display: inline-block;
+	padding: 1px 0;
+	font-size: 12px;
 }
 
 /* ==================== 技能名稱 / Skill name ==================== */
 
-.g-skill .g-name {
-  text-shadow: 0 0 0.2em #8f7;
-  cursor: help;
-  vertical-align: middle;
+.g-skill .g-name
+{
+	text-shadow: 0 0 0.2em #8f7;
+	cursor: help;
+	vertical-align: middle;
 }
 
 /* ==================== 技能圖示 / Skill icon ==================== */
 
-.g-skill .skill-icon-img {
-  vertical-align: middle;
-  margin: 0 5px;
-  width: 24px;
-  height: 24px;
+.g-skill .skill-icon-img
+{
+	vertical-align: middle;
+	margin: 0 5px;
+	width: 24px;
+	height: 24px;
 }
 
-.g-skill .skill-icon-placeholder {
-  display: inline-block;
-  vertical-align: middle;
-  width: 24px;
-  height: 24px;
-  margin: 0 5px;
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border-mid);
-  border-radius: 3px;
-  text-align: center;
-  line-height: 24px;
-  font-size: 12px;
-  color: var(--color-text-dim);
+.g-skill .skill-icon-placeholder
+{
+	display: inline-block;
+	vertical-align: middle;
+	width: 24px;
+	height: 24px;
+	margin: 0 5px;
+	background: var(--color-bg-surface);
+	border: 1px solid var(--color-border-mid);
+	border-radius: 3px;
+	text-align: center;
+	line-height: 24px;
+	font-size: 12px;
+	color: var(--color-text-dim);
 }
 
 /* ==================== 目標顏色 / Target colors ==================== */
 
 /* 敵方目標（紅色）/ Enemy target (red) */
-.tgt-enemy {
-  color: var(--color-dmg);
-  text-shadow: 0 0 0.2em var(--color-dmg-glow);
+.tgt-enemy
+{
+	color: var(--color-dmg);
+	text-shadow: 0 0 0.2em var(--color-dmg-glow);
 }
 
 /* 友方目標（藍色）/ Friend target (blue) */
-.tgt-friend {
-  color: var(--color-recover);
-  text-shadow: 0 0 0.2em var(--color-recover-glow);
+.tgt-friend
+{
+	color: var(--color-recover);
+	text-shadow: 0 0 0.2em var(--color-recover-glow);
 }
 
 /* 自我目標（綠色）/ Self target (green) */
-.tgt-self {
-  color: var(--color-support);
-  text-shadow: 0 0 0.2em var(--color-support-glow);
+.tgt-self
+{
+	color: var(--color-support);
+	text-shadow: 0 0 0.2em var(--color-support-glow);
 }
 
 /* ==================== 範圍顏色 / Scope colors ==================== */
 
 /* 單體（藍色）/ Individual (blue) */
-.scp-normal {
-  color: var(--color-recover);
-  text-shadow: 0 0 0.2em var(--color-recover-glow);
+.scp-normal
+{
+	color: var(--color-recover);
+	text-shadow: 0 0 0.2em var(--color-recover-glow);
 }
 
 /* 多目標（紫色）/ Multi (purple) */
 .scp-multi,
-.spdmg {
-  color: #993399;
-  text-shadow: 0 0 0.2em #b02fdd;
+.spdmg
+{
+	color: #993399;
+	text-shadow: 0 0 0.2em #b02fdd;
 }
 
 /* 全體 / 金色 / All (gold) */
-.scp-all {
-  color: var(--color-accent-gold-bright);
-  text-shadow: 0 0 0.2em #ddaa44;
+.scp-all
+{
+	color: var(--color-accent-gold-bright);
+	text-shadow: 0 0 0.2em #ddaa44;
 }
 
 /* ==================== SP / Power / Hit rate ==================== */
 
-.sp-cost {
-  color: var(--color-support);
-  text-shadow: 0 0 0.2em var(--color-support-glow);
+.sp-cost
+{
+	color: var(--color-support);
+	text-shadow: 0 0 0.2em var(--color-support-glow);
 }
 
-.power-pct {
-  color: var(--color-text-primary);
+.power-pct
+{
+	color: var(--color-text-primary);
 }
 
-.hit-rate {
-  color: var(--color-text-primary);
+.hit-rate
+{
+	color: var(--color-text-primary);
 }
 
-.weapon-limit {
-  color: var(--color-text-dim);
-  font-size: 11px;
+.weapon-limit
+{
+	color: var(--color-text-dim);
+	font-size: 11px;
 }
 
 /* ==================== 其他屬性 / Extra attributes ==================== */
 
-.extra-attr {
-  color: var(--color-accent-gold-bright);
-  text-shadow: 0 0 0.2em #8f7;
+.extra-attr
+{
+	color: var(--color-accent-gold-bright);
+	text-shadow: 0 0 0.2em #8f7;
 }
 
 /* ==================== 技能效果 / Skill effect ==================== */
 
-.skill-effect {
-  color: var(--color-text-primary);
+.skill-effect
+{
+	color: var(--color-text-primary);
 }
 
 /* ==================== 粗體 / Bold (learn points) ==================== */
 
-.g-skill .bold {
-  font-weight: bold;
+.g-skill .bold
+{
+	font-weight: bold;
 }

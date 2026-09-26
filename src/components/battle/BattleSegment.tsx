@@ -13,11 +13,11 @@
  */
 import React from 'react';
 import type {
-  IBattleFieldConfig,
-  IBattleDisplayOptions,
-  IBattleSegment,
-  IBattleSprite,
-  IBattleTeam,
+	IBattleFieldConfig,
+	IBattleDisplayOptions,
+	IBattleSegment,
+	IBattleSprite,
+	IBattleTeam,
 } from './types';
 import { BattleFieldScene } from './BattleFieldScene';
 import { BattleLog } from './BattleLog';
@@ -28,19 +28,20 @@ import { segmentUnitsForSide, resolveSegmentSprites } from './battleUtils';
 import './BattleSegment.css';
 
 /** 戰鬥分段屬性（顯示開關共用 IBattleDisplayOptions）/ Battle segment props (toggles come from the shared IBattleDisplayOptions) */
-export interface IBattleSegmentProps extends IBattleDisplayOptions {
-  /** 分段資料（快照＋該段行動）/ Segment data (snapshot + its actions) */
-  segment: IBattleSegment;
-  /** 分段總數（用於導覽與 aria 標籤）/ Total segments (for navigation and the aria label) */
-  totalSegments: number;
-  /** 左側隊伍 / Left team */
-  leftTeam: IBattleTeam;
-  /** 右側隊伍 / Right team */
-  rightTeam: IBattleTeam;
-  /** 戰場配置 / Battlefield config */
-  battlefield: IBattleFieldConfig;
-  /** 全部戰場精靈（由分段依快照過濾）/ All battlefield sprites (filtered per snapshot) */
-  sprites: IBattleSprite[];
+export interface IBattleSegmentProps extends IBattleDisplayOptions
+{
+	/** 分段資料（快照＋該段行動）/ Segment data (snapshot + its actions) */
+	segment: IBattleSegment;
+	/** 分段總數（用於導覽與 aria 標籤）/ Total segments (for navigation and the aria label) */
+	totalSegments: number;
+	/** 左側隊伍 / Left team */
+	leftTeam: IBattleTeam;
+	/** 右側隊伍 / Right team */
+	rightTeam: IBattleTeam;
+	/** 戰場配置 / Battlefield config */
+	battlefield: IBattleFieldConfig;
+	/** 全部戰場精靈（由分段依快照過濾）/ All battlefield sprites (filtered per snapshot) */
+	sprites: IBattleSprite[];
 }
 
 /**
@@ -48,56 +49,57 @@ export interface IBattleSegmentProps extends IBattleDisplayOptions {
  * Battle segment component
  */
 export const BattleSegment: React.FC<IBattleSegmentProps> = ({
-  segment,
-  totalSegments,
-  leftTeam,
-  rightTeam,
-  battlefield,
-  sprites,
-  showSpriteLabels,
-  showHpBars,
-  showSpBars,
-  showTeamSprite,
-  showUnitSprites,
-}) => {
-  const leftUnits = segmentUnitsForSide(segment, EnumTeamSideUI.Left, leftTeam.units);
-  const rightUnits = segmentUnitsForSide(segment, EnumTeamSideUI.Right, rightTeam.units);
-  const segmentSprites = resolveSegmentSprites(sprites, segment.snapshot);
+	segment,
+	totalSegments,
+	leftTeam,
+	rightTeam,
+	battlefield,
+	sprites,
+	showSpriteLabels,
+	showHpBars,
+	showSpBars,
+	showTeamSprite,
+	showUnitSprites,
+}) =>
+{
+	const leftUnits = segmentUnitsForSide(segment, EnumTeamSideUI.Left, leftTeam.units);
+	const rightUnits = segmentUnitsForSide(segment, EnumTeamSideUI.Right, rightTeam.units);
+	const segmentSprites = resolveSegmentSprites(sprites, segment.snapshot);
 
-  return (
-    <section
-      className="battle-segment"
-      id={`battle-seg-${segment.index}`}
-      aria-label={`battle segment ${segment.index + 1} / ${totalSegments}`}
-    >
-      {/* 戰場畫面 / Battlefield scene */}
-      <div className="battle-segment-scene">
-        <BattleFieldScene
-          sprites={segmentSprites}
-          config={battlefield}
-          showSpriteLabels={showSpriteLabels}
-        />
-      </div>
+	return (
+		<section
+			className="battle-segment"
+			id={`battle-seg-${segment.index}`}
+			aria-label={`battle segment ${segment.index + 1} / ${totalSegments}`}
+		>
+			{/* 戰場畫面 / Battlefield scene */}
+			<div className="battle-segment-scene">
+				<BattleFieldScene
+					sprites={segmentSprites}
+					config={battlefield}
+					showSpriteLabels={showSpriteLabels}
+				/>
+			</div>
 
-      {/* HP/SP 狀態（該段起始）/ HP/SP status (segment start) */}
-      <BattleSegmentStatus
-        leftUnits={leftUnits}
-        rightUnits={rightUnits}
-        showHpBars={showHpBars}
-        showSpBars={showSpBars}
-        showTeamSprite={showTeamSprite}
-        showUnitSprites={showUnitSprites}
-      />
+			{/* HP/SP 狀態（該段起始）/ HP/SP status (segment start) */}
+			<BattleSegmentStatus
+				leftUnits={leftUnits}
+				rightUnits={rightUnits}
+				showHpBars={showHpBars}
+				showSpBars={showSpBars}
+				showTeamSprite={showTeamSprite}
+				showUnitSprites={showUnitSprites}
+			/>
 
-      {/* 該段行動日誌 / Segment action log */}
-      {segment.actions.length > 0 && (
-        <div className="battle-segment-log">
-          <BattleLog actions={segment.actions} />
-        </div>
-      )}
+			{/* 該段行動日誌 / Segment action log */}
+			{segment.actions.length > 0 && (
+				<div className="battle-segment-log">
+					<BattleLog actions={segment.actions} />
+				</div>
+			)}
 
-      {/* 分段導覽（僅多段時輸出）/ Segment navigation (only emitted when paged) */}
-      <BattleSegmentNav index={segment.index} total={totalSegments} />
-    </section>
-  );
+			{/* 分段導覽（僅多段時輸出）/ Segment navigation (only emitted when paged) */}
+			<BattleSegmentNav index={segment.index} total={totalSegments} />
+		</section>
+	);
 };

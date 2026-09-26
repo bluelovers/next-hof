@@ -11,11 +11,12 @@ import type { IFacilityData } from './TownFacility';
 import './FacilityGroup.css';
 
 /** FacilityGroup 屬性 / FacilityGroup props */
-export interface IFacilityGroupProps {
-  /** 群組標題 / Group title */
-  title: string;
-  /** 設施列表 / Facility list */
-  facilities: IFacilityData[];
+export interface IFacilityGroupProps
+{
+	/** 群組標題 / Group title */
+	title: string;
+	/** 設施列表 / Facility list */
+	facilities: IFacilityData[];
 }
 
 /**
@@ -23,20 +24,21 @@ export interface IFacilityGroupProps {
  * FacilityGroup component
  */
 export const FacilityGroup: React.FC<IFacilityGroupProps> = ({
-  title,
-  facilities,
-}) => {
-  return (
-    <div className="town-facility-group">
-      <h4 className="town-facility-group-title">{title}</h4>
-      <div className="town-facility-group-items">
-        {facilities.map((facility, i) => (
-          <React.Fragment key={i}>
-            {i > 0 && <span className="town-facility-divide"> / </span>}
-            <TownFacility facility={facility} />
-          </React.Fragment>
-        ))}
-      </div>
-    </div>
-  );
+	title,
+	facilities,
+}) =>
+{
+	return (
+		<div className="town-facility-group">
+			<h4 className="town-facility-group-title">{title}</h4>
+			<div className="town-facility-group-items">
+				{facilities.map((facility, i) => (
+					<React.Fragment key={i}>
+						{i > 0 && <span className="town-facility-divide"> / </span>}
+						<TownFacility facility={facility} />
+					</React.Fragment>
+				))}
+			</div>
+		</div>
+	);
 };

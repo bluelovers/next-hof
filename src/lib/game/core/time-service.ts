@@ -41,5 +41,6 @@ import { FakeTimer } from 'fake-timer';
  * Read time the fake-timer way: the absolute clock `t.timer.now()` (`dayjs`), elapsed ms via
  * `t.timer.now().diff(t.initTime)` (`initTime` is the public accessor).
  */
-export class GameTime extends FakeTimer {
+export class GameTime extends FakeTimer
+{
 }

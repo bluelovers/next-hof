@@ -51,7 +51,8 @@ export const MAGIC_CIRCLE_MAX = 5;
  * 使用數值枚舉取代字串字面量，徹底消除 TEAM_0='0' / TEAM_1='1' 設計。
  * Uses numeric enum instead of string literals.
  */
-export enum EnumTeamSide {
+export enum EnumTeamSide
+{
 	/** 陣營 0 / Team side 0 */
 	Team0 = 0,
 	/** 陣營 1 / Team side 1 */
@@ -61,7 +62,8 @@ export enum EnumTeamSide {
 /**
  * 角色狀態列舉 / Character state enumeration
  */
-export enum EnumState {
+export enum EnumState
+{
 	/** 存活 / alive */
 	Alive = 0,
 	/** 死亡 / dead */
@@ -77,7 +79,8 @@ export enum EnumState {
 /**
  * 隊伍位置列舉 / Formation position enumeration
  */
-export enum EnumPosition {
+export enum EnumPosition
+{
 	/** 前衛（可守護後衛）/ front row (can guard the back row) */
 	Front = 'front',
 	/** 後衛（受前衛守護）/ back row (protected by front-row guard) */
@@ -87,7 +90,8 @@ export enum EnumPosition {
 /**
  * 預期行為列舉
  */
-export enum EnumExpect {
+export enum EnumExpect
+{
 	/** 蓄力預期 */
 	Charge = 'charge',
 	/** 詠唱預期 */

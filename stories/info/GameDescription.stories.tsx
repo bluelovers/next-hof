@@ -12,12 +12,12 @@ import { GameDescription } from '../../src/components/info/GameDescription';
 
 /** GameDescription 元件設定 / GameDescription component settings */
 const meta: Meta<typeof GameDescription> = {
-  title: 'Info/GameDescription',
-  component: GameDescription,
-  parameters: {
-    // Storybook 裝飾器配置 / Storybook decorators configuration
-    decorators: [GameDescriptionDarkDecorator],
-  },
+	title: 'Info/GameDescription',
+	component: GameDescription,
+	parameters: {
+		// Storybook 裝飾器配置 / Storybook decorators configuration
+		decorators: [GameDescriptionDarkDecorator],
+	},
 };
 
 export default meta;
@@ -28,8 +28,8 @@ export const Basic: Story = {};
 
 /** 長遊戲簡介 / Long game description (simulated) */
 export const LongDescription: Story = {
-  parameters: {
-    // 這裡可以添加額外的描述內容
-    // Additional description content can be added here
-  },
+	parameters: {
+		// 這裡可以添加額外的描述內容
+		// Additional description content can be added here
+	},
 };

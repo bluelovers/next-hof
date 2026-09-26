@@ -32,55 +32,55 @@
 import { runEventEngine } from '#/lib/game/battle/event-engine';
 import type { IBattleEventRecord } from '#/lib/game/battle/event-engine';
 import {
-  EnumBattleEventType,
-  EnumSkillDamageType,
-  EnumTargetMethod,
-  EnumTargetType,
+	EnumBattleEventType,
+	EnumSkillDamageType,
+	EnumTargetMethod,
+	EnumTargetType,
 } from '#/lib/game/types';
 import type { IBattleEvent, ISkillDef } from '#/lib/game/types';
 
 /** 複合效果技能：傷害＋施毒＋減益 / Multi-effect skill: damage + poison + debuff */
 const plagueHex: ISkillDef = {
-  no: 1210,
-  name: 'PlagueHex',
-  sp: 20,
-  type: EnumSkillDamageType.Magic,
-  target: [EnumTargetType.Enemy, EnumTargetMethod.Individual, 1],
-  pow: 120,
-  poison: 70,
-  DownSTR: 15,
+	no: 1210,
+	name: 'PlagueHex',
+	sp: 20,
+	type: EnumSkillDamageType.Magic,
+	target: [EnumTargetType.Enemy, EnumTargetMethod.Individual, 1],
+	pow: 120,
+	poison: 70,
+	DownSTR: 15,
 };
 
 /** 治療技能：回復＋解毒（毒系統被偵測到，但施毒/毒傷紀錄不會出現）/ Heal skill: recovery + cure */
 const purify: ISkillDef = {
-  no: 3110,
-  name: 'Purify',
-  sp: 8,
-  type: EnumSkillDamageType.Physical,
-  target: [EnumTargetType.Friend, EnumTargetMethod.Individual, 1],
-  pow: 200,
-  support: 1,
-  CurePoison: 1,
-  SpRegen: 5,
+	no: 3110,
+	name: 'Purify',
+	sp: 8,
+	type: EnumSkillDamageType.Physical,
+	target: [EnumTargetType.Friend, EnumTargetMethod.Individual, 1],
+	pow: 200,
+	support: 1,
+	CurePoison: 1,
+	SpRegen: 5,
 };
 
 /** 召喚技能：回復＋魔方陣＋召喚（魔方陣先行，召喚物再入場）/ Summon skill: heal + magic circle + summon */
 const summonSlime: ISkillDef = {
-  no: 2500,
-  name: 'SummonSlime',
-  sp: 30,
-  type: EnumSkillDamageType.Physical,
-  target: [EnumTargetType.Self, EnumTargetMethod.Individual, 1],
-  pow: 100,
-  support: 1,
-  MagicCircleAdd: 1,
-  summon: 1002,
+	no: 2500,
+	name: 'SummonSlime',
+	sp: 30,
+	type: EnumSkillDamageType.Physical,
+	target: [EnumTargetType.Self, EnumTargetMethod.Individual, 1],
+	pow: 100,
+	support: 1,
+	MagicCircleAdd: 1,
+	summon: 1002,
 };
 
 const skillDefs = new Map<number, ISkillDef>([
-  [plagueHex.no, plagueHex],
-  [purify.no, purify],
-  [summonSlime.no, summonSlime],
+	[plagueHex.no, plagueHex],
+	[purify.no, purify],
+	[summonSlime.no, summonSlime],
 ]);
 
 /** 引擎的技能定義查詢（同 IDataRepository.getSkill）/ The engine's skill lookup (same as IDataRepository.getSkill) */
@@ -91,7 +91,7 @@ const getSkill = (no: number): ISkillDef | undefined => skillDefs.get(no);
  * Unit names: display names for events whose actor / target is a def no
  */
 export const dispatchUnitNames: Record<string, string> = {
-  '1002': 'Slime',
+	'1002': 'Slime',
 };
 
 /**
@@ -100,31 +100,31 @@ export const dispatchUnitNames: Record<string, string> = {
  * general event in between
  */
 const skillUseEvents: IBattleEvent[] = [
-  { type: EnumBattleEventType.Act, actor: 'Mage', skill: plagueHex.no },
-  {
-    type: EnumBattleEventType.Damage,
-    actor: 'Mage',
-    target: 'GoblinAxe',
-    skill: plagueHex.no,
-    value: 96,
-    hpBefore: 140,
-    hpAfter: 44,
-  },
-  { type: EnumBattleEventType.Debuff, actor: 'Mage', target: 'GoblinAxe', skill: plagueHex.no },
-  { type: EnumBattleEventType.Poison, actor: 'Mage', target: 'GoblinAxe', skill: plagueHex.no },
-  // 每回合毒傷：屬一般事件，夾在技能執行中間也不會切開它
-  // Per-turn poison damage: a general event that must not split the execution even when interleaved
-  { type: EnumBattleEventType.Poison, target: 'Warrior', value: 31, hpBefore: 240, hpAfter: 209 },
-  { type: EnumBattleEventType.Act, actor: 'Priest', skill: purify.no },
-  {
-    type: EnumBattleEventType.Heal,
-    actor: 'Priest',
-    target: 'Warrior',
-    skill: purify.no,
-    value: 120,
-    hpBefore: 180,
-    hpAfter: 300,
-  },
+	{ type: EnumBattleEventType.Act, actor: 'Mage', skill: plagueHex.no },
+	{
+		type: EnumBattleEventType.Damage,
+		actor: 'Mage',
+		target: 'GoblinAxe',
+		skill: plagueHex.no,
+		value: 96,
+		hpBefore: 140,
+		hpAfter: 44,
+	},
+	{ type: EnumBattleEventType.Debuff, actor: 'Mage', target: 'GoblinAxe', skill: plagueHex.no },
+	{ type: EnumBattleEventType.Poison, actor: 'Mage', target: 'GoblinAxe', skill: plagueHex.no },
+	// 每回合毒傷：屬一般事件，夾在技能執行中間也不會切開它
+	// Per-turn poison damage: a general event that must not split the execution even when interleaved
+	{ type: EnumBattleEventType.Poison, target: 'Warrior', value: 31, hpBefore: 240, hpAfter: 209 },
+	{ type: EnumBattleEventType.Act, actor: 'Priest', skill: purify.no },
+	{
+		type: EnumBattleEventType.Heal,
+		actor: 'Priest',
+		target: 'Warrior',
+		skill: purify.no,
+		value: 120,
+		hpBefore: 180,
+		hpAfter: 300,
+	},
 ];
 
 /** 複合效果技能的分派結果 / Dispatch output of the multi-effect skill uses */
@@ -135,30 +135,30 @@ export const multiEffectRecords: IBattleEventRecord[] = runEventEngine(skillUseE
  * 2. Summon skill event: the summon system derives an entry follow-up (never written to Battle.log)
  */
 const summonUseEvents: IBattleEvent[] = [
-  { type: EnumBattleEventType.Cast, actor: 'Priest', skill: summonSlime.no },
-  { type: EnumBattleEventType.Act, actor: 'Priest', skill: summonSlime.no },
-  {
-    type: EnumBattleEventType.Heal,
-    actor: 'Priest',
-    target: 'Priest',
-    skill: summonSlime.no,
-    value: 0,
-    hpBefore: 300,
-    hpAfter: 300,
-  },
-  { type: EnumBattleEventType.MagicCircle, actor: 'Priest', skill: summonSlime.no },
-  {
-    type: EnumBattleEventType.Summon,
-    actor: 'Priest',
-    target: '1002',
-    value: 1,
-    skill: summonSlime.no,
-  },
+	{ type: EnumBattleEventType.Cast, actor: 'Priest', skill: summonSlime.no },
+	{ type: EnumBattleEventType.Act, actor: 'Priest', skill: summonSlime.no },
+	{
+		type: EnumBattleEventType.Heal,
+		actor: 'Priest',
+		target: 'Priest',
+		skill: summonSlime.no,
+		value: 0,
+		hpBefore: 300,
+		hpAfter: 300,
+	},
+	{ type: EnumBattleEventType.MagicCircle, actor: 'Priest', skill: summonSlime.no },
+	{
+		type: EnumBattleEventType.Summon,
+		actor: 'Priest',
+		target: '1002',
+		value: 1,
+		skill: summonSlime.no,
+	},
 ];
 
 /** 召喚與入場的分派結果 / Dispatch output of the summon and entry */
 export const summonEntryRecords: IBattleEventRecord[] = runEventEngine(summonUseEvents, {
-  getSkill,
+	getSkill,
 });
 
 /**
@@ -167,19 +167,19 @@ export const summonEntryRecords: IBattleEventRecord[] = runEventEngine(summonUse
  * classes together cover the whole log
  */
 const mixedEvents: IBattleEvent[] = [
-  ...skillUseEvents,
-  { type: EnumBattleEventType.Death, target: 'GoblinAxe' },
-  { type: EnumBattleEventType.Act, actor: 'Warrior', skill: 1000 },
-  {
-    type: EnumBattleEventType.Damage,
-    actor: 'Warrior',
-    target: 'GoblinClub',
-    skill: 1000,
-    value: 78,
-    hpBefore: 78,
-    hpAfter: 0,
-  },
-  { type: EnumBattleEventType.Death, target: 'GoblinClub' },
+	...skillUseEvents,
+	{ type: EnumBattleEventType.Death, target: 'GoblinAxe' },
+	{ type: EnumBattleEventType.Act, actor: 'Warrior', skill: 1000 },
+	{
+		type: EnumBattleEventType.Damage,
+		actor: 'Warrior',
+		target: 'GoblinClub',
+		skill: 1000,
+		value: 78,
+		hpBefore: 78,
+		hpAfter: 0,
+	},
+	{ type: EnumBattleEventType.Death, target: 'GoblinClub' },
 ];
 
 /** 混合日誌的分派結果（技能 1000 不在 fixture 技能表 → effects 為空，分派照常）/ Dispatch output of the mixed log (skill 1000 is not in the fixture table: `effects` stays empty while dispatch still works) */

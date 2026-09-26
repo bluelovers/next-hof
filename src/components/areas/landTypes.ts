@@ -10,23 +10,23 @@
 
 /** 地形類型 / Land type */
 export type ILandType =
-  | 'aband'
-  | 'grass'
-  | 'grass01'
-  | 'sea'
-  | 'cave'
-  | 'snow'
-  | 'swamp'
-  | 'ocean0'
-  | 'sand'
-  | 'sand1'
-  | 'mount'
-  | 'lava'
-  | 'pavement01'
-  | 'build01'
-  | 'jungle'
-  | 'nest'
-  | 'noimage';
+	| 'aband'
+	| 'grass'
+	| 'grass01'
+	| 'sea'
+	| 'cave'
+	| 'snow'
+	| 'swamp'
+	| 'ocean0'
+	| 'sand'
+	| 'sand1'
+	| 'mount'
+	| 'lava'
+	| 'pavement01'
+	| 'build01'
+	| 'jungle'
+	| 'nest'
+	| 'noimage';
 
 /**
  * 組合地形 CSS class（land land_<type>，無類型時僅 land）
@@ -35,6 +35,7 @@ export type ILandType =
  * @param landType - 地形類型 / Land type
  * @returns CSS class 字串 / CSS class string
  */
-export function buildLandClass(landType?: string): string {
-  return landType ? `land land_${landType}` : 'land';
+export function buildLandClass(landType?: string): string
+{
+	return landType ? `land land_${landType}` : 'land';
 }

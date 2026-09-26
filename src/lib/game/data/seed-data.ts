@@ -9,7 +9,21 @@
 // Corpse-policy 3-level demo (character level set here; team/battle levels in the showcase
 // battle config): battle-level corpse:true, team-level Team1:false, and per-def overrides below.
 
-import { EnumWeaponType, EnumTargetType, EnumTargetMethod, EnumEquipSlot, EnumGuardKind, EnumSkillDamageType, EnumGender, EnumItemCategory, type ISkillDef, type IItemDef, type IJobDef, type ICharDef, type IMonDef } from '../types';
+import {
+	EnumWeaponType,
+	EnumTargetType,
+	EnumTargetMethod,
+	EnumEquipSlot,
+	EnumGuardKind,
+	EnumSkillDamageType,
+	EnumGender,
+	EnumItemCategory,
+	type ISkillDef,
+	type IItemDef,
+	type IJobDef,
+	type ICharDef,
+	type IMonDef,
+} from '../types';
 import { EnumPosition } from '../constants';
 import { EnumJudgeCode } from '../battle/judge-codes';
 import { InMemoryRepository, type IDataRepository } from './repository';
@@ -18,7 +32,15 @@ import { InMemoryRepository, type IDataRepository } from './repository';
 const job100: IJobDef = {
 	no: 100,
 	job_name: 'Warrior',
-	equip: [EnumWeaponType.Sword, EnumWeaponType.TwoHandSword, EnumWeaponType.Shield, EnumWeaponType.Armor, EnumWeaponType.Cloth, EnumWeaponType.Robe, EnumWeaponType.Item],
+	equip: [
+		EnumWeaponType.Sword,
+		EnumWeaponType.TwoHandSword,
+		EnumWeaponType.Shield,
+		EnumWeaponType.Armor,
+		EnumWeaponType.Cloth,
+		EnumWeaponType.Robe,
+		EnumWeaponType.Item,
+	],
 	coe: { maxhp: 3, maxsp: 0.5 },
 	pattern: null,
 	img: 'mon_079',
@@ -44,7 +66,14 @@ const job200: IJobDef = {
 const job300: IJobDef = {
 	no: 300,
 	job_name: 'Ranger',
-	equip: [EnumWeaponType.Bow, EnumWeaponType.Sword, EnumWeaponType.Dagger, EnumWeaponType.Armor, EnumWeaponType.Cloth, EnumWeaponType.Item],
+	equip: [
+		EnumWeaponType.Bow,
+		EnumWeaponType.Sword,
+		EnumWeaponType.Dagger,
+		EnumWeaponType.Armor,
+		EnumWeaponType.Cloth,
+		EnumWeaponType.Item,
+	],
 	coe: { maxhp: 2.5, maxsp: 0.8 },
 	pattern: null,
 	img: 'mon_019',
@@ -179,7 +208,11 @@ const mon1000: IMonDef = {
 	no: 1000, name: 'GoblinAxe', level: 1, maxhp: 140, hp: 140, maxsp: 10, sp: 10,
 	str: 20, int: 2, dex: 10, spd: 8, luk: 2, skill: [1000],
 	reward: { moneyhold: 50, exphold: 30, itemtable: {} },
-	behavior: { position: EnumPosition.Front, guard: EnumGuardKind.Always, pattern: [{ judge: EnumJudgeCode.DefaultAttack, quantity: 0, action: EnumJudgeCode.DefaultAttack }] },
+	behavior: {
+		position: EnumPosition.Front,
+		guard: EnumGuardKind.Always,
+		pattern: [{ judge: EnumJudgeCode.DefaultAttack, quantity: 0, action: EnumJudgeCode.DefaultAttack }],
+	},
 };
 
 const mon1001: IMonDef = {
@@ -189,7 +222,11 @@ const mon1001: IMonDef = {
 	// 角色級屍體政策：暗精靈獵手仍留屍體（覆寫隊伍級 Team1:false）
 	// Character-level corpse policy: the DarkElfHunter still leaves a corpse (overrides team-level Team1:false)
 	corpse: true,
-	behavior: { position: EnumPosition.Back, guard: EnumGuardKind.Never, pattern: [{ judge: EnumJudgeCode.DefaultAttack, quantity: 0, action: 2000 }] },
+	behavior: {
+		position: EnumPosition.Back,
+		guard: EnumGuardKind.Never,
+		pattern: [{ judge: EnumJudgeCode.DefaultAttack, quantity: 0, action: 2000 }],
+	},
 };
 
 // 展示頁入門怪物：史萊姆（低威脅，供入門 encounter 使用）/ Showcase entry monster: Slime
@@ -200,11 +237,16 @@ const mon1002: IMonDef = {
 	// 角色級屍體政策：史萊姆溶解，不留屍體
 	// Character-level corpse policy: the Slime dissolves, leaving no corpse
 	corpse: false,
-	behavior: { position: EnumPosition.Front, guard: EnumGuardKind.Never, pattern: [{ judge: EnumJudgeCode.DefaultAttack, quantity: 0, action: EnumJudgeCode.DefaultAttack }] },
+	behavior: {
+		position: EnumPosition.Front,
+		guard: EnumGuardKind.Never,
+		pattern: [{ judge: EnumJudgeCode.DefaultAttack, quantity: 0, action: EnumJudgeCode.DefaultAttack }],
+	},
 };
 
 /** 建立並填入範例資料的倉庫 / Build an in-memory repository seeded with sample data */
-export function createSeedRepository(): IDataRepository {
+export function createSeedRepository(): IDataRepository
+{
 	const repo = new InMemoryRepository();
 	repo.addJob(job100);
 	repo.addJob(job200);

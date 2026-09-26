@@ -17,11 +17,16 @@ import type { RNG } from '../core/rng';
  * - 低等（level<10 且 MAXHP<200）再額外減傷 max(10, 25-level)。
  *   low level (level<10 and MAXHP<200) takes an extra reduction of max(10, 25-level).
  */
-export function hpDamage(char: Character, dmg: number): number {
-	if (char.isChar() && dmg > 20) {
-		if (char.HP > 10 && dmg >= char.HP) {
+export function hpDamage(char: Character, dmg: number): number
+{
+	if (char.isChar() && dmg > 20)
+	{
+		if (char.HP > 10 && dmg >= char.HP)
+		{
 			dmg = char.HP - 1; // 留 1 HP（不致死）
-		} else if (char.level < 10 && char.MAXHP < 200) {
+		}
+		else if (char.level < 10 && char.MAXHP < 200)
+		{
 			dmg -= Math.max(10, 25 - char.level); // 低等減傷
 		}
 	}
@@ -32,28 +37,32 @@ export function hpDamage(char: Character, dmg: number): number {
 }
 
 /** 回復 HP，回傳實際回復量（不超過 MAXHP）/ recover HP, returning the amount actually healed (capped at MAXHP) */
-export function hpRecover(char: Character, amount: number): number {
+export function hpRecover(char: Character, amount: number): number
+{
 	const before = char.HP;
 	char.HP = Math.min(char.MAXHP, char.HP + amount);
 	return char.HP - before;
 }
 
 /** 消耗 SP，回傳實際消耗量（下限 0）/ spend SP, returning the amount actually spent (floor 0) */
-export function spDamage(char: Character, dmg: number): number {
+export function spDamage(char: Character, dmg: number): number
+{
 	const before = char.SP;
 	char.SP = Math.max(0, char.SP - dmg);
 	return before - char.SP;
 }
 
 /** 回復 SP，回傳實際回復量（不超過 MAXSP）/ recover SP, returning the amount actually restored (capped at MAXSP) */
-export function spRecover(char: Character, amount: number): number {
+export function spRecover(char: Character, amount: number): number
+{
 	const before = char.SP;
 	char.SP = Math.min(char.MAXSP, char.SP + amount);
 	return char.SP - before;
 }
 
 /** 中毒傷害公式：MAXHP*10% + ceil(level/2) / poison damage formula: MAXHP*10% + ceil(level/2) */
-export function poisonDamageFormula(char: Character): number {
+export function poisonDamageFormula(char: Character): number
+{
 	return Math.round(char.MAXHP * 0.1) + Math.ceil(char.level / 2);
 }
 
@@ -71,12 +80,15 @@ export function poisonDamageFormula(char: Character): number {
  * 抗性時機率折減為 bePoison*(1-PoisonResist/100)；無 rng 時視為無抗性直接成功。
  * With resistance the chance becomes bePoison*(1-PoisonResist/100); without an rng the resist roll is skipped (always succeeds).
  */
-export function getPoison(char: Character, bePoison: number, rng?: RNG): boolean | 'BLOCK' {
+export function getPoison(char: Character, bePoison: number, rng?: RNG): boolean | 'BLOCK'
+{
 	if (char.STATE === EnumState.Poison) return false;
 
-	if (char.SPECIAL.PoisonResist && rng) {
+	if (char.SPECIAL.PoisonResist && rng)
+	{
 		const chance = bePoison * (1 - char.SPECIAL.PoisonResist / 100);
-		if (rng.randInt(0, 99) < chance) {
+		if (rng.randInt(0, 99) < chance)
+		{
 			char.STATE = EnumState.Poison;
 			return true;
 		}
@@ -88,7 +100,8 @@ export function getPoison(char: Character, bePoison: number, rng?: RNG): boolean
 }
 
 /** 中毒持續傷害（不致死，最低 HP=1），回傳實際扣血量 / per-turn poison damage (never fatal; floors at HP=1), returns HP lost */
-export function poisonDamage(char: Character): number {
+export function poisonDamage(char: Character): number
+{
 	if (char.STATE !== EnumState.Poison) return 0;
 	const dmg = poisonDamageFormula(char);
 	const before = char.HP;
@@ -111,7 +124,8 @@ export function poisonDamage(char: Character): number {
  *
  * @returns 新的 PoisonResist 值 / the new PoisonResist value
  */
-export function getPoisonResist(char: Character, no: number): number {
+export function getPoisonResist(char: Character, no: number): number
+{
 	const add = Math.round((100 - char.SPECIAL.PoisonResist) * (no / 100));
 	char.SPECIAL.PoisonResist += add;
 	return char.SPECIAL.PoisonResist;
@@ -132,7 +146,8 @@ export function getPoisonResist(char: Character, no: number): number {
  *
  * @returns 實際損失的 HP / the HP actually lost
  */
-export function sacrificeHp(char: Character, rate: number): number {
+export function sacrificeHp(char: Character, rate: number): number
+{
 	if (!rate) return 0;
 	let selfDamage = Math.ceil(char.MAXHP * (rate / 100));
 	if (char.POSITION !== EnumPosition.Front) selfDamage *= 2; // 後衛犧牲翻倍
@@ -142,8 +157,10 @@ export function sacrificeHp(char: Character, rate: number): number {
 }
 
 /** 消耗一次 Barrier（絕對防禦），成功回傳 true / consume one Barrier charge (absolute guard), true on success */
-export function consumeBarrier(char: Character): boolean {
-	if (char.SPECIAL.Barrier > 0) {
+export function consumeBarrier(char: Character): boolean
+{
+	if (char.SPECIAL.Barrier > 0)
+	{
 		char.SPECIAL.Barrier--;
 		return true;
 	}
@@ -151,16 +168,20 @@ export function consumeBarrier(char: Character): boolean {
 }
 
 /** 持續回復（HpRegen / SpRegen），每回合行動前觸發 / periodic regen (HpRegen / SpRegen), triggered before acting each turn */
-export function autoRegeneration(char: Character): void {
-	if (char.SPECIAL.HpRegen) {
+export function autoRegeneration(char: Character): void
+{
+	if (char.SPECIAL.HpRegen)
+	{
 		hpRecover(char, Math.round(char.MAXHP * char.SPECIAL.HpRegen / 100));
 	}
-	if (char.SPECIAL.SpRegen) {
+	if (char.SPECIAL.SpRegen)
+	{
 		spRecover(char, Math.round(char.MAXSP * char.SPECIAL.SpRegen / 100));
 	}
 }
 
 /** 解除異常狀態（復活/解毒後回到正常）/ clear the status effect (back to normal after revive/cure) */
-export function getNormal(char: Character): void {
+export function getNormal(char: Character): void
+{
 	char.STATE = EnumState.Alive;
 }

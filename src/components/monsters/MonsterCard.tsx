@@ -20,30 +20,32 @@ import { CharacterSprite } from '#/components/characters/CharacterSprite';
 import { EnumSpriteVariant } from '#/components/battle/enums';
 
 /** MonsterCard 屬性 / MonsterCard props */
-export interface IMonsterCardProps {
-  /** 怪物資料 / Monster data */
-  monster: IMonsterData;
+export interface IMonsterCardProps
+{
+	/** 怪物資料 / Monster data */
+	monster: IMonsterData;
 }
 
 /**
  * MonsterCard 怪物卡片元件
  * MonsterCard component
  */
-export const MonsterCard: React.FC<IMonsterCardProps> = ({ monster }) => {
-  const landClass = buildLandClass(monster.landType);
+export const MonsterCard: React.FC<IMonsterCardProps> = ({ monster }) =>
+{
+	const landClass = buildLandClass(monster.landType);
 
-  return (
-    <div className="carpet_frame">
-      <div className={landClass}>
-        <CharacterSprite
-          url={monster.imageUrl}
-          variant={EnumSpriteVariant.Avatar}
-          alt={monster.name}
-        />
-      </div>
-      {monster.name}
-      <br />
-      Lv.{monster.level}
-    </div>
-  );
+	return (
+		<div className="carpet_frame">
+			<div className={landClass}>
+				<CharacterSprite
+					url={monster.imageUrl}
+					variant={EnumSpriteVariant.Avatar}
+					alt={monster.name}
+				/>
+			</div>
+			{monster.name}
+			<br />
+			Lv.{monster.level}
+		</div>
+	);
 };

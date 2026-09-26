@@ -24,7 +24,8 @@ import {
  * @param battle 戰鬥（可選，部分判定會參考 turn 等）/ battle (optional; some codes inspect turn, etc.)
  * @returns 是否成立 / whether the condition holds
  */
-export function DecideJudge(code: number, char: Character, battle?: unknown): boolean {
+export function DecideJudge(code: number, char: Character, battle?: unknown): boolean
+{
 	// 預設動作碼：恆真
 	if (isDefaultAttackCode(code)) return true;
 

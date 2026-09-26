@@ -5,7 +5,6 @@
 
 import { RNG } from './rng';
 
-
 /**
  * 加權隨機項目 / Weighted random entry
  * 型別別名 / type alias
@@ -22,7 +21,8 @@ export type IWeightedEntry<T> = [value: T, weight: number];
  * @param rng 可注入的隨機源 / injectable random source
  * @returns 選中的 value；空陣列回傳 undefined / the picked value; undefined for an empty array
  */
-export function weightedPick<T>(entries: readonly IWeightedEntry<T>[], rng: RNG): T | undefined {
+export function weightedPick<T>(entries: readonly IWeightedEntry<T>[], rng: RNG): T | undefined
+{
 	if (entries.length === 0) return undefined;
 
 	let max = 0;
@@ -34,7 +34,8 @@ export function weightedPick<T>(entries: readonly IWeightedEntry<T>[], rng: RNG)
 	const shuffled = rng.shuffle(entries);
 
 	let upp = 0;
-	for (const [value, w] of shuffled) {
+	for (const [value, w] of shuffled)
+	{
 		upp += w;
 		if (pos <= upp) return value;
 	}

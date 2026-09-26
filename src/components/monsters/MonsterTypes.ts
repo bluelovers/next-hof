@@ -8,13 +8,14 @@
 import type { ILandType } from '#/components/areas/landTypes';
 
 /** 怪物資料 / Monster data */
-export interface IMonsterData {
-  /** 怪物名稱 / Monster name */
-  name: string;
-  /** 怪物圖片 URL / Monster image URL */
-  imageUrl: string;
-  /** 等級 / Level */
-  level: number;
-  /** 地形類型（影響背景圖）/ Land type (affects background image) */
-  landType?: ILandType;
+export interface IMonsterData
+{
+	/** 怪物名稱 / Monster name */
+	name: string;
+	/** 怪物圖片 URL / Monster image URL */
+	imageUrl: string;
+	/** 等級 / Level */
+	level: number;
+	/** 地形類型（影響背景圖）/ Land type (affects background image) */
+	landType?: ILandType;
 }

@@ -23,70 +23,71 @@ import React from 'react';
 import type { IBattleEvent } from '#/lib/game/types';
 import { EnumBattleEventType } from '#/lib/game/types';
 import {
-  EnumEventClass,
-  EnumFollowUpType,
-  EnumSkillEffect,
+	EnumEventClass,
+	EnumFollowUpType,
+	EnumSkillEffect,
 } from '#/lib/game/battle/event-engine';
 import type {
-  IBattleEventRecord,
-  ISkillDispatch,
-  ISkillEvent,
+	IBattleEventRecord,
+	ISkillDispatch,
+	ISkillEvent,
 } from '#/lib/game/battle/event-engine';
 import './BattleEventDispatch.css';
 
 /** 事件分派檢視屬性 / Event dispatch view props */
-export interface IBattleEventDispatchProps {
-  /** 上級事件引擎輸出（兩類涵蓋所有戰鬥紀錄）/ upper event engine output (two classes cover every record) */
-  records: readonly IBattleEventRecord[];
-  /** 標題（省略＝預設）/ title (falls back to the default when omitted) */
-  title?: string;
-  /**
-   * 單位對照：事件的 actor／target 為 def no 時提供顯示名稱
-   * Unit name map: supplies display names when an event's actor / target is a def no
-   */
-  unitNames?: Readonly<Record<string, string>>;
+export interface IBattleEventDispatchProps
+{
+	/** 上級事件引擎輸出（兩類涵蓋所有戰鬥紀錄）/ upper event engine output (two classes cover every record) */
+	records: readonly IBattleEventRecord[];
+	/** 標題（省略＝預設）/ title (falls back to the default when omitted) */
+	title?: string;
+	/**
+	 * 單位對照：事件的 actor／target 為 def no 時提供顯示名稱
+	 * Unit name map: supplies display names when an event's actor / target is a def no
+	 */
+	unitNames?: Readonly<Record<string, string>>;
 }
 
 /** 兩類分類標籤（單一事實來源）/ Class labels (single source of truth) */
 const CLASS_LABEL: Record<EnumEventClass, string> = {
-  [EnumEventClass.Skill]: '技能事件 / Skill',
-  [EnumEventClass.General]: '一般事件 / General',
+	[EnumEventClass.Skill]: '技能事件 / Skill',
+	[EnumEventClass.General]: '一般事件 / General',
 };
 
 /** 效果系統標籤 / Effect system labels */
 const EFFECT_LABEL: Record<EnumSkillEffect, string> = {
-  [EnumSkillEffect.Damage]: '傷害系統 / Damage',
-  [EnumSkillEffect.Heal]: '恢復系統 / Heal',
-  [EnumSkillEffect.Poison]: '毒系統 / Poison',
-  [EnumSkillEffect.Buff]: '增益系統 / Buff',
-  [EnumSkillEffect.Debuff]: '減益系統 / Debuff',
-  [EnumSkillEffect.Summon]: '召喚系統 / Summon',
-  [EnumSkillEffect.MagicCircle]: '魔方陣系統 / MagicCircle',
-  [EnumSkillEffect.Guard]: '守護系統 / Guard',
-  [EnumSkillEffect.Miss]: '命中系統 / Miss',
+	[EnumSkillEffect.Damage]: '傷害系統 / Damage',
+	[EnumSkillEffect.Heal]: '恢復系統 / Heal',
+	[EnumSkillEffect.Poison]: '毒系統 / Poison',
+	[EnumSkillEffect.Buff]: '增益系統 / Buff',
+	[EnumSkillEffect.Debuff]: '減益系統 / Debuff',
+	[EnumSkillEffect.Summon]: '召喚系統 / Summon',
+	[EnumSkillEffect.MagicCircle]: '魔方陣系統 / MagicCircle',
+	[EnumSkillEffect.Guard]: '守護系統 / Guard',
+	[EnumSkillEffect.Miss]: '命中系統 / Miss',
 };
 
 /** 紀錄型別標籤（EnumBattleEventType 全員）/ Record type labels (every EnumBattleEventType member) */
 const EVENT_TYPE_LABEL: Record<EnumBattleEventType, string> = {
-  [EnumBattleEventType.Damage]: '傷害 Damage',
-  [EnumBattleEventType.Heal]: '回復 Heal',
-  [EnumBattleEventType.Guard]: '守護 Guard',
-  [EnumBattleEventType.Buff]: '增益 Buff',
-  [EnumBattleEventType.Debuff]: '減益 Debuff',
-  [EnumBattleEventType.Poison]: '中毒 Poison',
-  [EnumBattleEventType.Death]: '死亡 Death',
-  [EnumBattleEventType.Cast]: '詠唱 Cast',
-  [EnumBattleEventType.Act]: '行動 Act',
-  [EnumBattleEventType.Charge]: '蓄力 Charge',
-  [EnumBattleEventType.MagicCircle]: '魔方陣 MagicCircle',
-  [EnumBattleEventType.Summon]: '召喚 Summon',
-  [EnumBattleEventType.Miss]: '未命中 Miss',
-  [EnumBattleEventType.Info]: '資訊 Info',
+	[EnumBattleEventType.Damage]: '傷害 Damage',
+	[EnumBattleEventType.Heal]: '回復 Heal',
+	[EnumBattleEventType.Guard]: '守護 Guard',
+	[EnumBattleEventType.Buff]: '增益 Buff',
+	[EnumBattleEventType.Debuff]: '減益 Debuff',
+	[EnumBattleEventType.Poison]: '中毒 Poison',
+	[EnumBattleEventType.Death]: '死亡 Death',
+	[EnumBattleEventType.Cast]: '詠唱 Cast',
+	[EnumBattleEventType.Act]: '行動 Act',
+	[EnumBattleEventType.Charge]: '蓄力 Charge',
+	[EnumBattleEventType.MagicCircle]: '魔方陣 MagicCircle',
+	[EnumBattleEventType.Summon]: '召喚 Summon',
+	[EnumBattleEventType.Miss]: '未命中 Miss',
+	[EnumBattleEventType.Info]: '資訊 Info',
 };
 
 /** 後續事件標籤 / Follow-up labels */
 const FOLLOW_UP_LABEL: Record<EnumFollowUpType, string> = {
-  [EnumFollowUpType.Enter]: '入場事件 Enter',
+	[EnumFollowUpType.Enter]: '入場事件 Enter',
 };
 
 /**
@@ -97,98 +98,99 @@ const FOLLOW_UP_LABEL: Record<EnumFollowUpType, string> = {
  * Names pass through unitNames first (kept as-is without a match); every other field shows only
  * when present.
  */
-function summarize(ev: IBattleEvent, nameOf: (key: string) => string): string {
-  const from = ev.actor !== undefined ? nameOf(ev.actor) : undefined;
-  const to = ev.target !== undefined ? nameOf(ev.target) : undefined;
-  const route = from !== undefined && to !== undefined && from !== to ? `${from} → ${to}` : (to ?? from);
+function summarize(ev: IBattleEvent, nameOf: (key: string) => string): string
+{
+	const from = ev.actor !== undefined ? nameOf(ev.actor) : undefined;
+	const to = ev.target !== undefined ? nameOf(ev.target) : undefined;
+	const route = from !== undefined && to !== undefined && from !== to ? `${from} → ${to}` : (to ?? from);
 
-  const parts: string[] = [];
-  if (route !== undefined && route !== '') parts.push(route);
-  if (ev.value !== undefined) parts.push(String(ev.value));
-  if (ev.hpBefore !== undefined && ev.hpAfter !== undefined) parts.push(`[${ev.hpBefore} → ${ev.hpAfter}]`);
-  if (ev.text !== undefined) parts.push(`“${ev.text}”`);
-  return parts.join(' ') || '—';
+	const parts: string[] = [];
+	if (route !== undefined && route !== '') parts.push(route);
+	if (ev.value !== undefined) parts.push(String(ev.value));
+	if (ev.hpBefore !== undefined && ev.hpAfter !== undefined) parts.push(`[${ev.hpBefore} → ${ev.hpAfter}]`);
+	if (ev.text !== undefined) parts.push(`“${ev.text}”`);
+	return parts.join(' ') || '—';
 }
 
 /** 效果系統區塊：該系統處理到的紀錄與衍生事件 / One effect system's records and derived events */
 const DispatchSection: React.FC<{ dispatch: ISkillDispatch; nameOf: (key: string) => string }> = ({
-  dispatch,
-  nameOf,
+	dispatch,
+	nameOf,
 }) => (
-  <section className={`dispatch dispatch--${dispatch.effect}`}>
-    <h4 className="dispatch__label">{EFFECT_LABEL[dispatch.effect]}</h4>
-    <ul className="dispatch__records">
-      {dispatch.records.map((ev, index) => (
-        <li className="dispatch__record" key={`${ev.type}-${index}`}>
-          <span className="dispatch__type">{EVENT_TYPE_LABEL[ev.type]}</span>
-          <span className="dispatch__detail">{summarize(ev, nameOf)}</span>
-        </li>
-      ))}
-    </ul>
-    {dispatch.followUps.length > 0 && (
-      <ul className="dispatch__followups">
-        {dispatch.followUps.map((followUp, index) => (
-          <li className="followup" key={`${followUp.type}-${index}`}>
-            <span className="followup__label">後續 / follow-up</span>
-            <span className="followup__type">{FOLLOW_UP_LABEL[followUp.type]}</span>
-            <span className="followup__detail">
+	<section className={`dispatch dispatch--${dispatch.effect}`}>
+		<h4 className="dispatch__label">{EFFECT_LABEL[dispatch.effect]}</h4>
+		<ul className="dispatch__records">
+			{dispatch.records.map((ev, index) => (
+				<li className="dispatch__record" key={`${ev.type}-${index}`}>
+					<span className="dispatch__type">{EVENT_TYPE_LABEL[ev.type]}</span>
+					<span className="dispatch__detail">{summarize(ev, nameOf)}</span>
+				</li>
+			))}
+		</ul>
+		{dispatch.followUps.length > 0 && (
+			<ul className="dispatch__followups">
+				{dispatch.followUps.map((followUp, index) => (
+					<li className="followup" key={`${followUp.type}-${index}`}>
+						<span className="followup__label">後續 / follow-up</span>
+						<span className="followup__type">{FOLLOW_UP_LABEL[followUp.type]}</span>
+						<span className="followup__detail">
               {followUp.unit !== undefined ? nameOf(followUp.unit) : ''}
-              {followUp.level !== undefined ? ` Lv.${followUp.level}` : ''}
+							{followUp.level !== undefined ? ` Lv.${followUp.level}` : ''}
             </span>
-          </li>
-        ))}
-      </ul>
-    )}
-  </section>
+					</li>
+				))}
+			</ul>
+		)}
+	</section>
 );
 
 /** 技能事件卡片 / Skill event card */
 const SkillEventCard: React.FC<{ event: ISkillEvent; nameOf: (key: string) => string }> = ({
-  event,
-  nameOf,
+	event,
+	nameOf,
 }) => (
-  <li className="event-card event-card--skill">
-    <div className="event-card__head">
-      <span className="event-badge event-badge--skill">{CLASS_LABEL[EnumEventClass.Skill]}</span>
-      <span className="event-card__sentence">
+	<li className="event-card event-card--skill">
+		<div className="event-card__head">
+			<span className="event-badge event-badge--skill">{CLASS_LABEL[EnumEventClass.Skill]}</span>
+			<span className="event-card__sentence">
         <b className="event-card__actor">
           {event.source.actor !== undefined ? nameOf(event.source.actor) : '未知'}
         </b>{' '}
-        使用了 <b className="event-card__skill">{event.skillName ?? `技能 #${event.skill}`}</b>
+				使用了 <b className="event-card__skill">{event.skillName ?? `技能 #${event.skill}`}</b>
       </span>
-    </div>
+		</div>
 
-    {event.effects.length > 0 && (
-      <ul className="event-card__effects">
-        {event.effects.map((effect) => (
-          <li className={`effect-chip effect-chip--${effect}`} key={effect}>
-            {EFFECT_LABEL[effect]}
-          </li>
-        ))}
-      </ul>
-    )}
+		{event.effects.length > 0 && (
+			<ul className="event-card__effects">
+				{event.effects.map((effect) => (
+					<li className={`effect-chip effect-chip--${effect}`} key={effect}>
+						{EFFECT_LABEL[effect]}
+					</li>
+				))}
+			</ul>
+		)}
 
-    <div className="event-card__dispatch">
-      {event.dispatch.map((dispatch) => (
-        <DispatchSection dispatch={dispatch} nameOf={nameOf} key={dispatch.effect} />
-      ))}
-      {event.dispatch.length === 0 && (
-        <p className="event-card__empty">沒有可分派的效果紀錄 / no effect records to dispatch</p>
-      )}
-    </div>
-  </li>
+		<div className="event-card__dispatch">
+			{event.dispatch.map((dispatch) => (
+				<DispatchSection dispatch={dispatch} nameOf={nameOf} key={dispatch.effect} />
+			))}
+			{event.dispatch.length === 0 && (
+				<p className="event-card__empty">沒有可分派的效果紀錄 / no effect records to dispatch</p>
+			)}
+		</div>
+	</li>
 );
 
 /** 一般事件列 / General event row */
 const GeneralEventRow: React.FC<{ event: IBattleEvent; nameOf: (key: string) => string }> = ({
-  event,
-  nameOf,
+	event,
+	nameOf,
 }) => (
-  <li className="event-card event-card--general">
-    <span className="event-badge event-badge--general">{CLASS_LABEL[EnumEventClass.General]}</span>
-    <span className="event-card__type">{EVENT_TYPE_LABEL[event.type]}</span>
-    <span className="event-card__detail">{summarize(event, nameOf)}</span>
-  </li>
+	<li className="event-card event-card--general">
+		<span className="event-badge event-badge--general">{CLASS_LABEL[EnumEventClass.General]}</span>
+		<span className="event-card__type">{EVENT_TYPE_LABEL[event.type]}</span>
+		<span className="event-card__detail">{summarize(event, nameOf)}</span>
+	</li>
 );
 
 /**
@@ -199,37 +201,38 @@ const GeneralEventRow: React.FC<{ event: IBattleEvent; nameOf: (key: string) => 
  * @param unitNames - 單位對照（def no → 顯示名稱）/ unit name map (def no → display name)
  */
 export const BattleEventDispatch: React.FC<IBattleEventDispatchProps> = ({
-  records,
-  title,
-  unitNames,
-}) => {
-  const nameOf = (key: string): string => unitNames?.[key] ?? key;
-  const skillCount = records.filter((record) => record.class === EnumEventClass.Skill).length;
-  const generalCount = records.length - skillCount;
+	records,
+	title,
+	unitNames,
+}) =>
+{
+	const nameOf = (key: string): string => unitNames?.[key] ?? key;
+	const skillCount = records.filter((record) => record.class === EnumEventClass.Skill).length;
+	const generalCount = records.length - skillCount;
 
-  return (
-    <div className="event-dispatch">
-      <header className="event-dispatch__head">
-        <h2 className="event-dispatch__title">{title ?? '事件分派檢視 / Event Dispatch'}</h2>
-        <p className="event-dispatch__summary">
+	return (
+		<div className="event-dispatch">
+			<header className="event-dispatch__head">
+				<h2 className="event-dispatch__title">{title ?? '事件分派檢視 / Event Dispatch'}</h2>
+				<p className="event-dispatch__summary">
           <span className="event-dispatch__count event-dispatch__count--skill">
             技能事件 {skillCount}
           </span>
-          <span className="event-dispatch__count event-dispatch__count--general">
+					<span className="event-dispatch__count event-dispatch__count--general">
             一般事件 {generalCount}
           </span>
-        </p>
-      </header>
+				</p>
+			</header>
 
-      <ol className="event-dispatch__list">
-        {records.map((record, index) =>
-          record.class === EnumEventClass.Skill ? (
-            <SkillEventCard event={record} nameOf={nameOf} key={`skill-${record.skill}-${index}`} />
-          ) : (
-            <GeneralEventRow event={record.event} nameOf={nameOf} key={`general-${index}`} />
-          ),
-        )}
-      </ol>
-    </div>
-  );
+			<ol className="event-dispatch__list">
+				{records.map((record, index) =>
+					record.class === EnumEventClass.Skill ? (
+						<SkillEventCard event={record} nameOf={nameOf} key={`skill-${record.skill}-${index}`} />
+					) : (
+						<GeneralEventRow event={record.event} nameOf={nameOf} key={`general-${index}`} />
+					),
+				)}
+			</ol>
+		</div>
+	);
 };

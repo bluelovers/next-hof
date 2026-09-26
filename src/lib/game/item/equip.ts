@@ -9,14 +9,17 @@ import { EnumEquipSlot, EnumWeaponType } from '../types';
 import { parseItem } from './Item';
 
 /** 玩家最大負荷：5 + floor(level/10) + floor(DEX/5) / max equipment weight: 5 + floor(level/10) + floor(DEX/5) */
-export function getHandleMax(char: Character): number {
+export function getHandleMax(char: Character): number
+{
 	return 5 + Math.floor(char.level / 10) + Math.floor(char.DEX / 5);
 }
 
 /** 目前裝備總負荷 / total weight of currently equipped items */
-export function currentHandle(char: Character, repo: IDataRepository): number {
+export function currentHandle(char: Character, repo: IDataRepository): number
+{
 	let h = 0;
-	for (const no of Object.values(char.equip)) {
+	for (const no of Object.values(char.equip))
+	{
 		if (!no) continue;
 		const it = repo.getItem(no);
 		if (it) h += it.handle ?? 0;
@@ -33,10 +36,12 @@ export function currentHandle(char: Character, repo: IDataRepository): number {
  * Sums atk/def per slot; MainHand additionally writes char.WEAPON for skill weapon limits;
  * compensation fields (COMP_FIELDS) plus P_SUMMON/P_PIERCE are accumulated too.
  */
-export function CalcEquips(char: Character, repo: IDataRepository): void {
+export function CalcEquips(char: Character, repo: IDataRepository): void
+{
 	char.atk = [0, 0];
 	char.def = [0, 0, 0, 0];
-	for (const slot of Object.keys(char.equip) as EnumEquipSlot[]) {
+	for (const slot of Object.keys(char.equip) as EnumEquipSlot[])
+	{
 		const no = char.equip[slot];
 		if (!no) continue;
 		const item = repo.getItem(no);
@@ -50,12 +55,14 @@ export function CalcEquips(char: Character, repo: IDataRepository): void {
 		char.def[EnumDefSlot.MagPct] += item.def?.[EnumDefSlot.MagPct] ?? 0;
 		char.def[EnumDefSlot.MagFlat] += item.def?.[EnumDefSlot.MagFlat] ?? 0;
 
-		for (const f of COMP_FIELDS) {
+		for (const f of COMP_FIELDS)
+		{
 			char[f] += item[f] ?? 0;
 		}
 
 		if (item.P_SUMMON) char.addSpecial('Summon', item.P_SUMMON);
-		if (item.P_PIERCE) {
+		if (item.P_PIERCE)
+		{
 			char.SPECIAL.Pierce[EnumAtkSlot.Phys] += item.P_PIERCE;
 			char.SPECIAL.Pierce[EnumAtkSlot.Mag] += item.P_PIERCE;
 		}
@@ -79,19 +86,23 @@ export function setEquip(
 	repo: IDataRepository,
 	slot: EnumEquipSlot,
 	itemNo: number,
-): [boolean, number[]] {
+): [boolean, number[]]
+{
 	const item = repo.getItem(itemNo);
 	if (!item) return [true, []];
 
 	const removed: number[] = [];
 
 	// 雙手互斥
-	if (slot === EnumEquipSlot.MainHand || slot === EnumEquipSlot.OffHand) {
+	if (slot === EnumEquipSlot.MainHand || slot === EnumEquipSlot.OffHand)
+	{
 		const other: EnumEquipSlot = slot === EnumEquipSlot.MainHand ? EnumEquipSlot.OffHand : EnumEquipSlot.MainHand;
 		const otherNo = char.equip[other];
-		if (otherNo) {
+		if (otherNo)
+		{
 			const otherItem = repo.getItem(otherNo);
-			if (item.dh || otherItem?.dh) {
+			if (item.dh || otherItem?.dh)
+			{
 				removed.push(otherNo);
 				delete char.equip[other];
 			}
@@ -101,7 +112,8 @@ export function setEquip(
 	// 負荷檢查
 	const trial: Record<string, number | undefined> = { ...char.equip, [slot]: itemNo };
 	let h = 0;
-	for (const no of Object.values(trial)) {
+	for (const no of Object.values(trial))
+	{
 		if (!no) continue;
 		const it = repo.getItem(no);
 		h += it?.handle ?? 0;

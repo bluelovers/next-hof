@@ -9,16 +9,19 @@
  * The header is centred and uses .divider-bottom (SharedBase.css) for its bottom divider.
  */
 
-.battle-header {
-  padding: 15px 0;
-  width: 100%;
-  text-align: center;
+.battle-header
+{
+	padding: 15px 0;
+	width: 100%;
+	text-align: center;
 }
 
-.battle-title {
-  margin: 0;
+.battle-title
+{
+	margin: 0;
 }
 
-.battle-time {
-  padding-top: 4px;
+.battle-time
+{
+	padding-top: 4px;
 }

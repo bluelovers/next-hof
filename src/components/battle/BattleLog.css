@@ -8,8 +8,9 @@
  * one populated; on narrow screens it collapses to one column and hides empty slots.
  */
 
-.battle-log {
-  width: 100%;
+.battle-log
+{
+	width: 100%;
 }
 
 /* 刻意不畫水平框線：.log-row 不套用共用的 .divider-bottom（SharedBase.css），
@@ -18,34 +19,41 @@
    Deliberately draws no horizontal rules: .log-row skips the shared .divider-bottom
    utility (SharedBase.css) and .action-entry carries no border-bottom (see BattleAction.css),
    so per-row lines do not chop the log into visual fragments. */
-.log-row {
-  display: flex;
-  align-items: stretch;
+.log-row
+{
+	display: flex;
+	align-items: stretch;
 }
 
-.log-cell {
-  flex: 1 1 50%;
-  min-width: 0;
+.log-cell
+{
+	flex: 1 1 50%;
+	min-width: 0;
 }
 
-.log-cell--full {
-  flex-basis: 100%;
+.log-cell--full
+{
+	flex-basis: 100%;
 }
 
 /* ==================== 窄螢幕 / Narrow screens ==================== */
 
-@media (max-width: 640px) {
-  .log-row {
-    flex-direction: column;
-  }
+@media (max-width: 640px)
+{
+	.log-row
+	{
+		flex-direction: column;
+	}
 
-  /* 空欄不佔位：僅顯示實際有行動的一側 / Empty slots take no space */
-  .log-cell:empty {
-    display: none;
-  }
+	/* 空欄不佔位：僅顯示實際有行動的一側 / Empty slots take no space */
+	.log-cell:empty
+	{
+		display: none;
+	}
 
-  /* 覆寫 .ttd1 的欄位分隔線（堆疊後不需要）/ Override .ttd1 column divider when stacked */
-  .log-row .log-cell {
-    border-left: none;
-  }
+	/* 覆寫 .ttd1 的欄位分隔線（堆疊後不需要）/ Override .ttd1 column divider when stacked */
+	.log-row .log-cell
+	{
+		border-left: none;
+	}
 }

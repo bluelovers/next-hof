@@ -8,17 +8,19 @@
 
 /* ==================== 精靈圖層 / Sprite Layers ==================== */
 
-.battle-sprite {
-  position: absolute;
-  background-repeat: no-repeat;
-  filter: drop-shadow(2px 5px 1px rgba(0, 0, 0, 0.3));
+.battle-sprite
+{
+	position: absolute;
+	background-repeat: no-repeat;
+	filter: drop-shadow(2px 5px 1px rgba(0, 0, 0, 0.3));
 }
 
-.battle-sprite.flip-h {
-  -moz-transform: scaleX(-1);
-  -o-transform: scaleX(-1);
-  -webkit-transform: scaleX(-1);
-  transform: scaleX(-1);
-  /* filter: FlipH;
-  -ms-filter: "FlipH"; */
+.battle-sprite.flip-h
+{
+	-moz-transform: scaleX(-1);
+	-o-transform: scaleX(-1);
+	-webkit-transform: scaleX(-1);
+	transform: scaleX(-1);
+	/* filter: FlipH;
+	-ms-filter: "FlipH"; */
 }

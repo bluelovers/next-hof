@@ -11,7 +11,8 @@ import { STATUS_UP_KEY_NAME, STATUS_DOWN_KEY_NAME, STATUS_PLUS_KEY_NAME, BASE_ST
  * atk 陣列索引（物理/魔法）/ atk array indices (physical/magic)
  * 列舉 / enumeration
  */
-export enum EnumAtkSlot {
+export enum EnumAtkSlot
+{
 	/** 物理攻擊（atk[0]）/ physical attack (atk[0]) */
 	Phys = 0,
 	/** 魔法攻擊（atk[1]）/ magic attack (atk[1]) */
@@ -22,7 +23,8 @@ export enum EnumAtkSlot {
  * def 陣列索引（物理%, 物理-, 魔法%, 魔法-）/ def array indices
  * 列舉 / enumeration
  */
-export enum EnumDefSlot {
+export enum EnumDefSlot
+{
 	/** 物理減傷 %（def[0]）/ physical damage reduction % (def[0]) */
 	PhysPct = 0,
 	/** 物理定值減傷（def[1]）/ physical flat damage reduction (def[1]) */
@@ -43,12 +45,12 @@ export enum EnumDefSlot {
  */
 export type IAttrFn = (c: Character, n: number) => void;
 
-
 /**
  * 狀態屬性項目 / Status attribute entry
  * 介面 / interface
  */
-export interface IStatusAttrEntry {
+export interface IStatusAttrEntry
+{
 	/** 讀取角色戰鬥屬性 / Read battle attribute from character */
 	get: (c: Character) => number;
 	/** 寫入角色戰鬥屬性 / Write battle attribute to character */
@@ -66,7 +68,8 @@ export interface IStatusAttrEntry {
  * Generic buff: round(orig*(1+n/100)), capped at orig*(MAX_STATUS_MAXIMUM/100)
  */
 const upAttr = (get: (c: Character) => number, set: (c: Character, v: number) => void): IAttrFn =>
-	(c, n) => {
+	(c, n) =>
+	{
 		const orig = get(c);
 		const cap = orig * (MAX_STATUS_MAXIMUM / 100);
 		set(c, Math.min(Math.round(orig * (1 + n / 100)), cap));
@@ -156,14 +159,24 @@ export const STATUS_ATTR_TABLE: Record<IStatusAttr, IStatusAttrEntry> = {
 		get: (c) => c.MAXHP,
 		set: (c, v) => { c.MAXHP = v; },
 		up: (c, n) => { c.MAXHP = Math.round(c.MAXHP * (1 + n / 100)); },
-		down: (c, n) => { const v = Math.round(c.MAXHP * (1 - n / 100)); c.MAXHP = v; if (c.HP > v) c.HP = v; },
+		down: (c, n) =>
+		{
+			const v = Math.round(c.MAXHP * (1 - n / 100));
+			c.MAXHP = v;
+			if (c.HP > v) c.HP = v;
+		},
 		plus: plusAttr((c) => c.MAXHP, (c, v) => { c.MAXHP = v; }),
 	},
 	MAXSP: {
 		get: (c) => c.MAXSP,
 		set: (c, v) => { c.MAXSP = v; },
 		up: (c, n) => { c.MAXSP = Math.round(c.MAXSP * (1 + n / 100)); },
-		down: (c, n) => { const v = Math.round(c.MAXSP * (1 - n / 100)); c.MAXSP = v; if (c.SP > v) c.SP = v; },
+		down: (c, n) =>
+		{
+			const v = Math.round(c.MAXSP * (1 - n / 100));
+			c.MAXSP = v;
+			if (c.SP > v) c.SP = v;
+		},
 		plus: plusAttr((c) => c.MAXSP, (c, v) => { c.MAXSP = v; }),
 	},
 };
@@ -178,11 +191,17 @@ export const STATUS_ATTR_TABLE: Record<IStatusAttr, IStatusAttrEntry> = {
  * missing up/down fall back to generic upAttr/downAttr;
  * Plus* keys created only where plus is registered.
  */
-function buildStatusMaps(): { UPMAP: Record<string, IAttrFn>; DOWNMAP: Record<string, IAttrFn>; PLUSMAP: Record<string, IAttrFn> } {
+function buildStatusMaps(): {
+	UPMAP: Record<string, IAttrFn>;
+	DOWNMAP: Record<string, IAttrFn>;
+	PLUSMAP: Record<string, IAttrFn>
+}
+{
 	const UPMAP: Record<string, IAttrFn> = {};
 	const DOWNMAP: Record<string, IAttrFn> = {};
 	const PLUSMAP: Record<string, IAttrFn> = {};
-	for (const key of Object.keys(STATUS_ATTR_TABLE) as IStatusAttr[]) {
+	for (const key of Object.keys(STATUS_ATTR_TABLE) as IStatusAttr[])
+	{
 		const e = STATUS_ATTR_TABLE[key];
 		// 使用 STATUS_UP_KEY_NAME 靜態對照表取代 'Up' + key 字串聯合
 		UPMAP[STATUS_UP_KEY_NAME[key]] = e.up ?? upAttr(e.get, e.set);
@@ -198,7 +217,6 @@ function buildStatusMaps(): { UPMAP: Record<string, IAttrFn>; DOWNMAP: Record<st
  * 型別別名 / type alias
  */
 export const { UPMAP, DOWNMAP, PLUSMAP } = buildStatusMaps();
-
 
 /**
  * 補正欄位（技能/道具共用，單一事實來源）/ Compensation fields (shared by passive & equip)

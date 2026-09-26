@@ -16,11 +16,12 @@ import '#/components/shared/SharedBase.css';
 import type { IStyleProps } from '#/components/shared/types';
 
 /** 隊伍側邊面板屬性 / Team side panel props */
-export interface IBattleSidePanelProps extends IStyleProps {
-  /** 隊伍側邊類別 / Team side CSS class */
-  sideClass: EnumTeamSideClass;
-  /** 面板內容 / Panel content */
-  children: React.ReactNode;
+export interface IBattleSidePanelProps extends IStyleProps
+{
+	/** 隊伍側邊類別 / Team side CSS class */
+	sideClass: EnumTeamSideClass;
+	/** 面板內容 / Panel content */
+	children: React.ReactNode;
 }
 
 /**
@@ -31,12 +32,12 @@ export interface IBattleSidePanelProps extends IStyleProps {
  * A pure layout container with no business data; content comes via children.
  */
 export const BattleSidePanel: React.FC<IBattleSidePanelProps> = ({
-  sideClass,
-  className,
-  style,
-  children,
+	sideClass,
+	className,
+	style,
+	children,
 }) => (
-  <div className={`teams ${sideClass}${className ? ` ${className}` : ''}`} style={style}>
-    {children}
-  </div>
+	<div className={`teams ${sideClass}${className ? ` ${className}` : ''}`} style={style}>
+		{children}
+	</div>
 );

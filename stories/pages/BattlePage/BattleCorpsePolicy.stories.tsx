@@ -54,7 +54,8 @@ import './BattleCorpsePolicy.css';
  * Values deliberately keep the lowercase literals so the Storybook Controls labels and the
  * serialized args stay byte-identical to the pre-enum behaviour.
  */
-enum EnumCorpseChoice {
+enum EnumCorpseChoice
+{
 	/** 繼承上層（不覆寫）/ inherit from the next level up (no override) */
 	Inherit = 'inherit',
 	/** 留屍體（政策 `true`）/ leave a corpse (policy `true`) */
@@ -86,7 +87,8 @@ const DEFAULT_CORPSE_ASSET = SPRITE_CORPSE_URL.split('/').pop() ?? SPRITE_CORPSE
  * IStylePropsRequired (backed by ITSPickExtra) promotes those two to required while the
  * non-style fields stay declared in this interface.
  */
-interface ICorpseSpecControls extends IStylePropsRequired<'className' | 'style'> {
+interface ICorpseSpecControls extends IStylePropsRequired<'className' | 'style'>
+{
 	/** 屍體圖路徑（空白＝自動）/ corpse image path (blank = auto) */
 	imageUrl: string;
 }
@@ -96,7 +98,8 @@ interface ICorpseSpecControls extends IStylePropsRequired<'className' | 'style'>
  * Build the object spec from the controls, skipping blank strings and an empty style so
  * the spec stays clean
  */
-function buildSpec(controls: ICorpseSpecControls): ICorpseSpec {
+function buildSpec(controls: ICorpseSpecControls): ICorpseSpec
+{
 	const spec: ICorpseSpec = {};
 	const imageUrl = controls.imageUrl.trim();
 	const className = controls.className.trim();
@@ -107,7 +110,8 @@ function buildSpec(controls: ICorpseSpecControls): ICorpseSpec {
 }
 
 /** 由 args 取出物件規格的三個控制項（組裝只發生在這裡一次）/ Pull the three object-spec controls from args (built in exactly one place) */
-function buildControls(args: ICorpsePolicyDemoArgs): ICorpseSpecControls {
+function buildControls(args: ICorpsePolicyDemoArgs): ICorpseSpecControls
+{
 	return {
 		imageUrl: args.corpseImageUrl,
 		className: args.corpseClassName,
@@ -123,7 +127,8 @@ function buildControls(args: ICorpsePolicyDemoArgs): ICorpseSpecControls {
  * Builds the string in a function instead of JSX text nodes, because JSX inserts a space at
  * line breaks and would split the separators.
  */
-function describeSpec(controls: ICorpseSpecControls): string {
+function describeSpec(controls: ICorpseSpecControls): string
+{
 	const image = controls.imageUrl.trim() || `自動（${DEFAULT_CORPSE_ASSET}）`;
 	const cssClass = controls.className.trim() || '無';
 	const style =
@@ -158,7 +163,8 @@ const POLICY_BY_CHOICE: Record<
  * Only this translates the choice into a policy value; the shared resolveCorpsePolicy
  * performs the actual level inheritance.
  */
-function toPolicy(choice: EnumCorpseChoice, controls: ICorpseSpecControls): ICorpsePolicy | undefined {
+function toPolicy(choice: EnumCorpseChoice, controls: ICorpseSpecControls): ICorpsePolicy | undefined
+{
 	return POLICY_BY_CHOICE[choice](controls);
 }
 
@@ -174,7 +180,8 @@ const CORPSE_LABEL: Record<EnumCorpseChoice, string> = {
 };
 
 /** 四態顯示文字 / 4-state label */
-function choiceLabel(value: EnumCorpseChoice): string {
+function choiceLabel(value: EnumCorpseChoice): string
+{
 	return CORPSE_LABEL[value];
 }
 
@@ -182,7 +189,8 @@ function choiceLabel(value: EnumCorpseChoice): string {
  * 解析結果 → 可讀文字（同時說明物件規格帶了哪些欄位）
  * Resolved result → readable text (also listing which spec fields the object carries)
  */
-function describeCorpse(policy: ICorpsePolicy | undefined): string {
+function describeCorpse(policy: ICorpsePolicy | undefined): string
+{
 	if (!policy) return '消失';
 	if (policy === true) return `留屍體（預設圖 ${DEFAULT_CORPSE_ASSET}）`;
 	const styleText =
@@ -196,7 +204,8 @@ function describeCorpse(policy: ICorpsePolicy | undefined): string {
 }
 
 /** 示範參數 / demo args */
-interface ICorpsePolicyDemoArgs {
+interface ICorpsePolicyDemoArgs
+{
 	/** 戰鬥級：全場預設 corpse / battle-level default */
 	battleCorpse: EnumCorpseChoice;
 	/** 隊伍級（左＝敵方）/ team-level (left = enemies) */
@@ -228,7 +237,8 @@ const RIGHT_IMAGE = '/image/char_rev/mon_018.png';
 function buildDemoData(
 	args: ICorpsePolicyDemoArgs,
 	controls: ICorpseSpecControls,
-): IBattleDisplayData {
+): IBattleDisplayData
+{
 	// 以共用的 resolveCorpsePolicy 解析，與引擎同一套規則（單一事實來源）
 	// Resolve with the shared resolveCorpsePolicy so the story and the engine share one rule
 	const leftCorpse = resolveCorpsePolicy(
@@ -327,7 +337,8 @@ function buildDemoData(
 }
 
 /** 示範元件：顯示各級設定與解析結果，再渲染單段 BattleDisplay / Demo component */
-const CorpsePolicyDemo: React.FC<ICorpsePolicyDemoArgs> = (args) => {
+const CorpsePolicyDemo: React.FC<ICorpsePolicyDemoArgs> = (args) =>
+{
 	const controls = buildControls(args);
 	const data = buildDemoData(args, controls);
 	const [leftUnit, rightUnit] = data.snapshots![0].units;

@@ -16,11 +16,12 @@
 import { spriteImageSizes } from './spriteImageIndex.generated';
 
 /** 圖像尺寸 / Image size */
-export interface ISpriteImageSize {
-  /** 寬度 / Width */
-  width: number;
-  /** 高度 / Height */
-  height: number;
+export interface ISpriteImageSize
+{
+	/** 寬度 / Width */
+	width: number;
+	/** 高度 / Height */
+	height: number;
 }
 
 /**
@@ -30,8 +31,9 @@ export interface ISpriteImageSize {
  * 以函式形式提供，每次呼叫回傳全新物件，避免呼叫端意外修改共享常數。
  * Returned as a fresh object each call so callers can't mutate a shared constant.
  */
-export function getDefaultSpriteImageSize(): ISpriteImageSize {
-  return { width: 100, height: 100 };
+export function getDefaultSpriteImageSize(): ISpriteImageSize
+{
+	return { width: 100, height: 100 };
 }
 
 /**
@@ -40,8 +42,9 @@ export function getDefaultSpriteImageSize(): ISpriteImageSize {
  *
  * @param url 圖檔 URL（如 /image/char/mon_052.png） / Image URL
  */
-export function getSpriteImageSize(url: string): ISpriteImageSize {
-  return spriteImageSizes[url] ?? getDefaultSpriteImageSize();
+export function getSpriteImageSize(url: string): ISpriteImageSize
+{
+	return spriteImageSizes[url] ?? getDefaultSpriteImageSize();
 }
 
 /** 圖像尺寸索引資料（由 spriteImageIndex.generated.ts 彙總；重新匯出供直接取用）

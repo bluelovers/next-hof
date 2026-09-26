@@ -24,23 +24,28 @@ import React, { useMemo } from 'react';
 import type { CSSProperties } from 'react';
 import type { IBattleSprite, IBattleSpriteLabelOptions } from './types';
 import { BattleFieldSpriteLabel } from './BattleFieldSpriteLabel';
-import { useSpriteLabelRegistry, type ISpriteLabelRegistry, type ISpriteLabelComputeInput } from './useSpriteLabelRegistry';
+import {
+	useSpriteLabelRegistry,
+	type ISpriteLabelRegistry,
+	type ISpriteLabelComputeInput,
+} from './useSpriteLabelRegistry';
 import './BattleFieldSpriteLayers.css';
 import type { IStyleProps } from '#/components/shared/types';
 
 /** 戰場精靈圖層屬性（標籤開關共用 IBattleSpriteLabelOptions）/ Battlefield sprite layers props (label toggle from the shared IBattleSpriteLabelOptions) */
-export interface IBattleFieldSpriteLayersProps extends IBattleSpriteLabelOptions, IStyleProps {
-  /** 精靈列表 / Sprite list */
-  sprites: IBattleSprite[];
-  /**
-   * 當前處理的索引 / Current processing index
-   * @deprecated 保留為向後相容參數，同層渲染不再需要遞迴索引
-   */
-  index?: number;
-  /** 畫布寬度 / Canvas width */
-  width: number;
-  /** 畫布高度 / Canvas height */
-  height: number;
+export interface IBattleFieldSpriteLayersProps extends IBattleSpriteLabelOptions, IStyleProps
+{
+	/** 精靈列表 / Sprite list */
+	sprites: IBattleSprite[];
+	/**
+	 * 當前處理的索引 / Current processing index
+	 * @deprecated 保留為向後相容參數，同層渲染不再需要遞迴索引
+	 */
+	index?: number;
+	/** 畫布寬度 / Canvas width */
+	width: number;
+	/** 畫布高度 / Canvas height */
+	height: number;
 }
 
 /**
@@ -54,66 +59,68 @@ export interface IBattleFieldSpriteLayersProps extends IBattleSpriteLabelOptions
  * never compound.
  */
 function buildSpriteLayers(
-  props: IBattleFieldSpriteLayersProps,
-  registry: ISpriteLabelRegistry,
-): React.ReactNode[] {
-  const { sprites, width, height, showSpriteLabels, style, className } = props;
+	props: IBattleFieldSpriteLayersProps,
+	registry: ISpriteLabelRegistry,
+): React.ReactNode[]
+{
+	const { sprites, width, height, showSpriteLabels, style, className } = props;
 
-  return sprites.map((sprite, index) => {
-    const flipClass = sprite.flipped ? 'flip-h' : '';
-    // 精靈自身的 className（例如屍體規格附加的 class）與 battle-sprite 併存，不互相覆蓋
-    // The sprite's own className (e.g. from a corpse spec) coexists with battle-sprite
-    // instead of replacing it
-    const layerClass = ['battle-sprite', flipClass, sprite.className?.trim()]
-      .filter(Boolean)
-      .join(' ');
+	return sprites.map((sprite, index) =>
+	{
+		const flipClass = sprite.flipped ? 'flip-h' : '';
+		// 精靈自身的 className（例如屍體規格附加的 class）與 battle-sprite 併存，不互相覆蓋
+		// The sprite's own className (e.g. from a corpse spec) coexists with battle-sprite
+		// instead of replacing it
+		const layerClass = ['battle-sprite', flipClass, sprite.className?.trim()]
+			.filter(Boolean)
+			.join(' ');
 
-    const layerStyle: CSSProperties = {
-      width,
-      height,
-      backgroundImage: sprite.imageUrl
-        ? `url(${sprite.imageUrl})`
-        : undefined,
-      // backgroundRepeat: 'no-repeat',
-      backgroundPosition: `${sprite.x}px ${sprite.y}px`,
-      // position: 'absolute',
-    };
+		const layerStyle: CSSProperties = {
+			width,
+			height,
+			backgroundImage: sprite.imageUrl
+				? `url(${sprite.imageUrl})`
+				: undefined,
+			// backgroundRepeat: 'no-repeat',
+			backgroundPosition: `${sprite.x}px ${sprite.y}px`,
+			// position: 'absolute',
+		};
 
-    // 合併順序：基礎樣式 < 元件/輔助函式 style < 單體精靈 style（最優先）
-    // Merge order: base < component/helper style < per-sprite style (highest priority)
-    const mergedStyle: CSSProperties = {
-      ...layerStyle,
-      ...style,
-      ...sprite.style,
-    };
+		// 合併順序：基礎樣式 < 元件/輔助函式 style < 單體精靈 style（最優先）
+		// Merge order: base < component/helper style < per-sprite style (highest priority)
+		const mergedStyle: CSSProperties = {
+			...layerStyle,
+			...style,
+			...sprite.style,
+		};
 
-    // 由上層 useSpriteLabelRegistry 預先算好的防重疊位置（依順序對應）
-    // Pre-computed anti-overlap position from useSpriteLabelRegistry (matched by order).
-    const entry = registry.entries[index];
+		// 由上層 useSpriteLabelRegistry 預先算好的防重疊位置（依順序對應）
+		// Pre-computed anti-overlap position from useSpriteLabelRegistry (matched by order).
+		const entry = registry.entries[index];
 
-    return (
-      <div
-        key={sprite.unitUuid ?? index}
-        className={[layerClass, className].filter(Boolean).join(' ')}
-        id={sprite.unitUuid}
-        style={mergedStyle}
-      >
-        {showSpriteLabels && sprite.name && (
-          <BattleFieldSpriteLabel
-            name={sprite.name}
-            x={sprite.x}
-            y={sprite.y}
-            imageSize={sprite.imageSize}
-            placement={sprite.placement}
-            frameSize={{ width, height }}
-            flipped={sprite.flipped}
-            style={sprite.labelStyle}
-            position={entry?.pos}
-          />
-        )}
-      </div>
-    );
-  });
+		return (
+			<div
+				key={sprite.unitUuid ?? index}
+				className={[layerClass, className].filter(Boolean).join(' ')}
+				id={sprite.unitUuid}
+				style={mergedStyle}
+			>
+				{showSpriteLabels && sprite.name && (
+					<BattleFieldSpriteLabel
+						name={sprite.name}
+						x={sprite.x}
+						y={sprite.y}
+						imageSize={sprite.imageSize}
+						placement={sprite.placement}
+						frameSize={{ width, height }}
+						flipped={sprite.flipped}
+						style={sprite.labelStyle}
+						position={entry?.pos}
+					/>
+				)}
+			</div>
+		);
+	});
 }
 
 /**
@@ -127,23 +134,24 @@ function buildSpriteLayers(
  * (a ref-backed cache) to pre-compute each label's anti-overlap position, then passes it down
  * via the position prop so labels don't overlap each other.
  */
-export const BattleFieldSpriteLayers: React.FC<IBattleFieldSpriteLayersProps> = (props) => {
-  const { sprites, width, height } = props;
-  // 依序把精靈轉為標籤運算輸入；memo 化使 inputs 在 sprites 不變時保持穩定，
-  // 進而讓 useSpriteLabelRegistry 的 useMemo / ref 快取能跨渲染生效。
-  // Map sprites to label-compute inputs in order; memoized so inputs stay stable when
-  // sprites is unchanged, letting useSpriteLabelRegistry's useMemo/ref cache persist across renders.
-  const inputs = useMemo<ISpriteLabelComputeInput[]>(
-    () =>
-      sprites.map((s, i) => ({
-        x: s.x,
-        y: s.y,
-        imageSize: s.imageSize,
-        placement: s.placement,
-        unitUuid: s.unitUuid ?? String(i),
-      })),
-    [sprites],
-  );
-  const registry = useSpriteLabelRegistry(inputs, { width, height });
-  return <>{buildSpriteLayers(props, registry)}</>;
+export const BattleFieldSpriteLayers: React.FC<IBattleFieldSpriteLayersProps> = (props) =>
+{
+	const { sprites, width, height } = props;
+	// 依序把精靈轉為標籤運算輸入；memo 化使 inputs 在 sprites 不變時保持穩定，
+	// 進而讓 useSpriteLabelRegistry 的 useMemo / ref 快取能跨渲染生效。
+	// Map sprites to label-compute inputs in order; memoized so inputs stay stable when
+	// sprites is unchanged, letting useSpriteLabelRegistry's useMemo/ref cache persist across renders.
+	const inputs = useMemo<ISpriteLabelComputeInput[]>(
+		() =>
+			sprites.map((s, i) => ({
+				x: s.x,
+				y: s.y,
+				imageSize: s.imageSize,
+				placement: s.placement,
+				unitUuid: s.unitUuid ?? String(i),
+			})),
+		[sprites],
+	);
+	const registry = useSpriteLabelRegistry(inputs, { width, height });
+	return <>{buildSpriteLayers(props, registry)}</>;
 };

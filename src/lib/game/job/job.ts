@@ -8,7 +8,8 @@ import type { IJobDef, EnumWeaponType } from '../types';
  * 判斷職業是否可裝備某武器/防具型別
  * Whether the job may equip the given weapon/armor type
  */
-export function equipAllowed(job: IJobDef, itemType: EnumWeaponType): boolean {
+export function equipAllowed(job: IJobDef, itemType: EnumWeaponType): boolean
+{
 	return !!job.equip?.includes(itemType);
 }
 
@@ -18,7 +19,8 @@ export function equipAllowed(job: IJobDef, itemType: EnumWeaponType): boolean {
  * new_maxhp = 100 * coe['maxhp'] * (1 + (level-1)/49) * (1 + STR 係數 / STR factor)
  * STR 係數：MAX_STATUS > RevStr ? (div - RevStr^2)/div : RevStr^2/div
  */
-export function coeMaxHp(job: IJobDef, str: number, level: number): number {
+export function coeMaxHp(job: IJobDef, str: number, level: number): number
+{
 	const coe = job.coe?.maxhp ?? 1;
 	const div = MAX_STATUS * MAX_STATUS;
 	const revStr = MAX_STATUS - str;

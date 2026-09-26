@@ -16,7 +16,8 @@ import { EnumCharType } from '../types';
  * @param repo 資料倉庫 / data repository
  * @param rng 隨機源（存入 c.rng 供後續擲骰）/ random source (stored on c.rng for later rolls)
  */
-export function newChar(def: ICharDef, repo: IDataRepository, rng: RNG): Character {
+export function newChar(def: ICharDef, repo: IDataRepository, rng: RNG): Character
+{
 	const c = new Character({
 		no: def.no,
 		unitUuid: def.unitUuid,
@@ -51,7 +52,8 @@ export function newChar(def: ICharDef, repo: IDataRepository, rng: RNG): Charact
  * @param rng 隨機源 / random source
  * @param strength 強度倍率（≠1 時六維與 HP/SP 上限向上取整並回滿）/ strength multiplier (when ≠1, ceil-scales stats and HP/SP caps, then refills)
  */
-export function newMon(def: IMonDef, repo: IDataRepository, rng: RNG, strength = 1): Character {
+export function newMon(def: IMonDef, repo: IDataRepository, rng: RNG, strength = 1): Character
+{
 	const c = new Character({
 		no: def.no,
 		unitUuid: def.unitUuid,
@@ -73,8 +75,10 @@ export function newMon(def: IMonDef, repo: IDataRepository, rng: RNG, strength =
 		corpse: def.corpse,
 	});
 	c.rng = rng;
-	if (strength && strength !== 1) {
-		for (const k of PRIMARY_STATS) {
+	if (strength && strength !== 1)
+	{
+		for (const k of PRIMARY_STATS)
+		{
 			c[k] = Math.ceil(c[k] * strength);
 		}
 		c.maxhp = Math.ceil(c.maxhp * strength);
@@ -90,7 +94,8 @@ export function newMon(def: IMonDef, repo: IDataRepository, rng: RNG, strength =
  * 建立召喚物（Mon + Summon 類型疊加）/ Create a summon (Mon + Summon types stacked)
  * Callers rely on EnumCharType.Summon so counts exclude it.
  */
-export function newMonSummon(def: IMonDef, repo: IDataRepository, rng: RNG, strength = 1): Character {
+export function newMonSummon(def: IMonDef, repo: IDataRepository, rng: RNG, strength = 1): Character
+{
 	const c = newMon(def, repo, rng, strength);
 	c.types.add(EnumCharType.Summon);
 	return c;
@@ -99,7 +104,8 @@ export function newMonSummon(def: IMonDef, repo: IDataRepository, rng: RNG, stre
 /**
  * 建立工會怪（Mon + Union 類型疊加）/ Create a union monster (Mon + Union types stacked)
  */
-export function newUnion(def: IMonDef, repo: IDataRepository, rng: RNG): Character {
+export function newUnion(def: IMonDef, repo: IDataRepository, rng: RNG): Character
+{
 	const c = newMon(def, repo, rng, 1);
 	c.types.add(EnumCharType.Union);
 	return c;

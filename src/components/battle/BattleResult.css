@@ -12,57 +12,67 @@
  * Responsive: team stats use flex and stack automatically when too narrow.
  */
 
-.battle-result {
-  width: 100%;
+.battle-result
+{
+	width: 100%;
 }
 
-.result-title-row {
-  text-align: center;
-  padding: 10px 0;
+.result-title-row
+{
+	text-align: center;
+	padding: 10px 0;
 }
 
-.result-stats-row {
-  display: flex;
-  flex-wrap: wrap;
+.result-stats-row
+{
+	display: flex;
+	flex-wrap: wrap;
 }
 
 /* ==================== 結果標題 / Result Title ==================== */
 
-.result-title {
-  font-size: 200%;
-  text-align: center;
-  padding: 10px 0;
+.result-title
+{
+	font-size: 200%;
+	text-align: center;
+	padding: 10px 0;
 }
 
-.result-title.win {
-  color: var(--color-result);
-  text-shadow: 0 0 0.2em var(--color-result-glow);
+.result-title.win
+{
+	color: var(--color-result);
+	text-shadow: 0 0 0.2em var(--color-result-glow);
 }
 
-.result-title.lose {
-  color: var(--color-dmg);
-  text-shadow: 0 0 0.2em var(--color-dmg-glow);
+.result-title.lose
+{
+	color: var(--color-dmg);
+	text-shadow: 0 0 0.2em var(--color-dmg-glow);
 }
 
 /* ==================== 統計數據 / Statistics ==================== */
 
 /* 隊伍名稱標題（統計欄最上方；與統計列同置中）/ Team name heading (top of the stats column; centred with the rows) */
-.result-team-name {
-  padding-bottom: 2px;
+.result-team-name
+{
+	padding-bottom: 2px;
 }
 
 /* 統計列間距（面板容器版面 .teams 見 BattleSidePanel.css，單一事實來源）
    Stat-row spacing (the panel container layout .teams lives in BattleSidePanel.css; single source of truth) */
-.result-stats .stat-row {
-  padding: 2px 0;
+.result-stats .stat-row
+{
+	padding: 2px 0;
 }
 
 /* ==================== 窄螢幕 / Narrow screens ==================== */
 
-@media (max-width: 640px) {
-  /* 堆疊後不需要欄位分隔線（作用域限本元件，不依賴父頁面 CSS）
-     No column divider once stacked (scoped to this component; no parent-page CSS) */
-  .result-stats-row .ttd1 {
-    border-left: none;
-  }
+@media (max-width: 640px)
+{
+	/* 堆疊後不需要欄位分隔線（作用域限本元件，不依賴父頁面 CSS）
+		 No column divider once stacked (scoped to this component; no parent-page CSS) */
+	.result-stats-row .ttd1
+	{
+		border-left: none;
+	}
 }

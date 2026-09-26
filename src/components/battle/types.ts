@@ -34,7 +34,8 @@ export const TEAM_SIDE_CLASS: Record<EnumTeamSideUI, EnumTeamSideClass> = {
 };
 
 /** 以隊伍側為 key 的成對結構（通用單一事實來源）/ Generic left/right pair */
-export interface IBattleSidePair<T> {
+export interface IBattleSidePair<T>
+{
 	/** 左隊 / Left team */
 	left: T;
 	/** 右隊 / Right team */
@@ -58,7 +59,8 @@ export type IAttributeType = EnumAttributeType;
  * declared once. The engine layer uses team (EnumTeamSide) and dead instead — different
  * name and enum — so they stay out of this group and no conversion is required.
  */
-export interface IBattleDisplayUnitFields {
+export interface IBattleDisplayUnitFields
+{
 	/** 隊伍側（UI 顯示層 left/right）/ team side (UI display layer: left/right) */
 	side: EnumTeamSideUI;
 	/** 顯示狀態（down＝倒下、casting＝詠唱；缺省＝存活）/ display status (down/casting; absent = alive) */
@@ -66,7 +68,8 @@ export interface IBattleDisplayUnitFields {
 }
 
 /** 戰鬥單位 / Battle unit */
-export interface IBattleUnit extends IBattleUnitVitals, IBattleDisplayUnitFields {
+export interface IBattleUnit extends IBattleUnitVitals, IBattleDisplayUnitFields
+{
 	/** 等級 / Level */
 	level: number;
 	/** 速度（決定行動順序）/ speed (action order) */
@@ -81,7 +84,8 @@ export interface IBattleUnit extends IBattleUnitVitals, IBattleDisplayUnitFields
 }
 
 /** 隊伍資訊 / Team info */
-export interface IBattleTeam extends IUnitList<IBattleUnit> {
+export interface IBattleTeam extends IUnitList<IBattleUnit>
+{
 	/** 隊伍名稱 / Team name */
 	name: string;
 	/** 隊伍圖示 / Team icon */
@@ -91,7 +95,8 @@ export interface IBattleTeam extends IUnitList<IBattleUnit> {
 }
 
 /** 戰場精靈 / Battlefield sprite */
-export interface IBattleSprite extends IStyleProps {
+export interface IBattleSprite extends IStyleProps
+{
 	/**
 	 * 戰鬥單位實例唯一識別碼（Character.unitUuid；同時作為 DOM id 用於定位/選取）
 	 * Battle-unit instance uid (Character.unitUuid; also used as the DOM id for
@@ -130,7 +135,8 @@ export type IBattleFieldVAlign = EnumBattleFieldVAlign;
 export type IBattleFieldBgScale = EnumBattleFieldBgScale;
 
 /** 魔方陣（魔法陣）圖層 / Magic circle layer */
-export interface IBattleMagicCircle {
+export interface IBattleMagicCircle
+{
 	/** 魔方陣圖片路徑 / Magic-circle image path */
 	imageUrl: string;
 	/** X 軸位置（預設 280，對應 PHP 魔方陣定位） / X position (default 280) */
@@ -152,7 +158,8 @@ export const MAGIC_CIRCLE_DEFAULT_X = 280;
 export const MAGIC_CIRCLE_DEFAULT_Y = 0;
 
 /** 戰場背景 / Battlefield background */
-export interface IBattleFieldConfig {
+export interface IBattleFieldConfig
+{
 	/** 背景類型 / Background type */
 	backgroundType?: string;
 	/** 背景圖片 URL / Background image URL */
@@ -173,7 +180,8 @@ export interface IBattleFieldConfig {
 export type IActionType = EnumActionType;
 
 /** 技能圖示 / Skill icon */
-export interface ISkillIcon {
+export interface ISkillIcon
+{
 	/** 技能名稱 / Skill name */
 	name: string;
 	/** 圖示 URL / Icon URL */
@@ -190,7 +198,8 @@ export interface ISkillIcon {
  * Battlefield."; when `level` is absent the "Lv.N" is dropped, and when `imageUrl` is
  * absent the image is dropped.
  */
-export interface ISummonedUnit {
+export interface ISummonedUnit
+{
 	/** 單位名稱 / unit name */
 	name: string;
 	/** 單位等級（缺省時不顯示 Lv.N）/ unit level (no "Lv.N" when absent) */
@@ -209,7 +218,8 @@ export interface ISummonedUnit {
  * amount decides the " xN" suffix; for the Fail kind neither the caster name nor the
  * amount is shown.
  */
-export interface IMagicCircleRecord {
+export interface IMagicCircleRecord
+{
 	/** 紀錄種類 / Record kind */
 	kind: EnumMagicCircleKind;
 	/** 魔方陣數量（Fail 不顯示）/ Magic-circle amount (not shown for Fail) */
@@ -225,7 +235,8 @@ export interface IMagicCircleRecord {
  * Mirrors Char/Battle/Effect.php's EnergyExchange: `{name} exchanged rate of HP and SP.`
  * followed by two lines `HP: from(rate%) to to(rate%)` and `SP: from(rate%) to to(rate%)`.
  */
-export interface IEnergyExchangeRecord {
+export interface IEnergyExchangeRecord
+{
 	/** HP 交換前 / HP before */
 	hpFrom: number;
 	/** HP 交換前比率 / HP before rate */
@@ -256,7 +267,8 @@ export interface IEnergyExchangeRecord {
  * is printed (e.g. after `from enemy` the name is already shown, so its change drops the who).
  * The symbol between the ends is decided by the renderer.
  */
-export interface IValueChangeRecord {
+export interface IValueChangeRecord
+{
 	/** 誰的數值變化（缺省時只印括號；非缺省時以粗體名牌呈現）/ Whose value changed (omitted → parentheses only) */
 	who?: string;
 	/** 變化前 / Before */
@@ -266,7 +278,8 @@ export interface IValueChangeRecord {
 }
 
 /** 戰鬥動作 / Battle action */
-export interface IBattleAction {
+export interface IBattleAction
+{
 	/** 動作類型 / Action type */
 	type: EnumActionType;
 	/** 動作來源 / Source unit */
@@ -374,7 +387,8 @@ export interface IBattleAction {
 }
 
 /** 戰鬥結果 / Battle result */
-export interface IBattleResult {
+export interface IBattleResult
+{
 	/** 勝利隊伍名稱 / Winner team name */
 	winner: string;
 	/** 勝利側別（用於配色）/ winning side (for colouring) */
@@ -388,7 +402,8 @@ export interface IBattleResult {
 }
 
 /** 隊伍最終統計 / Team final stats */
-export interface ITeamFinalStats {
+export interface ITeamFinalStats
+{
 	/** 剩餘 HP / HP remain */
 	hpRemain: number;
 	/** 存活單位數 / Alive count */
@@ -424,7 +439,8 @@ export type IDisplayTimeString = string;
  * Shared by IBattleDisplayData and IShowcaseBattleInput via extends so the same-named,
  * same-typed fields are defined once instead of drifting apart.
  */
-export interface IBattleDisplayMeta {
+export interface IBattleDisplayMeta
+{
 	/** 戰鬥標題 / Battle title */
 	title?: string;
 	/** 戰鬥時間 / Battle time */
@@ -432,7 +448,8 @@ export interface IBattleDisplayMeta {
 }
 
 /** BattleDisplay 完整資料 / Complete battle display data */
-export interface IBattleDisplayData extends IBattleDisplayMeta {
+export interface IBattleDisplayData extends IBattleDisplayMeta
+{
 	/** 左側隊伍 / Left team */
 	leftTeam: IBattleTeam;
 	/** 右側隊伍 / Right team */
@@ -456,7 +473,8 @@ export interface IBattleDisplayData extends IBattleDisplayMeta {
  * HP/SP bar toggles (group A: BattleDisplay and its children extend this instead of
  * redeclaring the fields)
  */
-export interface IBattleBarToggleOptions {
+export interface IBattleBarToggleOptions
+{
 	/** 是否顯示 HP 條 / Whether to show HP bars */
 	showHpBars?: boolean;
 	/** 是否顯示 SP 條 / Whether to show SP bars */
@@ -467,7 +485,8 @@ export interface IBattleBarToggleOptions {
  * 戰場名稱標籤顯示開關（共用組 B：BattleDisplay 與 BattleField* 圖層鏈共用）
  * Sprite name-label toggle (group B: shared by BattleDisplay and the BattleField* layer chain)
  */
-export interface IBattleSpriteLabelOptions {
+export interface IBattleSpriteLabelOptions
+{
 	/** 是否顯示名稱標籤 / Whether to show name labels on sprites */
 	showSpriteLabels?: boolean;
 }
@@ -482,7 +501,8 @@ export interface IBattleSpriteLabelOptions {
  * rightSprite and IBattleUnit.sprite respectively, and nothing is rendered when the
  * data is absent even if the toggle is on.
  */
-export interface IBattleSpriteToggleOptions {
+export interface IBattleSpriteToggleOptions
+{
 	/** 是否顯示隊伍（側）精靈 / Whether to show the team (side) sprite */
 	showTeamSprite?: boolean;
 	/** 是否顯示單位精靈 / Whether to show unit sprites */
@@ -494,7 +514,8 @@ export interface IBattleSpriteToggleOptions {
  * Combined battle display toggles (group A + group B + group C)
  */
 export interface IBattleDisplayOptions
-	extends IBattleBarToggleOptions, IBattleSpriteLabelOptions, IBattleSpriteToggleOptions {}
+	extends IBattleBarToggleOptions, IBattleSpriteLabelOptions, IBattleSpriteToggleOptions
+{}
 
 /**
  * 快照單位（顯示側）
@@ -508,7 +529,8 @@ export interface IBattleDisplayOptions
  * EnumUnitStatus). The Display suffix avoids colliding with the domain type.
  */
 export interface IBattleSnapshotDisplayUnit
-	extends ICorpsePolicyField, IBattleUnitVitals, IBattleDisplayUnitFields {
+	extends ICorpsePolicyField, IBattleUnitVitals, IBattleDisplayUnitFields
+{
 	/**
 	 * 外觀覆寫（型態變化等；未提供時沿用精靈自身圖檔）
 	 * Appearance override (e.g. form change; when absent the sprite's own image is used)
@@ -526,7 +548,8 @@ export interface IBattleSnapshotDisplayUnit
 }
 
 /** 戰鬥快照（顯示側）/ Battle snapshot (display side) */
-export interface IBattleSnapshotDisplay extends IUnitList<IBattleSnapshotDisplayUnit> {
+export interface IBattleSnapshotDisplay extends IUnitList<IBattleSnapshotDisplayUnit>
+{
 	/** 對應 actions 的索引位置 / index into actions */
 	at: number;
 }
@@ -540,7 +563,8 @@ export interface IBattleSnapshotDisplay extends IUnitList<IBattleSnapshotDisplay
  * Each segment pairs a snapshot's starting state with the actions that follow it;
  * without snapshot data it degrades to a single segment (snapshot undefined).
  */
-export interface IBattleSegment {
+export interface IBattleSegment
+{
 	/** 分段索引（由 0 起）/ segment index (0-based) */
 	index: number;
 	/** 分段起始快照（無則 undefined）/ snapshot at segment start (undefined when absent) */

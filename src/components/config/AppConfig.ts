@@ -22,8 +22,9 @@ export const BASE_URL = 'http://127.0.0.1:8085';
  * @param path - 路徑（可含或不含開頭 '/'） / Path (with or without leading '/')
  * @returns 完整 URL / Full URL
  */
-export function buildAppUrl(path = ''): string {
-  if (!path) return BASE_URL;
-  const sep = path.startsWith('/') ? '' : '/';
-  return `${BASE_URL}${sep}${path}`;
+export function buildAppUrl(path = ''): string
+{
+	if (!path) return BASE_URL;
+	const sep = path.startsWith('/') ? '' : '/';
+	return `${BASE_URL}${sep}${path}`;
 }

@@ -11,28 +11,28 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { BattleDisplay } from '#/components/pages/BattleDisplay';
 import {
-  battleOverData,
-  casualtyData,
-  defaultBattleData,
-  logMessagesData,
-  magicCircleData,
-  midBattleData,
-  summonData,
+	battleOverData,
+	casualtyData,
+	defaultBattleData,
+	logMessagesData,
+	magicCircleData,
+	midBattleData,
+	summonData,
 } from '../../fixture/battleDisplayData';
 
 const meta: Meta<typeof BattleDisplay> = {
-  title: 'Pages/BattlePage/BattleDisplay',
-  component: BattleDisplay,
-  parameters: {
-    layout: 'fullscreen',
-    docs: {
-      description: {
-        component:
-          '完整戰鬥畫面展示組件，包含隊伍資訊、戰場畫面、HP/SP 狀態、行動日誌與戰鬥結果。\nComplete battle display component with team info, battlefield scene, HP/SP status, action log, and battle result.',
-      },
-    },
-  },
-  tags: ['autodocs'],
+	title: 'Pages/BattlePage/BattleDisplay',
+	component: BattleDisplay,
+	parameters: {
+		layout: 'fullscreen',
+		docs: {
+			description: {
+				component:
+					'完整戰鬥畫面展示組件，包含隊伍資訊、戰場畫面、HP/SP 狀態、行動日誌與戰鬥結果。\nComplete battle display component with team info, battlefield scene, HP/SP status, action log, and battle result.',
+			},
+		},
+	},
+	tags: ['autodocs'],
 };
 
 export default meta;
@@ -42,142 +42,142 @@ type Story = StoryObj<typeof BattleDisplay>;
 
 /** 預設戰鬥畫面 / Default battle scene */
 export const Default: Story = {
-  args: {
-    data: defaultBattleData,
-    showSpriteLabels: false,
-    showHpBars: true,
-    showSpBars: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '完整的戰鬥記錄，展示兩支隊伍交戰的完整過程。\nComplete battle record showing the full engagement between two teams.',
-      },
-    },
-  },
+	args: {
+		data: defaultBattleData,
+		showSpriteLabels: false,
+		showHpBars: true,
+		showSpBars: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'完整的戰鬥記錄，展示兩支隊伍交戰的完整過程。\nComplete battle record showing the full engagement between two teams.',
+			},
+		},
+	},
 };
 
 /** 顯示角色名稱 / With sprite labels */
 export const WithSpriteLabels: Story = {
-  args: {
-    data: defaultBattleData,
-    showSpriteLabels: true,
-    showHpBars: true,
-    showSpBars: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '在戰場畫面中顯示角色名稱標籤，方便識別每個單位。\nShow character name labels on the battlefield for easy unit identification.',
-      },
-    },
-  },
+	args: {
+		data: defaultBattleData,
+		showSpriteLabels: true,
+		showHpBars: true,
+		showSpBars: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'在戰場畫面中顯示角色名稱標籤，方便識別每個單位。\nShow character name labels on the battlefield for easy unit identification.',
+			},
+		},
+	},
 };
 
 /** 戰鬥中 / Mid-battle state */
 export const MidBattle: Story = {
-  args: {
-    data: midBattleData,
-    showHpBars: true,
-    showSpBars: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '戰鬥進行中的狀態，部分單位已受損。\nMid-battle state showing some units with reduced HP.',
-      },
-    },
-  },
+	args: {
+		data: midBattleData,
+		showHpBars: true,
+		showSpBars: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'戰鬥進行中的狀態，部分單位已受損。\nMid-battle state showing some units with reduced HP.',
+			},
+		},
+	},
 };
 
 /** 單位陣亡 / With casualties */
 export const WithCasualties: Story = {
-  args: {
-    data: casualtyData,
-    showHpBars: true,
-    showSpBars: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '單位陣亡狀態，部分角色 HP 歸零。\nCasualty state showing some characters with 0 HP.',
-      },
-    },
-  },
+	args: {
+		data: casualtyData,
+		showHpBars: true,
+		showSpBars: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'單位陣亡狀態，部分角色 HP 歸零。\nCasualty state showing some characters with 0 HP.',
+			},
+		},
+	},
 };
 
 /** 戰鬥中召喚 / Summoning mid-battle */
 export const WithSummon: Story = {
-  args: {
-    data: summonData,
-    showSpriteLabels: false,
-    showHpBars: true,
-    showSpBars: true,
-    showUnitSprites: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Mage1 施放 GraveYard（skill 2464，3 體召喚）：召喚條目顯示施放者＋技能與每隻木乃伊的「joined to the team / enter the Battlefield」，' +
-          '木乃伊不在開場入場列，第二段快照起才出現在 HP/SP 狀態與戰場上。'
-      },
-    },
-  },
+	args: {
+		data: summonData,
+		showSpriteLabels: false,
+		showHpBars: true,
+		showSpBars: true,
+		showUnitSprites: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'Mage1 施放 GraveYard（skill 2464，3 體召喚）：召喚條目顯示施放者＋技能與每隻木乃伊的「joined to the team / enter the Battlefield」，' +
+					'木乃伊不在開場入場列，第二段快照起才出現在 HP/SP 狀態與戰場上。',
+			},
+		},
+	},
 };
 
 /** 魔方陣紀錄 / Magic-circle records */
 export const WithMagicCircle: Story = {
-  args: {
-    data: magicCircleData,
-    showHpBars: true,
-    showSpBars: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '魔方陣相關紀錄：draw（描繪己方，support 色）／erased enemy（消除敵方，dmg 色）／use（消耗代價，charge 色）／failed!（魔方陣不足，dmg 色），' +
-          '文案與配色取自原始日誌字串。'
-      },
-    },
-  },
+	args: {
+		data: magicCircleData,
+		showHpBars: true,
+		showSpBars: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'魔方陣相關紀錄：draw（描繪己方，support 色）／erased enemy（消除敵方，dmg 色）／use（消耗代價，charge 色）／failed!（魔方陣不足，dmg 色），' +
+					'文案與配色取自原始日誌字串。',
+			},
+		},
+	},
 };
 
 /** 完整日誌訊息覆蓋 / Full log-message coverage */
 export const WithLogMessages: Story = {
-  args: {
-    data: logMessagesData,
-    showHpBars: true,
-    showSpBars: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '每個訊息族系各示範一次'
-      },
-    },
-  },
+	args: {
+		data: logMessagesData,
+		showHpBars: true,
+		showSpBars: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'每個訊息族系各示範一次',
+			},
+		},
+	},
 };
 
 /** 戰鬥結果 / Battle result */
 export const BattleOver: Story = {
-  args: {
-    data: battleOverData,
-    showHpBars: true,
-    showSpBars: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '戰鬥結束後的結果畫面，包含最終統計數據。\nPost-battle result screen with final statistics.',
-      },
-    },
-  },
+	args: {
+		data: battleOverData,
+		showHpBars: true,
+		showSpBars: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'戰鬥結束後的結果畫面，包含最終統計數據。\nPost-battle result screen with final statistics.',
+			},
+		},
+	},
 };

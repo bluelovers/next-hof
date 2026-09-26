@@ -6,7 +6,8 @@
 
 import { ShowcasePage } from '#/components/showcase/ShowcasePage';
 
-export default function HomePage() {
+export default function HomePage()
+{
 	return (
 		<main className="showcase-page">
 			<ShowcasePage />

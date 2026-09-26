@@ -47,7 +47,8 @@ import type {
 } from './types';
 
 /** 建立最小可用行動 / Build a minimal action */
-function action(message: string, side?: EnumTeamSideUI): IBattleAction {
+function action(message: string, side?: EnumTeamSideUI): IBattleAction
+{
 	return { type: EnumActionType.Attack, message, side };
 }
 
@@ -55,12 +56,15 @@ function action(message: string, side?: EnumTeamSideUI): IBattleAction {
 function snapshot(
 	at: number,
 	units: IBattleSnapshotDisplay['units'] = [],
-): IBattleSnapshotDisplay {
+): IBattleSnapshotDisplay
+{
 	return { at, units };
 }
 
-describe('splitActionsBySnapshots', () => {
-	it('returns a single snapshot-less segment when no snapshots are given', () => {
+describe('splitActionsBySnapshots', () =>
+{
+	it('returns a single snapshot-less segment when no snapshots are given', () =>
+	{
 		const actions = [action('a'), action('b')];
 		const segments = splitActionsBySnapshots(actions);
 		expect(segments).toHaveLength(1);
@@ -68,7 +72,8 @@ describe('splitActionsBySnapshots', () => {
 		expect(segments[0].actions).toEqual(actions);
 	});
 
-	it('splits actions at snapshot boundaries', () => {
+	it('splits actions at snapshot boundaries', () =>
+	{
 		const actions = [action('a'), action('b'), action('c'), action('d')];
 		const segments = splitActionsBySnapshots(actions, [snapshot(0), snapshot(2)]);
 		expect(segments.map((s) => s.actions.map((a) => a.message))).toEqual([
@@ -78,7 +83,8 @@ describe('splitActionsBySnapshots', () => {
 		expect(segments.map((s) => s.index)).toEqual([0, 1]);
 	});
 
-	it('keeps a trailing state-only snapshot as the final-state segment', () => {
+	it('keeps a trailing state-only snapshot as the final-state segment', () =>
+	{
 		const actions = [action('a'), action('b')];
 		const segments = splitActionsBySnapshots(actions, [snapshot(0), snapshot(2)]);
 		expect(segments).toHaveLength(2);
@@ -87,7 +93,8 @@ describe('splitActionsBySnapshots', () => {
 		expect(segments[1].snapshot?.at).toBe(2);
 	});
 
-	it('sorts out-of-order snapshot bounds and indexes sequentially', () => {
+	it('sorts out-of-order snapshot bounds and indexes sequentially', () =>
+	{
 		const actions = [action('a'), action('b'), action('c')];
 		const segments = splitActionsBySnapshots(actions, [snapshot(2), snapshot(0)]);
 		expect(segments.map((s) => s.index)).toEqual([0, 1]);
@@ -96,8 +103,10 @@ describe('splitActionsBySnapshots', () => {
 	});
 });
 
-describe('snapshotUnitToBattleUnit', () => {
-	it('maps dead/charging status', () => {
+describe('snapshotUnitToBattleUnit', () =>
+{
+	it('maps dead/charging status', () =>
+	{
 		const dead = snapshotUnitToBattleUnit({
 			name: 'Goblin',
 			side: EnumTeamSideUI.Left,
@@ -125,8 +134,10 @@ describe('snapshotUnitToBattleUnit', () => {
 	});
 });
 
-describe('segmentUnitsForSide', () => {
-	it('uses the snapshot state filtered by side', () => {
+describe('segmentUnitsForSide', () =>
+{
+	it('uses the snapshot state filtered by side', () =>
+	{
 		const left = { name: 'Goblin', side: EnumTeamSideUI.Left, hp: 30, maxHp: 100, sp: 0, maxSp: 10, dead: false };
 		const right = { name: 'Hero', side: EnumTeamSideUI.Right, hp: 80, maxHp: 100, sp: 0, maxSp: 10, dead: false };
 		const segment = splitActionsBySnapshots([action('a')], [snapshot(0, [left, right])])[0];
@@ -135,7 +146,8 @@ describe('segmentUnitsForSide', () => {
 		expect(segmentUnitsForSide(segment, EnumTeamSideUI.Right, []).map((u) => u.name)).toEqual(['Hero']);
 	});
 
-	it('falls back to the provided units when the segment has no snapshot', () => {
+	it('falls back to the provided units when the segment has no snapshot', () =>
+	{
 		const segment = splitActionsBySnapshots([action('a')])[0];
 		const fallback = [
 			{ name: 'Hero', level: 1, hp: 1, maxHp: 1, sp: 0, maxSp: 0, side: EnumTeamSideUI.Right },
@@ -145,9 +157,11 @@ describe('segmentUnitsForSide', () => {
 	});
 });
 
-describe('resolveSegmentSprites', () => {
+describe('resolveSegmentSprites', () =>
+{
 	/** 建立最小精靈 / Build a minimal sprite */
-	function sprite(id: string, imageUrl = `/image/char/${id}.png`): IBattleSprite {
+	function sprite(id: string, imageUrl = `/image/char/${id}.png`): IBattleSprite
+	{
 		return { unitUuid: id, imageUrl, x: 0, y: 0 };
 	}
 
@@ -156,7 +170,8 @@ describe('resolveSegmentSprites', () => {
 		id: string,
 		dead: boolean,
 		extra?: Partial<IBattleSnapshotDisplayUnit>,
-	): IBattleSnapshotDisplayUnit {
+	): IBattleSnapshotDisplayUnit
+	{
 		return {
 			unitUuid: id,
 			name: `unit-${id}`,
@@ -173,37 +188,43 @@ describe('resolveSegmentSprites', () => {
 		};
 	}
 
-	it('returns the same sprites when no snapshot is given', () => {
+	it('returns the same sprites when no snapshot is given', () =>
+	{
 		const sprites = [sprite('u1')];
 		expect(resolveSegmentSprites(sprites)).toBe(sprites);
 	});
 
-	it('keeps living units with their own image', () => {
+	it('keeps living units with their own image', () =>
+	{
 		const sprites = [sprite('u1', '/image/char/mon_052.png')];
 		const snap = snapshot(0, [unit('u1', false)]);
 		expect(resolveSegmentSprites(sprites, snap)[0].imageUrl).toBe('/image/char/mon_052.png');
 	});
 
-	it('replaces a dead unit with the corpse image (forward directory)', () => {
+	it('replaces a dead unit with the corpse image (forward directory)', () =>
+	{
 		const sprites = [sprite('u1', '/image/char/mon_052.png')];
 		const snap = snapshot(0, [unit('u1', true)]);
 		expect(resolveSegmentSprites(sprites, snap)[0].imageUrl).toBe(SPRITE_CORPSE_URL);
 	});
 
-	it('uses the mirrored corpse for char_rev sprites', () => {
+	it('uses the mirrored corpse for char_rev sprites', () =>
+	{
 		const sprites = [sprite('u1', '/image/char_rev/mon_018.png')];
 		const snap = snapshot(0, [unit('u1', true)]);
 		expect(resolveSegmentSprites(sprites, snap)[0].imageUrl).toBe(SPRITE_CORPSE_URL_REV);
 	});
 
-	it('vanishes a dead unit when its policy is corpse:false', () => {
+	it('vanishes a dead unit when its policy is corpse:false', () =>
+	{
 		const sprites = [sprite('u1'), sprite('u2')];
 		const snap = snapshot(0, [unit('u1', true, { corpse: false }), unit('u2', true)]);
 		// u1 vanishes (no corpse); u2 stays as a corpse
 		expect(resolveSegmentSprites(sprites, snap).map((s) => s.unitUuid)).toEqual(['u2']);
 	});
 
-	it('treats an unset corpse policy as falsy (vanish), never as leave-corpse', () => {
+	it('treats an unset corpse policy as falsy (vanish), never as leave-corpse', () =>
+	{
 		const sprites = [sprite('u1')];
 		const unset: IBattleSnapshotDisplayUnit = {
 			unitUuid: 'u1',
@@ -218,13 +239,15 @@ describe('resolveSegmentSprites', () => {
 		expect(resolveSegmentSprites(sprites, snapshot(0, [unset]))).toHaveLength(0);
 	});
 
-	it('hides units absent from the snapshot (not yet joined / already gone)', () => {
+	it('hides units absent from the snapshot (not yet joined / already gone)', () =>
+	{
 		const sprites = [sprite('u1'), sprite('u2')];
 		const snap = snapshot(0, [unit('u1', false)]);
 		expect(resolveSegmentSprites(sprites, snap).map((s) => s.unitUuid)).toEqual(['u1']);
 	});
 
-	it('restores the original image after a revive (same uid)', () => {
+	it('restores the original image after a revive (same uid)', () =>
+	{
 		const sprites = [sprite('u1', '/image/char/mon_052.png')];
 		const deadSnap = snapshot(0, [unit('u1', true)]);
 		const revivedSnap = snapshot(1, [unit('u1', false)]);
@@ -232,13 +255,15 @@ describe('resolveSegmentSprites', () => {
 		expect(resolveSegmentSprites(sprites, revivedSnap)[0].imageUrl).toBe('/image/char/mon_052.png');
 	});
 
-	it('applies a form-change appearance override from the snapshot', () => {
+	it('applies a form-change appearance override from the snapshot', () =>
+	{
 		const sprites = [sprite('u1', '/image/char/mon_052.png')];
 		const snap = snapshot(0, [unit('u1', false, { imageUrl: '/image/char/mon_053.png' })]);
 		expect(resolveSegmentSprites(sprites, snap)[0].imageUrl).toBe('/image/char/mon_053.png');
 	});
 
-	it('uses a custom corpse image from the object spec (verbatim path)', () => {
+	it('uses a custom corpse image from the object spec (verbatim path)', () =>
+	{
 		const sprites = [sprite('u1', '/image/char/mon_052.png')];
 		const snap = snapshot(0, [
 			unit('u1', true, { corpse: { imageUrl: '/image/char/mon_146.png' } }),
@@ -246,7 +271,8 @@ describe('resolveSegmentSprites', () => {
 		expect(resolveSegmentSprites(sprites, snap)[0].imageUrl).toBe('/image/char/mon_146.png');
 	});
 
-	it('falls back to the directory-based corpse image when the spec path is blank', () => {
+	it('falls back to the directory-based corpse image when the spec path is blank', () =>
+	{
 		const sprites = [{ ...sprite('u1', '/image/char_rev/mon_018.png'), flipped: true }];
 		const snap = snapshot(0, [unit('u1', true, { corpse: { imageUrl: '   ' } })]);
 		const out = resolveSegmentSprites(sprites, snap)[0];
@@ -256,7 +282,8 @@ describe('resolveSegmentSprites', () => {
 		expect(out.flipped).toBe(true);
 	});
 
-	it('treats an empty object spec as leave-corpse with the default appearance', () => {
+	it('treats an empty object spec as leave-corpse with the default appearance', () =>
+	{
 		const sprites = [sprite('u1', '/image/char/mon_052.png')];
 		const snap = snapshot(0, [unit('u1', true, { corpse: {} })]);
 		const out = resolveSegmentSprites(sprites, snap);
@@ -266,7 +293,8 @@ describe('resolveSegmentSprites', () => {
 		expect(out[0].style).toBeUndefined();
 	});
 
-	it('appends the spec className and merges the spec style onto the corpse layer', () => {
+	it('appends the spec className and merges the spec style onto the corpse layer', () =>
+	{
 		const sprites = [
 			{ ...sprite('u1'), className: 'on-field', style: { opacity: 1, filter: 'none' } },
 		];
@@ -280,13 +308,15 @@ describe('resolveSegmentSprites', () => {
 		expect(out.style).toEqual({ opacity: 0.6, filter: 'none' });
 	});
 
-	it('keeps the original facing for the default (boolean) corpse image', () => {
+	it('keeps the original facing for the default (boolean) corpse image', () =>
+	{
 		const sprites = [{ ...sprite('u1', '/image/char/mon_052.png'), flipped: true }];
 		const snap = snapshot(0, [unit('u1', true)]);
 		expect(resolveSegmentSprites(sprites, snap)[0].flipped).toBe(true);
 	});
 
-	it('re-derives facing from a custom corpse image plus the team side', () => {
+	it('re-derives facing from a custom corpse image plus the team side', () =>
+	{
 		// char 圖 + 左隊 → 不翻轉（原精靈 char_rev + 左隊本來是翻轉的）
 		// char image + left team → no flip (the original char_rev + left sprite was flipped)
 		const onLeft = [{ ...sprite('u1', '/image/char_rev/mon_018.png'), flipped: true }];
@@ -307,7 +337,8 @@ describe('resolveSegmentSprites', () => {
 		expect(resolveSegmentSprites(onRight, rightSnap)[0].flipped).toBe(true);
 	});
 
-	it('keeps the explicit flip for a custom image outside char / char_rev', () => {
+	it('keeps the explicit flip for a custom image outside char / char_rev', () =>
+	{
 		const sprites = [{ ...sprite('u1', '/image/char/mon_052.png'), flipped: true }];
 		const snap = snapshot(0, [
 			unit('u1', true, { corpse: { imageUrl: '/image/other/tomb.png' } }),
@@ -316,8 +347,10 @@ describe('resolveSegmentSprites', () => {
 	});
 });
 
-describe('原始日誌文案與配色 / original log copy and colours', () => {
-	it('buildActionMessage is the single join point for subject and copy', () => {
+describe('原始日誌文案與配色 / original log copy and colours', () =>
+{
+	it('buildActionMessage is the single join point for subject and copy', () =>
+	{
 		expect(buildActionMessage({ source: 'Hero1', text: 'got barriered!' })).toBe(
 			'Hero1 got barriered!',
 		);
@@ -344,7 +377,8 @@ describe('原始日誌文案與配色 / original log copy and colours', () => {
 		);
 	});
 
-	it('getNamedCopy reads the structured parts instead of slicing the message', () => {
+	it('getNamedCopy reads the structured parts instead of slicing the message', () =>
+	{
 		// 產生端存入 source／text → 渲染端直接取用，完全沒有「組字串再切割」的轉換
 		// The producer stores source / text → the renderer reads them back directly: no
 		// "join a string then slice it" conversion anywhere
@@ -369,7 +403,8 @@ describe('原始日誌文案與配色 / original log copy and colours', () => {
 		).toEqual({ subject: 'GoblinAxe', text: "'s poison has cured." });
 	});
 
-	it('getNamedCopy falls back to the whole line when no text is supplied', () => {
+	it('getNamedCopy falls back to the whole line when no text is supplied', () =>
+	{
 		// 沒有 text（外部匯入的舊資料）→ 整段視為文字、名稱不加粗
 		// Without `text` (legacy data from elsewhere) the whole line is the text and no name is bolded
 		expect(getNamedCopy({ message: 'Failed!' })).toEqual({ text: 'Failed!' });
@@ -378,7 +413,8 @@ describe('原始日誌文案與配色 / original log copy and colours', () => {
 		});
 	});
 
-	it('isProtectingGuard shares the copy builder branch rule', () => {
+	it('isProtectingGuard shares the copy builder branch rule', () =>
+	{
 		expect(isProtectingGuard('Warrior', 'Mage')).toBe(true);
 		expect(isProtectingGuard('Warrior', 'Warrior')).toBe(false);
 		expect(isProtectingGuard('Warrior', undefined)).toBe(false);
@@ -394,7 +430,8 @@ describe('原始日誌文案與配色 / original log copy and colours', () => {
 		);
 	});
 
-	it('buildChargeText picks the copy from the charge kind', () => {
+	it('buildChargeText picks the copy from the charge kind', () =>
+	{
 		expect(buildChargeText(EnumChargeKind.Charging)).toBe('start charging.');
 		expect(buildChargeText(EnumChargeKind.Casting)).toBe('start casting.');
 		expect(buildChargeText()).toBe('start casting.');
@@ -405,12 +442,14 @@ describe('原始日誌文案與配色 / original log copy and colours', () => {
 		);
 	});
 
-	it('buildSpDamageMessage keeps the original no-space wording', () => {
+	it('buildSpDamageMessage keeps the original no-space wording', () =>
+	{
 		expect(buildSpDamageMessage(120, 'GoblinAxe')).toBe('120SP Damage to GoblinAxe');
 		expect(buildSpDamageMessage(120)).toBe('120SP Damage');
 	});
 
-	it('buildStatChangeText covers rise, down and the maximum wording', () => {
+	it('buildStatChangeText covers rise, down and the maximum wording', () =>
+	{
 		expect(buildStatChangeText('STR', 'rise', 10)).toBe('STR rise 10%');
 		expect(buildStatChangeText('ATK', 'down', 15)).toBe('ATK down 15%');
 		expect(buildStatChangeText('ATK', 'rise', 100, '%', true)).toBe(
@@ -425,7 +464,8 @@ describe('原始日誌文案與配色 / original log copy and colours', () => {
 		);
 	});
 
-	it('delay keeps the copy in the data and the change structured', () => {
+	it('delay keeps the copy in the data and the change structured', () =>
+	{
 		// 固定文案只由 EnumLogCopy.Delay 持有：整行由唯一合併點用成員接出，輸入端不重打字串
 		// The fixed copy is owned solely by EnumLogCopy.Delay: the single join point builds the
 		// whole line from the member, so no input retypes the string
@@ -441,7 +481,8 @@ describe('原始日誌文案與配色 / original log copy and colours', () => {
 		});
 	});
 
-	it('getValueChangeSymbol decides the symbol by type, then direction, then default', () => {
+	it('getValueChangeSymbol decides the symbol by type, then direction, then default', () =>
+	{
 		// 型別優先：Delay 固定 ⏳↘（變化後是比率字串，比不出升降）
 		// The action type wins: Delay is always ⏳↘ (its `to` is a rate, so no direction can be told)
 		expect(getValueChangeSymbol(buildValueChangeFromDelay(15, 25, 100))).toBe(
@@ -462,7 +503,8 @@ describe('原始日誌文案與配色 / original log copy and colours', () => {
 		expect(getValueChangeSymbol({ from: 'A', to: 'B' })).toBe(VALUE_CHANGE_SYMBOL.default);
 	});
 
-	it('buildValueChange prefers the pre-assembled copy and yields nothing without data', () => {
+	it('buildValueChange prefers the pre-assembled copy and yields nothing without data', () =>
+	{
 		// 預組字串優先（符號規則不介入）
 		// The pre-assembled string wins (the symbol rules stay out of it)
 		expect(buildValueChange({ valueChangeText: 'by GoblinAxe', from: 1, to: 2 })).toBe(
@@ -475,7 +517,8 @@ describe('原始日誌文案與配色 / original log copy and colours', () => {
 		).toBeNull();
 	});
 
-	it('getMessageClass maps each family to the original span class', () => {
+	it('getMessageClass maps each family to the original span class', () =>
+	{
 		const of = (type: EnumActionType, extra: Partial<IBattleAction> = {}): string =>
 			getMessageClass({ type, message: '', ...extra });
 
@@ -508,8 +551,10 @@ describe('原始日誌文案與配色 / original log copy and colours', () => {
 	});
 });
 
-describe('事件家族的原始日誌文案 / original log copy per event family', () => {
-	it('buildActMessage joins caster and skill, or the caster alone', () => {
+describe('事件家族的原始日誌文案 / original log copy per event family', () =>
+{
+	it('buildActMessage joins caster and skill, or the caster alone', () =>
+	{
 		expect(buildActMessage('Warrior', 'Fireball')).toBe('Warrior Fireball');
 		expect(buildActMessage('Warrior')).toBe('Warrior');
 		// 缺施放者時由唯一合併點接手，不把 undefined 印進日誌
@@ -518,17 +563,20 @@ describe('事件家族的原始日誌文案 / original log copy per event family
 		expect(buildActMessage(undefined)).toBe('');
 	});
 
-	it('buildDamageMessage keeps the `to target` clause only when a target exists', () => {
+	it('buildDamageMessage keeps the `to target` clause only when a target exists', () =>
+	{
 		expect(buildDamageMessage(42, 'GoblinAxe')).toBe('42 Damage to GoblinAxe');
 		expect(buildDamageMessage(42)).toBe('42 Damage');
 	});
 
-	it('buildHealMessage shares buildRecoveredText wording and keeps the `N Heal` fallback', () => {
+	it('buildHealMessage shares buildRecoveredText wording and keeps the `N Heal` fallback', () =>
+	{
 		expect(buildHealMessage(30, 'Warrior')).toBe('Warrior Recovered 30 HP');
 		expect(buildHealMessage(30)).toBe('30 Heal');
 	});
 
-	it('buildItemDropMessage and buildFailMessage keep the item and reason out of `message`', () => {
+	it('buildItemDropMessage and buildFailMessage keep the item and reason out of `message`', () =>
+	{
 		// 道具名與失敗原因各有自己的結構化欄位，message 永遠只是整行鏡像
 		// The item name and the failure reason each have their own structured field, so `message`
 		// stays a whole-line mirror
@@ -541,7 +589,8 @@ describe('事件家族的原始日誌文案 / original log copy per event family
 		expect(buildFailMessage(undefined)).toBe('Failed');
 	});
 
-	it('buildTeamGoldMessage groups the figure the way the original log prints it', () => {
+	it('buildTeamGoldMessage groups the figure the way the original log prints it', () =>
+	{
 		// 千分位是這批資訊文案唯一的格式邏輯，分錯就與原始日誌的數字不一致
 		// The thousands separator is the only formatting logic in these info lines; the wrong
 		// grouping would stop matching the figures in the original log
@@ -549,7 +598,8 @@ describe('事件家族的原始日誌文案 / original log copy per event family
 		expect(buildTeamGoldMessage('TestTeam', 1234567)).toBe('TestTeam Get 1,234,567.');
 	});
 
-	it('buildProtectMessage separates guarding someone else from blocking alone', () => {
+	it('buildProtectMessage separates guarding someone else from blocking alone', () =>
+	{
 		expect(buildProtectMessage('Warrior', 'Mage')).toBe('Warrior protected Mage!');
 		// 同單位或缺目標 → 攔截文案 / same unit or no target → the interception copy
 		expect(buildProtectMessage('Warrior', 'Warrior')).toBe(
@@ -559,7 +609,8 @@ describe('事件家族的原始日誌文案 / original log copy per event family
 		expect(buildProtectMessage()).toBe('Unknown blocked the attack with barrier!');
 	});
 
-	it('buildDownMessage and buildSummonMessage keep the original wording', () => {
+	it('buildDownMessage and buildSummonMessage keep the original wording', () =>
+	{
 		expect(buildDownMessage('Warrior')).toBe('Warrior down.');
 		expect(buildSummonMessage('Slime')).toBe('Slime joined to the team.');
 		expect(buildSummonMessage(undefined, 'Warrior')).toBe('Warrior summon.');

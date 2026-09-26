@@ -15,15 +15,16 @@ import './BattleFieldMagicCircle.css';
 import type { IStyleProps } from '#/components/shared/types';
 
 /** 魔方陣圖層屬性 / Magic-circle layer props */
-export interface IBattleMagicCircleProps extends IStyleProps {
-  /** 魔方陣資料（圖片路徑與定位） / Magic-circle data (image path & placement) */
-  magicCircle: IBattleMagicCircle;
-  /** 排版框寬度（角色精靈層尺寸） / Layout frame width (sprite layer size) */
-  width: number;
-  /** 排版框高度 / Layout frame height */
-  height: number;
-  /** 元素 id（選填，供測試或錨點定位） / Element id (optional; for tests or anchor targeting) */
-  id?: string;
+export interface IBattleMagicCircleProps extends IStyleProps
+{
+	/** 魔方陣資料（圖片路徑與定位） / Magic-circle data (image path & placement) */
+	magicCircle: IBattleMagicCircle;
+	/** 排版框寬度（角色精靈層尺寸） / Layout frame width (sprite layer size) */
+	width: number;
+	/** 排版框高度 / Layout frame height */
+	height: number;
+	/** 元素 id（選填，供測試或錨點定位） / Element id (optional; for tests or anchor targeting) */
+	id?: string;
 }
 
 /**
@@ -38,21 +39,23 @@ export interface IBattleMagicCircleProps extends IStyleProps {
  * positioned at the frame's top-left, and the parent places it beneath sprites.
  */
 export const BattleFieldMagicCircle: React.FC<IBattleMagicCircleProps> = ({
-  magicCircle,
-  width,
-  height,
-  id,
-  style,
-  className,
-}) => {
-  /** 動態樣式（依 props 計算，並合併外部傳入樣式） / Dynamic style (computed, merged with passed style) */
-  const mergedStyle: CSSProperties = {
-    width,
-    height,
-    backgroundImage: `url(${magicCircle.imageUrl})`,
-    backgroundPosition: `${magicCircle.x ?? MAGIC_CIRCLE_DEFAULT_X}px ${magicCircle.y ?? MAGIC_CIRCLE_DEFAULT_Y}px`,
-    ...style,
-  };
+	magicCircle,
+	width,
+	height,
+	id,
+	style,
+	className,
+}) =>
+{
+	/** 動態樣式（依 props 計算，並合併外部傳入樣式） / Dynamic style (computed, merged with passed style) */
+	const mergedStyle: CSSProperties = {
+		width,
+		height,
+		backgroundImage: `url(${magicCircle.imageUrl})`,
+		backgroundPosition: `${magicCircle.x ?? MAGIC_CIRCLE_DEFAULT_X}px ${magicCircle.y ?? MAGIC_CIRCLE_DEFAULT_Y}px`,
+		...style,
+	};
 
-  return <div id={id} className={className ? `battle-magic-circle ${className}` : 'battle-magic-circle'} style={mergedStyle} />;
+	return <div id={id} className={className ? `battle-magic-circle ${className}` : 'battle-magic-circle'}
+	            style={mergedStyle} />;
 };

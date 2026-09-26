@@ -23,7 +23,8 @@ import { EnumAtkSlot, EnumDefSlot } from '../character/status-attrs';
  * 傳入技能的最小必要欄位（結構型別，可直接傳入 ISkillDef）。
  * Minimal skill fields required (structural type; a full ISkillDef is assignable).
  */
-export interface ICalcSkillMinimal {
+export interface ICalcSkillMinimal
+{
 	/** 傷害類型：0=物理、1=魔法 / damage type: 0=physical, 1=magic */
 	type: EnumSkillDamageType;
 	/** 威力倍率 % / power % */
@@ -36,7 +37,8 @@ export interface ICalcSkillMinimal {
  * 額外選項（對齊原始 CalcBasicDamage 的 $option）。
  * Extra options (mirrors the original CalcBasicDamage $option).
  */
-export interface ICalcOption {
+export interface ICalcOption
+{
 	/** 傷害倍率（ChargeAttack ×4、Hit&Away ×3、PoisonBlow ×6、SoulRevenge ×N 等）/
 	 *  damage multiplier (ChargeAttack ×4, Hit&Away ×3, PoisonBlow ×6, SoulRevenge ×N, ...) */
 	multiply?: number;
@@ -65,7 +67,8 @@ export function calcBasicDamageOriginal(
 	user: Character,
 	target: Character,
 	option: ICalcOption = {},
-): number {
+): number
+{
 	const isMagic = skill.type === EnumSkillDamageType.Magic;
 	const stat = skill.inf === EnumInfluence.Dex
 		? user.DEX
@@ -80,7 +83,8 @@ export function calcBasicDamageOriginal(
 
 	// Barrier：消耗一次並使傷害歸 0（對齊原始）
 	// Barrier: consume one charge and zero the damage (mirrors original)
-	if (target.SPECIAL.Barrier) {
+	if (target.SPECIAL.Barrier)
+	{
 		target.SPECIAL.Barrier = Math.max(0, target.SPECIAL.Barrier - 1);
 		dmg = 0;
 	}
@@ -89,11 +93,15 @@ export function calcBasicDamageOriginal(
 	// Floor reference: mirrors original `$min = $dmg * (1/10)`, computed BEFORE defence reduction (after Barrier).
 	const min = dmg * 0.1;
 
-	if (!option.pierce) {
-		if (isMagic) {
+	if (!option.pierce)
+	{
+		if (isMagic)
+		{
 			dmg *= 1 - (target.def[EnumDefSlot.MagPct] ?? 0) / 100;
 			dmg -= target.def[EnumDefSlot.MagFlat] ?? 0;
-		} else {
+		}
+		else
+		{
 			dmg *= 1 - (target.def[EnumDefSlot.PhysPct] ?? 0) / 100;
 			dmg -= target.def[EnumDefSlot.PhysFlat] ?? 0;
 		}
@@ -101,7 +109,8 @@ export function calcBasicDamageOriginal(
 
 	// 穿透：原始「無條件」加算（只要有 SPECIAL.Pierce[slot] 即生效，與 option.pierce 無關）。
 	// Pierce: the original adds it UNCONDITIONALLY whenever SPECIAL.Pierce[slot] is set, independent of option.pierce.
-	if (user.SPECIAL.Pierce[atkIdx]) {
+	if (user.SPECIAL.Pierce[atkIdx])
+	{
 		dmg += (user.SPECIAL.Pierce[atkIdx] ?? 0) * (skill.pow ?? 100) / 100;
 	}
 
@@ -111,10 +120,14 @@ export function calcBasicDamageOriginal(
 
 	// 玩家保護（對齊原始尾端處理）
 	// Player protection (mirrors original end-of-function handling)
-	if (target.isChar() && dmg > 20) {
-		if (target.HP > 10 && dmg >= target.HP) {
+	if (target.isChar() && dmg > 20)
+	{
+		if (target.HP > 10 && dmg >= target.HP)
+		{
 			dmg = target.HP - 1; // 不致死
-		} else if (target.level < 10 && target.MAXHP < 200) {
+		}
+		else if (target.level < 10 && target.MAXHP < 200)
+		{
 			dmg -= Math.max(10, 25 - target.level); // 低等減傷
 		}
 	}

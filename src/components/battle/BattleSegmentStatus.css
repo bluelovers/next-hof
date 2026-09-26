@@ -11,57 +11,67 @@
  * Two 50% columns aligned to the top; they stack vertically on narrow screens.
  */
 
-.battle-segment-status {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  align-items: flex-start;
+.battle-segment-status
+{
+	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
+	align-items: flex-start;
 }
 
-.battle-side {
-  flex: 1 1 50%;
-  min-width: 0;
-  padding: 4px 10px 6px;
+.battle-side
+{
+	flex: 1 1 50%;
+	min-width: 0;
+	padding: 4px 10px 6px;
 }
 
-.battle-side-unit {
-  padding: 1px 0;
+.battle-side-unit
+{
+	padding: 1px 0;
 }
 
 /* 單位角色精靈列（選填；有 sprite 時改為橫向排列，精靈在左）
    Unit sprite row (optional; switches to a horizontal layout with the sprite on the left) */
-.battle-side-unit--sprite {
-  display: flex;
-  gap: 6px;
-  align-items: center;
+.battle-side-unit--sprite
+{
+	display: flex;
+	gap: 6px;
+	align-items: center;
 }
 
-.battle-side-unit-sprite {
-  flex: 0 0 auto;
+.battle-side-unit-sprite
+{
+	flex: 0 0 auto;
 }
 
-.battle-side-unit-body {
-  flex: 1 1 auto;
-  min-width: 0;
+.battle-side-unit-body
+{
+	flex: 1 1 auto;
+	min-width: 0;
 }
 
 /* 側邊角色精靈容器（左右共用；選填，位於該側單位列表上方）/ Side character sprite container (shared by both sides; optional, above that side's unit list) */
-.battle-side-sprite {
-  display: block;
-  padding-bottom: 4px;
+.battle-side-sprite
+{
+	display: block;
+	padding-bottom: 4px;
 }
 
 /* ==================== 窄螢幕 / Narrow screens ==================== */
 
-@media (max-width: 640px) {
-  /* 狀態：兩隊上下堆疊 / Status: stack both sides */
-  .battle-side {
-    flex-basis: 100%;
-  }
+@media (max-width: 640px)
+{
+	/* 狀態：兩隊上下堆疊 / Status: stack both sides */
+	.battle-side
+	{
+		flex-basis: 100%;
+	}
 
-  /* 堆疊後不需要欄位分隔線（作用域限本元件，不依賴父頁面 CSS）
-     No column divider once stacked (scoped to this component; no parent-page CSS) */
-  .battle-side.ttd1 {
-    border-left: none;
-  }
+	/* 堆疊後不需要欄位分隔線（作用域限本元件，不依賴父頁面 CSS）
+		 No column divider once stacked (scoped to this component; no parent-page CSS) */
+	.battle-side.ttd1
+	{
+		border-left: none;
+	}
 }

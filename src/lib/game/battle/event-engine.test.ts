@@ -40,8 +40,10 @@ const defs = new Map<number, ISkillDef>([
 ]);
 const getSkill = (no: number): ISkillDef | undefined => defs.get(no);
 
-describe('上級事件引擎：兩類涵蓋所有紀錄 / upper event engine: two classes cover every record', () => {
-	it('splits records into skill events (skill-attached) and general events (standalone)', () => {
+describe('上級事件引擎：兩類涵蓋所有紀錄 / upper event engine: two classes cover every record', () =>
+{
+	it('splits records into skill events (skill-attached) and general events (standalone)', () =>
+	{
 		expect(classifyBattleEvent({ type: EnumBattleEventType.Act, actor: 'Mage', skill: 1000 })).toBe(
 			EnumEventClass.Skill,
 		);
@@ -61,11 +63,21 @@ describe('上級事件引擎：兩類涵蓋所有紀錄 / upper event engine: tw
 	});
 });
 
-describe('技能事件：效果偵測與分派 / skill events: effect detection and dispatch', () => {
-	it('detects every effect of one skill and dispatches each record to its system', () => {
+describe('技能事件：效果偵測與分派 / skill events: effect detection and dispatch', () =>
+{
+	it('detects every effect of one skill and dispatches each record to its system', () =>
+	{
 		const events: IBattleEvent[] = [
 			{ type: EnumBattleEventType.Act, actor: 'Mage', skill: curse.no },
-			{ type: EnumBattleEventType.Damage, actor: 'Mage', target: 'GoblinAxe', skill: curse.no, value: 96, hpBefore: 140, hpAfter: 44 },
+			{
+				type: EnumBattleEventType.Damage,
+				actor: 'Mage',
+				target: 'GoblinAxe',
+				skill: curse.no,
+				value: 96,
+				hpBefore: 140,
+				hpAfter: 44,
+			},
 			// 每回合毒傷夾在中間：屬一般事件，不切開這次技能執行
 			// Per-turn poison damage in the middle: a general event that must not split the execution
 			{ type: EnumBattleEventType.Poison, target: 'Warrior', value: 31, hpBefore: 240, hpAfter: 209 },
@@ -96,7 +108,8 @@ describe('技能事件：效果偵測與分派 / skill events: effect detection 
 		expect(general.event).toBe(events[2]);
 	});
 
-	it('groups by execution: a new Act or a changed skill number opens a new skill event', () => {
+	it('groups by execution: a new Act or a changed skill number opens a new skill event', () =>
+	{
 		const events: IBattleEvent[] = [
 			{ type: EnumBattleEventType.Act, actor: 'Priest', skill: 3000 },
 			{ type: EnumBattleEventType.Heal, actor: 'Priest', target: 'Warrior', skill: 3000, value: 200 },
@@ -120,8 +133,10 @@ describe('技能事件：效果偵測與分派 / skill events: effect detection 
 	});
 });
 
-describe('召喚系統的後續事件 / follow-up events of the summon system', () => {
-	it('derives one entry event per summon record, without touching the source record', () => {
+describe('召喚系統的後續事件 / follow-up events of the summon system', () =>
+{
+	it('derives one entry event per summon record, without touching the source record', () =>
+	{
 		const events: IBattleEvent[] = [
 			{ type: EnumBattleEventType.Act, actor: 'Priest', skill: summonSkill.no },
 			{ type: EnumBattleEventType.Summon, actor: 'Priest', target: '1002', value: 1, skill: summonSkill.no },

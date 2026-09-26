@@ -12,10 +12,11 @@ export const metadata: Metadata = {
 		'從 seed 資料選取隊伍與敵方編組，實際執行回合制戰鬥引擎並檢視完整日誌與結果。',
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode })
+{
 	return (
 		<html lang="zh-Hant">
-			<body>{children}</body>
+		<body>{children}</body>
 		</html>
 	);
 }

@@ -5,42 +5,48 @@
 
 /* ==================== 導航列容器 / Navigation container ==================== */
 
-.dashboard-nav {
-  padding: 8px 10px 5px 10px;
-  border-top: 1px solid var(--color-border-dark);
-  background: var(--color-bg-mid);
+.dashboard-nav
+{
+	padding: 8px 10px 5px 10px;
+	border-top: 1px solid var(--color-border-dark);
+	background: var(--color-bg-mid);
 }
 
 /* ==================== 導航連結 / Navigation links ==================== */
 
-.dashboard-nav-link {
-  text-decoration: none;
-  color: var(--color-text-secondary);
-  font-weight: bold;
-  font-size: 12px;
+.dashboard-nav-link
+{
+	text-decoration: none;
+	color: var(--color-text-secondary);
+	font-weight: bold;
+	font-size: 12px;
 }
 
-.dashboard-nav-link:hover {
-  text-decoration: underline;
-  color: var(--color-text-hover);
+.dashboard-nav-link:hover
+{
+	text-decoration: underline;
+	color: var(--color-text-hover);
 }
 
-.dashboard-nav-link-active {
-  color: var(--color-accent-gold);
+.dashboard-nav-link-active
+{
+	color: var(--color-accent-gold);
 }
 
-.dashboard-nav-link-active:hover {
-  color: var(--color-accent-gold-bright);
+.dashboard-nav-link-active:hover
+{
+	color: var(--color-accent-gold-bright);
 }
 
 /* ==================== 分隔線 / Divider ==================== */
 
-.nav-divide {
-  border-left: 1px solid var(--color-border-dark);
-  width: 1px;
-  background: var(--color-border-dark);
-  margin: 0px 15px;
-  display: inline-block;
-  height: 14px;
-  vertical-align: middle;
+.nav-divide
+{
+	border-left: 1px solid var(--color-border-dark);
+	width: 1px;
+	background: var(--color-border-dark);
+	margin: 0px 15px;
+	display: inline-block;
+	height: 14px;
+	vertical-align: middle;
 }

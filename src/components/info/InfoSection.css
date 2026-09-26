@@ -8,22 +8,25 @@
 
 /* ==================== 資訊區域容器 / Info section wrapper ==================== */
 
-.info-section-wrapper {
-  /* 外層 wrapper 樣式（取代 .home-page） */
-  margin: 15px;
+.info-section-wrapper
+{
+	/* 外層 wrapper 樣式（取代 .home-page） */
+	margin: 15px;
 }
 
 /* ==================== 資訊標題 / Info heading ==================== */
 
-.info-section-wrapper h4 {
-  padding-left: 5px;
-  margin: 10px 0px;
-  border-left: 15px solid var(--color-border-heading);
-  border-bottom: 1px solid var(--color-border-heading);
+.info-section-wrapper h4
+{
+	padding-left: 5px;
+	margin: 10px 0px;
+	border-left: 15px solid var(--color-border-heading);
+	border-bottom: 1px solid var(--color-border-heading);
 }
 
 /* ==================== 資訊文字 / Info text ==================== */
 
-.info-section-wrapper .info-text {
-  margin: 4px 0;
+.info-section-wrapper .info-text
+{
+	margin: 4px 0;
 }

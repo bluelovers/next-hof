@@ -9,13 +9,15 @@
 // consumers and are NEVER re-exported here, to keep the original source unambiguous.
 
 /** 隊伍側別（UI 顯示層：left/right）/ Team side (UI display layer) */
-export enum EnumTeamSideUI {
+export enum EnumTeamSideUI
+{
 	Left = 'left',
 	Right = 'right',
 }
 
 /** 隊伍側 → CSS class（單一事實來源）/ Team side → CSS class */
-export enum EnumTeamSideClass {
+export enum EnumTeamSideClass
+{
 	Ttd1 = 'ttd1',
 	Ttd2 = 'ttd2',
 }
@@ -24,14 +26,16 @@ export enum EnumTeamSideClass {
  * 單位顯示狀態（對應 lib EnumState）
  * Display unit status (maps to lib EnumState: Alive/Dead/Poison/...).
  */
-export enum EnumUnitStatus {
+export enum EnumUnitStatus
+{
 	Alive = 'alive',
 	Down = 'down',
 	Casting = 'casting',
 }
 
 /** 屬性數值顯示分類（UI 專用，無 domain 對應）/ Attribute display category (UI-only) */
-export enum EnumAttributeType {
+export enum EnumAttributeType
+{
 	Dmg = 'dmg',
 	Recover = 'recover',
 	Support = 'support',
@@ -42,20 +46,23 @@ export enum EnumAttributeType {
 }
 
 /** 標籤演算法位置（UI-only）/ Label placement (UI-only) */
-export enum EnumSpriteLabelPlacement {
+export enum EnumSpriteLabelPlacement
+{
 	Above = 'above',
 	Below = 'below',
 }
 
 /** 戰場精靈框垂直對齊方式（UI-only）/ Sprite frame vertical alignment (UI-only) */
-export enum EnumBattleFieldVAlign {
+export enum EnumBattleFieldVAlign
+{
 	Top = 'top',
 	Middle = 'middle',
 	Bottom = 'bottom',
 }
 
 /** 背景圖縮放模式（UI-only）/ Background image scale mode (UI-only) */
-export enum EnumBattleFieldBgScale {
+export enum EnumBattleFieldBgScale
+{
 	Natural = 'natural',
 	Cover = 'cover',
 	Contain = 'contain',
@@ -67,7 +74,8 @@ export enum EnumBattleFieldBgScale {
  * 戰鬥動作顯示分類（對應 lib EnumBattleEventType 顯示子集）
  * Action display category (maps to lib EnumBattleEventType).
  */
-export enum EnumActionType {
+export enum EnumActionType
+{
 	Skill = 'skill',
 	Attack = 'attack',
 	Damage = 'damage',
@@ -130,7 +138,8 @@ export enum EnumActionType {
  * Sources: "draw" / "erased enemy" from HOF/Class/Skill/Effect.php and
  * "use" / "failed!" from HOF/Class/Battle/Skill.php.
  */
-export enum EnumMagicCircleKind {
+export enum EnumMagicCircleKind
+{
 	/** 描繪己方魔方陣（draw MagicCircle xN）/ draw own magic circles */
 	Draw = 'draw',
 	/** 消除敵方魔方陣（erased enemy MagicCircle xN）/ erase enemy magic circles */
@@ -145,7 +154,8 @@ export enum EnumMagicCircleKind {
  * 蓄力種類（對應 lib EnumExpect Charge/Cast）
  * Charge kind (maps to lib EnumExpect: Charge/Cast).
  */
-export enum EnumChargeKind {
+export enum EnumChargeKind
+{
 	Charging = 'charging',
 	Casting = 'casting',
 }
@@ -154,20 +164,23 @@ export enum EnumChargeKind {
  * 技能類型（UI 顯示層；lib 以 EnumSkillDamageType 表示：Physical=0／Magic=1）
  * Skill type (UI layer; lib uses EnumSkillDamageType: Physical = 0 / Magic = 1).
  */
-export enum EnumSkillType {
+export enum EnumSkillType
+{
 	Physical = 'physical',
 	Magic = 'magic',
 }
 
 /** 精靈圖資料夾（UI-only）/ Sprite image directory (UI-only) */
-export enum EnumSpriteImageDir {
+export enum EnumSpriteImageDir
+{
 	Char = 'char',
 	CharRev = 'char_rev',
 	Other = 'other',
 }
 
 /** 精靈顯示模式（UI-only）/ Sprite display variant (UI-only) */
-export enum EnumSpriteVariant {
+export enum EnumSpriteVariant
+{
 	Boxed = 'boxed',
 	Raw = 'raw',
 	Original = 'original',
@@ -175,14 +188,16 @@ export enum EnumSpriteVariant {
 }
 
 /** 精靈尺寸（UI-only）/ Sprite size (UI-only) */
-export enum EnumSpriteSize {
+export enum EnumSpriteSize
+{
 	Small = 'small',
 	Normal = 'normal',
 	Large = 'large',
 }
 
 /** 展示頁流程階段（UI-only）/ Showcase flow phase (UI-only) */
-export enum EnumShowcasePhase {
+export enum EnumShowcasePhase
+{
 	Setup = 'setup',
 	Result = 'result',
 }

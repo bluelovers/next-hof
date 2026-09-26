@@ -27,6 +27,7 @@
  * sets it: it cannot collide with the component's filter/transform, so no specificity
  * contest and no dependence on stylesheet load order — the control stays reliably visible.
  */
-.corpse-ghost {
-  opacity: 0.55;
+.corpse-ghost
+{
+	opacity: 0.55;
 }

@@ -13,35 +13,36 @@ import type { IHuntAreaData } from '#/components/areas/HuntAreaLink';
 import { HuntAreaLink } from '#/components/areas/HuntAreaLink';
 
 /** HuntPage 屬性 / HuntPage props */
-export interface IHuntPageProps {
-  /** 頁面標題 / Page title */
-  title?: string;
-  /** 子導航項目 / Sub-nav items */
-  subNavItems?: INavLink[];
-  /** 區域分類標題 / Area section title */
-  sectionTitle?: string;
-  /** 獵區列表 / Area list */
-  areas?: IHuntAreaData[];
+export interface IHuntPageProps
+{
+	/** 頁面標題 / Page title */
+	title?: string;
+	/** 子導航項目 / Sub-nav items */
+	subNavItems?: INavLink[];
+	/** 區域分類標題 / Area section title */
+	sectionTitle?: string;
+	/** 獵區列表 / Area list */
+	areas?: IHuntAreaData[];
 }
 
 /** 預設獵區資料 / Default area data */
 const DEFAULT_AREAS: IHuntAreaData[] = [
-  { name: 'ヒルズブロウ地区', land: 'blow01', levelRange: 'Lv20-30', landType: 'aband' },
-  { name: '略奪者の砂漠',   land: 'des01',  levelRange: 'Lv5-10',  landType: 'sand' },
-  { name: 'ゴブリンと遊ぶ(最弱)', land: 'gb0', levelRange: 'Lv1', landType: 'grass' },
-  { name: 'ちょっと強いゴブリン', land: 'gb1', levelRange: 'Lv1-5', landType: 'grass' },
-  { name: 'ゴブリンの戦士達',     land: 'gb2', levelRange: 'Lv3-8', landType: 'grass' },
-  { name: '火山ふもと',   land: 'mt0',     levelRange: 'Lv??', landType: 'mount' },
-  { name: '海中',         land: 'ocean0',  levelRange: 'Lv??', landType: 'ocean0' },
-  { name: '海中2',        land: 'ocean1',  levelRange: 'Lv??', landType: 'ocean0' },
-  { name: '賊の巣窟',     land: 'plund01', levelRange: 'Lv10-15', landType: 'sand1' },
-  { name: '砂漠',         land: 'sand0',   levelRange: 'Lv??', landType: 'sand' },
-  { name: '海',           land: 'sea0',    levelRange: 'Lv??', landType: 'sea' },
-  { name: '海(西海岸)',   land: 'sea1',    levelRange: 'Lv??', landType: 'sea' },
-  { name: '沼',           land: 'swamp0',  levelRange: 'Lv??', landType: 'swamp' },
-  { name: '集落?',         land: 'swamp1',  levelRange: 'Lv??', landType: 'swamp' },
-  { name: '火山(中腹)',    land: 'volc0',   levelRange: 'Lv??', landType: 'lava' },
-  { name: '火山(頂上)',    land: 'volc1',   levelRange: 'Lv??', landType: 'lava' },
+	{ name: 'ヒルズブロウ地区', land: 'blow01', levelRange: 'Lv20-30', landType: 'aband' },
+	{ name: '略奪者の砂漠', land: 'des01', levelRange: 'Lv5-10', landType: 'sand' },
+	{ name: 'ゴブリンと遊ぶ(最弱)', land: 'gb0', levelRange: 'Lv1', landType: 'grass' },
+	{ name: 'ちょっと強いゴブリン', land: 'gb1', levelRange: 'Lv1-5', landType: 'grass' },
+	{ name: 'ゴブリンの戦士達', land: 'gb2', levelRange: 'Lv3-8', landType: 'grass' },
+	{ name: '火山ふもと', land: 'mt0', levelRange: 'Lv??', landType: 'mount' },
+	{ name: '海中', land: 'ocean0', levelRange: 'Lv??', landType: 'ocean0' },
+	{ name: '海中2', land: 'ocean1', levelRange: 'Lv??', landType: 'ocean0' },
+	{ name: '賊の巣窟', land: 'plund01', levelRange: 'Lv10-15', landType: 'sand1' },
+	{ name: '砂漠', land: 'sand0', levelRange: 'Lv??', landType: 'sand' },
+	{ name: '海', land: 'sea0', levelRange: 'Lv??', landType: 'sea' },
+	{ name: '海(西海岸)', land: 'sea1', levelRange: 'Lv??', landType: 'sea' },
+	{ name: '沼', land: 'swamp0', levelRange: 'Lv??', landType: 'swamp' },
+	{ name: '集落?', land: 'swamp1', levelRange: 'Lv??', landType: 'swamp' },
+	{ name: '火山(中腹)', land: 'volc0', levelRange: 'Lv??', landType: 'lava' },
+	{ name: '火山(頂上)', land: 'volc1', levelRange: 'Lv??', landType: 'lava' },
 ];
 
 /**
@@ -49,21 +50,22 @@ const DEFAULT_AREAS: IHuntAreaData[] = [
  * HuntPage component
  */
 export const HuntPage: React.FC<IHuntPageProps> = ({
-  title = 'Hunt',
-  subNavItems,
-  sectionTitle = 'CommonMonster',
-  areas = DEFAULT_AREAS,
-}) => {
-  return (
-    <div className="hunt-page">
-      <h4>{title}</h4>
-      <HuntSubNav items={subNavItems} />
-      <h4>{sectionTitle}</h4>
-      <div className="hunt-area-list">
-        {areas.map((area) => (
-          <HuntAreaLink key={area.land} area={area} />
-        ))}
-      </div>
-    </div>
-  );
+	title = 'Hunt',
+	subNavItems,
+	sectionTitle = 'CommonMonster',
+	areas = DEFAULT_AREAS,
+}) =>
+{
+	return (
+		<div className="hunt-page">
+			<h4>{title}</h4>
+			<HuntSubNav items={subNavItems} />
+			<h4>{sectionTitle}</h4>
+			<div className="hunt-area-list">
+				{areas.map((area) => (
+					<HuntAreaLink key={area.land} area={area} />
+				))}
+			</div>
+		</div>
+	);
 };

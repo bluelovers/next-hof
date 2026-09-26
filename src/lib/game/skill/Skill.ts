@@ -4,7 +4,6 @@
 import type { ISkillDef } from '../types';
 import type { IDataRepository } from '../data/repository';
 
-
 /**
  * 原始技能資料 / Raw skill data
  * 型別別名 / type alias
@@ -20,13 +19,15 @@ import type { IDataRepository } from '../data/repository';
 type IRawSkill = Partial<ISkillDef> & { no: number; name: string; sp: number; type: ISkillDef['type'] };
 
 /** 正規化原始技能資料 / normalize raw skill data */
-export function parseSkill(raw: IRawSkill): ISkillDef {
+export function parseSkill(raw: IRawSkill): ISkillDef
+{
 	return { ...raw };
 }
 
 /**
  * 依編號取得技能（倉庫無此筆回傳 undefined）/ fetch a skill by number (undefined when absent) */
-export function getSkill(no: number, repo: IDataRepository): ISkillDef | undefined {
+export function getSkill(no: number, repo: IDataRepository): ISkillDef | undefined
+{
 	const d = repo.getSkill(no);
 	return d ? parseSkill(d) : undefined;
 }

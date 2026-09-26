@@ -10,31 +10,36 @@
  * do not react to hover.
  */
 
-.battle-segment-nav {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 2px 10px 6px;
+.battle-segment-nav
+{
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 10px;
+	padding: 2px 10px 6px;
 }
 
-.battle-segment-link {
-  color: var(--color-text-secondary);
-  font-weight: bold;
-  text-decoration: none;
+.battle-segment-link
+{
+	color: var(--color-text-secondary);
+	font-weight: bold;
+	text-decoration: none;
 }
 
-.battle-segment-link:hover {
-  color: var(--color-text-hover);
-  text-decoration: underline;
+.battle-segment-link:hover
+{
+	color: var(--color-text-hover);
+	text-decoration: underline;
 }
 
-.battle-segment-link--disabled {
-  color: var(--color-text-dim);
-  cursor: default;
+.battle-segment-link--disabled
+{
+	color: var(--color-text-dim);
+	cursor: default;
 }
 
-.battle-segment-counter {
-  color: var(--color-text-dim);
-  font-size: 80%;
+.battle-segment-counter
+{
+	color: var(--color-text-dim);
+	font-size: 80%;
 }

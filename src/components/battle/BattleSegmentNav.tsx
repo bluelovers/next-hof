@@ -15,47 +15,49 @@ import React from 'react';
 import './BattleSegmentNav.css';
 
 /** 分段導覽屬性 / Segment navigation props */
-export interface IBattleSegmentNavProps {
-  /** 目前分段索引（0 起）/ Current segment index (0-based) */
-  index: number;
-  /** 分段總數 / Total number of segments */
-  total: number;
+export interface IBattleSegmentNavProps
+{
+	/** 目前分段索引（0 起）/ Current segment index (0-based) */
+	index: number;
+	/** 分段總數 / Total number of segments */
+	total: number;
 }
 
 /**
  * 分段導覽組件
  * Segment navigation component
  */
-export const BattleSegmentNav: React.FC<IBattleSegmentNavProps> = ({ index, total }) => {
-  // 單一分段不需導覽 / No navigation needed for a single segment
-  if (total <= 1) return null;
+export const BattleSegmentNav: React.FC<IBattleSegmentNavProps> = ({ index, total }) =>
+{
+	// 單一分段不需導覽 / No navigation needed for a single segment
+	if (total <= 1) return null;
 
-  const hasPrev = index > 0;
-  const hasNext = index < total - 1;
+	const hasPrev = index > 0;
+	const hasNext = index < total - 1;
 
-  return (
-    <nav className="battle-segment-nav" aria-label="segment navigation">
-      {hasPrev ? (
-        <a className="battle-segment-link" href={`#battle-seg-${index - 1}`}>
-          &lt;&lt;
-        </a>
-      ) : (
-        <span className="battle-segment-link battle-segment-link--disabled" aria-hidden="true">
+	return (
+		<nav className="battle-segment-nav" aria-label="segment navigation">
+			{hasPrev ? (
+				<a className="battle-segment-link" href={`#battle-seg-${index - 1}`}>
+					&lt;&lt;
+				</a>
+			) : (
+				<span className="battle-segment-link battle-segment-link--disabled" aria-hidden="true">
           &lt;&lt;
         </span>
-      )}
-      <span className="battle-segment-counter">
+			)}
+			<span className="battle-segment-counter">
         {index + 1} / {total}
       </span>
-      {hasNext ? (
-        <a className="battle-segment-link" href={`#battle-seg-${index + 1}`}>
-          &gt;&gt;
-        </a>
-      ) : (
-        <span className="battle-segment-link battle-segment-link--disabled" aria-hidden="true">
+			{hasNext ? (
+				<a className="battle-segment-link" href={`#battle-seg-${index + 1}`}>
+					&gt;&gt;
+				</a>
+			) : (
+				<span className="battle-segment-link battle-segment-link--disabled" aria-hidden="true">
           &gt;&gt;
         </span>
-      )}
-    </nav>
-  );
+			)}
+		</nav>
+	);
 };

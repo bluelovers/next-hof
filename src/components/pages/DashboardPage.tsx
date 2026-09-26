@@ -21,59 +21,60 @@ import type { ICharacterData } from '#/components/characters/CharacterTypes';
 import { buildCharacterImageUrl } from '#/components/characters/characterUtils';
 
 /** DashboardPage 屬性 / DashboardPage props */
-export interface IDashboardPageProps {
-  /** 導航項目 / Navigation items */
-  navItems?: INavLink[];
-  /** 隊伍狀態 / Team status */
-  teamStatus?: ITeamStatusProps;
-  /** 角色列表 / Character list */
-  characters?: ICharacterData[];
-  /** 角色選取回調 / Character select callback */
-  onCharacterSelect?: (id: string) => void;
-  /** 頁尾連結 / Footer links */
-  footerLinks?: INavLink[];
-  /** 版權文字 / Copyright text */
-  copyright?: string;
+export interface IDashboardPageProps
+{
+	/** 導航項目 / Navigation items */
+	navItems?: INavLink[];
+	/** 隊伍狀態 / Team status */
+	teamStatus?: ITeamStatusProps;
+	/** 角色列表 / Character list */
+	characters?: ICharacterData[];
+	/** 角色選取回調 / Character select callback */
+	onCharacterSelect?: (id: string) => void;
+	/** 頁尾連結 / Footer links */
+	footerLinks?: INavLink[];
+	/** 版權文字 / Copyright text */
+	copyright?: string;
 }
 
 /** 預設角色資料 / Default character data */
 const DEFAULT_CHARACTERS: ICharacterData[] = [
-  {
-    id: '2f4954e7348fff17f92b46e8d72005d1',
-    name: 'Mage1',
-    imageUrl: buildCharacterImageUrl('mon_018.png'),
-    level: 3,
-    className: 'Sorceress',
-    hasStar: true,
-    selected: false,
-  },
-  {
-    id: '6ece402a38eab57ef07afff56535d6e1',
-    name: 'Healer1',
-    imageUrl: buildCharacterImageUrl('mon_214.png'),
-    level: 3,
-    className: 'Priestess',
-    hasStar: true,
-    selected: true,
-  },
-  {
-    id: 'b3e304903f09e14b8386a49a1e1e01e3',
-    name: 'Hero1',
-    imageUrl: buildCharacterImageUrl('mon_079.png'),
-    level: 3,
-    className: 'Warrior',
-    hasStar: true,
-    selected: false,
-  },
-  {
-    id: 'de979500692a963857ea9d68868f2958',
-    name: 'Priest1',
-    imageUrl: buildCharacterImageUrl('mon_214.png'),
-    level: 3,
-    className: 'Priestess',
-    hasStar: true,
-    selected: false,
-  },
+	{
+		id: '2f4954e7348fff17f92b46e8d72005d1',
+		name: 'Mage1',
+		imageUrl: buildCharacterImageUrl('mon_018.png'),
+		level: 3,
+		className: 'Sorceress',
+		hasStar: true,
+		selected: false,
+	},
+	{
+		id: '6ece402a38eab57ef07afff56535d6e1',
+		name: 'Healer1',
+		imageUrl: buildCharacterImageUrl('mon_214.png'),
+		level: 3,
+		className: 'Priestess',
+		hasStar: true,
+		selected: true,
+	},
+	{
+		id: 'b3e304903f09e14b8386a49a1e1e01e3',
+		name: 'Hero1',
+		imageUrl: buildCharacterImageUrl('mon_079.png'),
+		level: 3,
+		className: 'Warrior',
+		hasStar: true,
+		selected: false,
+	},
+	{
+		id: 'de979500692a963857ea9d68868f2958',
+		name: 'Priest1',
+		imageUrl: buildCharacterImageUrl('mon_214.png'),
+		level: 3,
+		className: 'Priestess',
+		hasStar: true,
+		selected: false,
+	},
 ];
 
 /**
@@ -81,55 +82,57 @@ const DEFAULT_CHARACTERS: ICharacterData[] = [
  * DashboardPage component
  */
 export const DashboardPage: React.FC<IDashboardPageProps> = ({
-  navItems,
-  teamStatus,
-  characters = DEFAULT_CHARACTERS,
-  onCharacterSelect,
-  footerLinks = DEFAULT_FOOTER_LINKS,
-  copyright = COPYRIGHT_TEXT,
-}) => {
-  const [selectedChar, setSelectedChar] = useState<string>(
-    characters.find((c) => c.selected)?.id ?? '',
-  );
+	navItems,
+	teamStatus,
+	characters = DEFAULT_CHARACTERS,
+	onCharacterSelect,
+	footerLinks = DEFAULT_FOOTER_LINKS,
+	copyright = COPYRIGHT_TEXT,
+}) =>
+{
+	const [selectedChar, setSelectedChar] = useState<string>(
+		characters.find((c) => c.selected)?.id ?? '',
+	);
 
-  /** 處理角色選取 / Handle character selection */
-  const handleSelect = (id: string) => {
-    setSelectedChar(id);
-    onCharacterSelect?.(id);
-  };
+	/** 處理角色選取 / Handle character selection */
+	const handleSelect = (id: string) =>
+	{
+		setSelectedChar(id);
+		onCharacterSelect?.(id);
+	};
 
-  return (
-    <div className="dashboard-page">
-      {/* 導航列 / Navigation bar */}
-      <NavigationBar items={navItems} />
+	return (
+		<div className="dashboard-page">
+			{/* 導航列 / Navigation bar */}
+			<NavigationBar items={navItems} />
 
-      {/* 隊伍狀態 / Team status */}
-      <TeamStatus
-        teamName={teamStatus?.teamName}
-        funds={teamStatus?.funds}
-        timeCurrent={teamStatus?.timeCurrent}
-        timeMax={teamStatus?.timeMax}
-      />
+			{/* 隊伍狀態 / Team status */}
+			<TeamStatus
+				teamName={teamStatus?.teamName}
+				funds={teamStatus?.funds}
+				timeCurrent={teamStatus?.timeCurrent}
+				timeMax={teamStatus?.timeMax}
+			/>
 
-      {/* 角色列表 / Character list */}
-      <CharacterList
-        characters={characters.map((c) => ({
-          ...c,
-          selected: c.id === selectedChar,
-        }))}
-        onSelect={handleSelect}
-      />
+			{/* 角色列表 / Character list */}
+			<CharacterList
+				characters={characters.map((c) => ({
+					...c,
+					selected: c.id === selectedChar,
+				}))}
+				onSelect={handleSelect}
+			/>
 
-      {/* 頁尾 / Footer */}
-      <div className="dashboard-footer">
-        <NavList
-          links={footerLinks}
-          separator={' - '}
-          linkClassName="footer-link"
-        />
-        <br />
-        <span className="footer-copyright">{copyright}</span>
-      </div>
-    </div>
-  );
+			{/* 頁尾 / Footer */}
+			<div className="dashboard-footer">
+				<NavList
+					links={footerLinks}
+					separator={' - '}
+					linkClassName="footer-link"
+				/>
+				<br />
+				<span className="footer-copyright">{copyright}</span>
+			</div>
+		</div>
+	);
 };

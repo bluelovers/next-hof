@@ -11,7 +11,8 @@ import { SEED } from '#/lib/game/data/seed-data';
  * 敵方編選項目 / Enemy encounter option
  * 介面 / interface（I 前綴命名慣例）
  */
-export interface IEncounter {
+export interface IEncounter
+{
 	/** 編選識別碼（唯一）/ unique encounter id */
 	id: string;
 	/** 編選顯示名稱 / display name */
@@ -51,12 +52,14 @@ export const SHOWCASE_ENCOUNTERS: readonly IEncounter[] = [
 export const DEFAULT_ENCOUNTER: IEncounter = SHOWCASE_ENCOUNTERS[0];
 
 /** 取得單一編選 / Get one encounter by id */
-export function getEncounter(id: string): IEncounter | undefined {
+export function getEncounter(id: string): IEncounter | undefined
+{
 	return SHOWCASE_ENCOUNTERS.find((e) => e.id === id);
 }
 
 /** 驗證編選的怪號皆存在於 seed（供測試／防呆）/ verify all mon nos exist in seed (for tests) */
-export function isEncounterValid(encounter: IEncounter): boolean {
+export function isEncounterValid(encounter: IEncounter): boolean
+{
 	return (
 		encounter.monNos.length > 0 &&
 		encounter.monNos.every((no) => SEED.mons.some((m) => m.no === no))

@@ -16,13 +16,14 @@ import './PartySelect.css';
 import '#/components/shared/SharedBase.css';
 
 /** PartySelect 屬性 / PartySelect props */
-export interface IPartySelectProps {
-  /** 已選角色 def no / Selected char def nos */
-  selected: readonly number[];
-  /** 勾選切換回调（傳入 def no）/ Toggle callback (def no) */
-  onToggle: (no: number) => void;
-  /** 人數上限（預設 MAX_CHAR）/ Party size cap (default MAX_CHAR) */
-  max?: number;
+export interface IPartySelectProps
+{
+	/** 已選角色 def no / Selected char def nos */
+	selected: readonly number[];
+	/** 勾選切換回调（傳入 def no）/ Toggle callback (def no) */
+	onToggle: (no: number) => void;
+	/** 人數上限（預設 MAX_CHAR）/ Party size cap (default MAX_CHAR) */
+	max?: number;
 }
 
 /**
@@ -30,32 +31,32 @@ export interface IPartySelectProps {
  * One character option (checkbox card)
  */
 const RosterCard: React.FC<{
-  entry: IRosterEntry;
-  checked: boolean;
-  disabled: boolean;
-  onToggle: (no: number) => void;
+	entry: IRosterEntry;
+	checked: boolean;
+	disabled: boolean;
+	onToggle: (no: number) => void;
 }> = ({ entry, checked, disabled, onToggle }) => (
-  <label
-    className={`party-card${checked ? ' is-checked' : ''}${disabled ? ' is-disabled' : ''}`}
-  >
-    <input
-      type="checkbox"
-      checked={checked}
-      disabled={disabled}
-      onChange={() => onToggle(entry.no)}
-    />
-    <span
-      className="party-card-sprite"
-      style={{ backgroundImage: `url(${entry.spriteUrl})` }}
-      aria-hidden="true"
-    />
-    <span className="party-card-body">
+	<label
+		className={`party-card${checked ? ' is-checked' : ''}${disabled ? ' is-disabled' : ''}`}
+	>
+		<input
+			type="checkbox"
+			checked={checked}
+			disabled={disabled}
+			onChange={() => onToggle(entry.no)}
+		/>
+		<span
+			className="party-card-sprite"
+			style={{ backgroundImage: `url(${entry.spriteUrl})` }}
+			aria-hidden="true"
+		/>
+		<span className="party-card-body">
       <span className="party-card-name">{entry.name}</span>
       <span className="party-card-meta">
         Lv.{entry.level} {entry.jobName}
       </span>
     </span>
-  </label>
+	</label>
 );
 
 /**
@@ -63,50 +64,52 @@ const RosterCard: React.FC<{
  * Party select component
  */
 export const PartySelect: React.FC<IPartySelectProps> = ({
-  selected,
-  onToggle,
-  max = MAX_CHAR,
-}) => {
-  const count = selected.length;
-  const full = count >= max;
+	selected,
+	onToggle,
+	max = MAX_CHAR,
+}) =>
+{
+	const count = selected.length;
+	const full = count >= max;
 
-  return (
-    <section className="party-select" aria-labelledby="party-select-heading">
-      <h2 id="party-select-heading" className="party-select-heading">
-        隊伍成員 / Your Party
-        <span className={`party-select-count${full ? ' is-full' : ''}`}>
+	return (
+		<section className="party-select" aria-labelledby="party-select-heading">
+			<h2 id="party-select-heading" className="party-select-heading">
+				隊伍成員 / Your Party
+				<span className={`party-select-count${full ? ' is-full' : ''}`}>
           {count}/{max}
         </span>
-      </h2>
+			</h2>
 
-      <div className="party-select-list">
-        {SHOWCASE_ROSTER.map((entry) => {
-          const checked = selected.includes(entry.no);
-          // 滿上限後，未勾選項禁用（再選需先取消一名）
-          // Once full, unchecked options are disabled (deselect to free a slot)
-          const disabled = !checked && full;
-          return (
-            <RosterCard
-              key={entry.no}
-              entry={entry}
-              checked={checked}
-              disabled={disabled}
-              onToggle={onToggle}
-            />
-          );
-        })}
-      </div>
+			<div className="party-select-list">
+				{SHOWCASE_ROSTER.map((entry) =>
+				{
+					const checked = selected.includes(entry.no);
+					// 滿上限後，未勾選項禁用（再選需先取消一名）
+					// Once full, unchecked options are disabled (deselect to free a slot)
+					const disabled = !checked && full;
+					return (
+						<RosterCard
+							key={entry.no}
+							entry={entry}
+							checked={checked}
+							disabled={disabled}
+							onToggle={onToggle}
+						/>
+					);
+				})}
+			</div>
 
-      {count === 0 && (
-        <p className="party-select-hint" role="alert">
-          ⚠ 至少選擇 1 名隊員才能開戰 / Select at least one member to battle.
-        </p>
-      )}
-      {full && (
-        <p className="party-select-note">
-          已達上限 {max} 人，取消一名才能再選 / Party is full ({max}); deselect one to change.
-        </p>
-      )}
-    </section>
-  );
+			{count === 0 && (
+				<p className="party-select-hint" role="alert">
+					⚠ 至少選擇 1 名隊員才能開戰 / Select at least one member to battle.
+				</p>
+			)}
+			{full && (
+				<p className="party-select-note">
+					已達上限 {max} 人，取消一名才能再選 / Party is full ({max}); deselect one to change.
+				</p>
+			)}
+		</section>
+	);
 };

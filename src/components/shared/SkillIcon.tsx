@@ -12,13 +12,14 @@ import React from 'react';
 import type { IStyleProps } from '#/components/shared/types';
 
 /** SkillIcon 屬性 / SkillIcon props */
-export interface ISkillIconProps extends IStyleProps {
-  /** 圖示 URL / Icon URL */
-  iconUrl?: string | null;
-  /** 技能名稱（用於 alt 和佔位符首字）/ Skill name (for alt and placeholder initial) */
-  name: string;
-  /** 圖示尺寸（px）/ Icon size in pixels */
-  size?: number;
+export interface ISkillIconProps extends IStyleProps
+{
+	/** 圖示 URL / Icon URL */
+	iconUrl?: string | null;
+	/** 技能名稱（用於 alt 和佔位符首字）/ Skill name (for alt and placeholder initial) */
+	name: string;
+	/** 圖示尺寸（px）/ Icon size in pixels */
+	size?: number;
 }
 
 /**
@@ -26,44 +27,46 @@ export interface ISkillIconProps extends IStyleProps {
  * Shared skill icon component
  */
 export const SkillIcon: React.FC<ISkillIconProps> = ({
-  iconUrl,
-  name,
-  size = 18,
-  className = '',
-  style,
-}) => {
-  if (iconUrl) {
-    return (
-      <img
-        className={className || 'skill-icon'}
-        src={iconUrl}
-        alt={name}
-        title={name}
-        style={{ width: size, height: size, ...style }}
-      />
-    );
-  }
+	iconUrl,
+	name,
+	size = 18,
+	className = '',
+	style,
+}) =>
+{
+	if (iconUrl)
+	{
+		return (
+			<img
+				className={className || 'skill-icon'}
+				src={iconUrl}
+				alt={name}
+				title={name}
+				style={{ width: size, height: size, ...style }}
+			/>
+		);
+	}
 
-  return (
-    <span
-      className={className || 'skill-placeholder'}
-      title={name}
-      style={{
-        display: 'inline-block',
-        verticalAlign: 'middle',
-        width: size,
-        height: size,
-        margin: '0 5px',
-        background: 'var(--color-bg-mid)',
-        border: '1px solid var(--color-border-mid)',
-        borderRadius: 3,
-        textAlign: 'center',
-        lineHeight: `${size}px`,
-        fontSize: size * 0.55,
-        ...style,
-      }}
-    >
+	return (
+		<span
+			className={className || 'skill-placeholder'}
+			title={name}
+			style={{
+				display: 'inline-block',
+				verticalAlign: 'middle',
+				width: size,
+				height: size,
+				margin: '0 5px',
+				background: 'var(--color-bg-mid)',
+				border: '1px solid var(--color-border-mid)',
+				borderRadius: 3,
+				textAlign: 'center',
+				lineHeight: `${size}px`,
+				fontSize: size * 0.55,
+				...style,
+			}}
+		>
       {name.charAt(0)}
     </span>
-  );
+	);
 };

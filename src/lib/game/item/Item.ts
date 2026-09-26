@@ -20,7 +20,8 @@ type IRawItem = Partial<IItemDef> & { no: number; name: string; type: EnumWeapon
  * 正規化原始物品資料，補齊陣列預設值
  * Normalize raw item data, filling in array defaults
  */
-export function parseItem(raw: IRawItem): IItemDef {
+export function parseItem(raw: IRawItem): IItemDef
+{
 	return {
 		...raw,
 		atk: raw.atk ?? [0, 0],
@@ -44,7 +45,8 @@ export function parseItem(raw: IRawItem): IItemDef {
 /**
  * 依編號取得道具（倉庫無此筆回傳 undefined）/ fetch an item by number (undefined when absent)
  */
-export function getItem(no: number, repo: IDataRepository): IItemDef | undefined {
+export function getItem(no: number, repo: IDataRepository): IItemDef | undefined
+{
 	const d = repo.getItem(no);
 	return d ? parseItem(d) : undefined;
 }

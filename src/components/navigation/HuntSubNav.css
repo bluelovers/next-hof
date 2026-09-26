@@ -10,27 +10,31 @@
 
 /* ==================== 子導航容器 / Sub-navigation container ==================== */
 
-.hunt-subnav {
-  margin: 5px 20px;
+.hunt-subnav
+{
+	margin: 5px 20px;
 }
 
 /* ==================== 分隔符 / Separator ==================== */
 
-.subnav-separator {
-  color: var(--color-text-primary);
-  font-size: 12px;
+.subnav-separator
+{
+	color: var(--color-text-primary);
+	font-size: 12px;
 }
 
 /* ==================== 導航連結 / Navigation links ==================== */
 
-.hunt-subnav-link {
-  text-decoration: none;
-  color: var(--color-text-secondary);
-  font-weight: bold;
-  font-size: 12px;
+.hunt-subnav-link
+{
+	text-decoration: none;
+	color: var(--color-text-secondary);
+	font-weight: bold;
+	font-size: 12px;
 }
 
-.hunt-subnav-link:hover {
-  text-decoration: underline;
-  color: var(--color-text-hover);
+.hunt-subnav-link:hover
+{
+	text-decoration: underline;
+	color: var(--color-text-hover);
 }

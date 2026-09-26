@@ -10,8 +10,9 @@
 import { BASE_URL } from '#/components/config/AppConfig';
 
 /** carpet 底座交替類別（偶數 carpet0 / 奇數 carpet1） / Alternating carpet class */
-export function getCarpetClass(index = 0): string {
-  return index % 2 === 0 ? 'carpet0' : 'carpet1';
+export function getCarpetClass(index = 0): string
+{
+	return index % 2 === 0 ? 'carpet0' : 'carpet1';
 }
 
 /**
@@ -20,8 +21,9 @@ export function getCarpetClass(index = 0): string {
  * @param id - 角色 ID / Character ID
  * @returns 完整角色頁 URL / Full character page URL
  */
-export function buildCharacterUrl(id: string): string {
-  return `${BASE_URL}/char/char?char=${id}`;
+export function buildCharacterUrl(id: string): string
+{
+	return `${BASE_URL}/char/char?char=${id}`;
 }
 
 /** 角色精靈圖片路徑前綴（靜態資源） / Character sprite image path prefix (static asset) */
@@ -38,6 +40,7 @@ export const CHAR_IMAGE_PREFIX = '/static/image/char/';
  * @param file - 檔名（可含或不含開頭斜線） / Filename (with or without leading slash)
  * @returns 完整圖片 URL / Full image URL
  */
-export function buildCharacterImageUrl(file: string): string {
-  return `${CHAR_IMAGE_PREFIX}${file.replace(/^\//, '')}`;
+export function buildCharacterImageUrl(file: string): string
+{
+	return `${CHAR_IMAGE_PREFIX}${file.replace(/^\//, '')}`;
 }

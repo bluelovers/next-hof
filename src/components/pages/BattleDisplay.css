@@ -16,37 +16,42 @@
 
 /* ==================== 主容器 / Main Container ==================== */
 
-.battle-display {
-  font-family: var(--font-primary);
-  font-size: 12px;
-  color: var(--color-text-primary);
-  background: var(--color-bg-page);
-  max-width: var(--page-max-width);
-  width: 100%;
-  margin: 0 auto;
-  border-left: 1px solid var(--color-border-dark);
-  border-right: 1px solid var(--color-border-dark);
-  border-bottom: 1px solid var(--color-border-dark);
-  box-sizing: border-box;
+.battle-display
+{
+	font-family: var(--font-primary);
+	font-size: 12px;
+	color: var(--color-text-primary);
+	background: var(--color-bg-page);
+	max-width: var(--page-max-width);
+	width: 100%;
+	margin: 0 auto;
+	border-left: 1px solid var(--color-border-dark);
+	border-right: 1px solid var(--color-border-dark);
+	border-bottom: 1px solid var(--color-border-dark);
+	box-sizing: border-box;
 }
 
 .battle-display *,
 .battle-display *::before,
-.battle-display *::after {
-  box-sizing: border-box;
+.battle-display *::after
+{
+	box-sizing: border-box;
 }
 
 /* ==================== 內容容器 / Content ==================== */
 
-.battle-content {
-  width: 100%;
+.battle-content
+{
+	width: 100%;
 }
 
 /* ==================== 窄螢幕 / Narrow screens ==================== */
 
-@media (max-width: 640px) {
-  .battle-display {
-    border-left: none;
-    border-right: none;
-  }
+@media (max-width: 640px)
+{
+	.battle-display
+	{
+		border-left: none;
+		border-right: none;
+	}
 }

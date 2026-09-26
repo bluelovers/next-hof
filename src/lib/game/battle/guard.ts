@@ -17,18 +17,29 @@ import { EnumGuardKind, EnumTargetType, GUARD_KIND_PROBABILITY, GUARD_KIND_HP_TH
  * Prob25/50/75 roll randInt(0,99) against a percentage chance (false without an rng).
  * 機率與閾值皆取自 GUARD_KIND_PROBABILITY / GUARD_KIND_HP_THRESHOLD 單一事實來源。
  */
-export function guardActive(guardChar: Character): boolean {
+export function guardActive(guardChar: Character): boolean
+{
 	const kind = guardChar.behavior?.guard ?? EnumGuardKind.Always;
-	switch (kind) {
-		case EnumGuardKind.Always: return true;
-		case EnumGuardKind.Never: return false;
-		case EnumGuardKind.Life25: return guardChar.hpPercent() <= (GUARD_KIND_HP_THRESHOLD[kind] ?? 0);
-		case EnumGuardKind.Life50: return guardChar.hpPercent() <= (GUARD_KIND_HP_THRESHOLD[kind] ?? 0);
-		case EnumGuardKind.Life75: return guardChar.hpPercent() <= (GUARD_KIND_HP_THRESHOLD[kind] ?? 0);
-		case EnumGuardKind.Prob25: return guardChar.rng ? guardChar.rng.randInt(0, 99) < (GUARD_KIND_PROBABILITY[kind] ?? 0) : false;
-		case EnumGuardKind.Prob50: return guardChar.rng ? guardChar.rng.randInt(0, 99) < (GUARD_KIND_PROBABILITY[kind] ?? 0) : false;
-		case EnumGuardKind.Prob75: return guardChar.rng ? guardChar.rng.randInt(0, 99) < (GUARD_KIND_PROBABILITY[kind] ?? 0) : false;
-		default: return true;
+	switch (kind)
+	{
+		case EnumGuardKind.Always:
+			return true;
+		case EnumGuardKind.Never:
+			return false;
+		case EnumGuardKind.Life25:
+			return guardChar.hpPercent() <= (GUARD_KIND_HP_THRESHOLD[kind] ?? 0);
+		case EnumGuardKind.Life50:
+			return guardChar.hpPercent() <= (GUARD_KIND_HP_THRESHOLD[kind] ?? 0);
+		case EnumGuardKind.Life75:
+			return guardChar.hpPercent() <= (GUARD_KIND_HP_THRESHOLD[kind] ?? 0);
+		case EnumGuardKind.Prob25:
+			return guardChar.rng ? guardChar.rng.randInt(0, 99) < (GUARD_KIND_PROBABILITY[kind] ?? 0) : false;
+		case EnumGuardKind.Prob50:
+			return guardChar.rng ? guardChar.rng.randInt(0, 99) < (GUARD_KIND_PROBABILITY[kind] ?? 0) : false;
+		case EnumGuardKind.Prob75:
+			return guardChar.rng ? guardChar.rng.randInt(0, 99) < (GUARD_KIND_PROBABILITY[kind] ?? 0) : false;
+		default:
+			return true;
 	}
 }
 
@@ -38,7 +49,8 @@ export function guardActive(guardChar: Character): boolean {
  * If the target is in the back row and the skill is not all/guard-piercing/support,
  * returns the intercepting front-row guardian; otherwise null (target is hit directly).
  */
-export function Defending(team: BattleTeam, target: Character, skill: ISkillDef): Character | null {
+export function Defending(team: BattleTeam, target: Character, skill: ISkillDef): Character | null
+{
 	if (skill.target?.[0] === EnumTargetType.All) return null;
 	if (skill.invalid) return null;
 	if (skill.support) return null;

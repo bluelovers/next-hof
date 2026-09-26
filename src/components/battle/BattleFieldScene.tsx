@@ -18,11 +18,12 @@ import { BattleFieldLayers } from './BattleFieldLayers';
 import './BattleFieldScene.css';
 
 /** 戰場畫面屬性（標籤開關共用 IBattleSpriteLabelOptions）/ Battlefield scene props (label toggle from the shared IBattleSpriteLabelOptions) */
-export interface IBattleFieldSceneProps extends IBattleSpriteLabelOptions {
-  /** 精靈列表 / Sprite list */
-  sprites: IBattleSprite[];
-  /** 戰場配置 / Battlefield config */
-  config: IBattleFieldConfig;
+export interface IBattleFieldSceneProps extends IBattleSpriteLabelOptions
+{
+	/** 精靈列表 / Sprite list */
+	sprites: IBattleSprite[];
+	/** 戰場配置 / Battlefield config */
+	config: IBattleFieldConfig;
 }
 
 /**
@@ -37,23 +38,24 @@ export interface IBattleFieldSceneProps extends IBattleSpriteLabelOptions {
  * Each div is 480x200, uses background-position for character placement
  */
 export const BattleFieldScene: React.FC<IBattleFieldSceneProps> = ({
-  sprites,
-  config,
-  showSpriteLabels,
-}) => {
-  return (
-    <div className="btl-img">
-      {/* 最外層背景 + 巢狀精靈圖層 / Outermost background + nested sprite layers */}
-      <div className="btl-img-inner">
-        <BattleFieldLayers
-          sprites={sprites}
-          config={config}
-          width={config.width}
-          height={config.height}
-          showSpriteLabels={showSpriteLabels}
-          bgSize={config.bgSize}
-        />
-      </div>
-    </div>
-  );
+	sprites,
+	config,
+	showSpriteLabels,
+}) =>
+{
+	return (
+		<div className="btl-img">
+			{/* 最外層背景 + 巢狀精靈圖層 / Outermost background + nested sprite layers */}
+			<div className="btl-img-inner">
+				<BattleFieldLayers
+					sprites={sprites}
+					config={config}
+					width={config.width}
+					height={config.height}
+					showSpriteLabels={showSpriteLabels}
+					bgSize={config.bgSize}
+				/>
+			</div>
+		</div>
+	);
 };

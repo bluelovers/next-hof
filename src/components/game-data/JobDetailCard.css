@@ -5,47 +5,54 @@
 
 /* ==================== 職業名稱單元格 / Job name cell ==================== */
 
-.job-name-cell {
-  vertical-align: top;
-  white-space: nowrap;
+.job-name-cell
+{
+	vertical-align: top;
+	white-space: nowrap;
 }
 
-.job-name-bold {
-  font-weight: bold;
-  color: var(--color-text-primary);
+.job-name-bold
+{
+	font-weight: bold;
+	color: var(--color-text-primary);
 }
 
 /* ==================== 精靈單元格 / Sprite cell ==================== */
 
-.job-sprite-cell {
-  white-space: nowrap;
+.job-sprite-cell
+{
+	white-space: nowrap;
 }
 
-.job-sprite {
-  display: inline-block;
-  width: 48px;
-  height: 48px;
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border-dark);
-  margin: 0 2px;
-  vertical-align: middle;
+.job-sprite
+{
+	display: inline-block;
+	width: 48px;
+	height: 48px;
+	background: var(--color-bg-surface);
+	border: 1px solid var(--color-border-dark);
+	margin: 0 2px;
+	vertical-align: middle;
 }
 
 /* ==================== 描述單元格 / Description cell ==================== */
 
-.job-desc-cell {
-  color: var(--color-text-primary);
+.job-desc-cell
+{
+	color: var(--color-text-primary);
 }
 
 /* ==================== 裝備列 / Equipment row ==================== */
 
-.equipment-row {
-  margin-left: 30px;
-  padding: 2px 0;
+.equipment-row
+{
+	margin-left: 30px;
+	padding: 2px 0;
 }
 
 /* ==================== 技能列 / Skills row ==================== */
 
-.skills-row {
-  padding-left: 30px;
+.skills-row
+{
+	padding-left: 30px;
 }

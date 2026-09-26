@@ -2,8 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { RNG } from './rng';
 import { weightedPick } from './random';
 
-describe('weightedPick', () => {
-	it('matches documented weights over many draws (fixed seed)', () => {
+describe('weightedPick', () =>
+{
+	it('matches documented weights over many draws (fixed seed)', () =>
+	{
 		const rng = new RNG(2024);
 		const entries: Array<[number, number]> = [
 			[1000, 4],
@@ -13,7 +15,8 @@ describe('weightedPick', () => {
 		];
 		const n = 4000;
 		const counts: Record<number, number> = { 1000: 0, 1001: 0, 1002: 0, 1003: 0 };
-		for (let i = 0; i < n; i++) {
+		for (let i = 0; i < n; i++)
+		{
 			const v = weightedPick(entries, rng);
 			if (v !== undefined) counts[v]++;
 		}
@@ -24,7 +27,8 @@ describe('weightedPick', () => {
 		expect(counts[1000]).toBeGreaterThan(counts[1003]);
 	});
 
-	it('returns undefined for empty entries', () => {
+	it('returns undefined for empty entries', () =>
+	{
 		expect(weightedPick([], new RNG(1))).toBeUndefined();
 	});
 });

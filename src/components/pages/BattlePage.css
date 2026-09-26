@@ -15,20 +15,22 @@
 
 /* ==================== 戰鬥編成頁容器 / Battle page container ==================== */
 
-.battle-page {
-  font-family: var(--font-primary);
-  font-size: 12px;
-  color: var(--color-text-primary);
+.battle-page
+{
+	font-family: var(--font-primary);
+	font-size: 12px;
+	color: var(--color-text-primary);
 }
 
 /* ==================== 標題 / Headings ==================== */
 
-.battle-page h4 {
-  padding-left: 5px;
-  margin: 10px 0;
-  border-left: 15px solid var(--color-border-heading);
-  border-bottom: 1px solid var(--color-border-heading);
-  display: block;
+.battle-page h4
+{
+	padding-left: 5px;
+	margin: 10px 0;
+	border-left: 15px solid var(--color-border-heading);
+	border-bottom: 1px solid var(--color-border-heading);
+	display: block;
 }
 
 /* ==================== 角色列容器（置中排列）/ Character row container (center-aligned) ==================== */
@@ -37,39 +39,44 @@
  * 角色卡片使用 text-align:center 置中，與原始站一致
  * Character cards center-aligned to match original site
  */
-.battle-characters {
-  text-align: center;
+.battle-characters
+{
+	text-align: center;
 }
 
 /* ==================== 動作按鈕 / Action buttons ==================== */
 
-.battle-page .btn {
-  font-size: 12px;
-  color: #565656;
-  background: #f5f5f5;
-  border: none;
-  padding: 4px 10px 3px 7px;
-  margin: 2px 7px 8px 2px;
-  cursor: pointer;
+.battle-page .btn
+{
+	font-size: 12px;
+	color: #565656;
+	background: #f5f5f5;
+	border: none;
+	padding: 4px 10px 3px 7px;
+	margin: 2px 7px 8px 2px;
+	cursor: pointer;
 }
 
 /* ==================== 儲存隊伍標籤 / Save party label ==================== */
 
-.battle-page .battle-save-label {
-  font-size: 12px;
-  color: var(--color-text-primary);
-  cursor: default;
+.battle-page .battle-save-label
+{
+	font-size: 12px;
+	color: var(--color-text-primary);
+	cursor: default;
 }
 
-.battle-page .battle-save-label input[type="checkbox"] {
-  accent-color: var(--color-accent-gold);
+.battle-page .battle-save-label input[type="checkbox"]
+{
+	accent-color: var(--color-accent-gold);
 }
 
 /* ==================== 分隔線 / Horizontal rule ==================== */
 
-.battle-page hr {
-  /* 保留瀏覽器預設樣式，與原始站一致 */
-  margin: 8px 0;
+.battle-page hr
+{
+	/* 保留瀏覽器預設樣式，與原始站一致 */
+	margin: 8px 0;
 }
 
 

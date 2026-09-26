@@ -25,12 +25,12 @@ import type { GameTime } from '../core/time-service';
 import type { ISkillDef, IBattleEvent, IBattleSnapshot } from '../types';
 import { EnumTargetType, EnumTargetMethod, EnumBattleEventType } from '../types';
 
-
 /**
  * 戰鬥配置 / Battle configuration
  * 介面 / interface
  */
-export interface IBattleConfig extends ICorpsePolicyField {
+export interface IBattleConfig extends ICorpsePolicyField
+{
 	/** 資料儲存庫（技能/職業/物品/怪物/角色）/ data repository (skills/jobs/items/mons/chars) */
 	repo: IDataRepository;
 	/** 可注入的隨機源 / injectable random source */
@@ -52,7 +52,8 @@ export interface IBattleConfig extends ICorpsePolicyField {
 	teamCorpse?: Partial<Record<EnumTeamSide, ICorpsePolicy>>;
 }
 
-export class Battle implements IBattleConfig {
+export class Battle implements IBattleConfig
+{
 	/** 資料儲存庫 / data repository */
 	repo: IDataRepository;
 	/** 隨機源 / random source */
@@ -86,57 +87,75 @@ export class Battle implements IBattleConfig {
 	 * @param team1 敵方角色 / enemy characters
 	 * @param cfg 戰鬥配置 / battle configuration
 	 */
-	constructor(team0: Character[], team1: Character[], cfg: IBattleConfig) {
+	constructor(team0: Character[], team1: Character[], cfg: IBattleConfig)
+	{
 		this.repo = cfg.repo;
 		this.rng = cfg.rng;
 		this.timeService = cfg.timeService;
 		this.corpse = cfg.corpse;
 		this.teamCorpse = cfg.teamCorpse ?? {};
-		this.teams = { [EnumTeamSide.Team0]: new BattleTeam(EnumTeamSide.Team0), [EnumTeamSide.Team1]: new BattleTeam(EnumTeamSide.Team1) };
+		this.teams = {
+			[EnumTeamSide.Team0]: new BattleTeam(EnumTeamSide.Team0),
+			[EnumTeamSide.Team1]: new BattleTeam(EnumTeamSide.Team1),
+		};
 		for (const c of team0) this.teams[EnumTeamSide.Team0].add(c);
 		for (const c of team1) this.teams[EnumTeamSide.Team1].add(c);
-		for (const c of this.allChars()) {
+		for (const c of this.allChars())
+		{
 			setBattleVariable(c, this.repo, this.rng);
 			c.delay = 0;
 		}
 	}
 
 	/** 所有單位（己隊 + 敵隊）/ every unit on both teams */
-	allChars(): Character[] {
+	allChars(): Character[]
+	{
 		return [...this.teams[EnumTeamSide.Team0].members, ...this.teams[EnumTeamSide.Team1].members];
 	}
 
 	/** 取得該單位的敵對隊伍 / the opposing team of the given unit */
-	enemyTeamOf(char: Character): BattleTeam {
+	enemyTeamOf(char: Character): BattleTeam
+	{
 		const side = (char.team as BattleTeam).side;
 		return side === EnumTeamSide.Team0 ? this.teams[EnumTeamSide.Team1] : this.teams[EnumTeamSide.Team0];
 	}
 
 	/** 行動延遲值：sqrt(SPD) + DELAY_BASE（SPD 越高延遲越短）/ action delay: sqrt(SPD) + DELAY_BASE (higher SPD = shorter delay) */
-	DelayValue(c: Character): number {
+	DelayValue(c: Character): number
+	{
 		return Math.sqrt(c.SPD) + DELAY_BASE;
 	}
 
 	/** 選出下一個行動者：delay 最小者；同 delay 時高 SPD 優先（對應 SPD 越高越早上場）/ pick the next actor: lowest delay, ties broken by higher SPD (higher SPD acts earlier) */
-	NextActer(): Character | null {
+	NextActer(): Character | null
+	{
 		let best: Character | null = null;
 		let bestDelay = Infinity;
 		let bestSpd = -1;
 		const EPS = 1e-9;
-		for (const c of this.allChars()) {
+		for (const c of this.allChars())
+		{
 			if (c.STATE === EnumState.Dead) continue;
-			if (c.delay < bestDelay - EPS) {
-				bestDelay = c.delay; bestSpd = c.SPD; best = c;
-			} else if (Math.abs(c.delay - bestDelay) <= EPS && c.SPD > bestSpd) {
-				bestSpd = c.SPD; best = c;
+			if (c.delay < bestDelay - EPS)
+			{
+				bestDelay = c.delay;
+				bestSpd = c.SPD;
+				best = c;
+			}
+			else if (Math.abs(c.delay - bestDelay) <= EPS && c.SPD > bestSpd)
+			{
+				bestSpd = c.SPD;
+				best = c;
 			}
 		}
 		return best;
 	}
 
 	/** 死亡者 delay 設為 Infinity（NextActer 永遠跳過死亡者）/ set dead units' delay to Infinity so NextActer always skips them */
-	SetDelay(): void {
-		for (const c of this.allChars()) {
+	SetDelay(): void
+	{
+		for (const c of this.allChars())
+		{
 			if (c.STATE === EnumState.Dead) c.delay = Infinity;
 		}
 	}
@@ -145,7 +164,8 @@ export class Battle implements IBattleConfig {
 	 * 取得下一個技能編號（樣式判定失敗時回預設攻擊）
 	 * Pick the next skill number (falls back to the default attack when no rule matches)
 	 */
-	ChooseSkill(actor: Character): number {
+	ChooseSkill(actor: Character): number
+	{
 		const keys = buildPattern(actor);
 		const action = MultiFactJudge(keys, actor, this);
 		return action ?? EnumJudgeCode.DefaultAttack;
@@ -163,20 +183,23 @@ export class Battle implements IBattleConfig {
 	 * - Self → 使用者本人 / the actor itself
 	 * - 其餘（如 All）→ 雙方所有存活單位 / otherwise (e.g. All) → every living unit on both sides
 	 */
-	selectTargets(actor: Character, skill: ISkillDef): Character[] {
+	selectTargets(actor: Character, skill: ISkillDef): Character[]
+	{
 		const enemyTeam = this.enemyTeamOf(actor);
 		const friendTeam = actor.team as BattleTeam;
 		const t = skill.target?.[0] ?? EnumTargetType.Enemy;
 		const method = skill.target?.[1] ?? EnumTargetMethod.Individual;
 		const count = skill.target?.[2] ?? 1;
 
-		if (t === EnumTargetType.Enemy) {
+		if (t === EnumTargetType.Enemy)
+		{
 			if (method === EnumTargetMethod.All) return enemyTeam.alive();
 			if (method === EnumTargetMethod.Multi) return enemyTeam.pickList(count, this.rng);
 			const p = enemyTeam.pick(this.rng);
 			return p ? [p] : [];
 		}
-		if (t === EnumTargetType.Friend) {
+		if (t === EnumTargetType.Friend)
+		{
 			if (method === EnumTargetMethod.All) return friendTeam.alive();
 			if (method === EnumTargetMethod.Multi) return friendTeam.pickList(count, this.rng);
 			const p = friendTeam.pick(this.rng);
@@ -196,12 +219,14 @@ export class Battle implements IBattleConfig {
 	 * guard interception (unless support/invalid/All) → applySkill → mark death at HP<=0 →
 	 * magic-circle / summon records (once per cast) → caster movement.
 	 */
-	UseSkill(actor: Character, skillNo: number): void {
+	UseSkill(actor: Character, skillNo: number): void
+	{
 		const skill = getSkill(skillNo, this.repo);
 		if (!skill) return;
 
 		// 詠唱/蓄力（charge）：首回合設定 expect，次回合執行
-		if (skill.charge && actor.expect === null) {
+		if (skill.charge && actor.expect === null)
+		{
 			actor.expect = skillNo;
 			actor.expect_type = EnumExpect.Cast;
 			this.log.push({ type: EnumBattleEventType.Cast, actor: charIdToString(actor.no), skill: skillNo });
@@ -209,7 +234,8 @@ export class Battle implements IBattleConfig {
 			this.actions--;
 			return;
 		}
-		if (actor.expect !== null && actor.expect !== skillNo) {
+		if (actor.expect !== null && actor.expect !== skillNo)
+		{
 			return; // 正在詠唱其他技能
 		}
 		actor.expect = null;
@@ -222,9 +248,11 @@ export class Battle implements IBattleConfig {
 
 		// 技能 `sacrifice`：施法前犧牲自身 HP（對齊原始 Skill.php:142，作用於使用者、每次施法一次）。
 		// Skill `sacrifice`: self HP cost before casting (mirrors original Skill.php:142, on the user, once per cast).
-		if (skill.sacrifice) {
+		if (skill.sacrifice)
+		{
 			sacrificeHp(actor, skill.sacrifice);
-			if (actor.HP <= 0 && actor.STATE !== EnumState.Dead) {
+			if (actor.HP <= 0 && actor.STATE !== EnumState.Dead)
+			{
 				actor.STATE = EnumState.Dead;
 				this.log.push({ type: EnumBattleEventType.Death, target: charIdToString(actor.no) });
 			}
@@ -234,15 +262,18 @@ export class Battle implements IBattleConfig {
 		this.log.push({ type: EnumBattleEventType.Act, actor: charIdToString(actor.no), skill: skillNo });
 
 		const targets = this.selectTargets(actor, skill);
-		for (const tgt of targets) {
+		for (const tgt of targets)
+		{
 			let realTarget = tgt;
-			if (!skill.support && !skill.invalid && skill.target?.[0] !== EnumTargetType.All) {
+			if (!skill.support && !skill.invalid && skill.target?.[0] !== EnumTargetType.All)
+			{
 				const guard = Defending(tgt.team as BattleTeam, tgt, skill);
 				if (guard) realTarget = guard;
 			}
 			const res = applySkill(skill, actor, realTarget, this.rng);
 			for (const ev of res.events) this.log.push(ev);
-			if (realTarget.HP <= 0 && realTarget.STATE !== EnumState.Dead) {
+			if (realTarget.HP <= 0 && realTarget.STATE !== EnumState.Dead)
+			{
 				realTarget.STATE = EnumState.Dead;
 				this.log.push({ type: EnumBattleEventType.Death, target: charIdToString(realTarget.no) });
 			}
@@ -252,7 +283,8 @@ export class Battle implements IBattleConfig {
 		// 魔方陣數（BattleTeam.mc）目前沒有任何引擎決策消費者，故不改動戰鬥狀態。
 		// Magic circle: record only (no `value`; the display derives amount and kind from the skill
 		// definition). BattleTeam.mc has no engine-side consumer yet, so battle state stays untouched.
-		if (skill.MagicCircleAdd || skill.MagicCircleDelete || skill.MagicCircleDeleteTeam || skill.MagicCircleDeleteEnemy) {
+		if (skill.MagicCircleAdd || skill.MagicCircleDelete || skill.MagicCircleDeleteTeam || skill.MagicCircleDeleteEnemy)
+		{
 			this.log.push({ type: EnumBattleEventType.MagicCircle, actor: charIdToString(actor.no), skill: skillNo });
 		}
 
@@ -278,11 +310,13 @@ export class Battle implements IBattleConfig {
 	 * @param skill - 帶 summon 欄位的技能定義 / the skill definition carrying `summon`
 	 * @param actor - 施放者 / the caster
 	 */
-	private applySummon(skill: ISkillDef, actor: Character): void {
+	private applySummon(skill: ISkillDef, actor: Character): void
+	{
 		const summon = skill.summon;
 		if (summon === undefined) return;
 		const defNos = Array.isArray(summon) ? summon : [summon];
-		for (const monNo of defNos) {
+		for (const monNo of defNos)
+		{
 			const def = this.repo.getMon(monNo);
 			if (!def) continue;
 			const summoned = newMonSummon(def, this.repo, this.rng);
@@ -301,7 +335,8 @@ export class Battle implements IBattleConfig {
 	 * 自動回復 → 中毒傷害 → 死亡則跳過 → 選技能 → 施放 → 行動計數 +1。
 	 * auto-regen → poison damage → skip if dead → choose skill → cast → actCount +1.
 	 */
-	Action(actor: Character): void {
+	Action(actor: Character): void
+	{
 		autoRegeneration(actor);
 		const hpBeforePoison = actor.HP;
 		const poisonLost = poisonDamage(actor);
@@ -309,7 +344,8 @@ export class Battle implements IBattleConfig {
 		// 因此上級事件引擎會把它歸類為一般事件。
 		// Per-turn poison damage: attached to no skill (it carries the value and before/after HP the
 		// display needs), so the upper event engine classes it as a general event.
-		if (poisonLost > 0) {
+		if (poisonLost > 0)
+		{
 			this.log.push({
 				type: EnumBattleEventType.Poison,
 				target: charIdToString(actor.no),
@@ -332,7 +368,8 @@ export class Battle implements IBattleConfig {
 	 * when none is set the result is false (no corpse). Returns a boolean or an object
 	 * spec (object = leave a corpse carrying image/class/style).
 	 */
-	private resolveCorpse(c: Character): ICorpsePolicy {
+	private resolveCorpse(c: Character): ICorpsePolicy
+	{
 		const team = c.team as BattleTeam | null;
 		const teamSide = team?.side;
 		return resolveCorpsePolicy(
@@ -343,7 +380,8 @@ export class Battle implements IBattleConfig {
 	}
 
 	/** 建立目前快照單位列表 / Build current snapshot unit list */
-	private snapshotUnits(): IBattleSnapshot['units'] {
+	private snapshotUnits(): IBattleSnapshot['units']
+	{
 		return this.allChars().map((c) => ({
 			unitUuid: c.unitUuid,
 			corpse: this.resolveCorpse(c),
@@ -365,15 +403,19 @@ export class Battle implements IBattleConfig {
 	 * 執行整場戰鬥直到分出勝負或超時平手
 	 * Run the whole battle until an outcome or a timeout draw
 	 */
-	run(): BattleResult {
-		while (!this.result) {
+	run(): BattleResult
+	{
+		while (!this.result)
+		{
 			// 每 BATTLE_STAT_TURNS 次行動插入一張快照（對齊 PHP BattleState）
-			if (this.actions % BATTLE_STAT_TURNS === 0 && this.actions !== this.lastSnapshotActions) {
+			if (this.actions % BATTLE_STAT_TURNS === 0 && this.actions !== this.lastSnapshotActions)
+			{
 				this.lastSnapshotActions = this.actions;
 				this.snapshots.push({ at: this.log.length, units: this.snapshotUnits() });
 			}
 			const actor = this.NextActer();
-			if (!actor) {
+			if (!actor)
+			{
 				this.result = new BattleResult(
 					computeOutcome(this.teams[EnumTeamSide.Team0], this.teams[EnumTeamSide.Team1]), this.turn, this.extend,
 				);
@@ -385,14 +427,17 @@ export class Battle implements IBattleConfig {
 			this.turn++;
 
 			const outcome = computeOutcome(this.teams[EnumTeamSide.Team0], this.teams[EnumTeamSide.Team1]);
-			if (outcome !== EnumOutcome.Draw) {
+			if (outcome !== EnumOutcome.Draw)
+			{
 				this.result = new BattleResult(outcome, this.turn, this.extend);
 				break;
 			}
 
 			// 回合上限：超過則延伸，最多 BATTLE_MAX_EXTENDS 次後判平手
-			if (this.turn > BATTLE_MAX_TURNS + this.extend * TURN_EXTENDS) {
-				if (this.extend >= BATTLE_MAX_EXTENDS) {
+			if (this.turn > BATTLE_MAX_TURNS + this.extend * TURN_EXTENDS)
+			{
+				if (this.extend >= BATTLE_MAX_EXTENDS)
+				{
 					this.result = new BattleResult(EnumOutcome.Draw, this.turn, this.extend);
 					break;
 				}
@@ -402,7 +447,8 @@ export class Battle implements IBattleConfig {
 		}
 		// 補最終快照（若與上一張不同）
 		const lastSnap = this.snapshots[this.snapshots.length - 1];
-		if (!lastSnap || lastSnap.at !== this.log.length) {
+		if (!lastSnap || lastSnap.at !== this.log.length)
+		{
 			this.snapshots.push({ at: this.log.length, units: this.snapshotUnits() });
 		}
 		return this.result;

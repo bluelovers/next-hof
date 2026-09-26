@@ -3,12 +3,12 @@
 
 import type { BattleTeam } from '../team/BattleTeam';
 
-
 /**
  * 戰鬥結果 / Battle outcome
  * 列舉 / enumeration
  */
-export enum EnumOutcome {
+export enum EnumOutcome
+{
 	/** 戰勝（敵方全滅）/ victory (enemy wiped out) */
 	Win = 'win',
 	/** 戰敗（己方全滅）/ defeat (own side wiped out) */
@@ -21,7 +21,8 @@ export enum EnumOutcome {
  * 戰鬥結果承載物件 / Battle result carrier
  * 介面 / class
  */
-export class BattleResult {
+export class BattleResult
+{
 	/** 判定結果（team0 視角）/ outcome from team0's perspective */
 	outcome: EnumOutcome;
 	/** 已進行回合數 / turns played */
@@ -35,7 +36,8 @@ export class BattleResult {
 	 * @param turns 回合數 / turns
 	 * @param extend 延長次數 / extensions
 	 */
-	constructor(outcome: EnumOutcome, turns: number, extend: number) {
+	constructor(outcome: EnumOutcome, turns: number, extend: number)
+	{
 		this.outcome = outcome;
 		this.turns = turns;
 		this.extend = extend;
@@ -51,7 +53,8 @@ export class BattleResult {
  * 3. 己方（team0）存活數為 0 → Lose / own side (team0) wiped → Lose
  * 4. 其餘（雙方皆存活，通常為超時）→ Draw / otherwise (both alive, usually timeout) → Draw
  */
-export function computeOutcome(team0: BattleTeam, team1: BattleTeam): EnumOutcome {
+export function computeOutcome(team0: BattleTeam, team1: BattleTeam): EnumOutcome
+{
 	const a0 = team0.CountAlive();
 	const a1 = team1.CountAlive();
 	if (a0 === 0 && a1 === 0) return EnumOutcome.Draw;

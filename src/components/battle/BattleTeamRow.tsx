@@ -19,13 +19,14 @@ import { getSideClass, segmentUnitsForSide } from './battleUtils';
 import './BattleTeamRow.css';
 
 /** 隊伍資訊列屬性 / Team info row props */
-export interface IBattleTeamRowProps {
-  /** 左側隊伍 / Left team */
-  leftTeam: IBattleTeam;
-  /** 右側隊伍 / Right team */
-  rightTeam: IBattleTeam;
-  /** 起始分段（提供快照時的起始狀態）/ Initial segment (starting state when a snapshot exists) */
-  segment: IBattleSegment;
+export interface IBattleTeamRowProps
+{
+	/** 左側隊伍 / Left team */
+	leftTeam: IBattleTeam;
+	/** 右側隊伍 / Right team */
+	rightTeam: IBattleTeam;
+	/** 起始分段（提供快照時的起始狀態）/ Initial segment (starting state when a snapshot exists) */
+	segment: IBattleSegment;
 }
 
 /**
@@ -33,16 +34,16 @@ export interface IBattleTeamRowProps {
  * Team info row component
  */
 export const BattleTeamRow: React.FC<IBattleTeamRowProps> = ({ leftTeam, rightTeam, segment }) => (
-  <div className="battle-team-row">
-    <BattleTeamInfo
-      name={leftTeam.name}
-      units={segmentUnitsForSide(segment, EnumTeamSideUI.Left, leftTeam.units)}
-      sideClass={getSideClass(EnumTeamSideUI.Left)}
-    />
-    <BattleTeamInfo
-      name={rightTeam.name}
-      units={segmentUnitsForSide(segment, EnumTeamSideUI.Right, rightTeam.units)}
-      sideClass={getSideClass(EnumTeamSideUI.Right)}
-    />
-  </div>
+	<div className="battle-team-row">
+		<BattleTeamInfo
+			name={leftTeam.name}
+			units={segmentUnitsForSide(segment, EnumTeamSideUI.Left, leftTeam.units)}
+			sideClass={getSideClass(EnumTeamSideUI.Left)}
+		/>
+		<BattleTeamInfo
+			name={rightTeam.name}
+			units={segmentUnitsForSide(segment, EnumTeamSideUI.Right, rightTeam.units)}
+			sideClass={getSideClass(EnumTeamSideUI.Right)}
+		/>
+	</div>
 );

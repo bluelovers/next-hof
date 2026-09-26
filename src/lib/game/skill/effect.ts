@@ -11,12 +11,12 @@ import type { ISkillDef, IBattleEvent } from '../types';
 import { EnumInfluence, EnumBattleEventType, EnumSkillDamageType } from '../types';
 import type { RNG } from '../core/rng';
 
-
 /**
  * 技能執行結果 / Skill execution result
  * 介面 / interface
  */
-export interface ISkillResult {
+export interface ISkillResult
+{
 	/** 實際造成的傷害（支援技能為 0/未設）/ damage dealt (0/unset for support skills) */
 	damage?: number;
 	/** 實際回復量（傷害技能未設）/ amount healed (unset for damage skills) */
@@ -48,7 +48,8 @@ export interface ISkillResult {
  * protection to Battle.UseSkill / hpDamage. For the original's unconditional Pierce and inline
  * Barrier / protection, see calcBasicDamageOriginal in effect.original.ts as the comparison baseline.
  */
-export function calcBasicDamage(skill: ISkillDef, user: Character, target: Character): number {
+export function calcBasicDamage(skill: ISkillDef, user: Character, target: Character): number
+{
 	const isMagic = skill.type === EnumSkillDamageType.Magic;
 	const stat = skill.inf === EnumInfluence.Dex
 		? user.DEX
@@ -61,11 +62,15 @@ export function calcBasicDamage(skill: ISkillDef, user: Character, target: Chara
 	// Floor reference: mirrors original `$min = $dmg * (1/10)`, computed BEFORE defence reduction.
 	const min = raw * 0.1;
 
-	if (!skill.pierce) {
-		if (isMagic) {
+	if (!skill.pierce)
+	{
+		if (isMagic)
+		{
 			raw = raw * (1 - (target.def[EnumDefSlot.MagPct] ?? 0) / 100);
 			raw = raw - (target.def[EnumDefSlot.MagFlat] ?? 0);
-		} else {
+		}
+		else
+		{
 			raw = raw * (1 - (target.def[EnumDefSlot.PhysPct] ?? 0) / 100);
 			raw = raw - (target.def[EnumDefSlot.PhysFlat] ?? 0);
 		}
@@ -77,7 +82,8 @@ export function calcBasicDamage(skill: ISkillDef, user: Character, target: Chara
 	// 原始 PHP 為「無條件」加算；完整還原請見 effect.original.ts 的 calcBasicDamageOriginal。
 	// Pierce bonus: the port (adapted) adds SPECIAL.Pierce only when skill.pierce is set.
 	// The original PHP adds it unconditionally; see calcBasicDamageOriginal in effect.original.ts.
-	if (skill.pierce) {
+	if (skill.pierce)
+	{
 		const p = user.SPECIAL.Pierce[atkIdx] ?? 0;
 		dmg += (p * (skill.pow ?? 100)) / 100;
 	}
@@ -94,11 +100,11 @@ export function calcBasicDamage(skill: ISkillDef, user: Character, target: Chara
  * sqrt(INT)×10 + 魔法 atk，再乘 pow%；支援技能的 pow 即回復倍率。
  * sqrt(INT)×10 + magic atk, scaled by pow%; for support skills pow is the heal ratio.
  */
-export function calcRecoveryValue(skill: ISkillDef, user: Character): number {
+export function calcRecoveryValue(skill: ISkillDef, user: Character): number
+{
 	const heal = Math.sqrt(user.INT) * 10 + (user.atk[EnumAtkSlot.Mag] ?? 0);
 	return Math.ceil(heal * (skill.pow ?? 100) / 100);
 }
-
 
 /**
  * 套用技能的状态變化，並回傳這段處理產生的戰鬥紀錄（對應 StatusChanges）。
@@ -134,27 +140,64 @@ export function calcRecoveryValue(skill: ISkillDef, user: Character): number {
  * @param rng - 隨機源（施毒機率判定）/ random source (poison chance roll)
  * @returns 產生的戰鬥紀錄 / produced battle records
  */
-export function statusChanges(skill: ISkillDef, actor: Character, target: Character, rng?: RNG): IBattleEvent[] {
+export function statusChanges(skill: ISkillDef, actor: Character, target: Character, rng?: RNG): IBattleEvent[]
+{
 	const events: IBattleEvent[] = [];
 	let buffed = false;
 	let debuffed = false;
 
 	// 對齊原始 StatusChanges：Up/Down/Plus 全部作用在目標（$target）。
 	// Mirrors original StatusChanges: Up/Down/Plus all apply to the target ($target).
-	for (const key of Object.keys(skill)) {
+	for (const key of Object.keys(skill))
+	{
 		const n = (skill as unknown as Record<string, unknown>)[key];
 		if (typeof n !== 'number') continue;
-		if (UPMAP[key]) { UPMAP[key](target, n); buffed = true; }
-		else if (DOWNMAP[key]) { DOWNMAP[key](target, n); debuffed = true; }
-		else if (PLUSMAP[key]) { PLUSMAP[key](target, n); buffed = true; }
+		if (UPMAP[key])
+		{
+			UPMAP[key](target, n);
+			buffed = true;
+		}
+		else if (DOWNMAP[key])
+		{
+			DOWNMAP[key](target, n);
+			debuffed = true;
+		}
+		else if (PLUSMAP[key])
+		{
+			PLUSMAP[key](target, n);
+			buffed = true;
+		}
 	}
-	if (buffed) events.push({ type: EnumBattleEventType.Buff, actor: charIdToString(actor.no), target: charIdToString(target.no), skill: skill.no });
-	if (debuffed) events.push({ type: EnumBattleEventType.Debuff, actor: charIdToString(actor.no), target: charIdToString(target.no), skill: skill.no });
+	if (buffed)
+	{
+		events.push({
+			type: EnumBattleEventType.Buff,
+			actor: charIdToString(actor.no),
+			target: charIdToString(target.no),
+			skill: skill.no,
+		});
+	}
+	if (debuffed)
+	{
+		events.push({
+			type: EnumBattleEventType.Debuff,
+			actor: charIdToString(actor.no),
+			target: charIdToString(target.no),
+			skill: skill.no,
+		});
+	}
 
-	if (skill.poison) {
+	if (skill.poison)
+	{
 		const applied = getPoison(target, skill.poison, rng);
-		if (applied === true) {
-			events.push({ type: EnumBattleEventType.Poison, actor: charIdToString(actor.no), target: charIdToString(target.no), skill: skill.no });
+		if (applied === true)
+		{
+			events.push({
+				type: EnumBattleEventType.Poison,
+				actor: charIdToString(actor.no),
+				target: charIdToString(target.no),
+				skill: skill.no,
+			});
 		}
 	}
 	/**
@@ -165,7 +208,8 @@ export function statusChanges(skill: ISkillDef, actor: Character, target: Charac
 	 * That branch contradicts cure semantics, so it deliberately records nothing (a "cured" record
 	 * would disagree with the actual state).
 	 */
-	if (skill.CurePoison && target.STATE !== EnumState.Poison) {
+	if (skill.CurePoison && target.STATE !== EnumState.Poison)
+	{
 		getNormal(target);
 	}
 	if (skill.HpRegen) target.SPECIAL.HpRegen += skill.HpRegen;
@@ -193,14 +237,24 @@ export function statusChanges(skill: ISkillDef, actor: Character, target: Charac
  * - 非 pierce 且目標 Barrier>0 → 消耗一層並完全抵擋 / non-pierce vs Barrier>0 → consume a layer, block fully
  * - 其餘 → calcBasicDamage 後經 hpDamage 套用 / otherwise → calcBasicDamage then applied via hpDamage
  */
-export function applySkill(skill: ISkillDef, user: Character, target: Character, rng?: RNG): ISkillResult {
+export function applySkill(skill: ISkillDef, user: Character, target: Character, rng?: RNG): ISkillResult
+{
 	const events: IBattleEvent[] = [];
 
-	if (skill.support) {
+	if (skill.support)
+	{
 		const hpBefore = target.HP;
 		const heal = calcRecoveryValue(skill, user);
 		const applied = hpRecover(target, heal);
-		events.push({ type: EnumBattleEventType.Heal, actor: charIdToString(user.no), target: charIdToString(target.no), skill: skill.no, value: applied, hpBefore, hpAfter: target.HP });
+		events.push({
+			type: EnumBattleEventType.Heal,
+			actor: charIdToString(user.no),
+			target: charIdToString(target.no),
+			skill: skill.no,
+			value: applied,
+			hpBefore,
+			hpAfter: target.HP,
+		});
 		events.push(...statusChanges(skill, user, target, rng));
 		return { heal: applied, events };
 	}
@@ -208,18 +262,33 @@ export function applySkill(skill: ISkillDef, user: Character, target: Character,
 	const dmg = calcBasicDamage(skill, user, target);
 
 	// 絕對防禦 Barrier：消耗一次，完全抵擋
-	if (target.SPECIAL.Barrier > 0 && !skill.pierce) {
+	if (target.SPECIAL.Barrier > 0 && !skill.pierce)
+	{
 		target.SPECIAL.Barrier--;
 		// 帶 skill 編號：攔截是「這次技能」造成的，上級事件引擎才能掛回同一筆技能事件。
 		// Carries the skill number: the interception belongs to *this* skill use, so the upper event
 		// engine can attach it to the same skill event.
-		events.push({ type: EnumBattleEventType.Guard, actor: charIdToString(target.no), target: charIdToString(target.no), skill: skill.no, text: 'barrier' });
+		events.push({
+			type: EnumBattleEventType.Guard,
+			actor: charIdToString(target.no),
+			target: charIdToString(target.no),
+			skill: skill.no,
+			text: 'barrier',
+		});
 		return { damage: 0, events };
 	}
 
 	const hpBefore = target.HP;
 	const applied = hpDamage(target, dmg);
-	events.push({ type: EnumBattleEventType.Damage, actor: charIdToString(user.no), target: charIdToString(target.no), skill: skill.no, value: applied, hpBefore, hpAfter: target.HP });
+	events.push({
+		type: EnumBattleEventType.Damage,
+		actor: charIdToString(user.no),
+		target: charIdToString(target.no),
+		skill: skill.no,
+		value: applied,
+		hpBefore,
+		hpAfter: target.HP,
+	});
 	events.push(...statusChanges(skill, user, target, rng));
 	return { damage: applied, events };
 }

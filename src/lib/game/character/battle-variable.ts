@@ -24,7 +24,8 @@ import type { RNG } from '../core/rng';
  * 4. HP/SP 上限夾制。
  *    clamp HP/SP to their caps.
  */
-export function setBattleVariable(char: Character, repo: IDataRepository, rng: RNG): void {
+export function setBattleVariable(char: Character, repo: IDataRepository, rng: RNG): void
+{
 	char.STATE = EnumState.Alive;
 	char.POSITION = rng.randInt(0, 1) === 0 ? EnumPosition.Front : EnumPosition.Back;
 
@@ -32,7 +33,8 @@ export function setBattleVariable(char: Character, repo: IDataRepository, rng: R
 	CalcEquips(char, repo);
 
 	const ch = char as unknown as Record<string, number>;
-	for (const k of PRIMARY_STATS) {
+	for (const k of PRIMARY_STATS)
+	{
 		const m = BASE_STAT_COMP_MAP[k];
 		ch[m.battle] = ch[k] + ch[m.comp];
 	}

@@ -21,57 +21,57 @@
  * and its sampleData).
  */
 import type {
-  IBattleAction,
-  IBattleDisplayData,
-  IBattleFieldConfig,
-  IBattleResult,
-  IBattleSnapshotDisplay,
-  IBattleSnapshotDisplayUnit,
-  IBattleSprite,
-  IBattleUnit,
-  IMagicCircleRecord,
-  ISkillIcon,
+	IBattleAction,
+	IBattleDisplayData,
+	IBattleFieldConfig,
+	IBattleResult,
+	IBattleSnapshotDisplay,
+	IBattleSnapshotDisplayUnit,
+	IBattleSprite,
+	IBattleUnit,
+	IMagicCircleRecord,
+	ISkillIcon,
 } from '#/components/battle/types';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
 import type { IBattlePositionChar } from '#/components/battle/computeSpritePositions';
 import { computeBattleSpritePositions, groupBattleChars } from '#/components/battle/computeSpritePositions';
 import { getSpriteImageSize } from '#/components/battle/spriteImageSizes';
 import {
-  EnumActionType,
-  EnumAttributeType,
-  EnumChargeKind,
-  EnumMagicCircleKind,
-  EnumTeamSideUI,
-  EnumUnitStatus,
+	EnumActionType,
+	EnumAttributeType,
+	EnumChargeKind,
+	EnumMagicCircleKind,
+	EnumTeamSideUI,
+	EnumUnitStatus,
 } from '#/components/battle/enums';
 import {
-  buildActionMessage,
-  buildActMessage,
-  buildAliveExpsMessage,
-  buildAutoRegenText,
-  buildChargeText,
-  buildDamageCountMessage,
-  buildDamageMessage,
-  buildDownMessage,
-  buildDrainMessage,
-  buildFailMessage,
-  buildItemDropMessage,
-  buildMagicCircleMessage,
-  buildPoisonDamageText,
-  buildPoisonResistText,
-  buildPossessiveText,
-  buildProtectMessage,
-  buildRecoveredText,
-  buildRegenText,
-  buildSacrificeText,
-  buildSpDamageMessage,
-  buildStatChangeText,
-  buildStatToText,
-  buildSummonMessage,
-  buildTeamGoldMessage,
-  buildValueChangeFromDelay,
-  EnumLogCopy,
-  getEnterBattlefieldText,
+	buildActionMessage,
+	buildActMessage,
+	buildAliveExpsMessage,
+	buildAutoRegenText,
+	buildChargeText,
+	buildDamageCountMessage,
+	buildDamageMessage,
+	buildDownMessage,
+	buildDrainMessage,
+	buildFailMessage,
+	buildItemDropMessage,
+	buildMagicCircleMessage,
+	buildPoisonDamageText,
+	buildPoisonResistText,
+	buildPossessiveText,
+	buildProtectMessage,
+	buildRecoveredText,
+	buildRegenText,
+	buildSacrificeText,
+	buildSpDamageMessage,
+	buildStatChangeText,
+	buildStatToText,
+	buildSummonMessage,
+	buildTeamGoldMessage,
+	buildValueChangeFromDelay,
+	EnumLogCopy,
+	getEnterBattlefieldText,
 } from '#/components/battle/battleUtils';
 import { EnumPosition } from '#/lib/game/constants';
 import { computeTeamHpStats, type ITeamHpUnit } from '#/lib/showcase/battle-adapter';
@@ -90,10 +90,10 @@ const BATTLE_TIME = '05/13(Wed) 04:39:24';
 
 /** 戰場設定（背景＋角色排版尺寸）/ Battlefield config (background + sprite layout size) */
 const BATTLEFIELD: IBattleFieldConfig = {
-  backgroundImageUrl: '/image/land/bg_grass.png',
-  backgroundType: 'grass',
-  width: SPRITE_LAYOUT_WIDTH,
-  height: SPRITE_LAYOUT_HEIGHT,
+	backgroundImageUrl: '/image/land/bg_grass.png',
+	backgroundType: 'grass',
+	width: SPRITE_LAYOUT_WIDTH,
+	height: SPRITE_LAYOUT_HEIGHT,
 };
 
 /** 精靈定位計算用的戰場尺寸 / Field size used for sprite positioning */
@@ -110,10 +110,10 @@ const SKILL_SUMMON_LEVIATHAN: ISkillIcon = { name: 'SummonLeviathan', iconUrl: '
 
 /** 戰鬥結果（預設與戰鬥結束共用）/ Battle result (shared by Default and BattleOver) */
 const BATTLE_RESULT: IBattleResult = {
-  winner: LEFT_TEAM_NAME,
-  isDraw: false,
-  leftTeam: { hpRemain: 573, alive: 4, totalUnits: 4, totalDamage: 1384, totalExp: 4, funds: '4' },
-  rightTeam: { hpRemain: 0, alive: 0, totalUnits: 4, totalDamage: 379 },
+	winner: LEFT_TEAM_NAME,
+	isDraw: false,
+	leftTeam: { hpRemain: 573, alive: 4, totalUnits: 4, totalDamage: 1384, totalExp: 4, funds: '4' },
+	rightTeam: { hpRemain: 0, alive: 0, totalUnits: 4, totalDamage: 379 },
 };
 
 // ==================== 單位定義（唯一事實來源）/ Unit definitions (single source of truth) ====================
@@ -125,66 +125,221 @@ const BATTLE_RESULT: IBattleResult = {
  * 狀態列、快照、戰場精靈與入場訊息的等級皆由此派生。
  * Status rows, snapshots, battlefield sprites and the enter-message level all derive from it.
  */
-interface IShowcaseUnit {
-  /** 戰鬥單位實例 uid（sprite.unitUuid ↔ snapshot unitUuid）/ battle-unit instance uid */
-  unitUuid: string;
-  /** 單位名稱 / Unit name */
-  name: string;
-  /** 等級 / Level */
-  level: number;
-  /** 目前 HP / Current HP */
-  hp: number;
-  /** 最大 HP / Max HP */
-  maxHp: number;
-  /** 目前 SP / Current SP */
-  sp: number;
-  /** 最大 SP / Max SP */
-  maxSp: number;
-  /** 隊伍側 / Team side */
-  side: EnumTeamSideUI;
-  /** 站位：前衛 / 後衛 / Position: front / back */
-  position: EnumPosition;
-  /** 場上精靈圖：char＝向右、char_rev＝預先鏡像向左 / Field sprite image: char = faces right, char_rev = pre-mirrored facing left */
-  imageUrl: string;
+interface IShowcaseUnit
+{
+	/** 戰鬥單位實例 uid（sprite.unitUuid ↔ snapshot unitUuid）/ battle-unit instance uid */
+	unitUuid: string;
+	/** 單位名稱 / Unit name */
+	name: string;
+	/** 等級 / Level */
+	level: number;
+	/** 目前 HP / Current HP */
+	hp: number;
+	/** 最大 HP / Max HP */
+	maxHp: number;
+	/** 目前 SP / Current SP */
+	sp: number;
+	/** 最大 SP / Max SP */
+	maxSp: number;
+	/** 隊伍側 / Team side */
+	side: EnumTeamSideUI;
+	/** 站位：前衛 / 後衛 / Position: front / back */
+	position: EnumPosition;
+	/** 場上精靈圖：char＝向右、char_rev＝預先鏡像向左 / Field sprite image: char = faces right, char_rev = pre-mirrored facing left */
+	imageUrl: string;
 }
 
 // ---- 預設戰鬥：左隊（ゴブリン）/ Default battle: left team (goblins) ----
 
-const goblinWarriorA: IShowcaseUnit = { unitUuid: 'goblin-a', name: 'GoblinWarrior(A)', level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: EnumTeamSideUI.Left, position: EnumPosition.Front, imageUrl: '/image/char/mon_052.png' };
-const goblinWarriorB: IShowcaseUnit = { unitUuid: 'goblin-b', name: 'GoblinWarrior(B)', level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: EnumTeamSideUI.Left, position: EnumPosition.Front, imageUrl: '/image/char/mon_052.png' };
-const goblinWarriorC: IShowcaseUnit = { unitUuid: 'goblin-c', name: 'GoblinWarrior(C)', level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: EnumTeamSideUI.Left, position: EnumPosition.Front, imageUrl: '/image/char/mon_052.png' };
-const goblinAxe: IShowcaseUnit = { unitUuid: 'goblin-axe', name: 'GoblinAxe', level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: EnumTeamSideUI.Left, position: EnumPosition.Back, imageUrl: '/image/char/mon_053.png' };
+const goblinWarriorA: IShowcaseUnit = {
+	unitUuid: 'goblin-a',
+	name: 'GoblinWarrior(A)',
+	level: 4,
+	hp: 263,
+	maxHp: 263,
+	sp: 263,
+	maxSp: 174,
+	side: EnumTeamSideUI.Left,
+	position: EnumPosition.Front,
+	imageUrl: '/image/char/mon_052.png',
+};
+const goblinWarriorB: IShowcaseUnit = {
+	unitUuid: 'goblin-b',
+	name: 'GoblinWarrior(B)',
+	level: 4,
+	hp: 263,
+	maxHp: 263,
+	sp: 263,
+	maxSp: 174,
+	side: EnumTeamSideUI.Left,
+	position: EnumPosition.Front,
+	imageUrl: '/image/char/mon_052.png',
+};
+const goblinWarriorC: IShowcaseUnit = {
+	unitUuid: 'goblin-c',
+	name: 'GoblinWarrior(C)',
+	level: 1,
+	hp: 213,
+	maxHp: 213,
+	sp: 213,
+	maxSp: 154,
+	side: EnumTeamSideUI.Left,
+	position: EnumPosition.Front,
+	imageUrl: '/image/char/mon_052.png',
+};
+const goblinAxe: IShowcaseUnit = {
+	unitUuid: 'goblin-axe',
+	name: 'GoblinAxe',
+	level: 1,
+	hp: 213,
+	maxHp: 213,
+	sp: 213,
+	maxSp: 154,
+	side: EnumTeamSideUI.Left,
+	position: EnumPosition.Back,
+	imageUrl: '/image/char/mon_053.png',
+};
 
 // ---- 預設戰鬥：右隊（TestTeam）/ Default battle: right team (TestTeam) ----
 
-const hero1: IShowcaseUnit = { unitUuid: 'hero1', name: 'Hero1', level: 3, hp: 349, maxHp: 349, sp: 349, maxSp: 53, side: EnumTeamSideUI.Right, position: EnumPosition.Front, imageUrl: '/image/char_rev/mon_018.png' };
-const mage1: IShowcaseUnit = { unitUuid: 'mage1', name: 'Mage1', level: 3, hp: 159, maxHp: 159, sp: 159, maxSp: 112, side: EnumTeamSideUI.Right, position: EnumPosition.Back, imageUrl: '/image/char_rev/mon_214.png' };
-const healer1: IShowcaseUnit = { unitUuid: 'healer1', name: 'Healer1', level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: EnumTeamSideUI.Right, position: EnumPosition.Back, imageUrl: '/image/char_rev/mon_214.png' };
-const priest1: IShowcaseUnit = { unitUuid: 'priest1', name: 'Priest1', level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: EnumTeamSideUI.Right, position: EnumPosition.Front, imageUrl: '/image/char_rev/mon_079.png' };
+const hero1: IShowcaseUnit = {
+	unitUuid: 'hero1',
+	name: 'Hero1',
+	level: 3,
+	hp: 349,
+	maxHp: 349,
+	sp: 349,
+	maxSp: 53,
+	side: EnumTeamSideUI.Right,
+	position: EnumPosition.Front,
+	imageUrl: '/image/char_rev/mon_018.png',
+};
+const mage1: IShowcaseUnit = {
+	unitUuid: 'mage1',
+	name: 'Mage1',
+	level: 3,
+	hp: 159,
+	maxHp: 159,
+	sp: 159,
+	maxSp: 112,
+	side: EnumTeamSideUI.Right,
+	position: EnumPosition.Back,
+	imageUrl: '/image/char_rev/mon_214.png',
+};
+const healer1: IShowcaseUnit = {
+	unitUuid: 'healer1',
+	name: 'Healer1',
+	level: 3,
+	hp: 213,
+	maxHp: 213,
+	sp: 213,
+	maxSp: 89,
+	side: EnumTeamSideUI.Right,
+	position: EnumPosition.Back,
+	imageUrl: '/image/char_rev/mon_214.png',
+};
+const priest1: IShowcaseUnit = {
+	unitUuid: 'priest1',
+	name: 'Priest1',
+	level: 3,
+	hp: 213,
+	maxHp: 213,
+	sp: 213,
+	maxSp: 89,
+	side: EnumTeamSideUI.Right,
+	position: EnumPosition.Front,
+	imageUrl: '/image/char_rev/mon_079.png',
+};
 
 /**
  * 預設戰鬥全體（狀態列順序；同一順序亦決定精靈的分組與前後疊放）
  * All default-battle units (status-column order; the same order also fixes sprite grouping and stacking)
  */
 const defaultUnits: IShowcaseUnit[] = [
-  goblinWarriorA,
-  goblinWarriorB,
-  goblinWarriorC,
-  goblinAxe,
-  hero1,
-  mage1,
-  healer1,
-  priest1,
+	goblinWarriorA,
+	goblinWarriorB,
+	goblinWarriorC,
+	goblinAxe,
+	hero1,
+	mage1,
+	healer1,
+	priest1,
 ];
 
 // ---- 召喚演示：GraveYard（skill 2464，3 體召喚）/ Summon demo: GraveYard (skill 2464, summon 3) ----
 
-const summonGoblinAxe: IShowcaseUnit = { unitUuid: 'u-goblin-axe', name: 'GoblinAxe', level: 1, hp: 213, maxHp: 213, sp: 154, maxSp: 154, side: EnumTeamSideUI.Left, position: EnumPosition.Front, imageUrl: '/image/char/mon_053.png' };
-const summonHero1: IShowcaseUnit = { unitUuid: 'u-hero1', name: 'Hero1', level: 3, hp: 349, maxHp: 349, sp: 53, maxSp: 53, side: EnumTeamSideUI.Right, position: EnumPosition.Back, imageUrl: '/image/char_rev/mon_018.png' };
-const summonMage1: IShowcaseUnit = { unitUuid: 'u-mage1', name: 'Mage1', level: 3, hp: 159, maxHp: 159, sp: 112, maxSp: 112, side: EnumTeamSideUI.Right, position: EnumPosition.Back, imageUrl: '/image/char_rev/mon_214.png' };
-const mummy1: IShowcaseUnit = { unitUuid: 'u-mummy-1', name: 'Mummy', level: 10, hp: 472, maxHp: 472, sp: 179, maxSp: 179, side: EnumTeamSideUI.Right, position: EnumPosition.Front, imageUrl: '/image/char_rev/mon_146.png' };
-const mummyPrisoner: IShowcaseUnit = { unitUuid: 'u-mummy-prisoner', name: 'MummyPrisoner', level: 10, hp: 682, maxHp: 682, sp: 179, maxSp: 179, side: EnumTeamSideUI.Right, position: EnumPosition.Front, imageUrl: '/image/char_rev/mon_146r.png' };
-const mummy2: IShowcaseUnit = { unitUuid: 'u-mummy-2', name: 'Mummy', level: 10, hp: 472, maxHp: 472, sp: 179, maxSp: 179, side: EnumTeamSideUI.Right, position: EnumPosition.Front, imageUrl: '/image/char_rev/mon_146.png' };
+const summonGoblinAxe: IShowcaseUnit = {
+	unitUuid: 'u-goblin-axe',
+	name: 'GoblinAxe',
+	level: 1,
+	hp: 213,
+	maxHp: 213,
+	sp: 154,
+	maxSp: 154,
+	side: EnumTeamSideUI.Left,
+	position: EnumPosition.Front,
+	imageUrl: '/image/char/mon_053.png',
+};
+const summonHero1: IShowcaseUnit = {
+	unitUuid: 'u-hero1',
+	name: 'Hero1',
+	level: 3,
+	hp: 349,
+	maxHp: 349,
+	sp: 53,
+	maxSp: 53,
+	side: EnumTeamSideUI.Right,
+	position: EnumPosition.Back,
+	imageUrl: '/image/char_rev/mon_018.png',
+};
+const summonMage1: IShowcaseUnit = {
+	unitUuid: 'u-mage1',
+	name: 'Mage1',
+	level: 3,
+	hp: 159,
+	maxHp: 159,
+	sp: 112,
+	maxSp: 112,
+	side: EnumTeamSideUI.Right,
+	position: EnumPosition.Back,
+	imageUrl: '/image/char_rev/mon_214.png',
+};
+const mummy1: IShowcaseUnit = {
+	unitUuid: 'u-mummy-1',
+	name: 'Mummy',
+	level: 10,
+	hp: 472,
+	maxHp: 472,
+	sp: 179,
+	maxSp: 179,
+	side: EnumTeamSideUI.Right,
+	position: EnumPosition.Front,
+	imageUrl: '/image/char_rev/mon_146.png',
+};
+const mummyPrisoner: IShowcaseUnit = {
+	unitUuid: 'u-mummy-prisoner',
+	name: 'MummyPrisoner',
+	level: 10,
+	hp: 682,
+	maxHp: 682,
+	sp: 179,
+	maxSp: 179,
+	side: EnumTeamSideUI.Right,
+	position: EnumPosition.Front,
+	imageUrl: '/image/char_rev/mon_146r.png',
+};
+const mummy2: IShowcaseUnit = {
+	unitUuid: 'u-mummy-2',
+	name: 'Mummy',
+	level: 10,
+	hp: 472,
+	maxHp: 472,
+	sp: 179,
+	maxSp: 179,
+	side: EnumTeamSideUI.Right,
+	position: EnumPosition.Front,
+	imageUrl: '/image/char_rev/mon_146.png',
+};
 
 /** 開場單位（首段快照；召喚者不在其中）/ Opening units (first snapshot; the summoned are not in it) */
 const summonOpeningUnits: IShowcaseUnit[] = [summonGoblinAxe, summonHero1, summonMage1];
@@ -198,13 +353,15 @@ const summonUnits: IShowcaseUnit[] = [...summonOpeningUnits, ...summonedUnits];
 // ==================== 派生 / Derivations ====================
 
 /** 某一側的單位 / Units of one side */
-function unitsOfSide(units: IShowcaseUnit[], side: EnumTeamSideUI): IShowcaseUnit[] {
-  return units.filter((unit) => unit.side === side);
+function unitsOfSide(units: IShowcaseUnit[], side: EnumTeamSideUI): IShowcaseUnit[]
+{
+	return units.filter((unit) => unit.side === side);
 }
 
 /** 依名稱覆寫 HP（狀態變體用）/ Override HP by name (for state variants) */
-function withHp(units: IShowcaseUnit[], patch: Record<string, number>): IShowcaseUnit[] {
-  return units.map((unit) => (patch[unit.name] === undefined ? unit : { ...unit, hp: patch[unit.name] }));
+function withHp(units: IShowcaseUnit[], patch: Record<string, number>): IShowcaseUnit[]
+{
+	return units.map((unit) => (patch[unit.name] === undefined ? unit : { ...unit, hp: patch[unit.name] }));
 }
 
 /**
@@ -215,13 +372,15 @@ function withHp(units: IShowcaseUnit[], patch: Record<string, number>): IShowcas
  * Sprite coordinates, snapshots and the uid stay out of the status row so a unit is not
  * restated in several shapes.
  */
-function statusUnit(unit: IShowcaseUnit): IBattleUnit {
-  const { name, level, hp, maxHp, sp, maxSp, side } = unit;
-  return { name, level, hp, maxHp, sp, maxSp, side };
+function statusUnit(unit: IShowcaseUnit): IBattleUnit
+{
+	const { name, level, hp, maxHp, sp, maxSp, side } = unit;
+	return { name, level, hp, maxHp, sp, maxSp, side };
 }
 
-function statusUnits(units: IShowcaseUnit[]): IBattleUnit[] {
-  return units.map(statusUnit);
+function statusUnits(units: IShowcaseUnit[]): IBattleUnit[]
+{
+	return units.map(statusUnit);
 }
 
 /**
@@ -231,32 +390,39 @@ function statusUnits(units: IShowcaseUnit[]): IBattleUnit[] {
  * 座標與翻轉全由 computeBattleSpritePositions 推導，此處不寫 x / y / flipped。
  * Coordinates and flipping are computed by computeBattleSpritePositions; no x / y / flipped here.
  */
-function rosterChar(unit: IShowcaseUnit): IBattlePositionChar {
-  const { unitUuid, name, imageUrl, position, side } = unit;
-  return { unitUuid, name, imageUrl, position, side, imageSize: getSpriteImageSize(imageUrl) };
+function rosterChar(unit: IShowcaseUnit): IBattlePositionChar
+{
+	const { unitUuid, name, imageUrl, position, side } = unit;
+	return { unitUuid, name, imageUrl, position, side, imageSize: getSpriteImageSize(imageUrl) };
 }
 
 /** 場戰精靈（位置自動計算）/ Battlefield sprites (positions auto-computed) */
-function battleSprites(units: IShowcaseUnit[]): IBattleSprite[] {
-  return computeBattleSpritePositions(groupBattleChars(units.map(rosterChar)), FIELD_SIZE);
+function battleSprites(units: IShowcaseUnit[]): IBattleSprite[]
+{
+	return computeBattleSpritePositions(groupBattleChars(units.map(rosterChar)), FIELD_SIZE);
 }
 
 /** 快照單位（預設為開場狀態，可覆寫個別欄位）/ Snapshot unit (opening state by default; fields overridable) */
-function snapshotUnit(unit: IShowcaseUnit, overrides: Partial<IBattleSnapshotDisplayUnit> = {}): IBattleSnapshotDisplayUnit {
-  const { unitUuid, name, level, hp, maxHp, sp, maxSp, side, imageUrl } = unit;
-  return { unitUuid, name, level, hp, maxHp, sp, maxSp, side, imageUrl, dead: false, ...overrides };
+function snapshotUnit(unit: IShowcaseUnit,
+	overrides: Partial<IBattleSnapshotDisplayUnit> = {},
+): IBattleSnapshotDisplayUnit
+{
+	const { unitUuid, name, level, hp, maxHp, sp, maxSp, side, imageUrl } = unit;
+	return { unitUuid, name, level, hp, maxHp, sp, maxSp, side, imageUrl, dead: false, ...overrides };
 }
 
-function snapshotUnits(units: IShowcaseUnit[]): IBattleSnapshotDisplayUnit[] {
-  return units.map((unit) => snapshotUnit(unit));
+function snapshotUnits(units: IShowcaseUnit[]): IBattleSnapshotDisplayUnit[]
+{
+	return units.map((unit) => snapshotUnit(unit));
 }
 
 /**
  * 召喚日誌頭像圖（原始日誌引用 char 目錄，場上精靈則用 char_rev）
  * Summon-log avatar (the original log references the char directory; the field sprite uses char_rev)
  */
-function logAvatarUrl(imageUrl: string): string {
-  return imageUrl.replace('/image/char_rev/', '/image/char/');
+function logAvatarUrl(imageUrl: string): string
+{
+	return imageUrl.replace('/image/char_rev/', '/image/char/');
 }
 
 // ==================== 行動建構器（文案只書寫一次）/ Action builders (every copy written once) ====================
@@ -280,15 +446,16 @@ function logAvatarUrl(imageUrl: string): string {
  * @returns 日誌條目 / log entry
  */
 function namedLogAction(
-  type: EnumActionType,
-  unit: IShowcaseUnit | undefined,
-  text: string,
-  side: EnumTeamSideUI,
-  extra: Partial<IBattleAction> = {}
-): IBattleAction {
-  const source = unit?.name;
-  const message = buildActionMessage({ source, text, message: extra.message });
-  return { type, source, text, side, ...extra, message };
+	type: EnumActionType,
+	unit: IShowcaseUnit | undefined,
+	text: string,
+	side: EnumTeamSideUI,
+	extra: Partial<IBattleAction> = {},
+): IBattleAction
+{
+	const source = unit?.name;
+	const message = buildActionMessage({ source, text, message: extra.message });
+	return { type, source, text, side, ...extra, message };
 }
 
 /**
@@ -308,34 +475,38 @@ function namedLogAction(
  * @returns 日誌條目 / log entry
  */
 function logAction(
-  type: EnumActionType,
-  unit: IShowcaseUnit | undefined,
-  message: string,
-  side: EnumTeamSideUI,
-  extra: Partial<IBattleAction> = {}
-): IBattleAction {
-  return { type, source: unit?.name, message, side, ...extra };
+	type: EnumActionType,
+	unit: IShowcaseUnit | undefined,
+	message: string,
+	side: EnumTeamSideUI,
+	extra: Partial<IBattleAction> = {},
+): IBattleAction
+{
+	return { type, source: unit?.name, message, side, ...extra };
 }
 
-function enterAction(unit: IShowcaseUnit): IBattleAction {
-  return namedLogAction(EnumActionType.Enter, unit, getEnterBattlefieldText(unit.level), unit.side, {
-    level: unit.level,
-    attribute: EnumAttributeType.Normal,
-  });
+function enterAction(unit: IShowcaseUnit): IBattleAction
+{
+	return namedLogAction(EnumActionType.Enter, unit, getEnterBattlefieldText(unit.level), unit.side, {
+		level: unit.level,
+		attribute: EnumAttributeType.Normal,
+	});
 }
 
-function skillAction(unit: IShowcaseUnit, skill: ISkillIcon, side: EnumTeamSideUI): IBattleAction {
-  return logAction(EnumActionType.Skill, unit, buildActMessage(unit.name, skill.name), side, {
-    skill,
-    attribute: EnumAttributeType.Dmg,
-  });
+function skillAction(unit: IShowcaseUnit, skill: ISkillIcon, side: EnumTeamSideUI): IBattleAction
+{
+	return logAction(EnumActionType.Skill, unit, buildActMessage(unit.name, skill.name), side, {
+		skill,
+		attribute: EnumAttributeType.Dmg,
+	});
 }
 
-function attackAction(unit: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction {
-  return logAction(EnumActionType.Attack, unit, buildActMessage(unit.name, SKILL_ATTACK.name), side, {
-    skill: SKILL_ATTACK,
-    attribute: EnumAttributeType.Dmg,
-  });
+function attackAction(unit: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction
+{
+	return logAction(EnumActionType.Attack, unit, buildActMessage(unit.name, SKILL_ATTACK.name), side, {
+		skill: SKILL_ATTACK,
+		attribute: EnumAttributeType.Dmg,
+	});
 }
 
 /**
@@ -351,37 +522,41 @@ function attackAction(unit: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction 
  * @param hp - 變化前後的 HP（from ＝ 變化前、to ＝ 變化後）/ HP before (`from`) and after (`to`)
  */
 function damageAction(
-  unit: IShowcaseUnit,
-  targetUnit: IShowcaseUnit,
-  value: number,
-  hp: { from: number; to: number },
-  side: EnumTeamSideUI
-): IBattleAction {
-  return logAction(EnumActionType.Damage, unit, buildDamageMessage(value, targetUnit.name), side, {
-    target: targetUnit.name,
-    value,
-    valueChange: hp,
-    attribute: EnumAttributeType.Dmg,
-  });
+	unit: IShowcaseUnit,
+	targetUnit: IShowcaseUnit,
+	value: number,
+	hp: { from: number; to: number },
+	side: EnumTeamSideUI,
+): IBattleAction
+{
+	return logAction(EnumActionType.Damage, unit, buildDamageMessage(value, targetUnit.name), side, {
+		target: targetUnit.name,
+		value,
+		valueChange: hp,
+		attribute: EnumAttributeType.Dmg,
+	});
 }
 
-function protectAction(unit: IShowcaseUnit, targetUnit: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction {
-  return logAction(EnumActionType.Protect, unit, buildProtectMessage(unit.name, targetUnit.name), side, {
-    target: targetUnit.name,
-    attribute: EnumAttributeType.Support,
-  });
+function protectAction(unit: IShowcaseUnit, targetUnit: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction
+{
+	return logAction(EnumActionType.Protect, unit, buildProtectMessage(unit.name, targetUnit.name), side, {
+		target: targetUnit.name,
+		attribute: EnumAttributeType.Support,
+	});
 }
 
-function castingAction(unit: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction {
-  return namedLogAction(EnumActionType.Casting, unit, buildChargeText(), side, {
-    attribute: EnumAttributeType.Charge,
-  });
+function castingAction(unit: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction
+{
+	return namedLogAction(EnumActionType.Casting, unit, buildChargeText(), side, {
+		attribute: EnumAttributeType.Charge,
+	});
 }
 
-function downAction(unit: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction {
-  return logAction(EnumActionType.Down, unit, buildDownMessage(unit.name), side, {
-    attribute: EnumAttributeType.Dmg,
-  });
+function downAction(unit: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction
+{
+	return logAction(EnumActionType.Down, unit, buildDownMessage(unit.name), side, {
+		attribute: EnumAttributeType.Dmg,
+	});
 }
 
 /**
@@ -393,18 +568,19 @@ function downAction(unit: IShowcaseUnit, side: EnumTeamSideUI): IBattleAction {
  * decides the trailing " xN".
  */
 function magicCircleAction(
-  unit: IShowcaseUnit,
-  skill: ISkillIcon,
-  kind: EnumMagicCircleKind,
-  amount: number | undefined,
-  side: EnumTeamSideUI
-): IBattleAction {
-  const magicCircle: IMagicCircleRecord = { kind, amount };
-  return logAction(EnumActionType.MagicCircle, unit, buildMagicCircleMessage(unit.name, magicCircle), side, {
-    skill,
-    magicCircle,
-    attribute: EnumAttributeType.Normal,
-  });
+	unit: IShowcaseUnit,
+	skill: ISkillIcon,
+	kind: EnumMagicCircleKind,
+	amount: number | undefined,
+	side: EnumTeamSideUI,
+): IBattleAction
+{
+	const magicCircle: IMagicCircleRecord = { kind, amount };
+	return logAction(EnumActionType.MagicCircle, unit, buildMagicCircleMessage(unit.name, magicCircle), side, {
+		skill,
+		magicCircle,
+		attribute: EnumAttributeType.Normal,
+	});
 }
 
 // ==================== 行動日誌 / Action logs ====================
@@ -418,36 +594,36 @@ function magicCircleAction(
  * so the units are listed explicitly.
  */
 const battleActions: IBattleAction[] = [
-  enterAction(goblinWarriorA),
-  enterAction(goblinWarriorB),
-  enterAction(goblinWarriorC),
-  enterAction(goblinAxe),
-  enterAction(priest1),
-  enterAction(healer1),
-  enterAction(hero1),
-  enterAction(mage1),
+	enterAction(goblinWarriorA),
+	enterAction(goblinWarriorB),
+	enterAction(goblinWarriorC),
+	enterAction(goblinAxe),
+	enterAction(priest1),
+	enterAction(healer1),
+	enterAction(hero1),
+	enterAction(mage1),
 
-  // ---- GoblinWarrior(B) FatalStab -> Hero1（保護 Priest1）/ protects Priest1 ----
-  skillAction(goblinWarriorB, SKILL_FATAL_STAB, EnumTeamSideUI.Left),
-  protectAction(hero1, priest1, EnumTeamSideUI.Left),
-  damageAction(goblinWarriorB, hero1, 182, { from: 349, to: 167 }, EnumTeamSideUI.Left),
+	// ---- GoblinWarrior(B) FatalStab -> Hero1（保護 Priest1）/ protects Priest1 ----
+	skillAction(goblinWarriorB, SKILL_FATAL_STAB, EnumTeamSideUI.Left),
+	protectAction(hero1, priest1, EnumTeamSideUI.Left),
+	damageAction(goblinWarriorB, hero1, 182, { from: 349, to: 167 }, EnumTeamSideUI.Left),
 
-  // ---- GoblinWarrior(A) FatalStab -> Hero1（保護 Healer1）/ protects Healer1 ----
-  skillAction(goblinWarriorA, SKILL_FATAL_STAB, EnumTeamSideUI.Left),
-  protectAction(hero1, healer1, EnumTeamSideUI.Left),
-  damageAction(goblinWarriorA, hero1, 166, { from: 167, to: 1 }, EnumTeamSideUI.Left),
+	// ---- GoblinWarrior(A) FatalStab -> Hero1（保護 Healer1）/ protects Healer1 ----
+	skillAction(goblinWarriorA, SKILL_FATAL_STAB, EnumTeamSideUI.Left),
+	protectAction(hero1, healer1, EnumTeamSideUI.Left),
+	damageAction(goblinWarriorA, hero1, 166, { from: 167, to: 1 }, EnumTeamSideUI.Left),
 
-  // ---- GoblinAxe Attack -> Healer1 ----
-  attackAction(goblinAxe, EnumTeamSideUI.Left),
-  damageAction(goblinAxe, healer1, 44, { from: 213, to: 169 }, EnumTeamSideUI.Left),
+	// ---- GoblinAxe Attack -> Healer1 ----
+	attackAction(goblinAxe, EnumTeamSideUI.Left),
+	damageAction(goblinAxe, healer1, 44, { from: 213, to: 169 }, EnumTeamSideUI.Left),
 
-  // ---- Mage1 詠唱後被擊倒 / Mage1 casts, then falls ----
-  castingAction(mage1, EnumTeamSideUI.Right),
-  attackAction(goblinWarriorB, EnumTeamSideUI.Left),
-  damageAction(goblinWarriorB, mage1, 48, { from: 49, to: 1 }, EnumTeamSideUI.Left),
-  attackAction(goblinWarriorA, EnumTeamSideUI.Left),
-  damageAction(goblinWarriorA, mage1, 40, { from: 1, to: -39 }, EnumTeamSideUI.Left),
-  downAction(mage1, EnumTeamSideUI.Left),
+	// ---- Mage1 詠唱後被擊倒 / Mage1 casts, then falls ----
+	castingAction(mage1, EnumTeamSideUI.Right),
+	attackAction(goblinWarriorB, EnumTeamSideUI.Left),
+	damageAction(goblinWarriorB, mage1, 48, { from: 49, to: 1 }, EnumTeamSideUI.Left),
+	attackAction(goblinWarriorA, EnumTeamSideUI.Left),
+	damageAction(goblinWarriorA, mage1, 40, { from: 1, to: -39 }, EnumTeamSideUI.Left),
+	downAction(mage1, EnumTeamSideUI.Left),
 ];
 
 /**
@@ -455,30 +631,30 @@ const battleActions: IBattleAction[] = [
  * Summon log (index 5 = the summon; segment 2 starts at index 6)
  */
 const summonActions: IBattleAction[] = [
-  enterAction(summonGoblinAxe),
-  enterAction(summonHero1),
-  enterAction(summonMage1),
-  attackAction(summonGoblinAxe, EnumTeamSideUI.Left),
-  damageAction(summonGoblinAxe, summonHero1, 148, { from: 349, to: 201 }, EnumTeamSideUI.Left),
-  logAction(
-    EnumActionType.Summon,
-    summonMage1,
-    // 整行＝「施放者 技能」＋「首個召喚單位 joined to the team.」，兩段皆取自建構器
-    // The whole line is "caster skill" + "first summoned unit joined to the team.", both from builders
-    `${buildActMessage(summonMage1.name, SKILL_GRAVEYARD.name)}: ${buildSummonMessage(summonedUnits[0].name)}`,
-    EnumTeamSideUI.Right,
-    {
-      skill: SKILL_GRAVEYARD,
-      summoned: summonedUnits.map((unit) => ({
-        name: unit.name,
-        level: unit.level,
-        imageUrl: logAvatarUrl(unit.imageUrl),
-      })),
-      attribute: EnumAttributeType.Normal,
-    }
-  ),
-  attackAction(summonedUnits[0], EnumTeamSideUI.Right),
-  damageAction(summonedUnits[0], summonGoblinAxe, 89, { from: 213, to: 124 }, EnumTeamSideUI.Right),
+	enterAction(summonGoblinAxe),
+	enterAction(summonHero1),
+	enterAction(summonMage1),
+	attackAction(summonGoblinAxe, EnumTeamSideUI.Left),
+	damageAction(summonGoblinAxe, summonHero1, 148, { from: 349, to: 201 }, EnumTeamSideUI.Left),
+	logAction(
+		EnumActionType.Summon,
+		summonMage1,
+		// 整行＝「施放者 技能」＋「首個召喚單位 joined to the team.」，兩段皆取自建構器
+		// The whole line is "caster skill" + "first summoned unit joined to the team.", both from builders
+		`${buildActMessage(summonMage1.name, SKILL_GRAVEYARD.name)}: ${buildSummonMessage(summonedUnits[0].name)}`,
+		EnumTeamSideUI.Right,
+		{
+			skill: SKILL_GRAVEYARD,
+			summoned: summonedUnits.map((unit) => ({
+				name: unit.name,
+				level: unit.level,
+				imageUrl: logAvatarUrl(unit.imageUrl),
+			})),
+			attribute: EnumAttributeType.Normal,
+		},
+	),
+	attackAction(summonedUnits[0], EnumTeamSideUI.Right),
+	damageAction(summonedUnits[0], summonGoblinAxe, 89, { from: 213, to: 124 }, EnumTeamSideUI.Right),
 ];
 
 // ==================== 魔方陣紀錄日誌 / Magic-circle record log ====================
@@ -494,25 +670,25 @@ const summonActions: IBattleAction[] = [
  * erased enemy are their own lines).
  */
 const magicCircleActions: IBattleAction[] = [
-  // ---- 描繪己方魔方陣（skill 3410，魔法陣+1）/ draw one own magic circle ----
-  skillAction(mage1, SKILL_MAGIC_CIRCLE, EnumTeamSideUI.Right),
-  magicCircleAction(mage1, SKILL_MAGIC_CIRCLE, EnumMagicCircleKind.Draw, 1, EnumTeamSideUI.Right),
+	// ---- 描繪己方魔方陣（skill 3410，魔法陣+1）/ draw one own magic circle ----
+	skillAction(mage1, SKILL_MAGIC_CIRCLE, EnumTeamSideUI.Right),
+	magicCircleAction(mage1, SKILL_MAGIC_CIRCLE, EnumMagicCircleKind.Draw, 1, EnumTeamSideUI.Right),
 
-  // ---- 描繪己方魔方陣（skill 3411，魔法陣+2）/ draw two own magic circles ----
-  skillAction(mage1, SKILL_DOUBLE_MAGIC_CIRCLE, EnumTeamSideUI.Right),
-  magicCircleAction(mage1, SKILL_DOUBLE_MAGIC_CIRCLE, EnumMagicCircleKind.Draw, 2, EnumTeamSideUI.Right),
+	// ---- 描繪己方魔方陣（skill 3411，魔法陣+2）/ draw two own magic circles ----
+	skillAction(mage1, SKILL_DOUBLE_MAGIC_CIRCLE, EnumTeamSideUI.Right),
+	magicCircleAction(mage1, SKILL_DOUBLE_MAGIC_CIRCLE, EnumMagicCircleKind.Draw, 2, EnumTeamSideUI.Right),
 
-  // ---- 消除敵方魔方陣（skill 3420，相手魔法陣-1）/ erase one enemy magic circle ----
-  skillAction(hero1, SKILL_CIRCLE_ERASE, EnumTeamSideUI.Right),
-  magicCircleAction(hero1, SKILL_CIRCLE_ERASE, EnumMagicCircleKind.EraseEnemy, 1, EnumTeamSideUI.Right),
+	// ---- 消除敵方魔方陣（skill 3420，相手魔法陣-1）/ erase one enemy magic circle ----
+	skillAction(hero1, SKILL_CIRCLE_ERASE, EnumTeamSideUI.Right),
+	magicCircleAction(hero1, SKILL_CIRCLE_ERASE, EnumMagicCircleKind.EraseEnemy, 1, EnumTeamSideUI.Right),
 
-  // ---- 消耗己方魔方陣作為代價（skill 2501，消費 4）/ spend four circles as skill cost ----
-  skillAction(hero1, SKILL_SUMMON_LEVIATHAN, EnumTeamSideUI.Right),
-  magicCircleAction(hero1, SKILL_SUMMON_LEVIATHAN, EnumMagicCircleKind.Use, 4, EnumTeamSideUI.Right),
+	// ---- 消耗己方魔方陣作為代價（skill 2501，消費 4）/ spend four circles as skill cost ----
+	skillAction(hero1, SKILL_SUMMON_LEVIATHAN, EnumTeamSideUI.Right),
+	magicCircleAction(hero1, SKILL_SUMMON_LEVIATHAN, EnumMagicCircleKind.Use, 4, EnumTeamSideUI.Right),
 
-  // ---- 魔方陣不足而失敗（無名稱、無數量）/ failed for lack of circles (no name, no amount) ----
-  skillAction(hero1, SKILL_SUMMON_LEVIATHAN, EnumTeamSideUI.Right),
-  magicCircleAction(hero1, SKILL_SUMMON_LEVIATHAN, EnumMagicCircleKind.Fail, undefined, EnumTeamSideUI.Right),
+	// ---- 魔方陣不足而失敗（無名稱、無數量）/ failed for lack of circles (no name, no amount) ----
+	skillAction(hero1, SKILL_SUMMON_LEVIATHAN, EnumTeamSideUI.Right),
+	magicCircleAction(hero1, SKILL_SUMMON_LEVIATHAN, EnumMagicCircleKind.Fail, undefined, EnumTeamSideUI.Right),
 ];
 
 // ==================== 完整日誌訊息覆蓋 / Full log-message coverage ====================
@@ -536,329 +712,329 @@ const magicCircleActions: IBattleAction[] = [
  * e.g. a poison cure carries no span in the original log (Normal) while a resist is support.
  */
 const logMessagesActions: IBattleAction[] = [
-  // ---- 蓄力開始（`start charging.`；文案由 castType 決定，不再硬編碼成 casting）----
-  // Charge start (`start charging.`; the copy follows castType and is no longer hardcoded to casting)
-  namedLogAction(
-    EnumActionType.Casting,
-    mage1,
-    buildChargeText(EnumChargeKind.Charging),
-    EnumTeamSideUI.Right,
-    {
-      castType: EnumChargeKind.Charging,
-      attribute: EnumAttributeType.Charge,
-    }
-  ),
+	// ---- 蓄力開始（`start charging.`；文案由 castType 決定，不再硬編碼成 casting）----
+	// Charge start (`start charging.`; the copy follows castType and is no longer hardcoded to casting)
+	namedLogAction(
+		EnumActionType.Casting,
+		mage1,
+		buildChargeText(EnumChargeKind.Charging),
+		EnumTeamSideUI.Right,
+		{
+			castType: EnumChargeKind.Charging,
+			attribute: EnumAttributeType.Charge,
+		},
+	),
 
-  // ---- SP 傷害（`NSP Damage to target`，數值與 SP 之間無空格）----
-  // SP damage (`NSP Damage to target`, no space between the value and "SP Damage")
-  logAction(
-    EnumActionType.SpDamage,
-    undefined,
-    buildSpDamageMessage(96, goblinWarriorA.name),
-    EnumTeamSideUI.Right,
-    { value: 96, valueUnit: 'SP', target: goblinWarriorA.name, attribute: EnumAttributeType.Spdmg }
-  ),
+	// ---- SP 傷害（`NSP Damage to target`，數值與 SP 之間無空格）----
+	// SP damage (`NSP Damage to target`, no space between the value and "SP Damage")
+	logAction(
+		EnumActionType.SpDamage,
+		undefined,
+		buildSpDamageMessage(96, goblinWarriorA.name),
+		EnumTeamSideUI.Right,
+		{ value: 96, valueUnit: 'SP', target: goblinWarriorA.name, attribute: EnumAttributeType.Spdmg },
+	),
 
-  // ---- 回復 HP／SP（`name Recovered N HP`；HP→recover、SP→support）----
-  // Recover HP / SP (`name Recovered N HP`; HP → recover, SP → support)
-  namedLogAction(EnumActionType.Recover, healer1, buildRecoveredText(84, 'HP'), EnumTeamSideUI.Left, {
-    value: 84,
-    valueUnit: 'HP',
-    valueChange: { from: 129, to: 213 },
-    attribute: EnumAttributeType.Recover,
-  }),
-  namedLogAction(EnumActionType.Recover, priest1, buildRecoveredText(30, 'SP'), EnumTeamSideUI.Left, {
-    value: 30,
-    valueUnit: 'SP',
-    valueChange: { from: 60, to: 90 },
-    attribute: EnumAttributeType.Support,
-  }),
+	// ---- 回復 HP／SP（`name Recovered N HP`；HP→recover、SP→support）----
+	// Recover HP / SP (`name Recovered N HP`; HP → recover, SP → support)
+	namedLogAction(EnumActionType.Recover, healer1, buildRecoveredText(84, 'HP'), EnumTeamSideUI.Left, {
+		value: 84,
+		valueUnit: 'HP',
+		valueChange: { from: 129, to: 213 },
+		attribute: EnumAttributeType.Recover,
+	}),
+	namedLogAction(EnumActionType.Recover, priest1, buildRecoveredText(30, 'SP'), EnumTeamSideUI.Left, {
+		value: 30,
+		valueUnit: 'SP',
+		valueChange: { from: 60, to: 90 },
+		attribute: EnumAttributeType.Support,
+	}),
 
-  // ---- 吸取（`Drained N HP from target`，行首無施放者）----
-  // Drain (`Drained N HP from target`, no caster name at the head)
-  logAction(
-    EnumActionType.Drain,
-    undefined,
-    buildDrainMessage(40, 'HP', hero1.name),
-    EnumTeamSideUI.Left,
-    {
-      value: 40,
-      valueUnit: 'HP',
-      target: hero1.name,
-      attribute: EnumAttributeType.Recover,
-      valueChanges: [{ from: 1000, to: 960 }, { who: '我方', from: 200, to: 240 }],
-    }
-  ),
-  logAction(
-    EnumActionType.Drain,
-    undefined,
-    buildDrainMessage(25, 'SP', hero1.name),
-    EnumTeamSideUI.Left,
-    {
-      value: 25,
-      valueUnit: 'SP',
-      target: hero1.name,
-      attribute: EnumAttributeType.Support,
-      valueChanges: [{ from: 100, to: 75 }, { who: '我方', from: 50, to: 75 }],
-    }
-  ),
+	// ---- 吸取（`Drained N HP from target`，行首無施放者）----
+	// Drain (`Drained N HP from target`, no caster name at the head)
+	logAction(
+		EnumActionType.Drain,
+		undefined,
+		buildDrainMessage(40, 'HP', hero1.name),
+		EnumTeamSideUI.Left,
+		{
+			value: 40,
+			valueUnit: 'HP',
+			target: hero1.name,
+			attribute: EnumAttributeType.Recover,
+			valueChanges: [{ from: 1000, to: 960 }, { who: '我方', from: 200, to: 240 }],
+		},
+	),
+	logAction(
+		EnumActionType.Drain,
+		undefined,
+		buildDrainMessage(25, 'SP', hero1.name),
+		EnumTeamSideUI.Left,
+		{
+			value: 25,
+			valueUnit: 'SP',
+			target: hero1.name,
+			attribute: EnumAttributeType.Support,
+			valueChanges: [{ from: 100, to: 75 }, { who: '我方', from: 50, to: 75 }],
+		},
+	),
 
-  // ---- 持續回復（`gained SP regeneration +15%`）----
-  // Regen (`gained SP regeneration +15%`)
-  namedLogAction(
-    EnumActionType.Regen,
-    mage1,
-    buildRegenText('SP', 15),
-    EnumTeamSideUI.Right,
-    { valueUnit: 'SP', attribute: EnumAttributeType.Support }
-  ),
+	// ---- 持續回復（`gained SP regeneration +15%`）----
+	// Regen (`gained SP regeneration +15%`)
+	namedLogAction(
+		EnumActionType.Regen,
+		mage1,
+		buildRegenText('SP', 15),
+		EnumTeamSideUI.Right,
+		{ valueUnit: 'SP', attribute: EnumAttributeType.Support },
+	),
 
-  // ---- 自動回復（行首 `* `、數值加粗）/ Auto regenerate (leading `* `, bold value) ----
-  namedLogAction(
-    EnumActionType.Regen,
-    hero1,
-    buildAutoRegenText('HP', 32),
-    EnumTeamSideUI.Left,
-    { value: 32, valueUnit: 'HP', linePrefix: '* ', attribute: EnumAttributeType.Recover }
-  ),
+	// ---- 自動回復（行首 `* `、數值加粗）/ Auto regenerate (leading `* `, bold value) ----
+	namedLogAction(
+		EnumActionType.Regen,
+		hero1,
+		buildAutoRegenText('HP', 32),
+		EnumTeamSideUI.Left,
+		{ value: 32, valueUnit: 'HP', linePrefix: '* ', attribute: EnumAttributeType.Recover },
+	),
 
-  // ---- 復活（`name <recover>revived</recover>!`；名稱預設色、只有 revived 上色）----
-  // Revive (`name <recover>revived</recover>!`; the name keeps the default colour, only revived is coloured)
-  namedLogAction(EnumActionType.Revive, hero1, EnumLogCopy.Revived, EnumTeamSideUI.Right, {
-    emphasis: 'revived',
-    attribute: EnumAttributeType.Recover,
-  }),
+	// ---- 復活（`name <recover>revived</recover>!`；名稱預設色、只有 revived 上色）----
+	// Revive (`name <recover>revived</recover>!`; the name keeps the default colour, only revived is coloured)
+	namedLogAction(EnumActionType.Revive, hero1, EnumLogCopy.Revived, EnumTeamSideUI.Right, {
+		emphasis: 'revived',
+		attribute: EnumAttributeType.Recover,
+	}),
 
-  // ---- 增益（quicked／casting shorted／barriered，support 色）----
-  // Buff (quicked / casting shorted / barriered, support colour)
-  namedLogAction(EnumActionType.Buff, mage1, EnumLogCopy.Barriered, EnumTeamSideUI.Right),
-  namedLogAction(EnumActionType.Buff, hero1, EnumLogCopy.Quicked, EnumTeamSideUI.Right),
-  namedLogAction(EnumActionType.Buff, mage1, EnumLogCopy.CastingShorted, EnumTeamSideUI.Right),
+	// ---- 增益（quicked／casting shorted／barriered，support 色）----
+	// Buff (quicked / casting shorted / barriered, support colour)
+	namedLogAction(EnumActionType.Buff, mage1, EnumLogCopy.Barriered, EnumTeamSideUI.Right),
+	namedLogAction(EnumActionType.Buff, hero1, EnumLogCopy.Quicked, EnumTeamSideUI.Right),
+	namedLogAction(EnumActionType.Buff, mage1, EnumLogCopy.CastingShorted, EnumTeamSideUI.Right),
 
-  // ---- 減益（能力下降，原始日誌無 span）/ Debuff (stat down, no span in the original log) ----
-  // 文案模板由 buildStatChangeText 持有，資料端只給統計項目・方向・數值
-  // The template lives in buildStatChangeText; the data only supplies the stat, direction and value
-  namedLogAction(
-    EnumActionType.Debuff,
-    goblinAxe,
-    buildStatChangeText('STR', 'down', 10),
-    EnumTeamSideUI.Left
-  ),
+	// ---- 減益（能力下降，原始日誌無 span）/ Debuff (stat down, no span in the original log) ----
+	// 文案模板由 buildStatChangeText 持有，資料端只給統計項目・方向・數值
+	// The template lives in buildStatChangeText; the data only supplies the stat, direction and value
+	namedLogAction(
+		EnumActionType.Debuff,
+		goblinAxe,
+		buildStatChangeText('STR', 'down', 10),
+		EnumTeamSideUI.Left,
+	),
 
-  // ---- 中毒：施加（spdmg）／每回合傷害（spdmg）／解除（無 span）／抗毒（support）----
-  // Poison: apply (spdmg) / per-turn damage (spdmg) / cure (no span) / resist (support)
-  // ---- 中毒施加（`get <spdmg>poisoned</spdmg>!`；名稱預設色、只有 poisoned 上色）----
-  // Poison apply (`get <spdmg>poisoned</spdmg>!`; the name keeps the default colour, only poisoned is coloured)
-  namedLogAction(
-    EnumActionType.Poison,
-    goblinAxe,
-    EnumLogCopy.PoisonApplied,
-    EnumTeamSideUI.Left,
-    { emphasis: 'poisoned', attribute: EnumAttributeType.Spdmg }
-  ),
-  namedLogAction(
-    EnumActionType.Poison,
-    goblinAxe,
-    buildPoisonDamageText(12),
-    EnumTeamSideUI.Left,
-    { value: 12, valueChange: { from: 1200, to: 1050 } }
-  ),
-  namedLogAction(
-    EnumActionType.Poison,
-    goblinAxe,
-    EnumLogCopy.PoisonBlocked,
-    EnumTeamSideUI.Left,
-    { attribute: EnumAttributeType.Normal }
-  ),
-  namedLogAction(
-    EnumActionType.Poison,
-    goblinAxe,
-    // 所有格片段由 buildPossessiveText 產出，整行鏡像仍由唯一合併點接出（不空格）
-    // The possessive fragment comes from buildPossessiveText and the mirror still from the single
-    // join point (no space)
-    buildPossessiveText('poison has cured.'),
-    EnumTeamSideUI.Left,
-    { attribute: EnumAttributeType.Normal }
-  ),
-  namedLogAction(
-    EnumActionType.Poison,
-    goblinWarriorA,
-    buildPoisonResistText(50),
-    EnumTeamSideUI.Left,
-    { attribute: EnumAttributeType.Support }
-  ),
-  // ---- 自我中毒（無名稱、無 span；對照 5.4 `Got poisoned`）----
-  // Self-poison (no name, no span; mirrors 5.4 `Got poisoned`)
-  namedLogAction(EnumActionType.Poison, undefined, EnumLogCopy.PoisonSelf, EnumTeamSideUI.Left, {
-    attribute: EnumAttributeType.Normal,
-  }),
+	// ---- 中毒：施加（spdmg）／每回合傷害（spdmg）／解除（無 span）／抗毒（support）----
+	// Poison: apply (spdmg) / per-turn damage (spdmg) / cure (no span) / resist (support)
+	// ---- 中毒施加（`get <spdmg>poisoned</spdmg>!`；名稱預設色、只有 poisoned 上色）----
+	// Poison apply (`get <spdmg>poisoned</spdmg>!`; the name keeps the default colour, only poisoned is coloured)
+	namedLogAction(
+		EnumActionType.Poison,
+		goblinAxe,
+		EnumLogCopy.PoisonApplied,
+		EnumTeamSideUI.Left,
+		{ emphasis: 'poisoned', attribute: EnumAttributeType.Spdmg },
+	),
+	namedLogAction(
+		EnumActionType.Poison,
+		goblinAxe,
+		buildPoisonDamageText(12),
+		EnumTeamSideUI.Left,
+		{ value: 12, valueChange: { from: 1200, to: 1050 } },
+	),
+	namedLogAction(
+		EnumActionType.Poison,
+		goblinAxe,
+		EnumLogCopy.PoisonBlocked,
+		EnumTeamSideUI.Left,
+		{ attribute: EnumAttributeType.Normal },
+	),
+	namedLogAction(
+		EnumActionType.Poison,
+		goblinAxe,
+		// 所有格片段由 buildPossessiveText 產出，整行鏡像仍由唯一合併點接出（不空格）
+		// The possessive fragment comes from buildPossessiveText and the mirror still from the single
+		// join point (no space)
+		buildPossessiveText('poison has cured.'),
+		EnumTeamSideUI.Left,
+		{ attribute: EnumAttributeType.Normal },
+	),
+	namedLogAction(
+		EnumActionType.Poison,
+		goblinWarriorA,
+		buildPoisonResistText(50),
+		EnumTeamSideUI.Left,
+		{ attribute: EnumAttributeType.Support },
+	),
+	// ---- 自我中毒（無名稱、無 span；對照 5.4 `Got poisoned`）----
+	// Self-poison (no name, no span; mirrors 5.4 `Got poisoned`)
+	namedLogAction(EnumActionType.Poison, undefined, EnumLogCopy.PoisonSelf, EnumTeamSideUI.Left, {
+		attribute: EnumAttributeType.Normal,
+	}),
 
-  // ---- 屬性升降（`STR rise 10%`、上限升降，原始日誌無 span）----
-  // Stat change (`STR rise 10%`, cap changes; no span in the original log)
-  namedLogAction(
-    EnumActionType.StatChange,
-    hero1,
-    buildStatChangeText('STR', 'rise', 10),
-    EnumTeamSideUI.Right
-  ),
-  namedLogAction(
-    EnumActionType.StatChange,
-    hero1,
-    buildStatChangeText('ATK', 'rise', 100, '%', true),
-    EnumTeamSideUI.Right
-  ),
-  namedLogAction(
-    EnumActionType.StatChange,
-    mage1,
-    buildStatToText('MAXSP', 'extended', 400),
-    EnumTeamSideUI.Right
-  ),
-  namedLogAction(
-    EnumActionType.StatChange,
-    goblinAxe,
-    buildStatToText('MAXHP', 'down to', 150),
-    EnumTeamSideUI.Left
-  ),
+	// ---- 屬性升降（`STR rise 10%`、上限升降，原始日誌無 span）----
+	// Stat change (`STR rise 10%`, cap changes; no span in the original log)
+	namedLogAction(
+		EnumActionType.StatChange,
+		hero1,
+		buildStatChangeText('STR', 'rise', 10),
+		EnumTeamSideUI.Right,
+	),
+	namedLogAction(
+		EnumActionType.StatChange,
+		hero1,
+		buildStatChangeText('ATK', 'rise', 100, '%', true),
+		EnumTeamSideUI.Right,
+	),
+	namedLogAction(
+		EnumActionType.StatChange,
+		mage1,
+		buildStatToText('MAXSP', 'extended', 400),
+		EnumTeamSideUI.Right,
+	),
+	namedLogAction(
+		EnumActionType.StatChange,
+		goblinAxe,
+		buildStatToText('MAXHP', 'down to', 150),
+		EnumTeamSideUI.Left,
+	),
 
-  // ---- 位移（`moved to front.`、`moved to back.`、`knock backed!`、`goes forward.`）/ Movement ----
-  namedLogAction(
-    EnumActionType.Move,
-    hero1,
-    EnumLogCopy.MoveToFront,
-    EnumTeamSideUI.Right
-  ),
-  namedLogAction(
-    EnumActionType.Move,
-    goblinAxe,
-    EnumLogCopy.MoveToBack,
-    EnumTeamSideUI.Left
-  ),
-  namedLogAction(
-    EnumActionType.Move,
-    goblinAxe,
-    EnumLogCopy.KnockBacked,
-    EnumTeamSideUI.Left
-  ),
-  namedLogAction(
-    EnumActionType.Move,
-    goblinWarriorA,
-    EnumLogCopy.GoesForward,
-    EnumTeamSideUI.Left
-  ),
+	// ---- 位移（`moved to front.`、`moved to back.`、`knock backed!`、`goes forward.`）/ Movement ----
+	namedLogAction(
+		EnumActionType.Move,
+		hero1,
+		EnumLogCopy.MoveToFront,
+		EnumTeamSideUI.Right,
+	),
+	namedLogAction(
+		EnumActionType.Move,
+		goblinAxe,
+		EnumLogCopy.MoveToBack,
+		EnumTeamSideUI.Left,
+	),
+	namedLogAction(
+		EnumActionType.Move,
+		goblinAxe,
+		EnumLogCopy.KnockBacked,
+		EnumTeamSideUI.Left,
+	),
+	namedLogAction(
+		EnumActionType.Move,
+		goblinWarriorA,
+		EnumLogCopy.GoesForward,
+		EnumTeamSideUI.Left,
+	),
 
-  // ---- 延遲（`name Delayed （15 ⏳↘ 25/100）`，對照 Skill.php 的 `Name Delayed` 與
-  // DelayByRate 括號輸出）----
-  // Delay (`name Delayed (15 ⏳↘ 25/100)`, mirroring Skill.php's `Name Delayed` and
-  // DelayByRate's parenthesised output)
-  // 名稱後的固定文案只由 battleUtils.EnumLogCopy.Delay 持有，此處引用成員、不重打字串；
-  // 前後值交給結構化資料，括號與 `⏳↘` 由渲染端組出。
-  // The fixed copy after the name is owned solely by battleUtils.EnumLogCopy.Delay: this side
-  // references the member instead of retyping it; the ends go to the structured value and the
-  // renderer builds the parentheses and the `⏳↘`.
-  namedLogAction(EnumActionType.Delay, mage1, EnumLogCopy.Delay, EnumTeamSideUI.Right, {
-    valueChange: buildValueChangeFromDelay(15, 25, 100),
-  }),
+	// ---- 延遲（`name Delayed （15 ⏳↘ 25/100）`，對照 Skill.php 的 `Name Delayed` 與
+	// DelayByRate 括號輸出）----
+	// Delay (`name Delayed (15 ⏳↘ 25/100)`, mirroring Skill.php's `Name Delayed` and
+	// DelayByRate's parenthesised output)
+	// 名稱後的固定文案只由 battleUtils.EnumLogCopy.Delay 持有，此處引用成員、不重打字串；
+	// 前後值交給結構化資料，括號與 `⏳↘` 由渲染端組出。
+	// The fixed copy after the name is owned solely by battleUtils.EnumLogCopy.Delay: this side
+	// references the member instead of retyping it; the ends go to the structured value and the
+	// renderer builds the parentheses and the `⏳↘`.
+	namedLogAction(EnumActionType.Delay, mage1, EnumLogCopy.Delay, EnumTeamSideUI.Right, {
+		valueChange: buildValueChangeFromDelay(15, 25, 100),
+	}),
 
-  // ---- 犧牲（`name sacrifice 50 HP`）/ Sacrifice ----
-  namedLogAction(
-    EnumActionType.Sacrifice,
-    hero1,
-    buildSacrificeText(50),
-    EnumTeamSideUI.Right,
-    { value: 50, valueUnit: 'HP', attribute: EnumAttributeType.Dmg }
-  ),
+	// ---- 犧牲（`name sacrifice 50 HP`）/ Sacrifice ----
+	namedLogAction(
+		EnumActionType.Sacrifice,
+		hero1,
+		buildSacrificeText(50),
+		EnumTeamSideUI.Right,
+		{ value: 50, valueUnit: 'HP', attribute: EnumAttributeType.Dmg },
+	),
 
-  // ---- 施放失敗：武器不符 / Failed to cast: weapon mismatch ----
-  // 首行 `.u` 底線名稱＋技能圖示，失敗字樣 `.dmg`；次行無樣式原因。
-  // First line: `.u` underlined name + skill icon, the ` Failed ` word in `.dmg`; second line: unstyled reason.
-  logAction(
-    EnumActionType.Fail,
-    goblinAxe,
-    // 失敗原因同時存進結構化欄位 failReason（供渲染端另起一行），message 只是整行鏡像
-    // The reason also lives in the structured `failReason` field (the renderer prints it on its
-    // own line) while `message` is only the whole-line mirror
-    buildFailMessage(goblinAxe.name, SKILL_FATAL_STAB.name, '(Weapon type doesnt match)'),
-    EnumTeamSideUI.Left,
-    {
-      skill: SKILL_FATAL_STAB,
-      failReason: '(Weapon type doesnt match)',
-      attribute: EnumAttributeType.Dmg,
-    }
-  ),
-  // 純文字資訊：整行即文案（InfoMessage 不輸出粗體主詞，避免與狀態列重複名稱）
-  // Plain info: the whole line is the copy (InfoMessage prints no bold subject so the name is
-  // not repeated next to the status-row data)
-  logAction(
-    EnumActionType.Info,
-    mage1,
-    buildActionMessage({ source: mage1.name, text: `failed to ${SKILL_SUMMON_LEVIATHAN.name}(SP shortage)` }),
-    EnumTeamSideUI.Right,
-    { attribute: EnumAttributeType.Normal }
-  ),
+	// ---- 施放失敗：武器不符 / Failed to cast: weapon mismatch ----
+	// 首行 `.u` 底線名稱＋技能圖示，失敗字樣 `.dmg`；次行無樣式原因。
+	// First line: `.u` underlined name + skill icon, the ` Failed ` word in `.dmg`; second line: unstyled reason.
+	logAction(
+		EnumActionType.Fail,
+		goblinAxe,
+		// 失敗原因同時存進結構化欄位 failReason（供渲染端另起一行），message 只是整行鏡像
+		// The reason also lives in the structured `failReason` field (the renderer prints it on its
+		// own line) while `message` is only the whole-line mirror
+		buildFailMessage(goblinAxe.name, SKILL_FATAL_STAB.name, '(Weapon type doesnt match)'),
+		EnumTeamSideUI.Left,
+		{
+			skill: SKILL_FATAL_STAB,
+			failReason: '(Weapon type doesnt match)',
+			attribute: EnumAttributeType.Dmg,
+		},
+	),
+	// 純文字資訊：整行即文案（InfoMessage 不輸出粗體主詞，避免與狀態列重複名稱）
+	// Plain info: the whole line is the copy (InfoMessage prints no bold subject so the name is
+	// not repeated next to the status-row data)
+	logAction(
+		EnumActionType.Info,
+		mage1,
+		buildActionMessage({ source: mage1.name, text: `failed to ${SKILL_SUMMON_LEVIATHAN.name}(SP shortage)` }),
+		EnumTeamSideUI.Right,
+		{ attribute: EnumAttributeType.Normal },
+	),
 
-  // ---- 未命中（原始日誌 `Failed!`，無 span）/ Miss (the original `Failed!`, no span) ----
-  namedLogAction(
-    EnumActionType.Miss,
-    goblinWarriorA,
-    EnumLogCopy.Miss,
-    EnumTeamSideUI.Left
-  ),
+	// ---- 未命中（原始日誌 `Failed!`，無 span）/ Miss (the original `Failed!`, no span) ----
+	namedLogAction(
+		EnumActionType.Miss,
+		goblinWarriorA,
+		EnumLogCopy.Miss,
+		EnumTeamSideUI.Left,
+	),
 
-  // ---- 升級（`name LevelUp!`）/ Level up ----
-  namedLogAction(EnumActionType.LevelUp, hero1, EnumLogCopy.LevelUp, EnumTeamSideUI.Right),
+	// ---- 升級（`name LevelUp!`）/ Level up ----
+	namedLogAction(EnumActionType.LevelUp, hero1, EnumLogCopy.LevelUp, EnumTeamSideUI.Right),
 
-  // ---- 掉落道具（`name dropped` 後接道具圖示＋`<b class="u">道具名</b>.`）----
-  // Dropped item (`name dropped` followed by the item icon + `<b class="u">item name</b>.`)
-  logAction(
-    EnumActionType.ItemDrop,
-    goblinWarriorA,
-    buildItemDropMessage(goblinWarriorA.name, 'Magic Scroll'),
-    EnumTeamSideUI.Left,
-    {
-      itemName: 'Magic Scroll',
-      itemIconUrl: '/image/icon/item/item_018.png',
-    }
-  ),
+	// ---- 掉落道具（`name dropped` 後接道具圖示＋`<b class="u">道具名</b>.`）----
+	// Dropped item (`name dropped` followed by the item icon + `<b class="u">item name</b>.`)
+	logAction(
+		EnumActionType.ItemDrop,
+		goblinWarriorA,
+		buildItemDropMessage(goblinWarriorA.name, 'Magic Scroll'),
+		EnumTeamSideUI.Left,
+		{
+			itemName: 'Magic Scroll',
+			itemIconUrl: '/image/icon/item/item_018.png',
+		},
+	),
 
-  // ---- 退場（`name Lv.N leave the Battlefield.`，dmg 色）/ Leave the battlefield (dmg colour) ----
-  namedLogAction(
-    EnumActionType.Leave,
-    goblinAxe,
-    getEnterBattlefieldText(goblinAxe.level, true),
-    EnumTeamSideUI.Left,
-    { level: goblinAxe.level }
-  ),
+	// ---- 退場（`name Lv.N leave the Battlefield.`，dmg 色）/ Leave the battlefield (dmg colour) ----
+	namedLogAction(
+		EnumActionType.Leave,
+		goblinAxe,
+		getEnterBattlefieldText(goblinAxe.level, true),
+		EnumTeamSideUI.Left,
+		{ level: goblinAxe.level },
+	),
 
-  // ---- 純文字資訊（無名稱、無 span；對照 4.8 / 6.7 / 3.3 / 7.4 / 7.5 / 3.2 等）----
-  // Plain info text (no name, no span; mirrors 4.8 / 6.7 / 3.3 / 7.4 / 7.5 / 3.2, …)
-  logAction(EnumActionType.Info, undefined, buildDamageCountMessage(6), EnumTeamSideUI.Left),
-  logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoNoTarget, EnumTeamSideUI.Left),
-  logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoAttackGone, EnumTeamSideUI.Left),
-  logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoOverCap, EnumTeamSideUI.Left),
-  logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoBattleTurns, EnumTeamSideUI.Left),
-  logAction(EnumActionType.Info, undefined, buildAliveExpsMessage(250), EnumTeamSideUI.Left),
-  logAction(EnumActionType.Info, undefined, buildTeamGoldMessage('TestTeam', 1500), EnumTeamSideUI.Left),
-  logAction(
-    EnumActionType.Info,
-    goblinWarriorA,
-    buildActionMessage({ source: goblinWarriorA.name, text: EnumLogCopy.InfoSunkInThought }),
-    EnumTeamSideUI.Left
-  ),
-  logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoNoMorePatterns, EnumTeamSideUI.Left),
-  // ---- HP/SP 交換（3 行區塊：exchanged rate of HP and SP. ＋ HP 行 ＋ SP 行）----
-  // HP/SP exchange (3-line block: exchanged rate of HP and SP. + HP line + SP line)
-  namedLogAction(EnumActionType.EnergyExchange, hero1, EnumLogCopy.EnergyExchange, EnumTeamSideUI.Right, {
-    energyExchange: {
-      hpFrom: 500,
-      hpFromRate: 50,
-      hpTo: 800,
-      hpToRate: 80,
-      spFrom: 80,
-      spFromRate: 80,
-      spTo: 50,
-      spToRate: 50,
-    },
-  }),
+	// ---- 純文字資訊（無名稱、無 span；對照 4.8 / 6.7 / 3.3 / 7.4 / 7.5 / 3.2 等）----
+	// Plain info text (no name, no span; mirrors 4.8 / 6.7 / 3.3 / 7.4 / 7.5 / 3.2, …)
+	logAction(EnumActionType.Info, undefined, buildDamageCountMessage(6), EnumTeamSideUI.Left),
+	logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoNoTarget, EnumTeamSideUI.Left),
+	logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoAttackGone, EnumTeamSideUI.Left),
+	logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoOverCap, EnumTeamSideUI.Left),
+	logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoBattleTurns, EnumTeamSideUI.Left),
+	logAction(EnumActionType.Info, undefined, buildAliveExpsMessage(250), EnumTeamSideUI.Left),
+	logAction(EnumActionType.Info, undefined, buildTeamGoldMessage('TestTeam', 1500), EnumTeamSideUI.Left),
+	logAction(
+		EnumActionType.Info,
+		goblinWarriorA,
+		buildActionMessage({ source: goblinWarriorA.name, text: EnumLogCopy.InfoSunkInThought }),
+		EnumTeamSideUI.Left,
+	),
+	logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoNoMorePatterns, EnumTeamSideUI.Left),
+	// ---- HP/SP 交換（3 行區塊：exchanged rate of HP and SP. ＋ HP 行 ＋ SP 行）----
+	// HP/SP exchange (3-line block: exchanged rate of HP and SP. + HP line + SP line)
+	namedLogAction(EnumActionType.EnergyExchange, hero1, EnumLogCopy.EnergyExchange, EnumTeamSideUI.Right, {
+		energyExchange: {
+			hpFrom: 500,
+			hpFromRate: 50,
+			hpTo: 800,
+			hpToRate: 80,
+			spFrom: 80,
+			spFromRate: 80,
+			spTo: 50,
+			spToRate: 50,
+		},
+	}),
 ];
 
 // ==================== 召喚快照 / Summon snapshots ====================
@@ -868,125 +1044,135 @@ const logMessagesActions: IBattleAction[] = [
  * Summon demo snapshots: at 0 = opening (no mummies), at 6 = after the summon (3 mummies on the field)
  */
 const summonSnapshots: IBattleSnapshotDisplay[] = [
-  { at: 0, units: snapshotUnits(summonOpeningUnits) },
-  {
-    at: 6,
-    units: [
-      snapshotUnit(summonGoblinAxe, { hp: 124 }),
-      snapshotUnit(summonHero1, { hp: 201 }),
-      snapshotUnit(summonMage1),
-      ...snapshotUnits(summonedUnits),
-    ],
-  },
+	{ at: 0, units: snapshotUnits(summonOpeningUnits) },
+	{
+		at: 6,
+		units: [
+			snapshotUnit(summonGoblinAxe, { hp: 124 }),
+			snapshotUnit(summonHero1, { hp: 201 }),
+			snapshotUnit(summonMage1),
+			...snapshotUnits(summonedUnits),
+		],
+	},
 ];
 
 // ==================== 狀態變體 / State variants ====================
 
 /** 中途戰鬥的左隊（前兩名受損）/ Left team mid-battle (first two units damaged) */
-function midBattleLeftUnits(): IBattleUnit[] {
-  return statusUnits(
-    withHp(unitsOfSide(defaultUnits, EnumTeamSideUI.Left), { 'GoblinWarrior(A)': 180, 'GoblinWarrior(B)': 200 })
-  );
+function midBattleLeftUnits(): IBattleUnit[]
+{
+	return statusUnits(
+		withHp(unitsOfSide(defaultUnits, EnumTeamSideUI.Left), { 'GoblinWarrior(A)': 180, 'GoblinWarrior(B)': 200 }),
+	);
 }
 
 /** 受創的左隊（結果畫面）/ Damaged left team (result screen) */
-function battleOverLeftUnits(): IBattleUnit[] {
-  return statusUnits(
-    withHp(unitsOfSide(defaultUnits, EnumTeamSideUI.Left), { 'GoblinWarrior(A)': 140, 'GoblinWarrior(B)': 130 })
-  );
+function battleOverLeftUnits(): IBattleUnit[]
+{
+	return statusUnits(
+		withHp(unitsOfSide(defaultUnits, EnumTeamSideUI.Left), { 'GoblinWarrior(A)': 140, 'GoblinWarrior(B)': 130 }),
+	);
 }
 
 /** 陣亡中的右隊（三人倒下、Hero1 僅剩 1 HP）/ Right team with casualties (three down, Hero1 at 1 HP) */
-function casualtyRightUnits(): IBattleUnit[] {
-  return statusUnits(unitsOfSide(defaultUnits, EnumTeamSideUI.Right)).map((unit) => {
-    if (unit.name === 'Mage1' || unit.name === 'Priest1' || unit.name === 'Healer1') {
-      return { ...unit, hp: 0, status: EnumUnitStatus.Down };
-    }
-    if (unit.name === 'Hero1') {
-      return { ...unit, hp: 1, status: EnumUnitStatus.Alive };
-    }
-    return unit;
-  });
+function casualtyRightUnits(): IBattleUnit[]
+{
+	return statusUnits(unitsOfSide(defaultUnits, EnumTeamSideUI.Right)).map((unit) =>
+	{
+		if (unit.name === 'Mage1' || unit.name === 'Priest1' || unit.name === 'Healer1')
+		{
+			return { ...unit, hp: 0, status: EnumUnitStatus.Down };
+		}
+		if (unit.name === 'Hero1')
+		{
+			return { ...unit, hp: 1, status: EnumUnitStatus.Alive };
+		}
+		return unit;
+	});
 }
 
 /** 全滅的右隊（結果畫面）/ Wiped-out right team (result screen) */
-function defeatedRightUnits(): IBattleUnit[] {
-  return statusUnits(unitsOfSide(defaultUnits, EnumTeamSideUI.Right)).map((unit) => ({
-    ...unit,
-    hp: 0,
-    status: EnumUnitStatus.Down,
-  }));
+function defeatedRightUnits(): IBattleUnit[]
+{
+	return statusUnits(unitsOfSide(defaultUnits, EnumTeamSideUI.Right)).map((unit) => ({
+		...unit,
+		hp: 0,
+		status: EnumUnitStatus.Down,
+	}));
 }
 
 // ==================== 資料組裝 / Data assembly ====================
 
 /** 資料覆寫（只覆寫與預設不同的部分）/ Data overrides (only what differs from the default) */
-interface IBattleDataOverrides {
-  /** 左隊單位（預設取自 units 的左側）/ Left-team units (defaults to the left side of units) */
-  leftUnits?: IBattleUnit[];
-  /** 右隊單位（預設取自 units 的右側）/ Right-team units (defaults to the right side of units) */
-  rightUnits?: IBattleUnit[];
-  /** 戰場精靈（預設由 units 計算）/ Battlefield sprites (computed from units by default) */
-  sprites?: IBattleSprite[];
-  /** 行動日誌（預設為完整預設日誌）/ Action log (the full default log by default) */
-  actions?: IBattleAction[];
-  /** 快照（預設無）/ Snapshots (none by default) */
-  snapshots?: IBattleSnapshotDisplay[];
-  /** 戰鬥結果（傳 undefined 表示不顯示結果）/ Battle result (undefined = no result panel) */
-  result?: IBattleResult;
+interface IBattleDataOverrides
+{
+	/** 左隊單位（預設取自 units 的左側）/ Left-team units (defaults to the left side of units) */
+	leftUnits?: IBattleUnit[];
+	/** 右隊單位（預設取自 units 的右側）/ Right-team units (defaults to the right side of units) */
+	rightUnits?: IBattleUnit[];
+	/** 戰場精靈（預設由 units 計算）/ Battlefield sprites (computed from units by default) */
+	sprites?: IBattleSprite[];
+	/** 行動日誌（預設為完整預設日誌）/ Action log (the full default log by default) */
+	actions?: IBattleAction[];
+	/** 快照（預設無）/ Snapshots (none by default) */
+	snapshots?: IBattleSnapshotDisplay[];
+	/** 戰鬥結果（傳 undefined 表示不顯示結果）/ Battle result (undefined = no result panel) */
+	result?: IBattleResult;
 }
 
 /**
  * 展示單位（IBattleUnit）→ 隊伍 HP 統計輸入
  * Showcase unit (IBattleUnit) → team HP-stats input
  */
-function toHpUnit(u: IBattleUnit): ITeamHpUnit {
-  return { hp: u.hp, maxHp: u.maxHp, dead: u.status === EnumUnitStatus.Down };
+function toHpUnit(u: IBattleUnit): ITeamHpUnit
+{
+	return { hp: u.hp, maxHp: u.maxHp, dead: u.status === EnumUnitStatus.Down };
 }
 
 /**
  * 組裝完整戰鬥資料（隊伍與精靈由單位定義派生）
  * Assemble complete battle display data (teams and sprites derive from the unit definitions)
  */
-function createBattleData(units: IShowcaseUnit[], overrides: IBattleDataOverrides = {}): IBattleDisplayData {
-  const leftUnits = overrides.leftUnits ?? statusUnits(unitsOfSide(units, EnumTeamSideUI.Left));
-  const rightUnits = overrides.rightUnits ?? statusUnits(unitsOfSide(units, EnumTeamSideUI.Right));
-  const { sprites, actions, snapshots } = overrides;
+function createBattleData(units: IShowcaseUnit[], overrides: IBattleDataOverrides = {}): IBattleDisplayData
+{
+	const leftUnits = overrides.leftUnits ?? statusUnits(unitsOfSide(units, EnumTeamSideUI.Left));
+	const rightUnits = overrides.rightUnits ?? statusUnits(unitsOfSide(units, EnumTeamSideUI.Right));
+	const { sprites, actions, snapshots } = overrides;
 
-  // 戰鬥結果以「實際顯示的單位」為準，確保 HP remain 分母（totalMaxHp）與畫面上的單位一致；
-  // totalDamage／totalExp／funds 等僅引擎可產出的欄位仍沿用撰寫值（BATTLE_RESULT）。
-  // The battle result is derived from the actually displayed units so the HP remain denominator
-  // (totalMaxHp) matches the on-screen units; only engine-only fields (totalDamage/totalExp/funds)
-  // keep their authored values (BATTLE_RESULT).
-  const result: IBattleResult | undefined =
-    'result' in overrides
-      ? overrides.result
-      : {
-          winner: BATTLE_RESULT.winner,
-          isDraw: BATTLE_RESULT.isDraw,
-          leftTeam: { ...BATTLE_RESULT.leftTeam, ...computeTeamHpStats(leftUnits.map(toHpUnit)) },
-          rightTeam: { ...BATTLE_RESULT.rightTeam, ...computeTeamHpStats(rightUnits.map(toHpUnit)) },
-        };
+	// 戰鬥結果以「實際顯示的單位」為準，確保 HP remain 分母（totalMaxHp）與畫面上的單位一致；
+	// totalDamage／totalExp／funds 等僅引擎可產出的欄位仍沿用撰寫值（BATTLE_RESULT）。
+	// The battle result is derived from the actually displayed units so the HP remain denominator
+	// (totalMaxHp) matches the on-screen units; only engine-only fields (totalDamage/totalExp/funds)
+	// keep their authored values (BATTLE_RESULT).
+	const result: IBattleResult | undefined =
+		'result' in overrides
+			? overrides.result
+			: {
+				winner: BATTLE_RESULT.winner,
+				isDraw: BATTLE_RESULT.isDraw,
+				leftTeam: { ...BATTLE_RESULT.leftTeam, ...computeTeamHpStats(leftUnits.map(toHpUnit)) },
+				rightTeam: { ...BATTLE_RESULT.rightTeam, ...computeTeamHpStats(rightUnits.map(toHpUnit)) },
+			};
 
-  return {
-    title: BATTLE_TITLE,
-    time: BATTLE_TIME,
-    leftTeam: {
-      name: LEFT_TEAM_NAME,
-      units: leftUnits,
-      side: EnumTeamSideUI.Left,
-    },
-    rightTeam: {
-      name: RIGHT_TEAM_NAME,
-      units: rightUnits,
-      side: EnumTeamSideUI.Right,
-    },
-    battlefield: BATTLEFIELD,
-    sprites: sprites ?? battleSprites(units),
-    actions: actions ?? battleActions,
-    snapshots,
-    result,
-  };
+	return {
+		title: BATTLE_TITLE,
+		time: BATTLE_TIME,
+		leftTeam: {
+			name: LEFT_TEAM_NAME,
+			units: leftUnits,
+			side: EnumTeamSideUI.Left,
+		},
+		rightTeam: {
+			name: RIGHT_TEAM_NAME,
+			units: rightUnits,
+			side: EnumTeamSideUI.Right,
+		},
+		battlefield: BATTLEFIELD,
+		sprites: sprites ?? battleSprites(units),
+		actions: actions ?? battleActions,
+		snapshots,
+		result,
+	};
 }
 
 // ==================== 匯出 / Exports ====================
@@ -996,38 +1182,38 @@ export const defaultBattleData: IBattleDisplayData = createBattleData(defaultUni
 
 /** 戰鬥中（左隊前兩名受損、日誌取前 6 筆）/ Mid-battle (first two left units damaged; first 6 log entries) */
 export const midBattleData: IBattleDisplayData = createBattleData(defaultUnits, {
-  leftUnits: midBattleLeftUnits(),
-  actions: battleActions.slice(0, 6),
+	leftUnits: midBattleLeftUnits(),
+	actions: battleActions.slice(0, 6),
 });
 
 /** 單位陣亡（右隊三人倒下；日誌取第 9–18 筆）/ Casualties (three right units down; log entries 9–18) */
 export const casualtyData: IBattleDisplayData = createBattleData(defaultUnits, {
-  rightUnits: casualtyRightUnits(),
-  actions: battleActions.slice(9, 18),
+	rightUnits: casualtyRightUnits(),
+	actions: battleActions.slice(9, 18),
 });
 
 /** 召喚演示（GraveYard 三體召喚、兩段快照、無結果畫面）/ Summon demo (GraveYard summon 3, two snapshots, no result) */
 export const summonData: IBattleDisplayData = createBattleData(summonUnits, {
-  actions: summonActions,
-  snapshots: summonSnapshots,
-  result: undefined,
+	actions: summonActions,
+	snapshots: summonSnapshots,
+	result: undefined,
 });
 
 /** 戰鬥結果（日誌取第 15 筆起）/ Battle result (log entries from 15 on) */
 export const battleOverData: IBattleDisplayData = createBattleData(defaultUnits, {
-  leftUnits: battleOverLeftUnits(),
-  rightUnits: defeatedRightUnits(),
-  actions: battleActions.slice(15),
+	leftUnits: battleOverLeftUnits(),
+	rightUnits: defeatedRightUnits(),
+	actions: battleActions.slice(15),
 });
 
 /** 魔方陣紀錄（四種種類各一次、無結果畫面）/ Magic-circle records (each kind once, no result panel) */
 export const magicCircleData: IBattleDisplayData = createBattleData(defaultUnits, {
-  actions: magicCircleActions,
-  result: undefined,
+	actions: magicCircleActions,
+	result: undefined,
 });
 
 /** 完整日誌訊息覆蓋（原始日誌每個訊息族系各一次、無結果畫面）/ Full log-message coverage (one entry per original message family, no result panel) */
 export const logMessagesData: IBattleDisplayData = createBattleData(defaultUnits, {
-  actions: logMessagesActions,
-  result: undefined,
+	actions: logMessagesActions,
+	result: undefined,
 });

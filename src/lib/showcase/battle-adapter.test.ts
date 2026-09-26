@@ -43,8 +43,10 @@ import {
 
 // ==================== 3.1 固定種子跑完整場 ====================
 // Task 3.1: run a complete battle with a fixed seed
-describe('3.1 runShowcaseBattle', () => {
-	it('completes a battle with outcome in {win, lose, draw} and is reproducible', () => {
+describe('3.1 runShowcaseBattle', () =>
+{
+	it('completes a battle with outcome in {win, lose, draw} and is reproducible', () =>
+	{
 		const input = { charNos: [100, 101], monNos: [1000], seed: 7 };
 		const a = runShowcaseBattle(input);
 
@@ -59,14 +61,16 @@ describe('3.1 runShowcaseBattle', () => {
 		expect(b.data.actions).toEqual(a.data.actions);
 	});
 
-	it('rejects a party below 1 or above MAX_CHAR', () => {
+	it('rejects a party below 1 or above MAX_CHAR', () =>
+	{
 		expect(() => runShowcaseBattle({ charNos: [], monNos: [1000] })).toThrow();
 		const sixNos = SEED.chars.slice(0, MAX_CHAR + 1).map((c) => c.no);
 		expect(sixNos).toHaveLength(MAX_CHAR + 1);
 		expect(() => runShowcaseBattle({ charNos: sixNos, monNos: [1000] })).toThrow();
 	});
 
-	it('rejects an empty encounter', () => {
+	it('rejects an empty encounter', () =>
+	{
 		expect(() => runShowcaseBattle({ charNos: [100], monNos: [] })).toThrow();
 	});
 });
@@ -74,10 +78,12 @@ describe('3.1 runShowcaseBattle', () => {
 // ==================== 3.2 單位/隊伍轉接 ====================
 // Task 3.2: unit/team adapter
 // 側別已翻轉：敵方＝左隊 EnumTeamSideUI.Left、我方＝右隊 EnumTeamSideUI.Right
-describe('3.2 buildTeam / toBattleUnit', () => {
+describe('3.2 buildTeam / toBattleUnit', () =>
+{
 	const run = runShowcaseBattle({ charNos: [100, 102], monNos: [1000, 1002], seed: 11 });
 
-	it('maps party and encounter into left/right teams with correct sizes', () => {
+	it('maps party and encounter into left/right teams with correct sizes', () =>
+	{
 		const { leftTeam, rightTeam } = run.data;
 		// left = enemies, right = allies
 		expect(leftTeam.side).toBe(EnumTeamSideUI.Left);
@@ -88,7 +94,8 @@ describe('3.2 buildTeam / toBattleUnit', () => {
 		expect(rightTeam.units.every((u) => u.side === EnumTeamSideUI.Right)).toBe(true);
 	});
 
-	it('keeps name/level and HP/SP caps from seed definitions', () => {
+	it('keeps name/level and HP/SP caps from seed definitions', () =>
+	{
 		const { leftTeam, rightTeam } = run.data;
 
 		// leftTeam = enemies → slime is on left
@@ -103,7 +110,8 @@ describe('3.2 buildTeam / toBattleUnit', () => {
 		expect(warrior!.maxHp).toBe(SEED.char100.maxhp);
 		expect(warrior!.maxSp).toBe(SEED.char100.maxsp);
 
-		for (const u of [...leftTeam.units, ...rightTeam.units]) {
+		for (const u of [...leftTeam.units, ...rightTeam.units])
+		{
 			expect(u.hp).toBeGreaterThanOrEqual(0);
 			expect(u.hp).toBeLessThanOrEqual(u.maxHp);
 			expect(u.sp).toBeGreaterThanOrEqual(0);
@@ -115,7 +123,8 @@ describe('3.2 buildTeam / toBattleUnit', () => {
 		}
 	});
 
-	it('dead units report status down and HP clamps at 0', () => {
+	it('dead units report status down and HP clamps at 0', () =>
+	{
 		const repo = createSeedRepository();
 		const rng = new RNG(1);
 		const dead = newChar(repo.getCharBase(100)!, repo, rng);
@@ -132,18 +141,28 @@ describe('3.2 buildTeam / toBattleUnit', () => {
 // ==================== 3.3 事件 → 日誌轉接 ====================
 // Task 3.3: event → action adapter
 // 側別翻轉後：100(我方)=EnumTeamSideUI.Right, 1000(敵方)=EnumTeamSideUI.Left
-describe('3.3 mapBattleEvent', () => {
+describe('3.3 mapBattleEvent', () =>
+{
 	const lookup: IUnitLookup = new Map<number, { name: string; side: EnumTeamSideUI }>([
 		[100, { name: 'Warrior', side: EnumTeamSideUI.Right }],
 		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left }],
 	]);
 	const repo = createSeedRepository();
 
-	it('maps every known event type to its action type', () => {
+	it('maps every known event type to its action type', () =>
+	{
 		const events: IBattleEvent[] = [
 			{ type: EnumBattleEventType.Act, actor: '100', skill: 1000 },
 			{ type: EnumBattleEventType.Cast, actor: '100', skill: 2000 },
-			{ type: EnumBattleEventType.Damage, actor: '100', target: '1000', skill: 1000, value: 42, hpBefore: 200, hpAfter: 158 },
+			{
+				type: EnumBattleEventType.Damage,
+				actor: '100',
+				target: '1000',
+				skill: 1000,
+				value: 42,
+				hpBefore: 200,
+				hpAfter: 158,
+			},
 			{ type: EnumBattleEventType.Heal, actor: '100', target: '1000', value: 10, hpBefore: 158, hpAfter: 168 },
 			{ type: EnumBattleEventType.Guard, actor: '1000', target: '1000', text: 'barrier' },
 			{ type: EnumBattleEventType.Death, target: '1000' },
@@ -203,7 +222,8 @@ describe('3.3 mapBattleEvent', () => {
 		expect(actions[6].message).toBe('GoblinAxe poisoned');
 	});
 
-	it('every engine event type maps to a dedicated action type', () => {
+	it('every engine event type maps to a dedicated action type', () =>
+	{
 		const cases: Array<[EnumBattleEventType, EnumActionType]> = [
 			[EnumBattleEventType.Act, EnumActionType.Skill],
 			[EnumBattleEventType.Cast, EnumActionType.Casting],
@@ -221,7 +241,8 @@ describe('3.3 mapBattleEvent', () => {
 			[EnumBattleEventType.Info, EnumActionType.Info],
 		];
 
-		for (const [event, expected] of cases) {
+		for (const [event, expected] of cases)
+		{
 			const action = mapBattleEvent(
 				{ type: event, actor: '100', target: '1000', text: 'sample' },
 				lookup,
@@ -231,7 +252,8 @@ describe('3.3 mapBattleEvent', () => {
 		}
 	});
 
-	it('charge event always reads as charging, cast event follows the skill type', () => {
+	it('charge event always reads as charging, cast event follows the skill type', () =>
+	{
 		const charge = mapBattleEvent(
 			{ type: EnumBattleEventType.Charge, actor: '100', skill: 1000 },
 			lookup,
@@ -252,13 +274,15 @@ describe('3.3 mapBattleEvent', () => {
 		expect(cast.message).toBe(`Warrior ${cast.text}`);
 	});
 
-	it('unknown type without text falls back to a message containing the type', () => {
+	it('unknown type without text falls back to a message containing the type', () =>
+	{
 		const action = mapBattleEvent({ type: 'nonsense' as EnumBattleEventType }, lookup, repo);
 		expect(action.type).toBe(EnumActionType.Result);
 		expect(action.message).toContain('nonsense');
 	});
 
-	it('summon event maps to a summon action carrying the summoned unit', () => {
+	it('summon event maps to a summon action carrying the summoned unit', () =>
+	{
 		const action = mapBattleEvent(
 			{ type: EnumBattleEventType.Summon, actor: '100', target: '1000', skill: 2000, value: 10 },
 			lookup,
@@ -278,7 +302,8 @@ describe('3.3 mapBattleEvent', () => {
 		expect(action.message).toContain('joined to the team');
 	});
 
-	it('poison damage event carries the structured value, poison apply keeps the default copy', () => {
+	it('poison damage event carries the structured value, poison apply keeps the default copy', () =>
+	{
 		// 每回合毒傷（Battle.Action 生產）：value 與前後 HP 交給 PoisonMessage 結構化渲染，
 		// text 是同一行的純文字鏡像（buildPoisonDamageText）
 		// Per-turn poison damage (produced by Battle.Action): value and before/after HP go to
@@ -311,7 +336,8 @@ describe('3.3 mapBattleEvent', () => {
 	const withSkill = (skill: Partial<ISkillDef>): IDataRepository =>
 		Object.assign(Object.create(repo), { getSkill: () => skill as ISkillDef });
 
-	it('magic circle event maps to a record whose kind follows the skill definition', () => {
+	it('magic circle event maps to a record whose kind follows the skill definition', () =>
+	{
 		const draw = mapBattleEvent(
 			{ type: EnumBattleEventType.MagicCircle, actor: '100', skill: 3410, value: 1 },
 			lookup,
@@ -346,7 +372,8 @@ describe('3.3 mapBattleEvent', () => {
 		expect(use.message).toBe('Warrior use MagicCircle x4');
 	});
 
-	it('magic circle event without a MagicCircle skill field falls back to draw', () => {
+	it('magic circle event without a MagicCircle skill field falls back to draw', () =>
+	{
 		const action = mapBattleEvent(
 			{ type: EnumBattleEventType.MagicCircle, actor: '100', value: 2 },
 			lookup,
@@ -358,7 +385,8 @@ describe('3.3 mapBattleEvent', () => {
 		expect(action.message).toBe('Warrior draw MagicCircle x2');
 	});
 
-	it('a real battle produces N actions for N events, in order, with actor/target names', () => {
+	it('a real battle produces N actions for N events, in order, with actor/target names', () =>
+	{
 		const run = runShowcaseBattle({ charNos: [100, 104], monNos: [1000, 1002], seed: 5 });
 		const { events, data } = run;
 
@@ -369,26 +397,40 @@ describe('3.3 mapBattleEvent', () => {
 			[...data.leftTeam.units, ...data.rightTeam.units].map((u) => u.name),
 		);
 
-		events.forEach((ev, i) => {
+		events.forEach((ev, i) =>
+		{
 			const action = data.actions[i];
-			if (ev.type === EnumBattleEventType.Act) {
+			if (ev.type === EnumBattleEventType.Act)
+			{
 				expect(action.type).toBe(EnumActionType.Skill);
 				expect(names.has(action.source!)).toBe(true);
-			} else if (ev.type === EnumBattleEventType.Damage) {
+			}
+			else if (ev.type === EnumBattleEventType.Damage)
+			{
 				expect(action.type).toBe(EnumActionType.Damage);
 				expect(names.has(action.source!)).toBe(true);
 				expect(names.has(action.target!)).toBe(true);
-			} else if (ev.type === EnumBattleEventType.Heal) {
+			}
+			else if (ev.type === EnumBattleEventType.Heal)
+			{
 				expect(action.type).toBe(EnumActionType.Heal);
-			} else if (ev.type === EnumBattleEventType.Death) {
+			}
+			else if (ev.type === EnumBattleEventType.Death)
+			{
 				expect(action.type).toBe(EnumActionType.Down);
 				expect(names.has(action.source!)).toBe(true);
-			} else if (ev.type === EnumBattleEventType.Cast) {
+			}
+			else if (ev.type === EnumBattleEventType.Cast)
+			{
 				expect(action.type).toBe(EnumActionType.Casting);
 				expect(names.has(action.source!)).toBe(true);
-			} else if (ev.type === EnumBattleEventType.Guard) {
+			}
+			else if (ev.type === EnumBattleEventType.Guard)
+			{
 				expect(action.type).toBe(EnumActionType.Protect);
-			} else {
+			}
+			else
+			{
 				expect(action.type).toBe(EnumActionType.Result);
 				expect(action.message).toBeTruthy();
 			}
@@ -409,8 +451,10 @@ describe('3.3 mapBattleEvent', () => {
 // ==================== 3.4 結果轉接 ====================
 // Task 3.4: result adapter
 // 側別翻轉後：leftTeam = 敵方, rightTeam = 我方
-describe('3.4 buildResultData', () => {
-	it('win branch: ally wipeout names the ally team, winnerSide=EnumTeamSideUI.Right', () => {
+describe('3.4 buildResultData', () =>
+{
+	it('win branch: ally wipeout names the ally team, winnerSide=EnumTeamSideUI.Right', () =>
+	{
 		const run = runShowcaseBattle({
 			charNos: [100, 101, 105],
 			monNos: [1002],
@@ -433,7 +477,8 @@ describe('3.4 buildResultData', () => {
 		expect(result.rightTeam.totalMaxHp).toBeGreaterThan(0);
 	});
 
-	it('lose branch: our wipeout names the enemy team, winnerSide=EnumTeamSideUI.Left', () => {
+	it('lose branch: our wipeout names the enemy team, winnerSide=EnumTeamSideUI.Left', () =>
+	{
 		const run = runShowcaseBattle({
 			charNos: [104],
 			monNos: [1001],
@@ -451,7 +496,8 @@ describe('3.4 buildResultData', () => {
 		expect(result.rightTeam.alive).toBe(0);
 	});
 
-	it('draw branch: flags a draw without naming a winner', () => {
+	it('draw branch: flags a draw without naming a winner', () =>
+	{
 		const repo = createSeedRepository();
 		const rng = new RNG(1);
 		const a = newChar(repo.getCharBase(100)!, repo, rng);
@@ -479,7 +525,8 @@ describe('3.4 buildResultData', () => {
 		expect(result.leftTeam.totalUnits).toBe(1);
 	});
 
-	it('totalDamage accumulates per side and totalMaxHp is set', () => {
+	it('totalDamage accumulates per side and totalMaxHp is set', () =>
+	{
 		const repo = createSeedRepository();
 		const rng = new RNG(1);
 		const ally = newChar(repo.getCharBase(100)!, repo, rng);
@@ -513,7 +560,8 @@ describe('3.4 buildResultData', () => {
 // ==================== 3.5 精靈轉接 ====================
 // Task 3.5: sprite adapter
 // 名冊以敵方(EnumTeamSideUI.Left)在前、我方(EnumTeamSideUI.Right)在後
-describe('3.5 buildSprites / buildPositionRoster', () => {
+describe('3.5 buildSprites / buildPositionRoster', () =>
+{
 	const charNos = [100, 104];
 	const monNos = [1000, 1002, 1001];
 	const repo = createSeedRepository();
@@ -522,12 +570,14 @@ describe('3.5 buildSprites / buildPositionRoster', () => {
 	const roster = buildPositionRoster(allies, enemies);
 	const run = runShowcaseBattle({ charNos, monNos, seed: 9 });
 
-	it('roster lists enemies(left) first then allies(right) with a real image', () => {
+	it('roster lists enemies(left) first then allies(right) with a real image', () =>
+	{
 		expect(roster).toHaveLength(charNos.length + monNos.length);
 		// 前半為敵方(EnumTeamSideUI.Left)，後半為我方(EnumTeamSideUI.Right)
 		expect(roster.filter((r) => r.side === EnumTeamSideUI.Left)).toHaveLength(monNos.length);
 		expect(roster.filter((r) => r.side === EnumTeamSideUI.Right)).toHaveLength(charNos.length);
-		for (const r of roster) {
+		for (const r of roster)
+		{
 			expect(r.imageUrl).toMatch(/^\/image\/char\//);
 			expect(r.imageUrl).not.toBe(SPRITE_PLACEHOLDER_URL);
 			expect([EnumPosition.Front, EnumPosition.Back]).toContain(r.position);
@@ -536,7 +586,8 @@ describe('3.5 buildSprites / buildPositionRoster', () => {
 		}
 	});
 
-	it('produces exactly one sprite per unit with unique ids and no missing image', () => {
+	it('produces exactly one sprite per unit with unique ids and no missing image', () =>
+	{
 		const units = [...run.data.leftTeam.units, ...run.data.rightTeam.units];
 		const sprites = run.data.sprites;
 
@@ -545,19 +596,25 @@ describe('3.5 buildSprites / buildPositionRoster', () => {
 		expect(new Set(spriteUids).size).toBe(units.length);
 		expect(spriteUids.sort()).toEqual(units.map((u) => u.unitUuid).sort());
 
-		for (const s of sprites) {
+		for (const s of sprites)
+		{
 			expect(s.imageUrl).toMatch(/^\/image\/char\//);
 			expect(s.imageUrl).not.toBe(SPRITE_PLACEHOLDER_URL);
 		}
 	});
 
-	it('right(ally) team sprites are flipped, left(enemy) team unflipped', () => {
+	it('right(ally) team sprites are flipped, left(enemy) team unflipped', () =>
+	{
 		const leftIds = new Set(run.data.leftTeam.units.map((u) => u.unitUuid));
-		for (const s of run.data.sprites) {
-			if (leftIds.has(s.unitUuid)) {
+		for (const s of run.data.sprites)
+		{
+			if (leftIds.has(s.unitUuid))
+			{
 				// 敵方(EnumTeamSideUI.Left)使用 char/ 圖(預設朝右) → 不翻轉（面向場地中心的右側）
 				expect(s.flipped).toBe(false);
-			} else {
+			}
+			else
+			{
 				// 我方(EnumTeamSideUI.Right)使用 char/ 圖(預設朝右) → 翻轉朝左
 				expect(s.flipped).toBe(true);
 			}
@@ -567,14 +624,16 @@ describe('3.5 buildSprites / buildPositionRoster', () => {
 
 // ==================== 3.3b 事件轉接的組裝元件 ====================
 // Task 3.3b: composable pieces of the event adapter
-describe('3.3b 事件轉接的組裝元件 / event adapter composition', () => {
+describe('3.3b 事件轉接的組裝元件 / event adapter composition', () =>
+{
 	const lookup: IUnitLookup = new Map<number, { name: string; side: EnumTeamSideUI }>([
 		[100, { name: 'Warrior', side: EnumTeamSideUI.Right }],
 		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left }],
 	]);
 	const repo = createSeedRepository();
 
-	it('resolveEventContext resolves actor, target, side and skill in one pass', () => {
+	it('resolveEventContext resolves actor, target, side and skill in one pass', () =>
+	{
 		const ctx = resolveEventContext(
 			{ type: EnumBattleEventType.Damage, actor: '100', target: '1000', skill: 1000 },
 			lookup,
@@ -589,20 +648,23 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () => {
 		expect(ctx.repo).toBe(repo);
 	});
 
-	it('resolveEventContext leaves side undefined when neither end is in the lookup', () => {
+	it('resolveEventContext leaves side undefined when neither end is in the lookup', () =>
+	{
 		const ctx = resolveEventContext({ type: EnumBattleEventType.Info, actor: '9999' }, lookup, repo);
 		expect(ctx.actor).toEqual({ name: '9999' });
 		expect(ctx.side).toBeUndefined();
 		expect(ctx.skillName).toBeUndefined();
 	});
 
-	it('resolveRef keeps the raw no string for unknown refs and {} for absent ones', () => {
+	it('resolveRef keeps the raw no string for unknown refs and {} for absent ones', () =>
+	{
 		expect(resolveRef('100', lookup)).toEqual({ name: 'Warrior', side: EnumTeamSideUI.Right });
 		expect(resolveRef('9999', lookup)).toEqual({ name: '9999' });
 		expect(resolveRef(undefined, lookup)).toEqual({});
 	});
 
-	it('composeAction fills the shared fields and honours per-type overrides', () => {
+	it('composeAction fills the shared fields and honours per-type overrides', () =>
+	{
 		const ctx = resolveEventContext(
 			{ type: EnumBattleEventType.Damage, actor: '100', target: '1000' },
 			lookup,
@@ -629,7 +691,8 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () => {
 		expect(over.target).toBe('GoblinAxe');
 	});
 
-	it('composeAction joins text into the message exactly once', () => {
+	it('composeAction joins text into the message exactly once', () =>
+	{
 		const ctx = resolveEventContext(
 			{ type: EnumBattleEventType.Buff, actor: '100' },
 			lookup,
@@ -650,7 +713,8 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () => {
 		expect(explicit.message).toBe('plain');
 	});
 
-	it('named families keep structured text for the renderer', () => {
+	it('named families keep structured text for the renderer', () =>
+	{
 		const events: IBattleEvent[] = [
 			{ type: EnumBattleEventType.Buff, actor: '100' },
 			{ type: EnumBattleEventType.Debuff, actor: '100' },
@@ -676,16 +740,19 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () => {
 		]);
 	});
 
-	it('registers exactly one mapper for every EnumBattleEventType member', () => {
+	it('registers exactly one mapper for every EnumBattleEventType member', () =>
+	{
 		const types = Object.values(EnumBattleEventType);
 		expect(types.length).toBeGreaterThan(0);
-		for (const type of types) {
+		for (const type of types)
+		{
 			expect(EVENT_MAPPERS[type], `missing mapper for ${type}`).toBeTypeOf('function');
 		}
 		expect(Object.keys(EVENT_MAPPERS)).toHaveLength(types.length);
 	});
 
-	it('runs a single mapper straight from the table', () => {
+	it('runs a single mapper straight from the table', () =>
+	{
 		const ev: IBattleEvent = {
 			type: EnumBattleEventType.Damage,
 			actor: '100',
@@ -700,7 +767,8 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () => {
 		expect(mapper?.(ev, ctx)).toEqual(mapBattleEvent(ev, lookup, repo));
 	});
 
-	it('falls back to mapUnknownEvent for an unregistered type', () => {
+	it('falls back to mapUnknownEvent for an unregistered type', () =>
+	{
 		const ev = { type: 'nonsense' as EnumBattleEventType, actor: '100', target: '1000' };
 		expect(EVENT_MAPPERS[ev.type]).toBeUndefined();
 
@@ -710,7 +778,8 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () => {
 		expect(action).toEqual(mapUnknownEvent(ev, resolveEventContext(ev, lookup, repo)));
 	});
 
-	it('exposes the fallback copy for text-less events', () => {
+	it('exposes the fallback copy for text-less events', () =>
+	{
 		expect(DEFAULT_EVENT_TEXT).toEqual({
 			buff: 'gained buff.',
 			debuff: 'got debuffed.',
@@ -719,13 +788,15 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () => {
 		});
 	});
 
-	it('parseDefNo keeps numeric refs and drops the rest', () => {
+	it('parseDefNo keeps numeric refs and drops the rest', () =>
+	{
 		expect(parseDefNo('1000')).toBe(1000);
 		expect(parseDefNo('GoblinAxe')).toBeUndefined();
 		expect(parseDefNo(undefined)).toBeUndefined();
 	});
 
-	it('chargeKindOf marks only physical skills as charging', () => {
+	it('chargeKindOf marks only physical skills as charging', () =>
+	{
 		const physical = { no: 1, name: 'Slash', type: EnumSkillDamageType.Physical } as ISkillDef;
 		const magic = { no: 2, name: 'Fireball', type: EnumSkillDamageType.Magic } as ISkillDef;
 		expect(chargeKindOf(physical)).toBe(EnumChargeKind.Charging);
@@ -737,13 +808,15 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () => {
 
 // ==================== 3.4b 展示資料組裝 ====================
 // Task 3.4b: display-data assembly
-describe('3.4b 展示資料組裝 / display data assembly', () => {
+describe('3.4b 展示資料組裝 / display data assembly', () =>
+{
 	const lookup: IUnitLookup = new Map<number, { name: string; side: EnumTeamSideUI }>([
 		[100, { name: 'Warrior', side: EnumTeamSideUI.Right }],
 		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left }],
 	]);
 
-	it('computeSideDamage sums only the events whose actor belongs to that side', () => {
+	it('computeSideDamage sums only the events whose actor belongs to that side', () =>
+	{
 		const events: IBattleEvent[] = [
 			{ type: EnumBattleEventType.Damage, actor: '100', value: 10 },
 			{ type: EnumBattleEventType.Damage, actor: '1000', value: 4 },
@@ -755,7 +828,8 @@ describe('3.4b 展示資料組裝 / display data assembly', () => {
 		expect(computeSideDamage(undefined, lookup, EnumTeamSideUI.Right)).toBe(0);
 	});
 
-	it('validateShowcaseInput rejects an empty or oversized party and an empty encounter', () => {
+	it('validateShowcaseInput rejects an empty or oversized party and an empty encounter', () =>
+	{
 		expect(() => validateShowcaseInput({ charNos: [], monNos: [1000] })).toThrow(/Party size/);
 		expect(() => validateShowcaseInput({ charNos: [100], monNos: [] })).toThrow(
 			/at least one monster/,
@@ -767,7 +841,8 @@ describe('3.4b 展示資料組裝 / display data assembly', () => {
 		expect(() => validateShowcaseInput({ charNos: [100], monNos: [1000] })).not.toThrow();
 	});
 
-	it('buildDisplayData assembles teams, actions and result from supplied members and events', () => {
+	it('buildDisplayData assembles teams, actions and result from supplied members and events', () =>
+	{
 		const repo = createSeedRepository();
 		const { allies, enemies } = buildShowcaseTeams([100], [1000], repo, new RNG(5));
 		const events: IBattleEvent[] = [

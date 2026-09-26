@@ -12,18 +12,18 @@ import { GDSubNav } from '../../src/components/navigation/GDSubNav';
 
 /** 背景裝飾器 — 模擬遊戲深色背景 / Dark game background decorator */
 const meta: Meta<typeof GDSubNav> = {
-  title: 'Navigation/GDSubNav',
-  component: GDSubNav,
-  parameters: {
-    docs: {
-      description: {
-        component:
-          'GameDataPage 子導航組件，顯示子頁面連結導航。\nGameDataPage sub-navigation component showing sub-page links navigation.',
-      },
-    },
-  },
-  tags: ['autodocs'],
-  decorators: [GDSubNavDarkDecorator],
+	title: 'Navigation/GDSubNav',
+	component: GDSubNav,
+	parameters: {
+		docs: {
+			description: {
+				component:
+					'GameDataPage 子導航組件，顯示子頁面連結導航。\nGameDataPage sub-navigation component showing sub-page links navigation.',
+			},
+		},
+	},
+	tags: ['autodocs'],
+	decorators: [GDSubNavDarkDecorator],
 };
 
 export default meta;
@@ -33,75 +33,75 @@ type Story = StoryObj<typeof meta>;
 
 /** 預設導航 / Default navigation */
 export const Default: Story = {
-  args: {},
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '預設的 GameDataPage 子導航，包含職業、物品、判定、怪物連結。\nDefault GameDataPage sub-navigation with job, item, judge, monster links.',
-      },
-    },
-  },
-  decorators: [makeCenteredDecorator({ maxWidth: CENTERED_MAX_WIDTH })],
+	args: {},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'預設的 GameDataPage 子導航，包含職業、物品、判定、怪物連結。\nDefault GameDataPage sub-navigation with job, item, judge, monster links.',
+			},
+		},
+	},
+	decorators: [makeCenteredDecorator({ maxWidth: CENTERED_MAX_WIDTH })],
 };
 
 /** 自訂導航連結 / Custom navigation links */
 export const CustomLinks: Story = {
-  args: {
-    subLinks: [
-      { label: '職業(Job)', href: 'http://127.0.0.1:8085/gamedata/job' },
-      { label: '技能(Skill)', href: 'http://127.0.0.1:8085/gamedata/skill' },
-      { label: '裝備(Equipment)', href: 'http://127.0.0.1:8085/gamedata/equipment' },
-      { label: '場景(Scene)', href: 'http://127.0.0.1:8085/gamedata/scene' },
-    ],
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '自訂子導航連結，展示不同的導選項。\nCustom sub-navigation links showing different navigation options.',
-      },
-    },
-  },
-  decorators: [makeCenteredDecorator({ maxWidth: CENTERED_MAX_WIDTH })],
+	args: {
+		subLinks: [
+			{ label: '職業(Job)', href: 'http://127.0.0.1:8085/gamedata/job' },
+			{ label: '技能(Skill)', href: 'http://127.0.0.1:8085/gamedata/skill' },
+			{ label: '裝備(Equipment)', href: 'http://127.0.0.1:8085/gamedata/equipment' },
+			{ label: '場景(Scene)', href: 'http://127.0.0.1:8085/gamedata/scene' },
+		],
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'自訂子導航連結，展示不同的導選項。\nCustom sub-navigation links showing different navigation options.',
+			},
+		},
+	},
+	decorators: [makeCenteredDecorator({ maxWidth: CENTERED_MAX_WIDTH })],
 };
 
 /** 最少連結 / Minimal links */
 export const MinimalLinks: Story = {
-  args: {
-    subLinks: [
-      { label: '職', href: 'http://127.0.0.1:8085/gamedata/job' },
-      { label: '物', href: 'http://127.0.0.1:8085/gamedata/item' },
-    ],
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '最少連結的導航，適用於簡化界面。\nMinimal navigation links for simplified interface.',
-      },
-    },
-  },
-  decorators: [makeCenteredDecorator({ maxWidth: 600 })],
+	args: {
+		subLinks: [
+			{ label: '職', href: 'http://127.0.0.1:8085/gamedata/job' },
+			{ label: '物', href: 'http://127.0.0.1:8085/gamedata/item' },
+		],
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'最少連結的導航，適用於簡化界面。\nMinimal navigation links for simplified interface.',
+			},
+		},
+	},
+	decorators: [makeCenteredDecorator({ maxWidth: 600 })],
 };
 
 /** 長標籤連結 / Long label links */
 export const LongLabels: Story = {
-  args: {
-    subLinks: [
-      { label: '職業情報(Job Info)', href: 'http://127.0.0.1:8085/gamedata/job' },
-      { label: 'アイテム詳細(Item Details)', href: 'http://127.0.0.1:8085/gamedata/item' },
-      { label: '判定基準(Judgment Criteria)', href: 'http://127.0.0.1:8085/gamedata/judge' },
-      { label: 'モンスター図鑑(Monster Encyclopedia)', href: 'http://127.0.0.1:8085/gamedata/monster' },
-    ],
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '長標籤的導航連結，展示文本包裝效果。\nLong label navigation links showing text wrapping effects.',
-      },
-    },
-  },
-  decorators: [makeCenteredDecorator({ maxWidth: 900 })],
+	args: {
+		subLinks: [
+			{ label: '職業情報(Job Info)', href: 'http://127.0.0.1:8085/gamedata/job' },
+			{ label: 'アイテム詳細(Item Details)', href: 'http://127.0.0.1:8085/gamedata/item' },
+			{ label: '判定基準(Judgment Criteria)', href: 'http://127.0.0.1:8085/gamedata/judge' },
+			{ label: 'モンスター図鑑(Monster Encyclopedia)', href: 'http://127.0.0.1:8085/gamedata/monster' },
+		],
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'長標籤的導航連結，展示文本包裝效果。\nLong label navigation links showing text wrapping effects.',
+			},
+		},
+	},
+	decorators: [makeCenteredDecorator({ maxWidth: 900 })],
 };

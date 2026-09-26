@@ -16,31 +16,40 @@ import type { IJobData, IJobTreeNode } from '#/components/game-data/GameDataType
  * @param jobs - 扁平的職業列表 / Flat job list
  * @returns 樹狀結構的職業列表 / Tree-structured job list
  */
-export function buildJobTree(jobs: IJobData[]): IJobTreeNode[] {
-  const tree: IJobTreeNode[] = [];
-  const map = new Map<number, IJobTreeNode>();
+export function buildJobTree(jobs: IJobData[]): IJobTreeNode[]
+{
+	const tree: IJobTreeNode[] = [];
+	const map = new Map<number, IJobTreeNode>();
 
-  // 建立所有節點 / Create all nodes
-  for (const job of jobs) {
-    map.set(job.id, { job, children: [] });
-  }
+	// 建立所有節點 / Create all nodes
+	for (const job of jobs)
+	{
+		map.set(job.id, { job, children: [] });
+	}
 
-  // 建立父子關係 / Build parent-child relationships
-  for (const job of jobs) {
-    const node = map.get(job.id)!;
-    if (job.parentId === 0) {
-      tree.push(node);
-    } else {
-      const parent = map.get(job.parentId);
-      if (parent) {
-        parent.children.push(node);
-      } else {
-        tree.push(node);
-      }
-    }
-  }
+	// 建立父子關係 / Build parent-child relationships
+	for (const job of jobs)
+	{
+		const node = map.get(job.id)!;
+		if (job.parentId === 0)
+		{
+			tree.push(node);
+		}
+		else
+		{
+			const parent = map.get(job.parentId);
+			if (parent)
+			{
+				parent.children.push(node);
+			}
+			else
+			{
+				tree.push(node);
+			}
+		}
+	}
 
-  return tree;
+	return tree;
 }
 
 /**
@@ -53,15 +62,16 @@ export function buildJobTree(jobs: IJobData[]): IJobTreeNode[] {
  * @param depth - 當前深度（用於縮排） / Current depth (for indentation)
  * @returns React 節點 / React node
  */
-export function renderJobTreeNode(node: IJobTreeNode, depth: number = 0): React.ReactNode {
-  return (
-    <li key={node.job.id} style={{ marginLeft: depth === 0 ? 0 : 40 }}>
-      <a href={`#job-${node.job.id}`}>{node.job.name}</a>
-      {node.children.length > 0 && (
-        <ul>
-          {node.children.map((child) => renderJobTreeNode(child, depth + 1))}
-        </ul>
-      )}
-    </li>
-  );
+export function renderJobTreeNode(node: IJobTreeNode, depth: number = 0): React.ReactNode
+{
+	return (
+		<li key={node.job.id} style={{ marginLeft: depth === 0 ? 0 : 40 }}>
+			<a href={`#job-${node.job.id}`}>{node.job.name}</a>
+			{node.children.length > 0 && (
+				<ul>
+					{node.children.map((child) => renderJobTreeNode(child, depth + 1))}
+				</ul>
+			)}
+		</li>
+	);
 }

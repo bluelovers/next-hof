@@ -21,11 +21,12 @@ import './BattleLog.css';
 import '#/components/shared/SharedBase.css';
 
 /** 戰鬥日誌屬性 / Battle log props */
-export interface IBattleLogProps {
-  /** 行動列表（依時間序）/ Action list (chronological order) */
-  actions: IBattleAction[];
-  /** 是否使用雙欄布局 / Whether to use two-column layout */
-  twoColumn?: boolean;
+export interface IBattleLogProps
+{
+	/** 行動列表（依時間序）/ Action list (chronological order) */
+	actions: IBattleAction[];
+	/** 是否使用雙欄布局 / Whether to use two-column layout */
+	twoColumn?: boolean;
 }
 
 /**
@@ -33,42 +34,45 @@ export interface IBattleLogProps {
  * Battle log component
  */
 export const BattleLog: React.FC<IBattleLogProps> = ({
-  actions,
-  twoColumn = true,
-}) => {
-  // 單欄模式：每個行動獨立一列（維持時間序）
-  // Single-column mode: one row per action (keeps chronological order)
-  if (!twoColumn) {
-    return (
-      <div className="battle-log battle-log--single">
-        {actions.map((action, index) => (
-          <div className="log-row" key={index}>
-            <div className="log-cell log-cell--full">
-              <BattleAction action={action} />
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
+	actions,
+	twoColumn = true,
+}) =>
+{
+	// 單欄模式：每個行動獨立一列（維持時間序）
+	// Single-column mode: one row per action (keeps chronological order)
+	if (!twoColumn)
+	{
+		return (
+			<div className="battle-log battle-log--single">
+				{actions.map((action, index) => (
+					<div className="log-row" key={index}>
+						<div className="log-cell log-cell--full">
+							<BattleAction action={action} />
+						</div>
+					</div>
+				))}
+			</div>
+		);
+	}
 
-  return (
-    <div className="battle-log battle-log--two-col">
-      {actions.map((action, index) => {
-        // 未指定側別時歸左欄（沿用既有行為）
-        // Actions without a side fall back to the left column (prior behaviour)
-        const isRight = action.side === EnumTeamSideUI.Right;
-        return (
-          <div className="log-row" key={index}>
-            <div className={`log-cell log-cell--left ${getSideClass(EnumTeamSideUI.Left)}`}>
-              {!isRight && <BattleAction action={action} />}
-            </div>
-            <div className={`log-cell log-cell--right ${getSideClass(EnumTeamSideUI.Right)}`}>
-              {isRight && <BattleAction action={action} />}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+	return (
+		<div className="battle-log battle-log--two-col">
+			{actions.map((action, index) =>
+			{
+				// 未指定側別時歸左欄（沿用既有行為）
+				// Actions without a side fall back to the left column (prior behaviour)
+				const isRight = action.side === EnumTeamSideUI.Right;
+				return (
+					<div className="log-row" key={index}>
+						<div className={`log-cell log-cell--left ${getSideClass(EnumTeamSideUI.Left)}`}>
+							{!isRight && <BattleAction action={action} />}
+						</div>
+						<div className={`log-cell log-cell--right ${getSideClass(EnumTeamSideUI.Right)}`}>
+							{isRight && <BattleAction action={action} />}
+						</div>
+					</div>
+				);
+			})}
+		</div>
+	);
 };

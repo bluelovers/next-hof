@@ -1,6 +1,7 @@
 import { EnumActionType } from "./enums";
 
-export interface IValueChangeInputCore01 {
+export interface IValueChangeInputCore01
+{
 	/** 變化前（與 to 同時提供時以符號相連）/ Before (joined to `to` by the symbol) */
 	from: React.ReactNode;
 	/** 變化後 / After */
@@ -21,7 +22,8 @@ export interface IValueChangeInputCore01 {
 	type?: EnumActionType;
 }
 
-export interface IValueChangeInputCore02 {
+export interface IValueChangeInputCore02
+{
 	/** 預組好的變化字串（優先採用；與 IBattleAction.valueChangeText 同名同義）/ Pre-assembled change string (wins; same name and meaning as IBattleAction.valueChangeText) */
 	valueChangeText: React.ReactNode;
 }
@@ -66,9 +68,11 @@ export const VALUE_CHANGE_SYMBOL = {
  * @param value - 變化端點 / change endpoint
  * @returns 數值或 undefined / the number or undefined
  */
-function toComparableNumber(value: React.ReactNode): number | undefined {
+function toComparableNumber(value: React.ReactNode): number | undefined
+{
 	if (typeof value === "number") return Number.isFinite(value) ? value : undefined;
-	if (typeof value === "string" && value.trim() !== "") {
+	if (typeof value === "string" && value.trim() !== "")
+	{
 		const parsed = Number(value);
 		return Number.isFinite(parsed) ? parsed : undefined;
 	}
@@ -91,11 +95,13 @@ function toComparableNumber(value: React.ReactNode): number | undefined {
  * @param input - 變化輸入（型別與兩端值）/ change input (the action type and both ends)
  * @returns 符號 / the symbol
  */
-export function getValueChangeSymbol(input: Partial<IValueChangeInputCore01>): string {
+export function getValueChangeSymbol(input: Partial<IValueChangeInputCore01>): string
+{
 	if (input.type === EnumActionType.Delay) return VALUE_CHANGE_SYMBOL.delay;
 	const from = toComparableNumber(input.from);
 	const to = toComparableNumber(input.to);
-	if (from !== undefined && to !== undefined) {
+	if (from !== undefined && to !== undefined)
+	{
 		if (to > from) return VALUE_CHANGE_SYMBOL.rise;
 		if (to < from) return VALUE_CHANGE_SYMBOL.fall;
 	}
@@ -121,10 +127,14 @@ export function getValueChangeSymbol(input: Partial<IValueChangeInputCore01>): s
  * @param input - 變化文字輸入 / Value-change input
  * @returns 變化內容（無資料時 null）/ Change content (null when there is none)
  */
-export function buildValueChange(input: IValueChangeInput) {
+export function buildValueChange(input: IValueChangeInput)
+{
 	if (input.valueChangeText != null) return input.valueChangeText;
-	if (input.from != null && input.to != null) return (
-		<>{input.from} {getValueChangeSymbol(input)} {input.to}</>
-	);
+	if (input.from != null && input.to != null)
+	{
+		return (
+			<>{input.from} {getValueChangeSymbol(input)} {input.to}</>
+		);
+	}
 	return null;
 }

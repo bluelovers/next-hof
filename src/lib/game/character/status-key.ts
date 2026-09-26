@@ -97,21 +97,24 @@ export const STATUS_PLUS_KEYS = Object.values(STATUS_PLUS_KEY_NAME) as string[];
  * @param key 狀態屬性鍵 / status attribute key
  * @returns 對應的 Up 鍵名 / corresponding Up key name
  */
-export function getUpKey(key: string): string {
+export function getUpKey(key: string): string
+{
 	return STATUS_UP_KEY_NAME[key as keyof typeof STATUS_UP_KEY_NAME] ?? `${STATUS_UP_PREFIX}${key}`;
 }
 
 /**
  * 取得 Down 鍵名 / Get Down key name
  */
-export function getDownKey(key: string): string {
+export function getDownKey(key: string): string
+{
 	return STATUS_DOWN_KEY_NAME[key as keyof typeof STATUS_DOWN_KEY_NAME] ?? `${STATUS_DOWN_PREFIX}${key}`;
 }
 
 /**
  * 取得 Plus 鍵名 / Get Plus key name
  */
-export function getPlusKey(key: string): string {
+export function getPlusKey(key: string): string
+{
 	return STATUS_PLUS_KEY_NAME[key as keyof typeof STATUS_PLUS_KEY_NAME] ?? `${STATUS_PLUS_PREFIX}${key}`;
 }
 
@@ -120,6 +123,7 @@ export function getPlusKey(key: string): string {
  * @param key 基礎屬性鍵 / base stat key
  * @returns 補正欄位名稱（如 'P_STR'）/ compensation field name (e.g., 'P_STR')
  */
-export function getCompFieldName(key: string): string {
+export function getCompFieldName(key: string): string
+{
 	return BASE_STAT_COMP_NAMES[key as keyof typeof BASE_STAT_COMP_NAMES]?.comp ?? `${COMP_PREFIX}${key.toUpperCase()}`;
 }

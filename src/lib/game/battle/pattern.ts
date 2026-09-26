@@ -18,7 +18,8 @@ import {
  *
  * Assembled from judge-codes.ts constants instead of inline magic numbers.
  */
-export function buildPattern(char: Character): IPatternItem[] {
+export function buildPattern(char: Character): IPatternItem[]
+{
 	const base = char.behavior?.pattern ? char.behavior.pattern.slice() : [];
 	const pattern: IPatternItem[] = [];
 	pattern.push(DEFAULT_PATTERN_FLEE);
@@ -37,10 +38,13 @@ export function buildPattern(char: Character): IPatternItem[] {
  * quantity is the trigger threshold: 0 always qualifies, otherwise battle.turn >= quantity.
  * Returns the action of the first item whose judge passes and threshold is met; null if none.
  */
-export function MultiFactJudge(keys: IPatternItem[], char: Character, battle?: { turn: number }): number | null {
+export function MultiFactJudge(keys: IPatternItem[], char: Character, battle?: { turn: number }): number | null
+{
 	const turn = battle?.turn ?? 0;
-	for (const item of keys) {
-		if (item.quantity === 0 || turn >= item.quantity) {
+	for (const item of keys)
+	{
+		if (item.quantity === 0 || turn >= item.quantity)
+		{
 			if (DecideJudge(item.judge, char, battle)) return item.action;
 		}
 	}

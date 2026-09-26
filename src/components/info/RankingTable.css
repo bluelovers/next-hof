@@ -8,22 +8,26 @@
 
 /* ==================== 表格容器 / Table wrapper ==================== */
 
-.ranking-table-wrapper {
-  /* 外層 wrapper 樣式（取代 .home-page） */
+.ranking-table-wrapper
+{
+	/* 外層 wrapper 樣式（取代 .home-page） */
 }
 
 /* ==================== 排行榜表格 / Ranking table ==================== */
 
-.ranking-table {
-  border-collapse: collapse;
-  width: 100%;
+.ranking-table
+{
+	border-collapse: collapse;
+	width: 100%;
 }
 
-.ranking-table td {
-  padding: 3px;
+.ranking-table td
+{
+	padding: 3px;
 }
 
-.ranking-table .td-header {
-  background-color: var(--color-bg-mid);
-  text-align: center;
+.ranking-table .td-header
+{
+	background-color: var(--color-bg-mid);
+	text-align: center;
 }

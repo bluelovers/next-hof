@@ -14,7 +14,8 @@ import type { RNG } from '../core/rng';
  * 集中管理 Character 的數字 ID 到字串的轉換，消除散佈的 String(x.no) 呼叫。
  * Centralizes the conversion of numeric character IDs to strings.
  */
-export function charIdToString(no: number): string {
+export function charIdToString(no: number): string
+{
 	return String(no);
 }
 
@@ -22,7 +23,8 @@ export function charIdToString(no: number): string {
  * 角色初始化參數 / Character initialization parameters
  * 介面 / interface
  */
-export interface ICharInit extends ICharCore {
+export interface ICharInit extends ICharCore
+{
 	/** 角色類型集合（char/mon/summon/union 等）/ character type tags (char/mon/summon/union, ...) */
 	types: EnumCharType[];
 	/** 當前累積經驗（怪物可省略）/ accumulated exp (optional for monsters) */
@@ -40,7 +42,8 @@ export interface ICharInit extends ICharCore {
  * 回傳全零的 ISpecial（所有數值欄位歸零、Pierce 為 [0,0]）。
  * Returns an all-zero ISpecial (numeric fields at 0, Pierce as [0,0]).
  */
-export function defaultSpecial(): ISpecial {
+export function defaultSpecial(): ISpecial
+{
 	return {
 		PoisonResist: 0,
 		HealBonus: 0,
@@ -66,7 +69,9 @@ export function defaultSpecial(): ISpecial {
  * `types`/`no` are only a readable prefix for debugging and do not affect uniqueness.
  */
 let unitUidCounter = 0;
-export function buildUnitUid(types: EnumCharType[], no: number, provided?: string): string {
+
+export function buildUnitUid(types: EnumCharType[], no: number, provided?: string): string
+{
 	if (provided) return provided;
 	const prefix = `${types.join('-')}-${no}-`;
 	const cryptoObj = (globalThis as { crypto?: { randomUUID?: () => string } }).crypto;
@@ -75,7 +80,8 @@ export function buildUnitUid(types: EnumCharType[], no: number, provided?: strin
 	return `${prefix}${unitUidCounter.toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-export class Character implements ICharCore {
+export class Character implements ICharCore
+{
 	/** 單位編號 / unit number */
 	no: number;
 	/** 單位名稱 / unit name */
@@ -107,15 +113,28 @@ export class Character implements ICharCore {
 	sp: number;
 
 	// 補正 / compensation
-	P_STR = 0; P_INT = 0; P_DEX = 0; P_SPD = 0; P_LUK = 0;
-	P_MAXHP = 0; P_MAXSP = 0;
-	M_MAXHP = 0; M_MAXSP = 0;
+	P_STR = 0;
+	P_INT = 0;
+	P_DEX = 0;
+	P_SPD = 0;
+	P_LUK = 0;
+	P_MAXHP = 0;
+	P_MAXSP = 0;
+	M_MAXHP = 0;
+	M_MAXSP = 0;
 
 	// 戰鬥屬性 / battle
 	/** 戰鬥六維（基礎值 + P_* 補正，setBattleVariable 計算）/ battle stats (base + P_*, computed by setBattleVariable) */
-	STR = 0; INT = 0; DEX = 0; SPD = 0; LUK = 0;
+	STR = 0;
+	INT = 0;
+	DEX = 0;
+	SPD = 0;
+	LUK = 0;
 	/** 戰鬥用 HP/SP 上限與現值（乘 M_% 加 P_* 後的結果）/ battle HP/SP caps and current values (after M_% scaling and P_* bonuses) */
-	MAXHP = 0; HP = 0; MAXSP = 0; SP = 0;
+	MAXHP = 0;
+	HP = 0;
+	MAXSP = 0;
+	SP = 0;
 	/** 物理/魔法攻擊（來源於裝備；索引同 EnumAtkSlot）/ physical/magic attack from equipment (indices match EnumAtkSlot) */
 	atk: [number, number] = [0, 0];
 	/** [物理%, 物理定值, 魔法%, 魔法定值] 減傷（索引同 EnumDefSlot）/ [phys%, phys flat, mag%, mag flat] reductions (indices match EnumDefSlot) */
@@ -169,7 +188,8 @@ export class Character implements ICharCore {
 	 * hp/sp default to maxhp/maxsp; types become a Set and an instance unitUuid is built
 	 * (overridable via init.unitUuid).
 	 */
-	constructor(init: ICharInit) {
+	constructor(init: ICharInit)
+	{
 		this.no = init.no;
 		this.name = init.name;
 		this.types = new Set(init.types);
@@ -194,40 +214,56 @@ export class Character implements ICharCore {
 	}
 
 	/** 將角色編號轉為字串（供事件日誌使用）/ Convert character number to string (for event logging) */
-	toIdString(): string {
+	toIdString(): string
+	{
 		return charIdToString(this.no);
 	}
 
 	/** 是否為玩家角色 / whether this is a player character */
-	isChar(): boolean { return this.types.has(EnumCharType.Char); }
+	isChar(): boolean
+	{ return this.types.has(EnumCharType.Char); }
+
 	/** 是否為怪物（含召喚物/工會怪）/ whether this is a monster (summons/unions included) */
-	isMon(): boolean { return this.types.has(EnumCharType.Mon); }
+	isMon(): boolean
+	{ return this.types.has(EnumCharType.Mon); }
+
 	/** 是否為召喚物 / whether this is a summon */
-	isSummon(): boolean { return this.types.has(EnumCharType.Summon); }
+	isSummon(): boolean
+	{ return this.types.has(EnumCharType.Summon); }
+
 	/** 是否為工會怪 / whether this is a union monster */
-	isUnion(): boolean { return this.types.has(EnumCharType.Union); }
+	isUnion(): boolean
+	{ return this.types.has(EnumCharType.Union); }
 
 	/** 以字串鍵讀取 SPECIAL 數值（缺省 0）/ read a SPECIAL value by string key (0 when absent) */
-	getSpecial(key: string): number {
+	getSpecial(key: string): number
+	{
 		return (this.SPECIAL as unknown as Record<string, number>)[key] ?? 0;
 	}
+
 	/** 以字串鍵累加 SPECIAL 數值，回傳新值 / add to a SPECIAL value by string key, returning the new value */
-	addSpecial(key: string, amount: number): number {
+	addSpecial(key: string, amount: number): number
+	{
 		const s = this.SPECIAL as unknown as Record<string, number>;
 		s[key] = (s[key] ?? 0) + amount;
 		return s[key];
 	}
+
 	/** 以字串鍵設定 SPECIAL 數值 / set a SPECIAL value by string key */
-	setSpecial(key: string, value: number): void {
+	setSpecial(key: string, value: number): void
+	{
 		(this.SPECIAL as unknown as Record<string, number>)[key] = value;
 	}
 
 	/** HP 百分比（MAXHP=0 時回 0）/ HP percentage (0 when MAXHP is 0) */
-	hpPercent(): number {
+	hpPercent(): number
+	{
 		return this.MAXHP > 0 ? (this.HP / this.MAXHP) * 100 : 0;
 	}
+
 	/** SP 百分比（MAXSP=0 時回 0）/ SP percentage (0 when MAXSP is 0) */
-	spPercent(): number {
+	spPercent(): number
+	{
 		return this.MAXSP > 0 ? (this.SP / this.MAXSP) * 100 : 0;
 	}
 }

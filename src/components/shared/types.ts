@@ -26,8 +26,8 @@ import type { ITSPickExtra } from 'ts-type';
  * optional values passed in (e.g. `action.source`) as missing required properties.
  */
 export type ITSRequiredWith2<T, K extends keyof T = never> = [K] extends [never]
-  ? T
-  : Omit<T, K> & Required<Pick<T, K>>;
+	? T
+	: Omit<T, K> & Required<Pick<T, K>>;
 
 /**
  * 共用樣式屬性基底（className ＋ style）
@@ -44,7 +44,8 @@ export type ITSRequiredWith2<T, K extends keyof T = never> = [K] extends [never]
  * instead of restating `className: string` by hand, so the declaration never drifts from
  * this base.
  */
-export interface IStyleProps {
+export interface IStyleProps
+{
 	/** 附加 CSS class（與元件基礎 class 併存，兩者不互相取代） / Extra CSS class (kept alongside base class) */
 	className?: string;
 	/** 自訂樣式（可複寫或追加） / Custom style */

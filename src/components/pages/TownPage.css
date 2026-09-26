@@ -10,18 +10,20 @@
 
 /* ==================== 城鎮標題 / Town title ==================== */
 
-.town-page .town-page-title {
-  padding-left: 5px;
-  margin: 10px 0px;
-  border-left: 15px solid var(--color-border-heading);
-  border-bottom: 1px solid var(--color-border-heading);
-  display: block;
-  font-size: 13px;
-  color: var(--color-text-primary);
+.town-page .town-page-title
+{
+	padding-left: 5px;
+	margin: 10px 0px;
+	border-left: 15px solid var(--color-border-heading);
+	border-bottom: 1px solid var(--color-border-heading);
+	display: block;
+	font-size: 13px;
+	color: var(--color-text-primary);
 }
 
 /* ==================== 設施區域容器 / Facilities area container ==================== */
 
-.town-page .town-facilities {
-  padding: 10px 15px;
+.town-page .town-facilities
+{
+	padding: 10px 15px;
 }

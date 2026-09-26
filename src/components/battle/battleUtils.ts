@@ -7,18 +7,26 @@
  * Centralizes percentage math, bar colors, and status/attribute → CSS class mappings
  * so BattleUnit and BattleAction share one implementation instead of diverging.
  */
-import { EnumUnitStatus, EnumAttributeType, EnumTeamSideUI, EnumTeamSideClass, EnumActionType, EnumMagicCircleKind, EnumChargeKind } from './enums';
+import {
+	EnumUnitStatus,
+	EnumAttributeType,
+	EnumTeamSideUI,
+	EnumTeamSideClass,
+	EnumActionType,
+	EnumMagicCircleKind,
+	EnumChargeKind,
+} from './enums';
 import { TEAM_SIDE_CLASS } from './types';
 import { computeSpriteFlipped } from './spriteFlip';
 import { corpseSpecOf } from '#/lib/game/battle/corpse-policy';
 import type {
-  IBattleAction,
-  IBattleSegment,
-  IBattleSnapshotDisplay,
-  IBattleSnapshotDisplayUnit,
-  IBattleSprite,
-  IBattleUnit,
-  IMagicCircleRecord,
+	IBattleAction,
+	IBattleSegment,
+	IBattleSnapshotDisplay,
+	IBattleSnapshotDisplayUnit,
+	IBattleSprite,
+	IBattleUnit,
+	IMagicCircleRecord,
 } from './types';
 import { IValueChangeInputCore01 } from './battleUtilsElem';
 
@@ -39,9 +47,10 @@ const BAR_LOW_COLOR = '#cc3300';
  * @param max - 最大值 / Maximum value
  * @returns 0–100 的百分比 / Percentage in 0–100
  */
-export function clampPercent(value: number, max: number): number {
-  if (max <= 0) return 0;
-  return Math.max(0, Math.min(100, (value / max) * 100));
+export function clampPercent(value: number, max: number): number
+{
+	if (max <= 0) return 0;
+	return Math.max(0, Math.min(100, (value / max) * 100));
 }
 
 /**
@@ -52,56 +61,63 @@ export function clampPercent(value: number, max: number): number {
  * @param highColor - 高血量時的顏色 / Color when above the high threshold
  * @returns CSS 顏色字串 / CSS color string
  */
-export function getBarColor(pct: number, highColor: string): string {
-  if (pct > BAR_HIGH_THRESHOLD) return highColor;
-  if (pct > BAR_MID_THRESHOLD) return BAR_WARN_COLOR;
-  return BAR_LOW_COLOR;
+export function getBarColor(pct: number, highColor: string): string
+{
+	if (pct > BAR_HIGH_THRESHOLD) return highColor;
+	if (pct > BAR_MID_THRESHOLD) return BAR_WARN_COLOR;
+	return BAR_LOW_COLOR;
 }
 
 /** HP 條顏色（高血量為藍） / HP bar color (blue when high) */
-export function getHpBarColor(pct: number): string {
-  return getBarColor(pct, '#3366ff');
+export function getHpBarColor(pct: number): string
+{
+	return getBarColor(pct, '#3366ff');
 }
 
 /** SP 條顏色（高血量為綠） / SP bar color (green when high) */
-export function getSpBarColor(pct: number): string {
-  return getBarColor(pct, '#66cc66');
+export function getSpBarColor(pct: number): string
+{
+	return getBarColor(pct, '#66cc66');
 }
 
 /**
  * 依單位狀態取得 CSS 類別
  * Get CSS class from unit status
  */
-export function getStatusClass(status?: EnumUnitStatus): string {
-  switch (status) {
-    case EnumUnitStatus.Down:
-      return 'dmg';
-    case EnumUnitStatus.Casting:
-      return 'charge';
-    default:
-      return '';
-  }
+export function getStatusClass(status?: EnumUnitStatus): string
+{
+	switch (status)
+	{
+		case EnumUnitStatus.Down:
+			return 'dmg';
+		case EnumUnitStatus.Casting:
+			return 'charge';
+		default:
+			return '';
+	}
 }
 
 /**
  * 依屬性類型取得 CSS 類別
  * Get CSS class from attribute type
  */
-export function getAttrClass(attr?: EnumAttributeType): string {
-  switch (attr) {
-    case EnumAttributeType.Dmg:
-      return 'dmg';
-    case EnumAttributeType.Recover:
-      return 'recover';
-    case EnumAttributeType.Support:
-      return 'support';
-    case EnumAttributeType.Charge:
-      return 'charge';
-    case EnumAttributeType.Spdmg:
-      return 'spdmg';
-    default:
-      return '';
-  }
+export function getAttrClass(attr?: EnumAttributeType): string
+{
+	switch (attr)
+	{
+		case EnumAttributeType.Dmg:
+			return 'dmg';
+		case EnumAttributeType.Recover:
+			return 'recover';
+		case EnumAttributeType.Support:
+			return 'support';
+		case EnumAttributeType.Charge:
+			return 'charge';
+		case EnumAttributeType.Spdmg:
+			return 'spdmg';
+		default:
+			return '';
+	}
 }
 
 /**
@@ -111,8 +127,9 @@ export function getAttrClass(attr?: EnumAttributeType): string {
  * @param side - 隊伍側 / Team side
  * @returns CSS class 字串 / CSS class string
  */
-export function getSideClass(side: EnumTeamSideUI): EnumTeamSideClass {
-  return TEAM_SIDE_CLASS[side];
+export function getSideClass(side: EnumTeamSideUI): EnumTeamSideClass
+{
+	return TEAM_SIDE_CLASS[side];
 }
 
 /**
@@ -127,10 +144,11 @@ export function getSideClass(side: EnumTeamSideUI): EnumTeamSideClass {
  * @returns CSS class 字串 / CSS class string
  */
 export function getStateTextClass(
-  status?: EnumUnitStatus,
-  fallback: EnumAttributeType = EnumAttributeType.Recover
-): string {
-  return status === EnumUnitStatus.Down ? 'dmg' : fallback;
+	status?: EnumUnitStatus,
+	fallback: EnumAttributeType = EnumAttributeType.Recover,
+): string
+{
+	return status === EnumUnitStatus.Down ? 'dmg' : fallback;
 }
 
 /**
@@ -148,9 +166,10 @@ export function getStateTextClass(
  * @param type - 行動類型 / Action type
  * @returns CSS class 字串 / CSS class string
  */
-export function getValueChangeClass(type?: EnumActionType): string {
-  if (type === EnumActionType.Poison) return 'spdmg';
-  return '';
+export function getValueChangeClass(type?: EnumActionType): string
+{
+	if (type === EnumActionType.Poison) return 'spdmg';
+	return '';
 }
 
 /**
@@ -162,10 +181,10 @@ export function getValueChangeClass(type?: EnumActionType): string {
  * (Battle/Skill.php).
  */
 export const MAGIC_CIRCLE_PHRASE: Record<EnumMagicCircleKind, string> = {
-  [EnumMagicCircleKind.Draw]: 'draw MagicCircle',
-  [EnumMagicCircleKind.EraseEnemy]: 'erased enemy MagicCircle',
-  [EnumMagicCircleKind.Use]: 'use MagicCircle',
-  [EnumMagicCircleKind.Fail]: "failed!(MagicCircle isn't enough)",
+	[EnumMagicCircleKind.Draw]: 'draw MagicCircle',
+	[EnumMagicCircleKind.EraseEnemy]: 'erased enemy MagicCircle',
+	[EnumMagicCircleKind.Use]: 'use MagicCircle',
+	[EnumMagicCircleKind.Fail]: "failed!(MagicCircle isn't enough)",
 };
 
 /**
@@ -179,17 +198,19 @@ export const MAGIC_CIRCLE_PHRASE: Record<EnumMagicCircleKind, string> = {
  * @param kind - 紀錄種類（缺省視為 draw）/ Record kind (defaults to draw)
  * @returns CSS class 字串 / CSS class string
  */
-export function getMagicCircleClass(kind?: EnumMagicCircleKind): string {
-  switch (kind) {
-    case EnumMagicCircleKind.EraseEnemy:
-    case EnumMagicCircleKind.Fail:
-      return 'dmg';
-    case EnumMagicCircleKind.Use:
-      return 'charge';
-    case EnumMagicCircleKind.Draw:
-    default:
-      return 'support';
-  }
+export function getMagicCircleClass(kind?: EnumMagicCircleKind): string
+{
+	switch (kind)
+	{
+		case EnumMagicCircleKind.EraseEnemy:
+		case EnumMagicCircleKind.Fail:
+			return 'dmg';
+		case EnumMagicCircleKind.Use:
+			return 'charge';
+		case EnumMagicCircleKind.Draw:
+		default:
+			return 'support';
+	}
 }
 
 /**
@@ -203,12 +224,13 @@ export function getMagicCircleClass(kind?: EnumMagicCircleKind): string {
  * @param record - 魔方陣紀錄 / Magic-circle record
  * @returns 訊息文字 / Message text
  */
-export function buildMagicCircleMessage(source?: string, record?: IMagicCircleRecord): string {
-  const kind = record?.kind ?? EnumMagicCircleKind.Draw;
-  const phrase = MAGIC_CIRCLE_PHRASE[kind];
-  if (kind === EnumMagicCircleKind.Fail) return phrase;
-  const amount = record?.amount !== undefined ? ` x${record.amount}` : '';
-  return `${source ?? ''} ${phrase}${amount}`.trim();
+export function buildMagicCircleMessage(source?: string, record?: IMagicCircleRecord): string
+{
+	const kind = record?.kind ?? EnumMagicCircleKind.Draw;
+	const phrase = MAGIC_CIRCLE_PHRASE[kind];
+	if (kind === EnumMagicCircleKind.Fail) return phrase;
+	const amount = record?.amount !== undefined ? ` x${record.amount}` : '';
+	return `${source ?? ''} ${phrase}${amount}`.trim();
 }
 
 // ==================== 原始日誌文案（單一事實來源）/ Original log copy (single source of truth) ====================
@@ -244,73 +266,75 @@ export function buildMagicCircleMessage(source?: string, record?: IMagicCircleRe
  * and never retype the strings elsewhere (cf. Skill.php's `Name Delayed`, Effect.php's
  * `moved to front.`, …). Copy carrying a value always goes through the buildXxx builders below.
  */
-export enum EnumLogCopy {
-  // ---- 復活・增益 / Revive & buff ----
-  /** 復活（`name revived!`）/ revive (`name revived!`) */
-  Revived = 'revived!',
-  /** 障壁（`name got barriered!`）/ barrier (`name got barriered!`) */
-  Barriered = 'got barriered!',
-  /** 加速（`name got quicked!`）/ quick (`name got quicked!`) */
-  Quicked = 'got quicked!',
-  /** 施法縮短（`name casting shorted!`）/ casting shorted (`name casting shorted!`) */
-  CastingShorted = 'casting shorted!',
+export enum EnumLogCopy
+{
+	// ---- 復活・增益 / Revive & buff ----
+	/** 復活（`name revived!`）/ revive (`name revived!`) */
+	Revived = 'revived!',
+	/** 障壁（`name got barriered!`）/ barrier (`name got barriered!`) */
+	Barriered = 'got barriered!',
+	/** 加速（`name got quicked!`）/ quick (`name got quicked!`) */
+	Quicked = 'got quicked!',
+	/** 施法縮短（`name casting shorted!`）/ casting shorted (`name casting shorted!`) */
+	CastingShorted = 'casting shorted!',
 
-  // ---- 中毒 / Poison ----
-  /** 中毒施加（`name get poisoned !`，` ` 為 NBSP）/ poison applied (`name get poisoned !`) */
-  PoisonApplied = 'get poisoned\u00a0!',
-  /** 抗毒（`name blocked poison.`）/ poison resisted (`name blocked poison.`) */
-  PoisonBlocked = 'blocked poison.',
-  /** 自我中毒（`Got poisoned`，無名稱）/ self-poison (`Got poisoned`, unnamed) */
-  PoisonSelf = 'Got poisoned',
+	// ---- 中毒 / Poison ----
+	/** 中毒施加（`name get poisoned !`，` ` 為 NBSP）/ poison applied (`name get poisoned !`) */
+	PoisonApplied = 'get poisoned\u00a0!',
+	/** 抗毒（`name blocked poison.`）/ poison resisted (`name blocked poison.`) */
+	PoisonBlocked = 'blocked poison.',
+	/** 自我中毒（`Got poisoned`，無名稱）/ self-poison (`Got poisoned`, unnamed) */
+	PoisonSelf = 'Got poisoned',
 
-  // ---- 位移 / Movement ----
-  /** 移至前方 / moved to the front */
-  MoveToFront = 'moved to front.',
-  /** 移至後方 / moved to the back */
-  MoveToBack = 'moved to back.',
-  /** 擊退（`knock backed!`）/ knocked back (`knock backed!`) */
-  KnockBacked = 'knock backed!',
-  /** 前進（`goes forward.`）/ goes forward (`goes forward.`) */
-  GoesForward = 'goes forward.',
+	// ---- 位移 / Movement ----
+	/** 移至前方 / moved to the front */
+	MoveToFront = 'moved to front.',
+	/** 移至後方 / moved to the back */
+	MoveToBack = 'moved to back.',
+	/** 擊退（`knock backed!`）/ knocked back (`knock backed!`) */
+	KnockBacked = 'knock backed!',
+	/** 前進（`goes forward.`）/ goes forward (`goes forward.`) */
+	GoesForward = 'goes forward.',
 
-  // ---- 延遲・未命中・升級 / Delay, miss & level up ----
-  /** 延遲（Skill.php `Name Delayed`）/ delay (Skill.php's `Name Delayed`) */
-  Delay = 'Delayed',
-  /** 未命中（`name Failed!`）/ miss (`name Failed!`) */
-  Miss = 'Failed!',
-  /** 升級（`name LevelUp!`）/ level up (`name LevelUp!`) */
-  LevelUp = 'LevelUp!',
+	// ---- 延遲・未命中・升級 / Delay, miss & level up ----
+	/** 延遲（Skill.php `Name Delayed`）/ delay (Skill.php's `Name Delayed`) */
+	Delay = 'Delayed',
+	/** 未命中（`name Failed!`）/ miss (`name Failed!`) */
+	Miss = 'Failed!',
+	/** 升級（`name LevelUp!`）/ level up (`name LevelUp!`) */
+	LevelUp = 'LevelUp!',
 
-  // ---- 純文字資訊 / Plain info ----
-  /** 無目標（`No target.Failed!`）/ no target (`No target.Failed!`) */
-  InfoNoTarget = 'No target.Failed!',
-  /** 攻擊消失（`Attack has disappeared.`）/ attack gone (`Attack has disappeared.`) */
-  InfoAttackGone = 'Attack has disappeared.',
-  /** 値過大補正（`※値が大きすぎて補正されました。`）/ value capped (`※値が大きすぎて補正されました。`) */
-  InfoOverCap = '※値が大きすぎて補正されました。',
-  /** 戰鬥回合延長（`battle turns extended.`）/ battle turns extended (`battle turns extended.`) */
-  InfoBattleTurns = 'battle turns extended.',
-  /** 無更多型態（`(No more patterns)`）/ no more patterns (`(No more patterns)`) */
-  InfoNoMorePatterns = '(No more patterns)',
-  /** 思考中未行動（名稱之後的片段）/ sunk in thought and could not act (fragment after the name) */
-  InfoSunkInThought = "sunk in thought and couldn't act.",
+	// ---- 純文字資訊 / Plain info ----
+	/** 無目標（`No target.Failed!`）/ no target (`No target.Failed!`) */
+	InfoNoTarget = 'No target.Failed!',
+	/** 攻擊消失（`Attack has disappeared.`）/ attack gone (`Attack has disappeared.`) */
+	InfoAttackGone = 'Attack has disappeared.',
+	/** 値過大補正（`※値が大きすぎて補正されました。`）/ value capped (`※値が大きすぎて補正されました。`) */
+	InfoOverCap = '※値が大きすぎて補正されました。',
+	/** 戰鬥回合延長（`battle turns extended.`）/ battle turns extended (`battle turns extended.`) */
+	InfoBattleTurns = 'battle turns extended.',
+	/** 無更多型態（`(No more patterns)`）/ no more patterns (`(No more patterns)`) */
+	InfoNoMorePatterns = '(No more patterns)',
+	/** 思考中未行動（名稱之後的片段）/ sunk in thought and could not act (fragment after the name) */
+	InfoSunkInThought = "sunk in thought and couldn't act.",
 
-  // ---- HP/SP 交換 / HP/SP exchange ----
-  /** 交換比率（名稱之後的片段）/ exchanged rate (fragment after the name) */
-  EnergyExchange = 'exchanged rate of HP and SP.',
+	// ---- HP/SP 交換 / HP/SP exchange ----
+	/** 交換比率（名稱之後的片段）/ exchanged rate (fragment after the name) */
+	EnergyExchange = 'exchanged rate of HP and SP.',
 }
 
 /**
  * 文案欄位輸入（source／text／message 的統一形狀）
  * Copy-field input (the one shape shared by source / text / message)
  */
-export interface IActionCopyInput {
-  /** 粗體主詞（名稱）/ the bold subject (name) */
-  source?: string;
-  /** 名稱之後的文案 / copy after the name */
-  text?: string;
-  /** 已是整行的文案（優先採用，跳過合併）/ pre-assembled whole line (wins; skips the join) */
-  message?: string;
+export interface IActionCopyInput
+{
+	/** 粗體主詞（名稱）/ the bold subject (name) */
+	source?: string;
+	/** 名稱之後的文案 / copy after the name */
+	text?: string;
+	/** 已是整行的文案（優先採用，跳過合併）/ pre-assembled whole line (wins; skips the join) */
+	message?: string;
 }
 
 /**
@@ -332,12 +356,13 @@ export interface IActionCopyInput {
  * @param input - 文案欄位 / copy fields
  * @returns 整行純文字 / the whole plain line
  */
-export function buildActionMessage(input: IActionCopyInput): string {
-  if (input.message !== undefined) return input.message;
-  if (input.text === undefined) return input.source ?? '';
-  if (!input.source) return input.text;
-  const separator = input.text.startsWith("'s ") ? '' : ' ';
-  return `${input.source}${separator}${input.text}`;
+export function buildActionMessage(input: IActionCopyInput): string
+{
+	if (input.message !== undefined) return input.message;
+	if (input.text === undefined) return input.source ?? '';
+	if (!input.source) return input.text;
+	const separator = input.text.startsWith("'s ") ? '' : ' ';
+	return `${input.source}${separator}${input.text}`;
 }
 
 /**
@@ -352,8 +377,9 @@ export function buildActionMessage(input: IActionCopyInput): string {
  * @param text - 所有格之後的文字 / Text after the possessive
  * @returns 名稱之後的文案片段 / the fragment that follows the name
  */
-export function buildPossessiveText(text: string): string {
-  return `'s ${text}`;
+export function buildPossessiveText(text: string): string
+{
+	return `'s ${text}`;
 }
 
 /**
@@ -374,11 +400,12 @@ export function buildPossessiveText(text: string): string {
  * @returns 粗體主詞與其後的文案 / the bold subject and the copy that follows
  */
 export function getNamedCopy(action: Pick<IBattleAction, 'source' | 'text' | 'message'>): {
-  subject?: string;
-  text: string;
-} {
-  if (action.text !== undefined) return { subject: action.source, text: action.text };
-  return { text: action.message };
+	subject?: string;
+	text: string;
+}
+{
+	if (action.text !== undefined) return { subject: action.source, text: action.text };
+	return { text: action.message };
 }
 
 /**
@@ -396,48 +423,56 @@ export function getNamedCopy(action: Pick<IBattleAction, 'source' | 'text' | 'me
  * @returns 是否走守護分支 / true when the guarding branch applies
  */
 export function isProtectingGuard(
-  source: string | undefined,
-  target: string | undefined,
-): target is string {
-  return Boolean(source) && Boolean(target) && source !== target;
+	source: string | undefined,
+	target: string | undefined,
+): target is string
+{
+	return Boolean(source) && Boolean(target) && source !== target;
 }
 
 /**
  * 蓄力／詠唱文案片段（`start charging.` / `start casting.`；粗體名稱由版面補上）
  * Charge/casting fragment (`start charging.` / `start casting.`; the layout prints the bold name)
  */
-export function buildChargeText(castType?: EnumChargeKind): string {
-  return `start ${castType ?? EnumChargeKind.Casting}.`;
+export function buildChargeText(castType?: EnumChargeKind): string
+{
+	return `start ${castType ?? EnumChargeKind.Casting}.`;
 }
 
 /** SP 傷害（`NSP Damage to target`，數值與 SP 間無空格）/ SP damage (no space between the value and "SP Damage") */
-export function buildSpDamageMessage(value: number, target?: string): string {
-  return target ? `${value}SP Damage to ${target}` : `${value}SP Damage`;
+export function buildSpDamageMessage(value: number, target?: string): string
+{
+	return target ? `${value}SP Damage to ${target}` : `${value}SP Damage`;
 }
 
 /** 回復文案片段（`Recovered N HP`；對應 IBattleAction.text）/ Recovery fragment (`Recovered N HP`) */
-export function buildRecoveredText(value: number, unit: string): string {
-  return `Recovered ${value} ${unit}`;
+export function buildRecoveredText(value: number, unit: string): string
+{
+	return `Recovered ${value} ${unit}`;
 }
 
 /** 吸取（`Drained N HP from target`）/ Drain (`Drained N HP from target`) */
-export function buildDrainMessage(value: number, unit: string, target?: string): string {
-  return target ? `Drained ${value} ${unit} from ${target}` : `Drained ${value} ${unit}`;
+export function buildDrainMessage(value: number, unit: string, target?: string): string
+{
+	return target ? `Drained ${value} ${unit} from ${target}` : `Drained ${value} ${unit}`;
 }
 
 /** 持續回復文案片段（`gained HP regeneration +N%`）/ Regen fragment (`gained HP regeneration +N%`) */
-export function buildRegenText(unit: string, value: number): string {
-  return `gained ${unit} regeneration +${value}%`;
+export function buildRegenText(unit: string, value: number): string
+{
+	return `gained ${unit} regeneration +${value}%`;
 }
 
 /** 自動回復文案片段（`Auto Regenerate N HP`）/ Auto-regenerate fragment (`Auto Regenerate N HP`) */
-export function buildAutoRegenText(unit: string, value: number): string {
-  return `Auto Regenerate ${value} ${unit}`;
+export function buildAutoRegenText(unit: string, value: number): string
+{
+	return `Auto Regenerate ${value} ${unit}`;
 }
 
 /** 犧牲文案片段（`sacrifice N HP`）/ Sacrifice fragment (`sacrifice N HP`) */
-export function buildSacrificeText(value: number): string {
-  return `sacrifice ${value} HP`;
+export function buildSacrificeText(value: number): string
+{
+	return `sacrifice ${value} HP`;
 }
 
 /**
@@ -445,33 +480,35 @@ export function buildSacrificeText(value: number): string {
  * Stat-change fragment (`STR rise 10%` / `STR down 10%` / `ATK rise to the maximum(100%)`)
  */
 export function buildStatChangeText(
-  stat: string,
-  direction: 'rise' | 'down',
-  value: number,
-  unit = '%',
-  atMaximum = false
-): string {
-  const tail = atMaximum ? `${direction} to the maximum(${value}${unit})` : `${direction} ${value}${unit}`;
-  return `${stat} ${tail}`;
+	stat: string,
+	direction: 'rise' | 'down',
+	value: number,
+	unit = '%',
+	atMaximum = false,
+): string
+{
+	const tail = atMaximum ? `${direction} to the maximum(${value}${unit})` : `${direction} ${value}${unit}`;
+	return `${stat} ${tail}`;
 }
 
 /** 上限升降文案片段（`MAXHP(舊值) extended to 999` / `MAXSP(舊值) down to 500`）/ Cap-change fragment */
 export function buildStatToText(
-  stat: string,
-  direction: 'extended' | 'down to',
-  value: number,
-  from?: number
-): string {
-  // `extended` 補回介係詞 `to`；有舊值時帶出 `(舊值)`，與原始日誌逐字一致
-  // `extended` regains the preposition `to`; when an old value exists it is shown as `(old)`,
-  // matching the original log verbatim
-  const phrase = direction === 'extended' ? 'extended to' : direction;
-  // 有舊值時帶出 `(舊值) `，否則補一個空格，使 `MAXHP extended to` 與
-  // `MAXHP(500) extended to` 都與原始日誌逐字一致。
-  // With an old value it shows `(old) `, otherwise a single space, so both
-  // `MAXHP extended to` and `MAXHP(500) extended to` match the original log verbatim.
-  const lead = from !== undefined ? `(${from}) ` : ' ';
-  return `${stat}${lead}${phrase} ${value}`;
+	stat: string,
+	direction: 'extended' | 'down to',
+	value: number,
+	from?: number,
+): string
+{
+	// `extended` 補回介係詞 `to`；有舊值時帶出 `(舊值)`，與原始日誌逐字一致
+	// `extended` regains the preposition `to`; when an old value exists it is shown as `(old)`,
+	// matching the original log verbatim
+	const phrase = direction === 'extended' ? 'extended to' : direction;
+	// 有舊值時帶出 `(舊值) `，否則補一個空格，使 `MAXHP extended to` 與
+	// `MAXHP(500) extended to` 都與原始日誌逐字一致。
+	// With an old value it shows `(old) `, otherwise a single space, so both
+	// `MAXHP extended to` and `MAXHP(500) extended to` match the original log verbatim.
+	const lead = from !== undefined ? `(${from}) ` : ' ';
+	return `${stat}${lead}${phrase} ${value}`;
 }
 
 /**
@@ -490,15 +527,16 @@ export function buildStatToText(
  * @returns 結構化數值變化 / the structured value change
  */
 export function buildValueChangeFromDelay(
-  oldValue: number,
-  newValue: number,
-  base: number
-): IValueChangeInputCore01 {
-  return {
-    from: oldValue,
-    to: `${newValue}/${base}`,
-    type: EnumActionType.Delay,
-  };
+	oldValue: number,
+	newValue: number,
+	base: number,
+): IValueChangeInputCore01
+{
+	return {
+		from: oldValue,
+		to: `${newValue}/${base}`,
+		type: EnumActionType.Delay,
+	};
 }
 
 /**
@@ -513,8 +551,9 @@ export function buildValueChangeFromDelay(
  * @param skillName - 技能名稱（缺省時只輸出名稱）/ Skill name (only the name prints when absent)
  * @returns 整行純文字 / The whole plain line
  */
-export function buildActMessage(source: string | undefined, skillName?: string): string {
-  return skillName !== undefined ? buildActionMessage({ source, text: skillName }) : source ?? '';
+export function buildActMessage(source: string | undefined, skillName?: string): string
+{
+	return skillName !== undefined ? buildActionMessage({ source, text: skillName }) : source ?? '';
 }
 
 /**
@@ -525,8 +564,9 @@ export function buildActMessage(source: string | undefined, skillName?: string):
  * @param target - 目標名稱（缺省時省略 ` to target`）/ Target name (the ` to target` part drops when absent)
  * @returns 訊息文字 / Message text
  */
-export function buildDamageMessage(value: number, target?: string): string {
-  return target ? `${value} Damage to ${target}` : `${value} Damage`;
+export function buildDamageMessage(value: number, target?: string): string
+{
+	return target ? `${value} Damage to ${target}` : `${value} Damage`;
 }
 
 /**
@@ -544,10 +584,11 @@ export function buildDamageMessage(value: number, target?: string): string {
  * @param target - 受療者名稱（缺省時省略名稱）/ Healed unit name (dropped when absent)
  * @returns 整行純文字 / The whole plain line
  */
-export function buildHealMessage(value: number, target?: string): string {
-  return target
-    ? buildActionMessage({ source: target, text: buildRecoveredText(value, 'HP') })
-    : `${value} Heal`;
+export function buildHealMessage(value: number, target?: string): string
+{
+	return target
+		? buildActionMessage({ source: target, text: buildRecoveredText(value, 'HP') })
+		: `${value} Heal`;
 }
 
 /**
@@ -562,11 +603,13 @@ export function buildHealMessage(value: number, target?: string): string {
  * @param target - 被守護單位（與 actor 相同或缺省時走兜底文案）/ Guarded unit (same as actor or absent → fallback)
  * @returns 訊息文字 / Message text
  */
-export function buildProtectMessage(actor?: string, target?: string): string {
-  if (isProtectingGuard(actor, target)) {
-    return `${actor} protected ${target}!`;
-  }
-  return `${actor ?? 'Unknown'} blocked the attack with barrier!`;
+export function buildProtectMessage(actor?: string, target?: string): string
+{
+	if (isProtectingGuard(actor, target))
+	{
+		return `${actor} protected ${target}!`;
+	}
+	return `${actor ?? 'Unknown'} blocked the attack with barrier!`;
 }
 
 /**
@@ -575,8 +618,9 @@ export function buildProtectMessage(actor?: string, target?: string): string {
  * @param name - 倒下單位名稱 / Name of the fallen unit
  * @returns 訊息文字 / Message text
  */
-export function buildDownMessage(name: string): string {
-  return `${name} down.`;
+export function buildDownMessage(name: string): string
+{
+	return `${name} down.`;
 }
 
 /**
@@ -587,8 +631,9 @@ export function buildDownMessage(name: string): string {
  * @param actorName - 施放者名稱 / Caster name
  * @returns 訊息文字 / Message text
  */
-export function buildSummonMessage(targetName?: string, actorName?: string): string {
-  return targetName ? `${targetName} joined to the team.` : `${actorName ?? ''} summon.`;
+export function buildSummonMessage(targetName?: string, actorName?: string): string
+{
+	return targetName ? `${targetName} joined to the team.` : `${actorName ?? ''} summon.`;
 }
 
 /**
@@ -602,8 +647,9 @@ export function buildSummonMessage(targetName?: string, actorName?: string): str
  * @param itemName - 道具名稱 / Item name
  * @returns 整行純文字 / The whole plain line
  */
-export function buildItemDropMessage(source: string | undefined, itemName: string): string {
-  return source ? `${source} dropped ${itemName}.` : `${itemName}.`;
+export function buildItemDropMessage(source: string | undefined, itemName: string): string
+{
+	return source ? `${source} dropped ${itemName}.` : `${itemName}.`;
 }
 
 /**
@@ -619,10 +665,11 @@ export function buildItemDropMessage(source: string | undefined, itemName: strin
  * @param reason - 失敗原因（含括號，可省略）/ Failure reason (already parenthesised, optional)
  * @returns 整行純文字 / The whole plain line
  */
-export function buildFailMessage(source?: string, skillName?: string, reason?: string): string {
-  const head = skillName ? `Failed ${skillName}` : 'Failed';
-  const line = source ? `${source} ${head}` : head;
-  return reason ? `${line} ${reason}` : line;
+export function buildFailMessage(source?: string, skillName?: string, reason?: string): string
+{
+	const head = skillName ? `Failed ${skillName}` : 'Failed';
+	const line = source ? `${source} ${head}` : head;
+	return reason ? `${line} ${reason}` : line;
 }
 
 /**
@@ -636,8 +683,9 @@ export function buildFailMessage(source?: string, skillName?: string, reason?: s
  * @param value - 本回合傷害 / this turn's damage
  * @returns 名稱之後的片段 / the fragment after the name
  */
-export function buildPoisonDamageText(value: number): string {
-  return `got ${value} damage by poison.`;
+export function buildPoisonDamageText(value: number): string
+{
+	return `got ${value} damage by poison.`;
 }
 
 /**
@@ -646,8 +694,9 @@ export function buildPoisonDamageText(value: number): string {
  * @param rate - 抵抗率（%）/ resist rate (%)
  * @returns 名稱之後的片段 / the fragment after the name
  */
-export function buildPoisonResistText(rate: number): string {
-  return `got PoisonResist!(${rate}%)`;
+export function buildPoisonResistText(rate: number): string
+{
+	return `got PoisonResist!(${rate}%)`;
 }
 
 /**
@@ -656,8 +705,9 @@ export function buildPoisonResistText(rate: number): string {
  * @param count - 傷害次數 / number of hits
  * @returns 整行純文字 / the whole plain line
  */
-export function buildDamageCountMessage(count: number): string {
-  return `Damage x${count}!`;
+export function buildDamageCountMessage(count: number): string
+{
+	return `Damage x${count}!`;
 }
 
 /**
@@ -667,8 +717,9 @@ export function buildDamageCountMessage(count: number): string {
  * @param exp - 獲得的經驗值 / experience gained
  * @returns 整行純文字 / the whole plain line
  */
-export function buildAliveExpsMessage(exp: number): string {
-  return `Alives get ${exp}exps.`;
+export function buildAliveExpsMessage(exp: number): string
+{
+	return `Alives get ${exp}exps.`;
 }
 
 /**
@@ -683,24 +734,25 @@ export function buildAliveExpsMessage(exp: number): string {
  * @param gold - 金額 / the amount
  * @returns 整行純文字 / the whole plain line
  */
-export function buildTeamGoldMessage(team: string, gold: number): string {
-  return `${team} Get ${gold.toLocaleString('en-US')}.`;
+export function buildTeamGoldMessage(team: string, gold: number): string
+{
+	return `${team} Get ${gold.toLocaleString('en-US')}.`;
 }
 
 /** 訊息型別 → CSS class（單一事實來源）/ Action type → CSS class (single source of truth) */
 const MESSAGE_CLASS: Partial<Record<EnumActionType, string>> = {
-  [EnumActionType.Damage]: 'dmg',
-  [EnumActionType.Down]: 'dmg',
-  [EnumActionType.Fail]: 'dmg',
-  [EnumActionType.Sacrifice]: 'dmg',
-  [EnumActionType.SpDamage]: 'spdmg',
-  [EnumActionType.Heal]: 'recover',
-  [EnumActionType.Revive]: 'recover',
-  [EnumActionType.Casting]: 'charge',
-  [EnumActionType.LevelUp]: 'levelup',
-  [EnumActionType.Enter]: 'result',
-  [EnumActionType.Leave]: 'dmg',
-  [EnumActionType.ItemDrop]: 'u',
+	[EnumActionType.Damage]: 'dmg',
+	[EnumActionType.Down]: 'dmg',
+	[EnumActionType.Fail]: 'dmg',
+	[EnumActionType.Sacrifice]: 'dmg',
+	[EnumActionType.SpDamage]: 'spdmg',
+	[EnumActionType.Heal]: 'recover',
+	[EnumActionType.Revive]: 'recover',
+	[EnumActionType.Casting]: 'charge',
+	[EnumActionType.LevelUp]: 'levelup',
+	[EnumActionType.Enter]: 'result',
+	[EnumActionType.Leave]: 'dmg',
+	[EnumActionType.ItemDrop]: 'u',
 };
 
 /**
@@ -721,24 +773,26 @@ const MESSAGE_CLASS: Partial<Record<EnumActionType, string>> = {
  * StatChange / Move / Delay / Info carry no span in the original log and fall back to
  * the default colour.
  */
-export function getMessageClass(action: IBattleAction): string {
-  switch (action.type) {
-    case EnumActionType.Recover:
-    case EnumActionType.Heal:
-    case EnumActionType.Drain:
-    case EnumActionType.Regen:
-      return action.valueUnit === 'SP' ? 'support' : 'recover';
-    // Buff／Poison 支援以 attribute 覆寫：未指定才取家族預設色，
-    // 明確指定（含 Normal＝不著色）一律尊重原值。
-    // Buff / Poison accept an attribute override: the family default applies only when no
-    // attribute is given; an explicit one (Normal = uncoloured included) is always honoured.
-    case EnumActionType.Buff:
-      return action.attribute !== undefined ? getAttrClass(action.attribute) : 'support';
-    case EnumActionType.Poison:
-      return action.attribute !== undefined ? getAttrClass(action.attribute) : 'spdmg';
-    default:
-      return MESSAGE_CLASS[action.type] ?? getAttrClass(action.attribute);
-  }
+export function getMessageClass(action: IBattleAction): string
+{
+	switch (action.type)
+	{
+		case EnumActionType.Recover:
+		case EnumActionType.Heal:
+		case EnumActionType.Drain:
+		case EnumActionType.Regen:
+			return action.valueUnit === 'SP' ? 'support' : 'recover';
+		// Buff／Poison 支援以 attribute 覆寫：未指定才取家族預設色，
+		// 明確指定（含 Normal＝不著色）一律尊重原值。
+		// Buff / Poison accept an attribute override: the family default applies only when no
+		// attribute is given; an explicit one (Normal = uncoloured included) is always honoured.
+		case EnumActionType.Buff:
+			return action.attribute !== undefined ? getAttrClass(action.attribute) : 'support';
+		case EnumActionType.Poison:
+			return action.attribute !== undefined ? getAttrClass(action.attribute) : 'spdmg';
+		default:
+			return MESSAGE_CLASS[action.type] ?? getAttrClass(action.attribute);
+	}
 }
 
 /**
@@ -752,9 +806,10 @@ export function getMessageClass(action: IBattleAction): string {
  * @param leave - 是否為退場（預設 false＝入場）/ Whether this is a leave (default false = enter)
  * @returns 訊息後綴 / Message suffix
  */
-export function getEnterBattlefieldText(level?: number, leave = false): string {
-  const verb = leave ? 'leave' : 'enter';
-  return level != null ? `Lv.${level} ${verb} the Battlefield.` : `${verb} the Battlefield.`;
+export function getEnterBattlefieldText(level?: number, leave = false): string
+{
+	const verb = leave ? 'leave' : 'enter';
+	return level != null ? `Lv.${level} ${verb} the Battlefield.` : `${verb} the Battlefield.`;
 }
 
 /**
@@ -767,8 +822,9 @@ export function getEnterBattlefieldText(level?: number, leave = false): string {
  * @param units - 單位列表 / Unit list
  * @returns 總等級 / Total level
  */
-export function calcTotalLevel(units: { level: number }[]): number {
-  return units.reduce((sum, u) => sum + u.level, 0);
+export function calcTotalLevel(units: { level: number }[]): number
+{
+	return units.reduce((sum, u) => sum + u.level, 0);
 }
 
 /**
@@ -781,14 +837,15 @@ export function calcTotalLevel(units: { level: number }[]): number {
  * @param units - 單位列表 / Unit list
  * @returns 當前 HP 總和與最大 HP 總和 / Current and max HP totals
  */
-export function calcTotalHp(units: { hp: number; maxHp: number }[]): { current: number; max: number } {
-  return units.reduce(
-    (acc, u) => ({
-      current: acc.current + u.hp,
-      max: acc.max + u.maxHp,
-    }),
-    { current: 0, max: 0 }
-  );
+export function calcTotalHp(units: { hp: number; maxHp: number }[]): { current: number; max: number }
+{
+	return units.reduce(
+		(acc, u) => ({
+			current: acc.current + u.hp,
+			max: acc.max + u.maxHp,
+		}),
+		{ current: 0, max: 0 },
+	);
 }
 
 /**
@@ -810,40 +867,44 @@ export function calcTotalHp(units: { hp: number; maxHp: number }[]): { current: 
  * @returns 分段列表 / segment list
  */
 export function splitActionsBySnapshots(
-  actions: IBattleAction[],
-  snapshots?: IBattleSnapshotDisplay[]
-): IBattleSegment[] {
-  if (!snapshots || snapshots.length === 0) {
-    return [{ index: 0, actions }];
-  }
+	actions: IBattleAction[],
+	snapshots?: IBattleSnapshotDisplay[],
+): IBattleSegment[]
+{
+	if (!snapshots || snapshots.length === 0)
+	{
+		return [{ index: 0, actions }];
+	}
 
-  // 複製 + 依 at 穩定排序 + 夾限到 [0, actions.length]
-  // Copy, stable-sort by `at`, then clamp into [0, actions.length]
-  const bounds = snapshots
-    .map((snapshot, order) => ({ snapshot, order, at: Math.max(0, Math.min(actions.length, snapshot.at)) }))
-    .sort((a, b) => a.at - b.at || a.order - b.order);
+	// 複製 + 依 at 穩定排序 + 夾限到 [0, actions.length]
+	// Copy, stable-sort by `at`, then clamp into [0, actions.length]
+	const bounds = snapshots
+		.map((snapshot, order) => ({ snapshot, order, at: Math.max(0, Math.min(actions.length, snapshot.at)) }))
+		.sort((a, b) => a.at - b.at || a.order - b.order);
 
-  const segments: IBattleSegment[] = [];
-  // 防禦：若首個界線晚於 0，先補一段「無快照」涵蓋開頭行動，避免遺失
-  // Guard: if the first bound is past 0, prepend a snapshot-less segment so no action is lost
-  if (bounds[0].at > 0) {
-    segments.push({ index: 0, actions: actions.slice(0, bounds[0].at) });
-  }
-  for (let i = 0; i < bounds.length; i++) {
-    const start = bounds[i].at;
-    const end = i + 1 < bounds.length ? bounds[i + 1].at : actions.length;
-    const isLast = i === bounds.length - 1;
-    // 跳過中間的空分段；最後一段保留（末端快照＝最終狀態頁，即使沒有行動）
-    // Skip empty intermediate spans; keep the last one (the trailing snapshot is the
-    // final-state page even when it carries no actions).
-    if (end <= start && !isLast && segments.length > 0) continue;
-    segments.push({
-      index: segments.length,
-      snapshot: bounds[i].snapshot,
-      actions: actions.slice(start, end),
-    });
-  }
-  return segments.length > 0 ? segments : [{ index: 0, actions }];
+	const segments: IBattleSegment[] = [];
+	// 防禦：若首個界線晚於 0，先補一段「無快照」涵蓋開頭行動，避免遺失
+	// Guard: if the first bound is past 0, prepend a snapshot-less segment so no action is lost
+	if (bounds[0].at > 0)
+	{
+		segments.push({ index: 0, actions: actions.slice(0, bounds[0].at) });
+	}
+	for (let i = 0; i < bounds.length; i++)
+	{
+		const start = bounds[i].at;
+		const end = i + 1 < bounds.length ? bounds[i + 1].at : actions.length;
+		const isLast = i === bounds.length - 1;
+		// 跳過中間的空分段；最後一段保留（末端快照＝最終狀態頁，即使沒有行動）
+		// Skip empty intermediate spans; keep the last one (the trailing snapshot is the
+		// final-state page even when it carries no actions).
+		if (end <= start && !isLast && segments.length > 0) continue;
+		segments.push({
+			index: segments.length,
+			snapshot: bounds[i].snapshot,
+			actions: actions.slice(start, end),
+		});
+	}
+	return segments.length > 0 ? segments : [{ index: 0, actions }];
 }
 
 /**
@@ -854,25 +915,26 @@ export function splitActionsBySnapshots(
  * `level` does not exist in the engine snapshot (optional on the display side) and is
  * fixed at 0 when absent.
  */
-export function snapshotUnitToBattleUnit(unit: IBattleSnapshotDisplayUnit): IBattleUnit {
-  const status = unit.dead
-    ? EnumUnitStatus.Down
-    : unit.chargeKind
-      ? EnumUnitStatus.Casting
-      : EnumUnitStatus.Alive;
-  return {
-    name: unit.name,
-    level: unit.level ?? 0,
-    hp: unit.hp,
-    maxHp: unit.maxHp,
-    sp: unit.sp,
-    maxSp: unit.maxSp,
-    status,
-    side: unit.side,
-    // 單位精靈資料：快照帶圖時才有（是否渲染另由 showUnitSprites 決定）
-    // Unit sprite data: only when the snapshot carries an image (rendering itself is gated by showUnitSprites)
-    sprite: unit.imageUrl ? { url: unit.imageUrl } : undefined,
-  };
+export function snapshotUnitToBattleUnit(unit: IBattleSnapshotDisplayUnit): IBattleUnit
+{
+	const status = unit.dead
+		? EnumUnitStatus.Down
+		: unit.chargeKind
+			? EnumUnitStatus.Casting
+			: EnumUnitStatus.Alive;
+	return {
+		name: unit.name,
+		level: unit.level ?? 0,
+		hp: unit.hp,
+		maxHp: unit.maxHp,
+		sp: unit.sp,
+		maxSp: unit.maxSp,
+		status,
+		side: unit.side,
+		// 單位精靈資料：快照帶圖時才有（是否渲染另由 showUnitSprites 決定）
+		// Unit sprite data: only when the snapshot carries an image (rendering itself is gated by showUnitSprites)
+		sprite: unit.imageUrl ? { url: unit.imageUrl } : undefined,
+	};
 }
 
 /**
@@ -888,16 +950,18 @@ export function snapshotUnitToBattleUnit(unit: IBattleSnapshotDisplayUnit): IBat
  * @returns 該側顯示單位 / display units of that side
  */
 export function segmentUnitsForSide(
-  segment: IBattleSegment,
-  side: EnumTeamSideUI,
-  fallback: IBattleUnit[]
-): IBattleUnit[] {
-  if (!segment.snapshot) {
-    return fallback.filter((unit) => unit.side === side || unit.side === undefined);
-  }
-  return segment.snapshot.units
-    .filter((unit) => unit.side === side)
-    .map(snapshotUnitToBattleUnit);
+	segment: IBattleSegment,
+	side: EnumTeamSideUI,
+	fallback: IBattleUnit[],
+): IBattleUnit[]
+{
+	if (!segment.snapshot)
+	{
+		return fallback.filter((unit) => unit.side === side || unit.side === undefined);
+	}
+	return segment.snapshot.units
+		.filter((unit) => unit.side === side)
+		.map(snapshotUnitToBattleUnit);
 }
 
 /**
@@ -909,8 +973,9 @@ export const SPRITE_CORPSE_URL = '/image/char/mon_145.png';
 export const SPRITE_CORPSE_URL_REV = '/image/char_rev/mon_145.png';
 
 /** 依原精靈圖所屬目錄選擇對應的屍體圖 / Pick the corpse asset matching the original image's directory */
-function corpseUrlFor(imageUrl: string): string {
-  return imageUrl.includes('/char_rev/') ? SPRITE_CORPSE_URL_REV : SPRITE_CORPSE_URL;
+function corpseUrlFor(imageUrl: string): string
+{
+	return imageUrl.includes('/char_rev/') ? SPRITE_CORPSE_URL_REV : SPRITE_CORPSE_URL;
 }
 
 /**
@@ -922,12 +987,13 @@ function corpseUrlFor(imageUrl: string): string {
  * @returns 併合後的 class（兩者皆空時為 undefined，避免多餘空白）
  * the joined class (undefined when both are empty, to avoid stray whitespace)
  */
-function joinClassNames(base?: string, extra?: string): string | undefined {
-  const joined = [base, extra]
-    .map((part) => part?.trim())
-    .filter((part) => part)
-    .join(' ');
-  return joined || undefined;
+function joinClassNames(base?: string, extra?: string): string | undefined
+{
+	const joined = [base, extra]
+		.map((part) => part?.trim())
+		.filter((part) => part)
+		.join(' ');
+	return joined || undefined;
 }
 
 /**
@@ -964,59 +1030,63 @@ function joinClassNames(base?: string, extra?: string): string | undefined {
  * @returns 該段要顯示的精靈（保留原圖層順序）/ sprites to show, preserving layer order
  */
 export function resolveSegmentSprites(
-  sprites: IBattleSprite[],
-  snapshot?: IBattleSnapshotDisplay
-): IBattleSprite[] {
-  if (!snapshot) return sprites;
+	sprites: IBattleSprite[],
+	snapshot?: IBattleSnapshotDisplay,
+): IBattleSprite[]
+{
+	if (!snapshot) return sprites;
 
-  const unitById = new Map<string, IBattleSnapshotDisplayUnit>();
-  for (const unit of snapshot.units) {
-    if (unit.unitUuid) unitById.set(unit.unitUuid, unit);
-  }
+	const unitById = new Map<string, IBattleSnapshotDisplayUnit>();
+	for (const unit of snapshot.units)
+	{
+		if (unit.unitUuid) unitById.set(unit.unitUuid, unit);
+	}
 
-  return sprites
-    .map((sprite) => {
-      const unit = sprite.unitUuid ? unitById.get(sprite.unitUuid) : undefined;
-      // 此快照中不存在（尚未加入／已離場）→ 不顯示
-      // Not present at this moment (not yet joined / already gone) → hidden
-      if (!unit) return undefined;
-      if (unit.dead) {
-        // 不留屍體（corpse 為 falsy，含未設定）：死亡即消失
-        // No corpse (corpse falsy, including unset): vanish on death
-        if (!unit.corpse) return undefined;
-        const baseImage = unit.imageUrl ?? sprite.imageUrl;
-        // 物件規格（可為空物件）→ 可指定屍體圖／class／style；布林 → 走預設屍體圖
-        // Object spec (may be empty) → may choose the corpse image/class/style; boolean → default corpse asset
-        const spec = corpseSpecOf(unit.corpse);
-        // 未指定圖路徑（或只有空白）＝沿用自動挑圖與原朝向；指定路徑則原樣採用
-        // No path (or a blank one) = auto-pick the asset and keep the original facing;
-        // a given path is used verbatim
-        const customImage = spec?.imageUrl?.trim();
-        const corpseImage = customImage || corpseUrlFor(baseImage);
-        // 自訂屍體圖會換掉圖檔目錄，故以「新圖 + 隊伍側」重新推導朝向，
-        // 維持兩隊皆面向場地中心（未指定圖時沿用原精靈朝向，行為不變）
-        // A custom corpse image changes the image directory, so re-derive facing from
-        // "new image + team side" to keep both teams facing the centre; without one the
-        // sprite keeps its original facing (unchanged behaviour)
-        const flipped = customImage
-          ? computeSpriteFlipped(corpseImage, unit.side, { flipped: sprite.flipped })
-          : sprite.flipped;
-        return {
-          ...sprite,
-          imageUrl: corpseImage,
-          flipped,
-          name: unit.name,
-          className: spec?.className
-            ? joinClassNames(sprite.className, spec.className)
-            : sprite.className,
-          style: spec?.style ? { ...sprite.style, ...spec.style } : sprite.style,
-        };
-      }
-      // 存活（含復活）；型態變化以外觀覆寫呈現
-      // Alive (incl. revived); a form change is expressed via the appearance override
-      return unit.imageUrl
-        ? { ...sprite, imageUrl: unit.imageUrl, name: unit.name }
-        : sprite;
-    })
-    .filter((sprite): sprite is IBattleSprite => sprite !== undefined);
+	return sprites
+		.map((sprite) =>
+		{
+			const unit = sprite.unitUuid ? unitById.get(sprite.unitUuid) : undefined;
+			// 此快照中不存在（尚未加入／已離場）→ 不顯示
+			// Not present at this moment (not yet joined / already gone) → hidden
+			if (!unit) return undefined;
+			if (unit.dead)
+			{
+				// 不留屍體（corpse 為 falsy，含未設定）：死亡即消失
+				// No corpse (corpse falsy, including unset): vanish on death
+				if (!unit.corpse) return undefined;
+				const baseImage = unit.imageUrl ?? sprite.imageUrl;
+				// 物件規格（可為空物件）→ 可指定屍體圖／class／style；布林 → 走預設屍體圖
+				// Object spec (may be empty) → may choose the corpse image/class/style; boolean → default corpse asset
+				const spec = corpseSpecOf(unit.corpse);
+				// 未指定圖路徑（或只有空白）＝沿用自動挑圖與原朝向；指定路徑則原樣採用
+				// No path (or a blank one) = auto-pick the asset and keep the original facing;
+				// a given path is used verbatim
+				const customImage = spec?.imageUrl?.trim();
+				const corpseImage = customImage || corpseUrlFor(baseImage);
+				// 自訂屍體圖會換掉圖檔目錄，故以「新圖 + 隊伍側」重新推導朝向，
+				// 維持兩隊皆面向場地中心（未指定圖時沿用原精靈朝向，行為不變）
+				// A custom corpse image changes the image directory, so re-derive facing from
+				// "new image + team side" to keep both teams facing the centre; without one the
+				// sprite keeps its original facing (unchanged behaviour)
+				const flipped = customImage
+					? computeSpriteFlipped(corpseImage, unit.side, { flipped: sprite.flipped })
+					: sprite.flipped;
+				return {
+					...sprite,
+					imageUrl: corpseImage,
+					flipped,
+					name: unit.name,
+					className: spec?.className
+						? joinClassNames(sprite.className, spec.className)
+						: sprite.className,
+					style: spec?.style ? { ...sprite.style, ...spec.style } : sprite.style,
+				};
+			}
+			// 存活（含復活）；型態變化以外觀覆寫呈現
+			// Alive (incl. revived); a form change is expressed via the appearance override
+			return unit.imageUrl
+				? { ...sprite, imageUrl: unit.imageUrl, name: unit.name }
+				: sprite;
+		})
+		.filter((sprite): sprite is IBattleSprite => sprite !== undefined);
 }

@@ -11,19 +11,20 @@ import type { INavLink } from './NavTypes';
 import { buildAppUrl } from '#/components/config/AppConfig';
 
 /** NavigationBar 屬性 / NavigationBar props */
-export interface INavigationBarProps {
-  /** 導航項目列表 / Nav items */
-  items?: INavLink[];
+export interface INavigationBarProps
+{
+	/** 導航項目列表 / Nav items */
+	items?: INavLink[];
 }
 
 /** 預設導航項目 / Default nav items */
 const DEFAULT_NAV_ITEMS: INavLink[] = [
-  { label: 'Top', href: buildAppUrl('/'), active: true },
-  { label: 'Hunt', href: buildAppUrl('/battle/hunt') },
-  { label: 'Item', href: buildAppUrl('/item') },
-  { label: 'Town', href: buildAppUrl('/town') },
-  { label: 'Setting', href: buildAppUrl('/game/setting') },
-  { label: 'Log', href: buildAppUrl('/log') },
+	{ label: 'Top', href: buildAppUrl('/'), active: true },
+	{ label: 'Hunt', href: buildAppUrl('/battle/hunt') },
+	{ label: 'Item', href: buildAppUrl('/item') },
+	{ label: 'Town', href: buildAppUrl('/town') },
+	{ label: 'Setting', href: buildAppUrl('/game/setting') },
+	{ label: 'Log', href: buildAppUrl('/log') },
 ];
 
 /**
@@ -31,25 +32,26 @@ const DEFAULT_NAV_ITEMS: INavLink[] = [
  * NavigationBar component
  */
 export const NavigationBar: React.FC<INavigationBarProps> = ({
-  items = DEFAULT_NAV_ITEMS,
-}) => {
-  return (
-    <div className="dashboard-nav">
-      {items.map((item, i) => (
-        <React.Fragment key={i}>
-          {i > 0 && <span className="nav-divide" />}
-          <a
-            href={item.href}
-            className={
-              item.active
-                ? 'dashboard-nav-link dashboard-nav-link-active'
-                : 'dashboard-nav-link'
-            }
-          >
-            {item.label}
-          </a>
-        </React.Fragment>
-      ))}
-    </div>
-  );
+	items = DEFAULT_NAV_ITEMS,
+}) =>
+{
+	return (
+		<div className="dashboard-nav">
+			{items.map((item, i) => (
+				<React.Fragment key={i}>
+					{i > 0 && <span className="nav-divide" />}
+					<a
+						href={item.href}
+						className={
+							item.active
+								? 'dashboard-nav-link dashboard-nav-link-active'
+								: 'dashboard-nav-link'
+						}
+					>
+						{item.label}
+					</a>
+				</React.Fragment>
+			))}
+		</div>
+	);
 };

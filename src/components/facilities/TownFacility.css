@@ -5,40 +5,46 @@
 
 /* ==================== 設施連結容器 / Facility link container ==================== */
 
-.town-facility-link {
-  text-decoration: none;
-  color: var(--color-text-primary);
-  font-weight: bold;
-  font-size: 12px;
+.town-facility-link
+{
+	text-decoration: none;
+	color: var(--color-text-primary);
+	font-weight: bold;
+	font-size: 12px;
 }
 
-.town-facility-link:hover {
-  text-decoration: underline;
-  color: var(--color-accent-gold);
+.town-facility-link:hover
+{
+	text-decoration: underline;
+	color: var(--color-accent-gold);
 }
 
 /* ==================== 設施圖示 / Facility icon ==================== */
 
-.town-facility-icon {
-  margin-right: 4px;
+.town-facility-icon
+{
+	margin-right: 4px;
 }
 
 /* ==================== 設施名稱 / Facility name ==================== */
 
-.town-facility-name {
-  color: var(--color-text-primary);
+.town-facility-name
+{
+	color: var(--color-text-primary);
 }
 
-.town-facility-name-en {
-  color: var(--color-text-secondary);
-  font-weight: normal;
-  font-size: 11px;
-  margin-left: 2px;
+.town-facility-name-en
+{
+	color: var(--color-text-secondary);
+	font-weight: normal;
+	font-size: 11px;
+	margin-left: 2px;
 }
 
 /* ==================== 分隔符 / Divider ==================== */
 
-.town-facility-divide {
-  color: var(--color-text-dim);
-  margin: 0 4px;
+.town-facility-divide
+{
+	color: var(--color-text-dim);
+	margin: 0 4px;
 }

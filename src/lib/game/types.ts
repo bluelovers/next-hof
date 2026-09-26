@@ -16,7 +16,8 @@ import type { ICorpsePolicy, ICorpsePolicyField } from './battle/corpse-policy';
  * 戰鬥統計（CountAlive 等）據此排除召喚物，勝負判定只計算真實角色。
  * Battle counters (CountAlive etc.) exclude summons based on this; only real chars decide victory.
  */
-export enum EnumCharType {
+export enum EnumCharType
+{
 	/** 玩家角色 / Player character */
 	Char = 'char',
 	/** 怪物 / Monster */
@@ -38,7 +39,8 @@ export enum EnumCharType {
  * MainHand/OffHand are mutually exclusive under two-handed (dh) weapons (see equip.ts setEquip);
  * equipping MainHand also writes Character.WEAPON for skill weapon-limit checks.
  */
-export enum EnumEquipSlot {
+export enum EnumEquipSlot
+{
 	/** 主手（武器）/ Main hand (weapon) */
 	MainHand = 'main_hand',
 	/** 副手（盾／左手劍）/ Off hand (shield / main-gauche) */
@@ -62,7 +64,8 @@ export enum EnumEquipSlot {
  * 非武器成員（Armor/Cloth/Robe/Item/Material/Other）供道具分類共用，勿視為可持握武器。
  * Non-weapon members (Armor/Cloth/Robe/Item/Material/Other) exist for item categories; they are not wieldable weapons.
  */
-export enum EnumWeaponType {
+export enum EnumWeaponType
+{
 	/** 劍（單手）/ Sword (one-handed) */
 	Sword = 'Sword',
 	/** 匕首 / Dagger */
@@ -122,7 +125,8 @@ export enum EnumWeaponType {
  * - Always/Never：恆真／恆假；behavior.guard 省略時預設 Always
  *   Always/Never: always true / always false; defaults to Always when behavior.guard is absent
  */
-export enum EnumGuardKind {
+export enum EnumGuardKind
+{
 	/** 恆常發動 / Always active */
 	Always = 'always',
 	/** HP ≤ 25% 時發動 / Active while HP ≤ 25% */
@@ -185,7 +189,8 @@ export const GUARD_KIND_HP_THRESHOLD: Record<EnumGuardKind, number | null> = {
  * quantity turn gate is met yields its action.
  * 其 action 即本回合要施放的技能編號（1000 為預設攻擊）。
  */
-export interface IPatternItem {
+export interface IPatternItem
+{
 	/** 判定碼（交由 judge.ts DecideJudge 評估）/ judge code (evaluated by judge.ts DecideJudge) */
 	judge: number;
 	/** 回合門檻：0＝恆可觸發，否則需 battle.turn >= quantity / turn gate: 0 = always eligible, else requires battle.turn >= quantity */
@@ -201,7 +206,8 @@ export interface IPatternItem {
  * 角色／職業的 AI 行為設定（ICharDef.behavior 與 IJobDef.pattern 皆使用本型別）。
  * AI behavior settings for chars/jobs (used by both ICharDef.behavior and IJobDef.pattern).
  */
-export interface IBehavior {
+export interface IBehavior
+{
 	/** 預期站位（資料層保留；開戰時 setBattleVariable 以隨機決定 POSITION）/ intended position (data-layer; setBattleVariable randomizes POSITION at battle start) */
 	position?: EnumPosition;
 	/** 前排守護條件；省略時視為 EnumGuardKind.Always / front-row guard condition; omitted = EnumGuardKind.Always */
@@ -221,7 +227,8 @@ export interface IBehavior {
  * - All：不分敵我的全體存活者；Self：僅施法者自己（忽略選取方式）
  * - All: all living units on both sides; Self: the caster only (method ignored)
  */
-export enum EnumTargetType {
+export enum EnumTargetType
+{
 	/** 敵隊 / Enemy team */
 	Enemy = 'enemy',
 	/** 己隊 / Friendly team */
@@ -243,7 +250,8 @@ export enum EnumTargetType {
  * - All：全體存活者（第 3 元 count 被忽略）
  *   All: every living member (the 3rd element count is ignored)
  */
-export enum EnumTargetMethod {
+export enum EnumTargetMethod
+{
 	/** 單體（隨機 1 名）/ Single target (1 random pick) */
 	Individual = 'individual',
 	/** 多體（隨機抽 count 名，有放回）/ Multiple targets (count random picks, with replacement) */
@@ -294,7 +302,8 @@ export type ICompBonuses = Partial<Record<ICompField, number>>;
  * Character.SPECIAL 的結構；純數值欄位可經 getSpecial/addSpecial 以字串鍵存取。
  * Shape of Character.SPECIAL; numeric fields are also reachable by string key via getSpecial/addSpecial.
  */
-export interface ISpecial {
+export interface ISpecial
+{
 	/** 中毒抗性 %（getPoison 據此折減施毒機率）/ poison resistance % (getPoison reduces the chance by this) */
 	PoisonResist: number;
 	/** 回復加成（被動技能累加；目前僅儲存，傷害公式尚未讀取）/ heal bonus (accumulated by passives; stored only, not yet read by the heal formula) */
@@ -327,7 +336,8 @@ export interface ISpecial {
  * - Dex：無論物理／魔法一律改用 DEX
  *   Dex: always uses DEX regardless of physical/magic
  */
-export enum EnumInfluence {
+export enum EnumInfluence
+{
 	/** 以 DEX 計算傷害 / compute damage from DEX */
 	Dex = 'dex',
 	/** 預設路徑：物理 STR／魔法 INT / default path: physical STR / magic INT */
@@ -345,7 +355,8 @@ export enum EnumInfluence {
  * - Summon：優先召喚物；Charge：目標正在詠唱；Back：背擊（優先後排）
  *   Summon: prefer summons; Charge: target is casting; Back: back attack (prefer the back row)
  */
-export enum EnumSkillPriority {
+export enum EnumSkillPriority
+{
 	/** 低 HP 比率優先 / prefer low HP rate */
 	LowHpRate = 'LowHpRate',
 	/** 已死亡目標優先（蘇生）/ prefer dead targets (revive) */
@@ -372,7 +383,8 @@ export enum EnumSkillPriority {
  * calcBasicDamage picks the stat and the physical/magic atk/def slots from this value;
  * the showcase battle-adapter picks the charge wording (Physical → charging, Magic → casting).
  */
-export enum EnumSkillDamageType {
+export enum EnumSkillDamageType
+{
 	/** 物理（YAML 值 0）/ physical (YAML value 0) */
 	Physical = 0,
 	/** 魔法（YAML 值 1）/ magic (YAML value 1) */
@@ -432,7 +444,8 @@ export type ISkillDownFields = Partial<Record<`Down${IStatusAttr}`, number>>;
  *   revive, SpRecoveryRate, MagicCircle*, priority, learn, exp, img）目前僅供資料層保留
  *   remaining fields are currently kept in the data layer only
  */
-export interface ISkillDef extends ICompBonuses, ISkillUpFields, ISkillDownFields {
+export interface ISkillDef extends ICompBonuses, ISkillUpFields, ISkillDownFields
+{
 	/** 技能編號（repository 的索引鍵）/ skill number (repository index key) */
 	no: number;
 	/** 技能名稱 / skill name */
@@ -508,8 +521,13 @@ export interface ISkillDef extends ICompBonuses, ISkillUpFields, ISkillDownField
 	 * stats plus MAXHP/MAXSP, so unregistered keys (PlusATK etc.) stay compile-time errors rather
 	 * than accepted fields that silently no-op at runtime.
 	 */
-	PlusSTR?: number; PlusINT?: number; PlusDEX?: number; PlusSPD?: number; PlusLUK?: number;
-	PlusMAXHP?: number; PlusMAXSP?: number;
+	PlusSTR?: number;
+	PlusINT?: number;
+	PlusDEX?: number;
+	PlusSPD?: number;
+	PlusLUK?: number;
+	PlusMAXHP?: number;
+	PlusMAXSP?: number;
 	/** 為真時無視 target.def 百分比／定值減傷，並加算 SPECIAL.Pierce（且穿透 Barrier）/ when truthy, ignores target.def percent/flat reduction, adds SPECIAL.Pierce, and bypasses Barrier */
 	pierce?: number;
 	/** 行動延遲 %（目前僅資料層保留）/ action delay % (data-layer only) */
@@ -570,7 +588,8 @@ export interface ISkillDef extends ICompBonuses, ISkillUpFields, ISkillDownField
  * 作為 IItemDef.type2 的型別；Item.ts 的 ITEM_TYPE_DEFAULT 指向 Item 成員作為預設值。
  * Type of IItemDef.type2; Item.ts's ITEM_TYPE_DEFAULT points at the Item member as the default.
  */
-export enum EnumItemCategory {
+export enum EnumItemCategory
+{
 	/** 武器 / Weapon */
 	Weapon = 'WEAPON',
 	/** 防具 / Armor */
@@ -587,7 +606,8 @@ export enum EnumItemCategory {
  * 道具定義 / Item definition
  * 介面 / interface
  */
-export interface IItemDef extends ICompBonuses {
+export interface IItemDef extends ICompBonuses
+{
 	/** 道具編號（repository 索引鍵）/ item number (repository index key) */
 	no: number;
 	/** 道具名稱 / item name */
@@ -627,7 +647,8 @@ export interface IItemDef extends ICompBonuses {
  * 作為 IJobDef.gender 的鍵（Partial<Record>）：0＝男性、1＝女性。
  * Keys of IJobDef.gender (Partial<Record>): 0 = male, 1 = female.
  */
-export enum EnumGender {
+export enum EnumGender
+{
 	/** 男性（值 0）/ male (value 0) */
 	Male = 0,
 	/** 女性（值 1）/ female (value 1) */
@@ -638,7 +659,8 @@ export enum EnumGender {
  * 性別專屬的名稱與圖示覆寫 / Gender-specific name & icon overrides
  * 介面 / interface
  */
-export interface IGenderOverride {
+export interface IGenderOverride
+{
 	/** 圖示路徑（覆寫職業預設 img）/ icon path (overrides the job default img) */
 	img?: string;
 	/** 性別專屬職業名稱（覆寫 job_name）/ gender-specific job name (overrides job_name) */
@@ -649,7 +671,8 @@ export interface IGenderOverride {
  * 職業定義 / Job definition
  * 介面 / interface
  */
-export interface IJobDef {
+export interface IJobDef
+{
 	/** 職業編號（資料來源可能為字串）/ job number (may arrive as a string in raw data) */
 	no: number | string;
 	/** 職業名稱 / job name */
@@ -674,7 +697,8 @@ export interface IJobDef {
  * 怪物/召喚/工會獎勵 / Monster / summon / union reward
  * 介面 / interface
  */
-export interface IMonReward {
+export interface IMonReward
+{
 	/** 金幣獎勵上限（moneyhold：超過此值不再累積）/ gold reward cap (gold stops accumulating past this) */
 	moneyhold?: number;
 	/** 經驗獎勵上限（exphold：超過此值不再累積）/ exp reward cap (exp stops accumulating past this) */
@@ -687,7 +711,8 @@ export interface IMonReward {
  * 戰鬥單位基礎定義（角色/怪物共用）/ Combatant base definition (shared by char & mon)
  * 介面 / interface
  */
-export interface ICharCore extends ICorpsePolicyField {
+export interface ICharCore extends ICorpsePolicyField
+{
 	/** 單位編號 / unit number */
 	no: number;
 	/**
@@ -735,7 +760,8 @@ export interface ICharCore extends ICorpsePolicyField {
  * 角色定義 / Character definition
  * 介面 / interface
  */
-export interface ICharDef extends ICharCore {
+export interface ICharDef extends ICharCore
+{
 	/** 當前累積經驗 / accumulated exp */
 	exp?: number;
 	/** 職業編號 / job number */
@@ -750,7 +776,8 @@ export interface ICharDef extends ICharCore {
  * 怪物定義 / Monster definition
  * 介面 / interface
  */
-export interface IMonDef extends ICharCore {
+export interface IMonDef extends ICharCore
+{
 	/** 掉落與獎勵設定（省略＝無獎勵）/ drop & reward settings (omitted = no reward) */
 	reward?: IMonReward;
 	/**
@@ -776,7 +803,8 @@ export interface IMonDef extends ICharCore {
  *   so there is no decision to record), Info (its copy variants live in the display layer's
  *   EnumLogCopy and cannot be structured at the engine layer).
  */
-export enum EnumBattleEventType {
+export enum EnumBattleEventType
+{
 	/** 造成傷害 / damage dealt */
 	Damage = 'damage',
 	/** 回復 HP / HP heal */
@@ -848,7 +876,8 @@ export enum EnumBattleEventType {
  * 戰鬥事件 / Battle event
  * 介面 / interface
  */
-export interface IBattleEvent {
+export interface IBattleEvent
+{
 	/** 事件類型 / battle event type */
 	type: EnumBattleEventType;
 	/** 行動者名稱 / actor name */
@@ -885,7 +914,8 @@ export type { EnumState };
  * side (EnumTeamSideUI), the engine's dead vs the display's status, level/no/expectSkill —
  * so no conversion function is needed and no existing behaviour changes.
  */
-export interface IBattleUnitVitals {
+export interface IBattleUnitVitals
+{
 	/**
 	 * 戰鬥單位實例唯一識別碼（Character.unitUuid）
 	 * Battle-unit instance uid (Character.unitUuid)
@@ -919,13 +949,15 @@ export interface IBattleUnitVitals {
  * IBattleSnapshotDisplay so the `units` declaration is maintained once, with the element
  * type supplied per layer as a type parameter.
  */
-export interface IUnitList<TUnit> {
+export interface IUnitList<TUnit>
+{
 	/** 單位列表（元素型別依層別而定）/ unit list (element type varies by layer) */
 	units: TUnit[];
 }
 
 /** 快照單位資料（戰場狀態某一刻的切面）/ Snapshot unit data (a moment's field state) */
-export interface IBattleSnapshotUnit extends ICorpsePolicyField, IBattleUnitVitals {
+export interface IBattleSnapshotUnit extends ICorpsePolicyField, IBattleUnitVitals
+{
 	/**
 	 * 戰鬥單位實例唯一識別碼（Character.unitUuid；個體追蹤用）/ unit instance uid (for per-instance tracking)
 	 *
@@ -952,7 +984,8 @@ export interface IBattleSnapshotUnit extends ICorpsePolicyField, IBattleUnitVita
 }
 
 /** 戰鬥快照（每 10 次行動插入，記錄戰場圖與 HP/SP）/ Battle snapshot (one per 10 actions) */
-export interface IBattleSnapshot extends IUnitList<IBattleSnapshotUnit> {
+export interface IBattleSnapshot extends IUnitList<IBattleSnapshotUnit>
+{
 	/** 插入時的 log.length / log length at insertion time */
 	at: number;
 }

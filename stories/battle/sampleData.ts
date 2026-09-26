@@ -9,20 +9,20 @@
 import type { IBattleSprite, IBattleFieldConfig, IBattleMagicCircle } from '../../src/components/battle/types';
 import { getSpriteImageSize } from '../../src/components/battle/spriteImageSizes';
 import {
-  computeBattleSpritePositions,
-  groupBattleChars,
-  type IComputeSpritePositionsOptions,
-  type IBattlePositionChar,
-  type ITeamBattleChars,
+	computeBattleSpritePositions,
+	groupBattleChars,
+	type IComputeSpritePositionsOptions,
+	type IBattlePositionChar,
+	type ITeamBattleChars,
 } from '../../src/components/battle/computeSpritePositions';
 import { EnumTeamSideUI } from '../../src/components/battle/enums';
 import { EnumPosition } from '../../src/lib/game/constants';
 
 /** 共用敵方精靈樣本 / Shared enemy sprite samples */
 export const sampleEnemySprites: IBattleSprite[] = [
-  { unitUuid: 'mon_052', imageUrl: '/image/char/mon_052.png', x: 164, y: 16, flipped: false, name: 'GoblinWarrior(A)' },
-  { unitUuid: 'mon_052', imageUrl: '/image/char/mon_052.png', x: 148, y: 56, flipped: false, name: 'GoblinWarrior(B)' },
-  { unitUuid: 'mon_053', imageUrl: '/image/char/mon_053.png', x: 124, y: 96, flipped: false, name: 'GoblinAxe' },
+	{ unitUuid: 'mon_052', imageUrl: '/image/char/mon_052.png', x: 164, y: 16, flipped: false, name: 'GoblinWarrior(A)' },
+	{ unitUuid: 'mon_052', imageUrl: '/image/char/mon_052.png', x: 148, y: 56, flipped: false, name: 'GoblinWarrior(B)' },
+	{ unitUuid: 'mon_053', imageUrl: '/image/char/mon_053.png', x: 124, y: 96, flipped: false, name: 'GoblinAxe' },
 ];
 
 /**
@@ -41,15 +41,15 @@ export const sampleEnemySprites: IBattleSprite[] = [
  * combined with the old nested layering, split a single team across sides.
  */
 export const sampleAllySprites: IBattleSprite[] = [
-  { unitUuid: 'mon_018', imageUrl: '/image/char_rev/mon_018.png', x: 352, y: 14, flipped: false, name: 'Hero1' },
-  { unitUuid: 'mon_214', imageUrl: '/image/char_rev/mon_214.png', x: 388, y: 64, flipped: false, name: 'Mage1' },
-  { unitUuid: 'mon_079', imageUrl: '/image/char_rev/mon_079.png', x: 300, y: 110, flipped: false, name: 'Priest1' },
+	{ unitUuid: 'mon_018', imageUrl: '/image/char_rev/mon_018.png', x: 352, y: 14, flipped: false, name: 'Hero1' },
+	{ unitUuid: 'mon_214', imageUrl: '/image/char_rev/mon_214.png', x: 388, y: 64, flipped: false, name: 'Mage1' },
+	{ unitUuid: 'mon_079', imageUrl: '/image/char_rev/mon_079.png', x: 300, y: 110, flipped: false, name: 'Priest1' },
 ];
 
 /** 共用完整戰場精靈樣本（敵方 + 友方） / Shared full battlefield sprite samples (enemies + allies) */
 export const sampleSprites: IBattleSprite[] = [
-  ...sampleEnemySprites,
-  ...sampleAllySprites,
+	...sampleEnemySprites,
+	...sampleAllySprites,
 ];
 
 /** 共用戰場尺寸（角色排版尺寸，預設 480×200） / Shared battlefield size (default 480×200) */
@@ -57,12 +57,12 @@ export const sampleFieldSize = { width: 480, height: 200 };
 
 /** 共用背景圖片 URL（單一事實來源，避免各處硬編碼路徑） / Shared background image URLs (single source of truth) */
 export const sampleBackgroundUrls = {
-  grass: '/image/land/bg_grass.png',
-  grass01: '/image/land/bg_grass01.png',
-  cave: '/image/land/bg_cave.png',
-  snow: '/image/land/bg_snow.png',
-  sand: '/image/land/bg_sand.png',
-  egypt: '/image/land/bg_egypt_001.png', // 實際圖檔尺寸 768×320 / actual file size 768×320
+	grass: '/image/land/bg_grass.png',
+	grass01: '/image/land/bg_grass01.png',
+	cave: '/image/land/bg_cave.png',
+	snow: '/image/land/bg_snow.png',
+	sand: '/image/land/bg_sand.png',
+	egypt: '/image/land/bg_egypt_001.png', // 實際圖檔尺寸 768×320 / actual file size 768×320
 } as const;
 
 /**
@@ -74,7 +74,7 @@ export const sampleBackgroundUrls = {
  * layer drawn beneath the sprites); position defaults to (280, 0) per PHP.
  */
 export const sampleMagicCircles: IBattleMagicCircle[] = [
-  { imageUrl: '/image/other/mc0_1.png', x: 280, y: 0 },
+	{ imageUrl: '/image/other/mc0_1.png', x: 280, y: 0 },
 ];
 
 /**
@@ -85,12 +85,13 @@ export const sampleMagicCircles: IBattleMagicCircle[] = [
  * Uses sampleFieldSize for the sprite layout size and applies the given background.
  */
 export function createSampleConfig(
-  bg: keyof typeof sampleBackgroundUrls
-): IBattleFieldConfig {
-  return {
-    backgroundImageUrl: sampleBackgroundUrls[bg],
-    ...sampleFieldSize,
-  };
+	bg: keyof typeof sampleBackgroundUrls,
+): IBattleFieldConfig
+{
+	return {
+		backgroundImageUrl: sampleBackgroundUrls[bg],
+		...sampleFieldSize,
+	};
 }
 
 // ============================================================================
@@ -98,25 +99,27 @@ export function createSampleConfig(
 // ============================================================================
 
 /** 名冊角色（不含尺寸，位置由 computeBattleSpritePositions 計算） / Roster char (no size; position computed) */
-interface IRosterChar {
-  /** 戰鬥單位實例 uid（同時作為 DOM id） / Battle-unit instance uid (also DOM id) */
-  unitUuid: string;
-  /** 角色名稱 / Name */
-  name?: string;
-  /** 精靈圖片路徑 / Sprite image path */
-  imageUrl: string;
-  /** 站位：前衛 / 後衛 / Position: front / back */
-  position: EnumPosition;
-  /** 隊伍側：左 / 右 / Team side: left / right */
-  side: EnumTeamSideUI;
+interface IRosterChar
+{
+	/** 戰鬥單位實例 uid（同時作為 DOM id） / Battle-unit instance uid (also DOM id) */
+	unitUuid: string;
+	/** 角色名稱 / Name */
+	name?: string;
+	/** 精靈圖片路徑 / Sprite image path */
+	imageUrl: string;
+	/** 站位：前衛 / 後衛 / Position: front / back */
+	position: EnumPosition;
+	/** 隊伍側：左 / 右 / Team side: left / right */
+	side: EnumTeamSideUI;
 }
 
 /** 名冊隊伍 / Roster team */
-interface IRosterTeam {
-  /** 前衛 / Front row */
-  front: IRosterChar[];
-  /** 後衛 / Back row */
-  back: IRosterChar[];
+interface IRosterTeam
+{
+	/** 前衛 / Front row */
+	front: IRosterChar[];
+	/** 後衛 / Back row */
+	back: IRosterChar[];
 }
 
 /**
@@ -133,33 +136,71 @@ interface IRosterTeam {
  * flag mirrors them to face left.
  */
 const demoRoster: { left: IRosterTeam; right: IRosterTeam } = {
-  left: {
-    back: [
-      { unitUuid: 'mon_018', name: 'Hero1', imageUrl: '/image/char/mon_018.png', position: EnumPosition.Back, side: EnumTeamSideUI.Left },
-    ],
-    front: [
-      { unitUuid: 'mon_014', name: 'Mage1', imageUrl: '/image/char/mon_014.png', position: EnumPosition.Front, side: EnumTeamSideUI.Left },
-      { unitUuid: 'mon_079', name: 'Priest1', imageUrl: '/image/char/mon_079.png', position: EnumPosition.Front, side: EnumTeamSideUI.Left },
-    ],
-  },
-  right: {
-    back: [
-      { unitUuid: 'mon_052a', name: 'GoblinWarrior(A)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Back, side: EnumTeamSideUI.Right },
-    ],
-    front: [
-      { unitUuid: 'mon_052b', name: 'GoblinWarrior(B)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
-      { unitUuid: 'mon_053', name: 'GoblinAxe', imageUrl: '/image/char/mon_053.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
-    ],
-  },
+	left: {
+		back: [
+			{
+				unitUuid: 'mon_018',
+				name: 'Hero1',
+				imageUrl: '/image/char/mon_018.png',
+				position: EnumPosition.Back,
+				side: EnumTeamSideUI.Left,
+			},
+		],
+		front: [
+			{
+				unitUuid: 'mon_014',
+				name: 'Mage1',
+				imageUrl: '/image/char/mon_014.png',
+				position: EnumPosition.Front,
+				side: EnumTeamSideUI.Left,
+			},
+			{
+				unitUuid: 'mon_079',
+				name: 'Priest1',
+				imageUrl: '/image/char/mon_079.png',
+				position: EnumPosition.Front,
+				side: EnumTeamSideUI.Left,
+			},
+		],
+	},
+	right: {
+		back: [
+			{
+				unitUuid: 'mon_052a',
+				name: 'GoblinWarrior(A)',
+				imageUrl: '/image/char/mon_052.png',
+				position: EnumPosition.Back,
+				side: EnumTeamSideUI.Right,
+			},
+		],
+		front: [
+			{
+				unitUuid: 'mon_052b',
+				name: 'GoblinWarrior(B)',
+				imageUrl: '/image/char/mon_052.png',
+				position: EnumPosition.Front,
+				side: EnumTeamSideUI.Right,
+			},
+			{
+				unitUuid: 'mon_053',
+				name: 'GoblinAxe',
+				imageUrl: '/image/char/mon_053.png',
+				position: EnumPosition.Front,
+				side: EnumTeamSideUI.Right,
+			},
+		],
+	},
 };
 
 /** 將名冊角色補上真實圖像尺寸，轉為定位計算用的輸入 / Inject real image sizes into roster chars */
-function toPositionChars(team: IRosterTeam): ITeamBattleChars {
-  const map = (c: IRosterChar): IBattlePositionChar => {
-    const size = getSpriteImageSize(c.imageUrl);
-    return { ...c, imageSize: size };
-  };
-  return { back: team.back.map(map), front: team.front.map(map) };
+function toPositionChars(team: IRosterTeam): ITeamBattleChars
+{
+	const map = (c: IRosterChar): IBattlePositionChar =>
+	{
+		const size = getSpriteImageSize(c.imageUrl);
+		return { ...c, imageSize: size };
+	};
+	return { back: team.back.map(map), front: team.front.map(map) };
 }
 
 /**
@@ -176,15 +217,16 @@ function toPositionChars(team: IRosterTeam): ITeamBattleChars {
  * being hardcoded. Pass options.flip to override, or options.cellCount to adjust.
  */
 export function createAutoSampleSprites(
-  options?: Partial<IComputeSpritePositionsOptions>
-): IBattleSprite[] {
-  const input = {
-    left: toPositionChars(demoRoster.left),
-    right: toPositionChars(demoRoster.right),
-  };
-  // 不傳 flip：交由 computeBattleSpritePositions 依圖檔目錄自動推導翻轉
-  // Omit flip so computeBattleSpritePositions auto-derives flipping from the directory.
-  return computeBattleSpritePositions(input, { ...sampleFieldSize, ...options });
+	options?: Partial<IComputeSpritePositionsOptions>,
+): IBattleSprite[]
+{
+	const input = {
+		left: toPositionChars(demoRoster.left),
+		right: toPositionChars(demoRoster.right),
+	};
+	// 不傳 flip：交由 computeBattleSpritePositions 依圖檔目錄自動推導翻轉
+	// Omit flip so computeBattleSpritePositions auto-derives flipping from the directory.
+	return computeBattleSpritePositions(input, { ...sampleFieldSize, ...options });
 }
 
 /**
@@ -198,30 +240,61 @@ export function createAutoSampleSprites(
  * on the same side with a consistent facing.
  */
 const mixedRoster: { left: IRosterTeam; right: IRosterTeam } = {
-  left: { front: [], back: [] },
-  right: {
-    back: [
-      { unitUuid: 'mon_190', name: 'mon_190(char_rev)', imageUrl: '/image/char_rev/mon_190.png', position: EnumPosition.Back, side: EnumTeamSideUI.Right },
-      { unitUuid: 'mon_170', name: 'mon_170(char_rev)', imageUrl: '/image/char/mon_170.png', position: EnumPosition.Back, side: EnumTeamSideUI.Right },
-    ],
-    front: [
-      { unitUuid: 'mon_052', name: 'Goblin(char)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
-      { unitUuid: 'mon_018', name: 'Hero(char_rev)', imageUrl: '/image/char_rev/mon_018.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
-      { unitUuid: 'mon_079', name: 'Priest(char_rev)', imageUrl: '/image/char_rev/mon_079.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
-    ],
-  },
+	left: { front: [], back: [] },
+	right: {
+		back: [
+			{
+				unitUuid: 'mon_190',
+				name: 'mon_190(char_rev)',
+				imageUrl: '/image/char_rev/mon_190.png',
+				position: EnumPosition.Back,
+				side: EnumTeamSideUI.Right,
+			},
+			{
+				unitUuid: 'mon_170',
+				name: 'mon_170(char_rev)',
+				imageUrl: '/image/char/mon_170.png',
+				position: EnumPosition.Back,
+				side: EnumTeamSideUI.Right,
+			},
+		],
+		front: [
+			{
+				unitUuid: 'mon_052',
+				name: 'Goblin(char)',
+				imageUrl: '/image/char/mon_052.png',
+				position: EnumPosition.Front,
+				side: EnumTeamSideUI.Right,
+			},
+			{
+				unitUuid: 'mon_018',
+				name: 'Hero(char_rev)',
+				imageUrl: '/image/char_rev/mon_018.png',
+				position: EnumPosition.Front,
+				side: EnumTeamSideUI.Right,
+			},
+			{
+				unitUuid: 'mon_079',
+				name: 'Priest(char_rev)',
+				imageUrl: '/image/char_rev/mon_079.png',
+				position: EnumPosition.Front,
+				side: EnumTeamSideUI.Right,
+			},
+		],
+	},
 };
 
 export function createMixedSampleSprites(
-  options?: Partial<IComputeSpritePositionsOptions>
-): IBattleSprite[] {
-  const input = {
-    left: toPositionChars(mixedRoster.left),
-    right: toPositionChars(mixedRoster.right),
-  };
-  // 不傳 flip：交由 computeBattleSpritePositions 依各圖檔目錄個別推導翻轉
-  // Omit flip so computeBattleSpritePositions auto-derives flip per sprite's directory.
-  return computeBattleSpritePositions(input, { ...sampleFieldSize, ...options });
+	options?: Partial<IComputeSpritePositionsOptions>,
+): IBattleSprite[]
+{
+	const input = {
+		left: toPositionChars(mixedRoster.left),
+		right: toPositionChars(mixedRoster.right),
+	};
+	// 不傳 flip：交由 computeBattleSpritePositions 依各圖檔目錄個別推導翻轉
+	// Omit flip so computeBattleSpritePositions auto-derives flip per sprite's directory.
+	return computeBattleSpritePositions(input, { ...sampleFieldSize, ...options });
 }
 
 // ============================================================================
@@ -243,20 +316,58 @@ export function createMixedSampleSprites(
  * by side / position, with no manual front/back nesting.
  */
 const flatRosterSample: IRosterChar[] = [
-  { unitUuid: 'mon_018', name: 'Hero1', imageUrl: '/image/char/mon_018.png', position: EnumPosition.Back, side: EnumTeamSideUI.Left },
-  { unitUuid: 'mon_014', name: 'Mage1', imageUrl: '/image/char/mon_014.png', position: EnumPosition.Front, side: EnumTeamSideUI.Left },
-  { unitUuid: 'mon_079', name: 'Priest1', imageUrl: '/image/char/mon_079.png', position: EnumPosition.Front, side: EnumTeamSideUI.Left },
-  { unitUuid: 'mon_052a', name: 'GoblinWarrior(A)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Back, side: EnumTeamSideUI.Right },
-  { unitUuid: 'mon_052b', name: 'GoblinWarrior(B)', imageUrl: '/image/char/mon_052.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
-  { unitUuid: 'mon_053', name: 'GoblinAxe', imageUrl: '/image/char/mon_053.png', position: EnumPosition.Front, side: EnumTeamSideUI.Right },
+	{
+		unitUuid: 'mon_018',
+		name: 'Hero1',
+		imageUrl: '/image/char/mon_018.png',
+		position: EnumPosition.Back,
+		side: EnumTeamSideUI.Left,
+	},
+	{
+		unitUuid: 'mon_014',
+		name: 'Mage1',
+		imageUrl: '/image/char/mon_014.png',
+		position: EnumPosition.Front,
+		side: EnumTeamSideUI.Left,
+	},
+	{
+		unitUuid: 'mon_079',
+		name: 'Priest1',
+		imageUrl: '/image/char/mon_079.png',
+		position: EnumPosition.Front,
+		side: EnumTeamSideUI.Left,
+	},
+	{
+		unitUuid: 'mon_052a',
+		name: 'GoblinWarrior(A)',
+		imageUrl: '/image/char/mon_052.png',
+		position: EnumPosition.Back,
+		side: EnumTeamSideUI.Right,
+	},
+	{
+		unitUuid: 'mon_052b',
+		name: 'GoblinWarrior(B)',
+		imageUrl: '/image/char/mon_052.png',
+		position: EnumPosition.Front,
+		side: EnumTeamSideUI.Right,
+	},
+	{
+		unitUuid: 'mon_053',
+		name: 'GoblinAxe',
+		imageUrl: '/image/char/mon_053.png',
+		position: EnumPosition.Front,
+		side: EnumTeamSideUI.Right,
+	},
 ];
 
 /** 將扁平名冊補上真實圖像尺寸，轉為 groupBattleChars 所需的 IBattlePositionChar[] */
-function toBattlePositionChars(roster: IRosterChar[]): IBattlePositionChar[] {
-  return roster.map((c): IBattlePositionChar => {
-    const size = getSpriteImageSize(c.imageUrl);
-    return { ...c, imageSize: size };
-  });
+function toBattlePositionChars(roster: IRosterChar[]): IBattlePositionChar[]
+{
+	return roster.map((c): IBattlePositionChar =>
+	{
+		const size = getSpriteImageSize(c.imageUrl);
+		return { ...c, imageSize: size };
+	});
 }
 
 /**
@@ -269,14 +380,15 @@ function toBattlePositionChars(roster: IRosterChar[]): IBattlePositionChar[] {
  * groupBattleChars builds the team structure from each char's side / position.
  */
 export function createFlatSampleSprites(
-  options?: Partial<IComputeSpritePositionsOptions>
-): IBattleSprite[] {
-  // 扁平名冊 → groupBattleChars 依 side/position 自動分隊 → 傳入計算
-  // Flat roster → groupBattleChars auto-groups by side/position → passed to compute.
-  const input = groupBattleChars(toBattlePositionChars(flatRosterSample));
-  // 不傳 flip：交由 computeBattleSpritePositions 依圖檔目錄自動推導翻轉
-  // Omit flip so computeBattleSpritePositions auto-derives flipping from the directory.
-  return computeBattleSpritePositions(input, { ...sampleFieldSize, ...options });
+	options?: Partial<IComputeSpritePositionsOptions>,
+): IBattleSprite[]
+{
+	// 扁平名冊 → groupBattleChars 依 side/position 自動分隊 → 傳入計算
+	// Flat roster → groupBattleChars auto-groups by side/position → passed to compute.
+	const input = groupBattleChars(toBattlePositionChars(flatRosterSample));
+	// 不傳 flip：交由 computeBattleSpritePositions 依圖檔目錄自動推導翻轉
+	// Omit flip so computeBattleSpritePositions auto-derives flipping from the directory.
+	return computeBattleSpritePositions(input, { ...sampleFieldSize, ...options });
 }
 
 /** 共用「扁平名冊自動分隊」精靈樣本（展示用） / Shared flat-roster auto-grouped sprite sample (demo) */

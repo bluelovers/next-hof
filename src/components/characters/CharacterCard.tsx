@@ -28,13 +28,14 @@ export type ISelectionMode = 'radio' | 'checkbox';
 // ==================== 子組件 / Sub-components ====================
 
 /** 底座屬性 / Pedestal props */
-export interface ICharacterPedestalProps {
-  /** 角色資料 / Character data */
-  character: ICharacterBase;
-  /** 索引 / Index */
-  index?: number;
-  /** 頭像連結 URL（有值時自動包 <a>）/ Avatar link URL (auto-wraps <a> if provided) */
-  avatarHref?: string;
+export interface ICharacterPedestalProps
+{
+	/** 角色資料 / Character data */
+	character: ICharacterBase;
+	/** 索引 / Index */
+	index?: number;
+	/** 頭像連結 URL（有值時自動包 <a>）/ Avatar link URL (auto-wraps <a> if provided) */
+	avatarHref?: string;
 }
 
 /**
@@ -45,77 +46,81 @@ export interface ICharacterPedestalProps {
  * Auto-wraps avatar in <a> when avatarHref is provided.
  */
 export const CharacterPedestal: React.FC<ICharacterPedestalProps> = ({
-  character,
-  index = 0,
-  avatarHref,
-}) => {
-  const sprite = (
-    <CharacterSprite
-      url={character.imageUrl}
-      variant={EnumSpriteVariant.Avatar}
-      alt={character.name}
-    />
-  );
+	character,
+	index = 0,
+	avatarHref,
+}) =>
+{
+	const sprite = (
+		<CharacterSprite
+			url={character.imageUrl}
+			variant={EnumSpriteVariant.Avatar}
+			alt={character.name}
+		/>
+	);
 
-  return (
-    <div className={getCarpetClass(index)}>
-      {avatarHref
-        ? <a href={avatarHref}>{sprite}</a>
-        : sprite
-      }
-    </div>
-  );
+	return (
+		<div className={getCarpetClass(index)}>
+			{avatarHref
+				? <a href={avatarHref}>{sprite}</a>
+				: sprite
+			}
+		</div>
+	);
 };
 
 /** 資訊區屬性 / Info props */
-export interface ICharacterInfoProps {
-  /** 角色資料 / Character data */
-  character: ICharacterBase;
-  /** 文字區塊 ID / Text area ID */
-  textId: string;
-  /** 是否高亮 / Whether highlighted */
-  highlighted: boolean;
-  /** 點擊回調 / Click callback */
-  onClick?: (e: React.MouseEvent) => void;
+export interface ICharacterInfoProps
+{
+	/** 角色資料 / Character data */
+	character: ICharacterBase;
+	/** 文字區塊 ID / Text area ID */
+	textId: string;
+	/** 是否高亮 / Whether highlighted */
+	highlighted: boolean;
+	/** 點擊回調 / Click callback */
+	onClick?: (e: React.MouseEvent) => void;
 }
 
 /**
  * 角色資訊區 / Character info area
  */
 export const CharacterInfo: React.FC<ICharacterInfoProps> = ({
-  character,
-  textId,
-  highlighted,
-  onClick,
-}) => {
-  return (
-    <div
-      id={textId}
-      className={highlighted ? '' : 'unselect'}
-      onClick={onClick}
-    >
-      {character.name}
-      {character.hasStar && <span className="bold charge">*</span>}
-      <br />
-      Lv.{character.level}
-      &nbsp;&nbsp;
-      {character.className}
-    </div>
-  );
+	character,
+	textId,
+	highlighted,
+	onClick,
+}) =>
+{
+	return (
+		<div
+			id={textId}
+			className={highlighted ? '' : 'unselect'}
+			onClick={onClick}
+		>
+			{character.name}
+			{character.hasStar && <span className="bold charge">*</span>}
+			<br />
+			Lv.{character.level}
+			&nbsp;&nbsp;
+			{character.className}
+		</div>
+	);
 };
 
 /** 選取控件屬性 / Selection control props */
-export interface ICharacterSelectionProps {
-  /** 角色資料 / Character data */
-  character: ICharacterBase;
-  /** 控件 ID / Control ID */
-  controlId: string;
-  /** 選取模式 / Selection mode */
-  mode: ISelectionMode;
-  /** 是否高亮 / Whether highlighted */
-  highlighted: boolean;
-  /** 變更回調 / Change callback */
-  onToggle?: (id: string, nextActive: boolean) => void;
+export interface ICharacterSelectionProps
+{
+	/** 角色資料 / Character data */
+	character: ICharacterBase;
+	/** 控件 ID / Control ID */
+	controlId: string;
+	/** 選取模式 / Selection mode */
+	mode: ISelectionMode;
+	/** 是否高亮 / Whether highlighted */
+	highlighted: boolean;
+	/** 變更回調 / Change callback */
+	onToggle?: (id: string, nextActive: boolean) => void;
 }
 
 /**
@@ -123,63 +128,66 @@ export interface ICharacterSelectionProps {
  * Selection control (radio / checkbox)
  */
 export const CharacterSelection: React.FC<ICharacterSelectionProps> = ({
-  character,
-  controlId,
-  mode,
-  highlighted,
-  onToggle,
-}) => {
-  if (mode === 'radio') {
-    return (
-      <input
-        type="radio"
-        id={controlId}
-        name="input_char_id[]"
-        value={character.id}
-        checked={highlighted}
-        onChange={() => onToggle?.(character.id, true)}
-      />
-    );
-  }
+	character,
+	controlId,
+	mode,
+	highlighted,
+	onToggle,
+}) =>
+{
+	if (mode === 'radio')
+	{
+		return (
+			<input
+				type="radio"
+				id={controlId}
+				name="input_char_id[]"
+				value={character.id}
+				checked={highlighted}
+				onChange={() => onToggle?.(character.id, true)}
+			/>
+		);
+	}
 
-  return (
-    <input
-      type="checkbox"
-      id={controlId}
-      name="input_char_id[]"
-      value={character.id}
-      checked={highlighted}
-      onChange={(e) => onToggle?.(character.id, e.target.checked)}
-    />
-  );
+	return (
+		<input
+			type="checkbox"
+			id={controlId}
+			name="input_char_id[]"
+			value={character.id}
+			checked={highlighted}
+			onChange={(e) => onToggle?.(character.id, e.target.checked)}
+		/>
+	);
 };
 
 // ==================== 主組件 / Main component ====================
 
 /** CharacterCard 屬性 / CharacterCard props */
-export interface ICharacterCardProps {
-  /** 角色資料 / Character data */
-  character: ICharacterBase;
-  /** 索引（決定 carpet0/carpet1 交替）/ Index */
-  index?: number;
-  /** 選取模式 / Selection mode */
-  selection?: ISelectionMode;
-  /** 頭像連結 URL（傳入時底座自動包 <a>）/ Avatar link URL (auto-wraps <a> in pedestal) */
-  avatarHref?: string;
-  /** 選取變更回調 / Selection change callback */
-  onActiveChange?: (id: string, active: boolean) => void;
+export interface ICharacterCardProps
+{
+	/** 角色資料 / Character data */
+	character: ICharacterBase;
+	/** 索引（決定 carpet0/carpet1 交替）/ Index */
+	index?: number;
+	/** 選取模式 / Selection mode */
+	selection?: ISelectionMode;
+	/** 頭像連結 URL（傳入時底座自動包 <a>）/ Avatar link URL (auto-wraps <a> in pedestal) */
+	avatarHref?: string;
+	/** 選取變更回調 / Selection change callback */
+	onActiveChange?: (id: string, active: boolean) => void;
 
-  // --- 可選區塊 / Optional sections ---
+	// --- 可選區塊 / Optional sections ---
 
-  /** 底座（傳 false 隱藏）/ Pedestal (pass false to hide) */
-  renderPedestal?: ((props: ICharacterPedestalProps) => React.ReactNode) | false;
-  /** 資訊區（傳 false 隱藏）/ Info area (pass false to hide) */
-  renderInfo?: ((props: ICharacterInfoProps) => React.ReactNode) | false;
-  /** 選取控件（傳 false 隱藏）/ Selection control (pass false to hide) */
-  renderSelection?: ((props: ICharacterSelectionProps) => React.ReactNode) | false;
+	/** 底座（傳 false 隱藏）/ Pedestal (pass false to hide) */
+	renderPedestal?: ((props: ICharacterPedestalProps) => React.ReactNode) | false;
+	/** 資訊區（傳 false 隱藏）/ Info area (pass false to hide) */
+	renderInfo?: ((props: ICharacterInfoProps) => React.ReactNode) | false;
+	/** 選取控件（傳 false 隱藏）/ Selection control (pass false to hide) */
+	renderSelection?: ((props: ICharacterSelectionProps) => React.ReactNode) | false;
 
-  /** 自訂子元件 / Custom children */
-  children?: React.ReactNode;
+	/** 自訂子元件 / Custom children */
+	children?: React.ReactNode;
 }
 
 /**
@@ -190,61 +198,70 @@ export interface ICharacterCardProps {
  * 各區塊可透過 render props 替換，或傳 false 隱藏。
  */
 export const CharacterCard: React.FC<ICharacterCardProps> = ({
-  character,
-  index = 0,
-  selection = 'radio',
-  avatarHref,
-  onActiveChange,
-  renderPedestal,
-  renderInfo,
-  renderSelection,
-  children,
-}) => {
-  const controlId = `${selection === 'radio' ? 'radio' : 'box'}${index + 1}`;
-  const textId = `text${index + 1}`;
+	character,
+	index = 0,
+	selection = 'radio',
+	avatarHref,
+	onActiveChange,
+	renderPedestal,
+	renderInfo,
+	renderSelection,
+	children,
+}) =>
+{
+	const controlId = `${selection === 'radio' ? 'radio' : 'box'}${index + 1}`;
+	const textId = `text${index + 1}`;
 
-  // 統一讀取 active（向後相容 selected / checked）
-  const highlighted = character.active
-    ?? (character as ICharacterData).selected
-    ?? (character as IBattleCharacterData).checked
-    ?? false;
+	// 統一讀取 active（向後相容 selected / checked）
+	const highlighted = character.active
+		?? (character as ICharacterData).selected
+		?? (character as IBattleCharacterData).checked
+		?? false;
 
-  /** 點擊文字區塊切換選取 / Click text to toggle */
-  const handleTextClick = (e: React.MouseEvent) => {
-    if (!(e.target as HTMLElement).closest('input')) {
-      onActiveChange?.(character.id, !highlighted);
-    }
-  };
+	/** 點擊文字區塊切換選取 / Click text to toggle */
+	const handleTextClick = (e: React.MouseEvent) =>
+	{
+		if (!(e.target as HTMLElement).closest('input'))
+		{
+			onActiveChange?.(character.id, !highlighted);
+		}
+	};
 
-  const pedestalProps: ICharacterPedestalProps = { character, index, avatarHref };
-  const infoProps: ICharacterInfoProps = { character, textId, highlighted, onClick: handleTextClick };
-  const selectionProps: ICharacterSelectionProps = { character, controlId, mode: selection, highlighted, onToggle: onActiveChange };
+	const pedestalProps: ICharacterPedestalProps = { character, index, avatarHref };
+	const infoProps: ICharacterInfoProps = { character, textId, highlighted, onClick: handleTextClick };
+	const selectionProps: ICharacterSelectionProps = {
+		character,
+		controlId,
+		mode: selection,
+		highlighted,
+		onToggle: onActiveChange,
+	};
 
-  return (
-    <div className="carpet_frame">
-      {/* 底座 / Pedestal */}
-      {renderPedestal !== false && (
-        renderPedestal
-          ? renderPedestal(pedestalProps)
-          : <CharacterPedestal {...pedestalProps} />
-      )}
+	return (
+		<div className="carpet_frame">
+			{/* 底座 / Pedestal */}
+			{renderPedestal !== false && (
+				renderPedestal
+					? renderPedestal(pedestalProps)
+					: <CharacterPedestal {...pedestalProps} />
+			)}
 
-      {/* 資訊區 / Info */}
-      {renderInfo !== false && (
-        renderInfo
-          ? renderInfo(infoProps)
-          : <CharacterInfo {...infoProps} />
-      )}
+			{/* 資訊區 / Info */}
+			{renderInfo !== false && (
+				renderInfo
+					? renderInfo(infoProps)
+					: <CharacterInfo {...infoProps} />
+			)}
 
-      {/* 選取控件 / Selection control */}
-      {renderSelection !== false && (
-        renderSelection
-          ? renderSelection(selectionProps)
-          : <CharacterSelection {...selectionProps} />
-      )}
+			{/* 選取控件 / Selection control */}
+			{renderSelection !== false && (
+				renderSelection
+					? renderSelection(selectionProps)
+					: <CharacterSelection {...selectionProps} />
+			)}
 
-      {/* 自訂子元件 / Custom children */}
-      {children}
-    </div>
-  );
+			{/* 自訂子元件 / Custom children */}
+			{children}
+		</div>
+	);
 };

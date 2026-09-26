@@ -9,14 +9,17 @@ import { GameTime } from './time-service';
  */
 const elapsed = (t: GameTime): number => t.timer.now().diff(t.initTime);
 
-describe('GameTime (fake-timer)', () => {
-	it('is a FakeTimer whose virtual clock starts at 0', () => {
+describe('GameTime (fake-timer)', () =>
+{
+	it('is a FakeTimer whose virtual clock starts at 0', () =>
+	{
 		const t = new GameTime();
 		expect(t).toBeInstanceOf(FakeTimer);
 		expect(elapsed(t)).toBe(0);
 	});
 
-	it('start(ms) advances the clock and runs expired callbacks with the final time', () => {
+	it('start(ms) advances the clock and runs expired callbacks with the final time', () =>
+	{
 		const t = new GameTime();
 		const seen: number[] = [];
 		t.setTimeout(() => seen.push(elapsed(t)), 500);
@@ -33,20 +36,24 @@ describe('GameTime (fake-timer)', () => {
 		expect(seen).toEqual([1000, 1500]);
 	});
 
-	it('callback receives the owning GameTime as self', () => {
+	it('callback receives the owning GameTime as self', () =>
+	{
 		const t = new GameTime();
 		let self: unknown;
-		t.setTimeout((_current, owner) => {
+		t.setTimeout((_current, owner) =>
+		{
 			self = owner;
 		}, 100);
 		t.start(100);
 		expect(self).toBe(t);
 	});
 
-	it('setInterval catches up once per interval boundary within a single start()', () => {
+	it('setInterval catches up once per interval boundary within a single start()', () =>
+	{
 		const t = new GameTime();
 		let fires = 0;
-		t.setInterval(() => {
+		t.setInterval(() =>
+		{
 			fires++;
 		}, 100);
 		t.start(350);
@@ -56,17 +63,20 @@ describe('GameTime (fake-timer)', () => {
 		expect(elapsed(t)).toBe(350);
 	});
 
-	it('clearTimeout cancels a pending timer and reset rewinds the clock', () => {
+	it('clearTimeout cancels a pending timer and reset rewinds the clock', () =>
+	{
 		const t = new GameTime();
 		let fired = 0;
-		const item = t.setTimeout(() => {
+		const item = t.setTimeout(() =>
+		{
 			fired++;
 		}, 1000);
 		t.clearTimeout(item);
 		t.start(2000);
 		expect(fired).toBe(0);
 
-		t.setTimeout(() => {
+		t.setTimeout(() =>
+		{
 			fired++;
 		}, 100);
 		t.start(100);
@@ -76,7 +86,8 @@ describe('GameTime (fake-timer)', () => {
 		expect(elapsed(t)).toBe(0);
 	});
 
-	it('instances keep independent clocks', () => {
+	it('instances keep independent clocks', () =>
+	{
 		const a = new GameTime();
 		const b = new GameTime();
 		a.start(1000);

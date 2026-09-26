@@ -16,11 +16,12 @@ import './EncounterSelect.css';
 import '#/components/shared/SharedBase.css';
 
 /** EncounterSelect 屬性 / EncounterSelect props */
-export interface IEncounterSelectProps {
-  /** 已選編選 id / Selected encounter id */
-  selectedId: string;
-  /** 編選變更回调（傳入 id）/ Encounter change callback (id) */
-  onChange: (id: string) => void;
+export interface IEncounterSelectProps
+{
+	/** 已選編選 id / Selected encounter id */
+	selectedId: string;
+	/** 編選變更回调（傳入 id）/ Encounter change callback (id) */
+	onChange: (id: string) => void;
 }
 
 /**
@@ -34,34 +35,34 @@ const monName = (no: number): string => SEED.mons.find((m) => m.no === no)?.name
  * One encounter option (radio card)
  */
 const EncounterCard: React.FC<{
-  encounter: IEncounter;
-  checked: boolean;
-  onChange: (id: string) => void;
+	encounter: IEncounter;
+	checked: boolean;
+	onChange: (id: string) => void;
 }> = ({ encounter, checked, onChange }) => (
-  <label className={`encounter-card${checked ? ' is-checked' : ''}`}>
-    <input
-      type="radio"
-      name="showcase-encounter"
-      checked={checked}
-      onChange={() => onChange(encounter.id)}
-    />
-    <span className="encounter-card-body">
+	<label className={`encounter-card${checked ? ' is-checked' : ''}`}>
+		<input
+			type="radio"
+			name="showcase-encounter"
+			checked={checked}
+			onChange={() => onChange(encounter.id)}
+		/>
+		<span className="encounter-card-body">
       <span className="encounter-card-name">{encounter.name}</span>
       <span className="encounter-card-team">{encounter.teamName}</span>
       <span className="encounter-card-mons">
         {encounter.monNos.map((no, i) => (
-          <span className="encounter-mon" key={`${no}-${i}`}>
+					<span className="encounter-mon" key={`${no}-${i}`}>
             <span
-              className="encounter-mon-sprite"
-              style={{ backgroundImage: `url(${getMonSpriteUrl(no)})` }}
-              aria-hidden="true"
-            />
+							className="encounter-mon-sprite"
+							style={{ backgroundImage: `url(${getMonSpriteUrl(no)})` }}
+							aria-hidden="true"
+						/>
             <span className="encounter-mon-name">{monName(no)}</span>
           </span>
-        ))}
+				))}
       </span>
     </span>
-  </label>
+	</label>
 );
 
 /**
@@ -69,25 +70,26 @@ const EncounterCard: React.FC<{
  * Encounter select component
  */
 export const EncounterSelect: React.FC<IEncounterSelectProps> = ({
-  selectedId,
-  onChange,
-}) => {
-  return (
-    <section className="encounter-select" aria-labelledby="encounter-select-heading">
-      <h2 id="encounter-select-heading" className="encounter-select-heading">
-        敵方編選 / Enemy Encounter
-      </h2>
+	selectedId,
+	onChange,
+}) =>
+{
+	return (
+		<section className="encounter-select" aria-labelledby="encounter-select-heading">
+			<h2 id="encounter-select-heading" className="encounter-select-heading">
+				敵方編選 / Enemy Encounter
+			</h2>
 
-      <div className="encounter-select-list">
-        {SHOWCASE_ENCOUNTERS.map((encounter) => (
-          <EncounterCard
-            key={encounter.id}
-            encounter={encounter}
-            checked={encounter.id === selectedId}
-            onChange={onChange}
-          />
-        ))}
-      </div>
-    </section>
-  );
+			<div className="encounter-select-list">
+				{SHOWCASE_ENCOUNTERS.map((encounter) => (
+					<EncounterCard
+						key={encounter.id}
+						encounter={encounter}
+						checked={encounter.id === selectedId}
+						onChange={onChange}
+					/>
+				))}
+			</div>
+		</section>
+	);
 };

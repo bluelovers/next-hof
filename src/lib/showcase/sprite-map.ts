@@ -43,7 +43,8 @@ export const MON_SPRITE_URLS: Readonly<Record<number, string>> = {
  * 取得玩家角色精靈圖路徑（無對應時回傳 placeholder）
  * Get a player char's sprite URL (returns the placeholder when unmapped)
  */
-export function getCharSpriteUrl(no: number): string {
+export function getCharSpriteUrl(no: number): string
+{
 	return CHAR_SPRITE_URLS[no] ?? SPRITE_PLACEHOLDER_URL;
 }
 
@@ -51,6 +52,7 @@ export function getCharSpriteUrl(no: number): string {
  * 取得怪物精靈圖路徑（無對應時回傳 placeholder）
  * Get a monster's sprite URL (returns the placeholder when unmapped)
  */
-export function getMonSpriteUrl(no: number): string {
+export function getMonSpriteUrl(no: number): string
+{
 	return MON_SPRITE_URLS[no] ?? SPRITE_PLACEHOLDER_URL;
 }

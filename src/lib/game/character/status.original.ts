@@ -37,12 +37,15 @@ import type { RNG } from '../core/rng';
  * @returns false=已中毒 | true=成功中毒 | 'BLOCK'=有抗毒且機率抵抗
  *          false=already poisoned | true=poisoned | 'BLOCK'=resisted by chance
  */
-export function getPoisonOriginal(char: Character, bePoison: number, rng?: RNG): boolean | 'BLOCK' {
+export function getPoisonOriginal(char: Character, bePoison: number, rng?: RNG): boolean | 'BLOCK'
+{
 	if (char.STATE === EnumState.Poison) return false;
 
-	if (char.SPECIAL.PoisonResist && rng) {
+	if (char.SPECIAL.PoisonResist && rng)
+	{
 		const chance = bePoison * (1 - char.SPECIAL.PoisonResist / 100);
-		if (rng.randInt(0, 99) < chance) {
+		if (rng.randInt(0, 99) < chance)
+		{
 			char.STATE = EnumState.Poison; // 抗毒成功仍為 STATE_POISON
 			return true;
 		}

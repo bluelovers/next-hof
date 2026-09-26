@@ -17,10 +17,11 @@ import type { CSSProperties } from 'react';
  * @param url - 精靈圖片 URL / Sprite image URL
  * @returns 背景樣式物件 / Background style object
  */
-export function buildSpriteStyle(url: string): CSSProperties {
-  return {
-    backgroundImage: `url(${url})`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-  };
+export function buildSpriteStyle(url: string): CSSProperties
+{
+	return {
+		backgroundImage: `url(${url})`,
+		backgroundSize: 'cover',
+		backgroundPosition: 'center',
+	};
 }

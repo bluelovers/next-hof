@@ -11,23 +11,25 @@ import { buildJobTree, renderJobTreeNode } from './utils/jobTreeUtils';
 import './JobTree.css';
 
 /** 職業樹組件屬性 / Job tree component properties */
-export interface IJobTreeProps {
-  /** 職業列表 / Job list */
-  jobs: IJobData[];
+export interface IJobTreeProps
+{
+	/** 職業列表 / Job list */
+	jobs: IJobData[];
 }
 
 /**
  * 職業樹組件
  * Job tree component
  */
-export const JobTree: React.FC<IJobTreeProps> = ({ jobs }) => {
-  const jobTree = buildJobTree(jobs);
+export const JobTree: React.FC<IJobTreeProps> = ({ jobs }) =>
+{
+	const jobTree = buildJobTree(jobs);
 
-  return (
-    <div className="job-tree">
-      <ul>
-        {jobTree.map((node) => renderJobTreeNode(node))}
-      </ul>
-    </div>
-  );
+	return (
+		<div className="job-tree">
+			<ul>
+				{jobTree.map((node) => renderJobTreeNode(node))}
+			</ul>
+		</div>
+	);
 };

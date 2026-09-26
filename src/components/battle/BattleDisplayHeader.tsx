@@ -14,30 +14,32 @@ import './BattleDisplayHeader.css';
 import '#/components/shared/SharedBase.css';
 
 /** 戰鬥標題列屬性 / Battle display header props */
-export interface IBattleDisplayHeaderProps {
-  /** 戰鬥標題（選填；未提供時不渲染）/ Battle title (optional; omitted when absent) */
-  title?: string;
-  /** 戰鬥時間（顯示於標題下方）/ Battle time (shown below the title) */
-  time?: IDisplayTimeString;
+export interface IBattleDisplayHeaderProps
+{
+	/** 戰鬥標題（選填；未提供時不渲染）/ Battle title (optional; omitted when absent) */
+	title?: string;
+	/** 戰鬥時間（顯示於標題下方）/ Battle time (shown below the title) */
+	time?: IDisplayTimeString;
 }
 
 /**
  * 戰鬥標題列組件
  * Battle display header component
  */
-export const BattleDisplayHeader: React.FC<IBattleDisplayHeaderProps> = ({ title, time }) => {
-  if (!title) return null;
+export const BattleDisplayHeader: React.FC<IBattleDisplayHeaderProps> = ({ title, time }) =>
+{
+	if (!title) return null;
 
-  return (
-    <header className="battle-header divider-bottom">
-      <h2 className="battle-title">{title}</h2>
-      {time && (
-        <div className="battle-time">
-          this battle starts at
-          <br />
-          {time}
-        </div>
-      )}
-    </header>
-  );
+	return (
+		<header className="battle-header divider-bottom">
+			<h2 className="battle-title">{title}</h2>
+			{time && (
+				<div className="battle-time">
+					this battle starts at
+					<br />
+					{time}
+				</div>
+			)}
+		</header>
+	);
 };

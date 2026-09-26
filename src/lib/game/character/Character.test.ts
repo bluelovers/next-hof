@@ -11,8 +11,10 @@ import { EnumCharType } from '../types';
 
 const repo = createSeedRepository();
 
-describe('Character factory (4.1)', () => {
-	it('newMon carries mon flag; newMonSummon carries mon + summon', () => {
+describe('Character factory (4.1)', () =>
+{
+	it('newMon carries mon flag; newMonSummon carries mon + summon', () =>
+	{
 		const rng = new RNG(1);
 		const mon = newMon(repo.getMon(1000)!, repo, rng);
 		expect(mon.isMon()).toBe(true);
@@ -25,7 +27,8 @@ describe('Character factory (4.1)', () => {
 	});
 });
 
-describe('instance identity (unitUuid)', () => {
+describe('instance identity (unitUuid)', () =>
+{
 	const base = {
 		name: 'x',
 		types: [EnumCharType.Mon],
@@ -34,19 +37,22 @@ describe('instance identity (unitUuid)', () => {
 		maxhp: 100, maxsp: 10,
 	};
 
-	it('honours a provider-supplied unitUuid', () => {
+	it('honours a provider-supplied unitUuid', () =>
+	{
 		const c = new Character({ ...base, no: 1000, unitUuid: 'mon-instance-7' });
 		expect(c.unitUuid).toBe('mon-instance-7');
 	});
 
-	it('generates distinct unitUids for same-no individuals', () => {
+	it('generates distinct unitUids for same-no individuals', () =>
+	{
 		const a = new Character({ ...base, no: 1000 });
 		const b = new Character({ ...base, no: 1000 });
 		expect(a.unitUuid).not.toBe(b.unitUuid);
 		expect(a.unitUuid.length).toBeGreaterThan(0);
 	});
 
-	it('carries the per-unit corpse policy', () => {
+	it('carries the per-unit corpse policy', () =>
+	{
 		expect(new Character({ ...base, no: 1000, corpse: true }).corpse).toBe(true);
 		expect(new Character({ ...base, no: 1000, corpse: false }).corpse).toBe(false);
 		// 未提供時保留 undefined（往上繼承：隊伍級 → 戰鬥級 → 最終未設定＝不留屍體）
@@ -54,8 +60,10 @@ describe('instance identity (unitUuid)', () => {
 	});
 });
 
-describe('level_fix (4.2)', () => {
-	it('scales monster base attributes by ceil(base * newLevel/oldLevel)', () => {
+describe('level_fix (4.2)', () =>
+{
+	it('scales monster base attributes by ceil(base * newLevel/oldLevel)', () =>
+	{
 		const rng = new RNG(2);
 		const mon = newMon(repo.getMon(1000)!, repo, rng); // base str 20, maxhp 140, level 1
 		const oldStr = mon.str;
@@ -68,7 +76,8 @@ describe('level_fix (4.2)', () => {
 		expect(mon.hp).toBe(mon.maxhp);
 	});
 
-	it('leaves char type unaffected', () => {
+	it('leaves char type unaffected', () =>
+	{
 		const rng = new RNG(3);
 		const char = newChar(repo.getCharBase(100)!, repo, rng);
 		const before = { str: char.str, maxhp: char.maxhp, level: char.level };
@@ -79,8 +88,10 @@ describe('level_fix (4.2)', () => {
 	});
 });
 
-describe('battle-variable (4.3)', () => {
-	it('computes STR and MAXHP from formula', () => {
+describe('battle-variable (4.3)', () =>
+{
+	it('computes STR and MAXHP from formula', () =>
+	{
 		const rng = new RNG(4);
 		const char = newChar(repo.getCharBase(100)!, repo, rng);
 		expect(char.STR).toBe(char.str + char.P_STR);
@@ -93,14 +104,18 @@ describe('battle-variable (4.3)', () => {
 	});
 });
 
-describe('status effects (4.4)', () => {
-	it('poison sets state and deals non-lethal damage; barrier blocks one hit', () => {
+describe('status effects (4.4)', () =>
+{
+	it('poison sets state and deals non-lethal damage; barrier blocks one hit', () =>
+	{
 		const rng = new RNG(5);
 		const char = new Character({
 			no: 1, name: 't', types: [EnumCharType.Char], level: 1,
 			str: 10, int: 10, dex: 10, spd: 10, luk: 10, maxhp: 300, maxsp: 50,
 		});
-		char.MAXHP = 300; char.HP = 300; char.rng = rng;
+		char.MAXHP = 300;
+		char.HP = 300;
+		char.rng = rng;
 
 		const poison = getPoison(char, 100, rng);
 		expect(poison).toBe(true);

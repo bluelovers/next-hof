@@ -6,12 +6,15 @@ import { COMP_FIELDS } from '../character/status-attrs';
 import type { IDataRepository } from '../data/repository';
 
 /** 套用所有已學且為被動(passive)技能的能力加成 / apply bonuses of every learned passive skill */
-export function skillPassive(char: Character, repo: IDataRepository): void {
-	for (const no of char.skill) {
+export function skillPassive(char: Character, repo: IDataRepository): void
+{
+	for (const no of char.skill)
+	{
 		const sk = repo.getSkill(no);
 		if (!sk || !sk.passive) continue;
 
-		for (const f of COMP_FIELDS) {
+		for (const f of COMP_FIELDS)
+		{
 			const v = sk[f];
 			if (v) char[f] += v;
 		}

@@ -10,47 +10,53 @@
 
 /* ==================== 整體佈局 / Overall layout ==================== */
 
-.dashboard-page {
-  font-family: var(--font-primary);
-  font-size: 12px;
-  color: var(--color-text-primary);
+.dashboard-page
+{
+	font-family: var(--font-primary);
+	font-size: 12px;
+	color: var(--color-text-primary);
 }
 
 /* ==================== 頁尾 / Footer ==================== */
 
-.dashboard-footer {
-  width: 100%;
-  padding: 8px 0 4px 0;
-  background: var(--color-bg-surface);
-  border-top: 1px solid var(--color-border-dark);
-  text-align: center;
-  color: var(--color-text-dim);
-  font-size: 12px;
+.dashboard-footer
+{
+	width: 100%;
+	padding: 8px 0 4px 0;
+	background: var(--color-bg-surface);
+	border-top: 1px solid var(--color-border-dark);
+	text-align: center;
+	color: var(--color-text-dim);
+	font-size: 12px;
 }
 
-.dashboard-footer .footer-link {
-  text-decoration: none;
-  color: var(--color-text-secondary);
-  font-weight: bold;
-  font-size: 12px;
+.dashboard-footer .footer-link
+{
+	text-decoration: none;
+	color: var(--color-text-secondary);
+	font-weight: bold;
+	font-size: 12px;
 }
 
-.dashboard-footer .footer-link:hover {
-  text-decoration: underline;
-  color: var(--color-text-hover);
+.dashboard-footer .footer-link:hover
+{
+	text-decoration: underline;
+	color: var(--color-text-hover);
 }
 
-.dashboard-footer .footer-copyright {
-  color: var(--color-text-dim);
-  font-size: 11px;
+.dashboard-footer .footer-copyright
+{
+	color: var(--color-text-dim);
+	font-size: 11px;
 }
 
 /* ==================== 標題 / Headings ==================== */
 
-.dashboard-page h4 {
-  padding-left: 5px;
-  margin: 10px 0px;
-  border-left: 15px solid var(--color-border-heading);
-  border-bottom: 1px solid var(--color-border-heading);
-  display: block;
+.dashboard-page h4
+{
+	padding-left: 5px;
+	margin: 10px 0px;
+	border-left: 15px solid var(--color-border-heading);
+	border-bottom: 1px solid var(--color-border-heading);
+	display: block;
 }

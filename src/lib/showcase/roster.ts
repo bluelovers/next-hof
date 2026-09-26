@@ -14,7 +14,8 @@ import { getCharSpriteUrl } from './sprite-map';
  * 名冊顯示項目 / Roster display entry
  * 介面 / interface（I 前綴命名慣例）
  */
-export interface IRosterEntry {
+export interface IRosterEntry
+{
 	/** 角色定義編號（def no）/ character definition number */
 	no: number;
 	/** 角色名稱 / character name */
@@ -51,6 +52,7 @@ export const SHOWCASE_ROSTER: readonly IRosterEntry[] = SEED.chars.map((c) => ({
 }));
 
 /** 取得單一角色的名冊項目 / Get one roster entry by def no */
-export function getRosterEntry(no: number): IRosterEntry | undefined {
+export function getRosterEntry(no: number): IRosterEntry | undefined
+{
 	return SHOWCASE_ROSTER.find((e) => e.no === no);
 }

@@ -13,13 +13,14 @@ import { BattleSidePanel } from './BattleSidePanel';
 import './BattleTeamInfo.css';
 
 /** 隊伍資訊屬性 / Team info props */
-export interface IBattleTeamInfoProps {
-  /** 隊伍名稱 / Team name */
-  name: string;
-  /** 單位列表 / Unit list */
-  units: IBattleUnit[];
-  /** 隊伍側邊類別 / Team side CSS class */
-  sideClass: EnumTeamSideClass;
+export interface IBattleTeamInfoProps
+{
+	/** 隊伍名稱 / Team name */
+	name: string;
+	/** 單位列表 / Unit list */
+	units: IBattleUnit[];
+	/** 隊伍側邊類別 / Team side CSS class */
+	sideClass: EnumTeamSideClass;
 }
 
 /**
@@ -27,22 +28,23 @@ export interface IBattleTeamInfoProps {
  * Team info component
  */
 export const BattleTeamInfo: React.FC<IBattleTeamInfoProps> = ({
-  name,
-  units,
-  sideClass,
-}) => {
-  const totalLevel = calcTotalLevel(units);
-  const avgLevel = units.length > 0 ? (totalLevel / units.length).toFixed(1) : '0';
-  const totalHp = calcTotalHp(units);
+	name,
+	units,
+	sideClass,
+}) =>
+{
+	const totalLevel = calcTotalLevel(units);
+	const avgLevel = units.length > 0 ? (totalLevel / units.length).toFixed(1) : '0';
+	const totalHp = calcTotalHp(units);
 
-  return (
-    <BattleSidePanel sideClass={sideClass}>
-      <div className="bold">{name}</div>
-      Total Lv : {totalLevel}
-      <br />
-      Average Lv : {avgLevel}
-      <br />
-      Total HP : {totalHp.current} / {totalHp.max}
-    </BattleSidePanel>
-  );
+	return (
+		<BattleSidePanel sideClass={sideClass}>
+			<div className="bold">{name}</div>
+			Total Lv : {totalLevel}
+			<br />
+			Average Lv : {avgLevel}
+			<br />
+			Total HP : {totalHp.current} / {totalHp.max}
+		</BattleSidePanel>
+	);
 };

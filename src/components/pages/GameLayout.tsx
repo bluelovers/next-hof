@@ -13,26 +13,27 @@ import { NavList } from '#/components/navigation/NavList';
 import { buildAppUrl } from '#/components/config/AppConfig';
 
 /** GameLayout 屬性 / GameLayout props */
-export interface IGameLayoutProps {
-  /** 子內容 / Child content */
-  children: React.ReactNode;
-  /** 導航連結列表 / Nav link list */
-  navLinks?: INavLink[];
-  /** 副標題 / Subtitle */
-  subtitle?: string;
-  /** 頁尾連結列表 / Footer link list */
-  footerLinks?: INavLink[];
-  /** 版權文字 / Copyright text */
-  copyright?: string;
+export interface IGameLayoutProps
+{
+	/** 子內容 / Child content */
+	children: React.ReactNode;
+	/** 導航連結列表 / Nav link list */
+	navLinks?: INavLink[];
+	/** 副標題 / Subtitle */
+	subtitle?: string;
+	/** 頁尾連結列表 / Footer link list */
+	footerLinks?: INavLink[];
+	/** 版權文字 / Copyright text */
+	copyright?: string;
 }
 
 /** 預設導航連結 / Default nav links */
 const DEFAULT_NAV_LINKS: INavLink[] = [
-  { label: 'トップ', href: buildAppUrl() },
-  { label: '新規', href: buildAppUrl('/game/newgame') },
-  { label: 'ルールとマニュアル', href: buildAppUrl('/manual') },
-  { label: 'ゲームデータ', href: buildAppUrl('/gamedata') },
-  { label: '戦闘ログ', href: buildAppUrl('/log') },
+	{ label: 'トップ', href: buildAppUrl() },
+	{ label: '新規', href: buildAppUrl('/game/newgame') },
+	{ label: 'ルールとマニュアル', href: buildAppUrl('/manual') },
+	{ label: 'ゲームデータ', href: buildAppUrl('/gamedata') },
+	{ label: '戦闘ログ', href: buildAppUrl('/log') },
 ];
 
 /**
@@ -40,48 +41,49 @@ const DEFAULT_NAV_LINKS: INavLink[] = [
  * GameLayout shared layout component
  */
 export const GameLayout: React.FC<IGameLayoutProps> = ({
-  children,
-  navLinks = DEFAULT_NAV_LINKS,
-  subtitle = 'Welcome to [ Hall of Rumor 噂のホール ]',
-  footerLinks = DEFAULT_FOOTER_LINKS,
-  copyright = COPYRIGHT_TEXT,
-}) => {
-  return (
-    <div className="game-layout">
-      <a id="top" />
+	children,
+	navLinks = DEFAULT_NAV_LINKS,
+	subtitle = 'Welcome to [ Hall of Rumor 噂のホール ]',
+	footerLinks = DEFAULT_FOOTER_LINKS,
+	copyright = COPYRIGHT_TEXT,
+}) =>
+{
+	return (
+		<div className="game-layout">
+			<a id="top" />
 
-      {/* 標題區 / Title */}
-      <div className="game-title">
-        <img
-          src="/image/title03.png"
-          alt="Hall of Rumor 噂のホール"
-        />
-      </div>
+			{/* 標題區 / Title */}
+			<div className="game-title">
+				<img
+					src="/image/title03.png"
+					alt="Hall of Rumor 噂のホール"
+				/>
+			</div>
 
-      {/* 導航欄 / Navigation */}
-      <div className="game-nav">
-        <NavList
-          links={navLinks}
-          separator={<span className="nav-divide" />}
-          activeClassName="nav-link-active"
-        />
-      </div>
+			{/* 導航欄 / Navigation */}
+			<div className="game-nav">
+				<NavList
+					links={navLinks}
+					separator={<span className="nav-divide" />}
+					activeClassName="nav-link-active"
+				/>
+			</div>
 
-      {/* 副標題 / Subtitle */}
-      <div className="game-subtitle">{subtitle}</div>
+			{/* 副標題 / Subtitle */}
+			<div className="game-subtitle">{subtitle}</div>
 
-      {/* 內容區 / Content */}
-      <div className="game-content">{children}</div>
+			{/* 內容區 / Content */}
+			<div className="game-content">{children}</div>
 
-      {/* 頁尾 / Footer */}
-      <div className="game-footer">
-        <NavList
-          links={footerLinks}
-          separator={' - '}
-        />
-        <br />
-        {copyright}
-      </div>
-    </div>
-  );
+			{/* 頁尾 / Footer */}
+			<div className="game-footer">
+				<NavList
+					links={footerLinks}
+					separator={' - '}
+				/>
+				<br />
+				{copyright}
+			</div>
+		</div>
+	);
 };

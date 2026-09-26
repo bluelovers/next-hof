@@ -5,30 +5,35 @@
 
 /* ==================== 子導航容器 / Sub-navigation container ==================== */
 
-.gd-subnav {
-  margin: 15px;
+.gd-subnav
+{
+	margin: 15px;
 }
 
-.gd-subnav-links {
-  margin: 0 20px;
+.gd-subnav-links
+{
+	margin: 0 20px;
 }
 
 /* ==================== 導航連結 / Navigation links ==================== */
 
-.gd-subnav a {
-  text-decoration: none;
-  color: var(--color-text-secondary);
-  font-weight: bold;
-  margin: 0 4px;
+.gd-subnav a
+{
+	text-decoration: none;
+	color: var(--color-text-secondary);
+	font-weight: bold;
+	margin: 0 4px;
 }
 
-.gd-subnav a:hover {
-  text-decoration: underline;
-  color: var(--color-text-hover);
+.gd-subnav a:hover
+{
+	text-decoration: underline;
+	color: var(--color-text-hover);
 }
 
 /* ==================== 分隔符 / Divider ==================== */
 
-.gd-subnav .subnav-divide {
-  color: var(--color-text-dim);
+.gd-subnav .subnav-divide
+{
+	color: var(--color-text-dim);
 }

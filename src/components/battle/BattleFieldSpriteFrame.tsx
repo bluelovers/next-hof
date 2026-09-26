@@ -17,15 +17,16 @@ import './BattleFieldSpriteFrame.css';
 import type { IStyleProps } from '#/components/shared/types';
 
 /** 戰場精靈排版框屬性（標籤開關共用 IBattleSpriteLabelOptions）/ Battlefield sprite layout frame props (label toggle from the shared IBattleSpriteLabelOptions) */
-export interface IBattleFieldSpriteFrameProps extends IBattleSpriteLabelOptions, IStyleProps {
-  /** 精靈列表 / Sprite list */
-  sprites: IBattleSprite[];
-  /** 排版框寬度（角色排版尺寸） / Frame width (sprite layout size) */
-  width: number;
-  /** 排版框高度（角色排版尺寸） / Frame height (sprite layout size) */
-  height: number;
-  /** 垂直對齊方式（預設 bottom） / Vertical alignment (default bottom) */
-  valign?: IBattleFieldVAlign;
+export interface IBattleFieldSpriteFrameProps extends IBattleSpriteLabelOptions, IStyleProps
+{
+	/** 精靈列表 / Sprite list */
+	sprites: IBattleSprite[];
+	/** 排版框寬度（角色排版尺寸） / Frame width (sprite layout size) */
+	width: number;
+	/** 排版框高度（角色排版尺寸） / Frame height (sprite layout size) */
+	height: number;
+	/** 垂直對齊方式（預設 bottom） / Vertical alignment (default bottom) */
+	valign?: IBattleFieldVAlign;
 }
 
 /**
@@ -41,26 +42,27 @@ export interface IBattleFieldSpriteFrameProps extends IBattleSpriteLabelOptions,
  * Always horizontally centered; vertical position controlled by valign (default bottom).
  */
 export const BattleFieldSpriteFrame: React.FC<IBattleFieldSpriteFrameProps> = ({
-  sprites,
-  width,
-  height,
-  showSpriteLabels,
-  valign,
-  style,
-  className,
-}) => {
-  return (
-    <div
-      className={`battle-sprite-frame battle-sprite-frame--${valign ?? 'bottom'}${className ? ` ${className}` : ''}`}
-      style={{ width, height, ...style }}
-    >
-      <BattleFieldSpriteLayers
-        sprites={sprites}
-        index={0}
-        width={width}
-        height={height}
-        showSpriteLabels={showSpriteLabels}
-      />
-    </div>
-  );
+	sprites,
+	width,
+	height,
+	showSpriteLabels,
+	valign,
+	style,
+	className,
+}) =>
+{
+	return (
+		<div
+			className={`battle-sprite-frame battle-sprite-frame--${valign ?? 'bottom'}${className ? ` ${className}` : ''}`}
+			style={{ width, height, ...style }}
+		>
+			<BattleFieldSpriteLayers
+				sprites={sprites}
+				index={0}
+				width={width}
+				height={height}
+				showSpriteLabels={showSpriteLabels}
+			/>
+		</div>
+	);
 };

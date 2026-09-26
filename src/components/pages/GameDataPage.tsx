@@ -15,11 +15,12 @@ import { JobDetailTable } from '#/components/game-data/JobDetailTable';
 import './GameDataPage.css';
 
 /** GameDataPage 屬性 / GameDataPage props */
-export interface IGameDataPageProps {
-  /** 頁面資料 / Page data */
-  data: IGameDataPageData;
-  /** 子頁面連結 / Sub-page links */
-  subLinks?: Array<{ label: string; href: string }>;
+export interface IGameDataPageProps
+{
+	/** 頁面資料 / Page data */
+	data: IGameDataPageData;
+	/** 子頁面連結 / Sub-page links */
+	subLinks?: Array<{ label: string; href: string }>;
 }
 
 /**
@@ -27,23 +28,24 @@ export interface IGameDataPageProps {
  * GameDataPage component
  */
 export const GameDataPage: React.FC<IGameDataPageProps> = ({
-  data,
-  subLinks,
-}) => {
-   return (
-     <div className="gamedata-page">
-       {/* 子頁面導航 / Sub-page navigation */}
-       <GDSubNav subLinks={subLinks} />
+	data,
+	subLinks,
+}) =>
+{
+	return (
+		<div className="gamedata-page">
+			{/* 子頁面導航 / Sub-page navigation */}
+			<GDSubNav subLinks={subLinks} />
 
-       {/* 職業樹 / Job tree */}
-       <div className="job-tree-section">
-         <h4>職業(Job)</h4>
-         <JobTree jobs={data.jobs} />
+			{/* 職業樹 / Job tree */}
+			<div className="job-tree-section">
+				<h4>職業(Job)</h4>
+				<JobTree jobs={data.jobs} />
 
-         {/* 職業詳細 / Job details */}
-         <h4>Variety</h4>
-         <JobDetailTable jobs={data.jobs} />
-       </div>
-     </div>
-   );
+				{/* 職業詳細 / Job details */}
+				<h4>Variety</h4>
+				<JobDetailTable jobs={data.jobs} />
+			</div>
+		</div>
+	);
 };

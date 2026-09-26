@@ -11,18 +11,21 @@
  * sit side by side via flex and wrap when narrow.
  */
 
-.battle-team-row {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
+.battle-team-row
+{
+	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
 }
 
 /* ==================== 窄螢幕 / Narrow screens ==================== */
 
-@media (max-width: 640px) {
-  /* 堆疊後不需要欄位分隔線（作用域限本元件，不依賴父頁面 CSS）
-     No column divider once stacked (scoped to this component; no parent-page CSS) */
-  .battle-team-row .ttd1 {
-    border-left: none;
-  }
+@media (max-width: 640px)
+{
+	/* 堆疊後不需要欄位分隔線（作用域限本元件，不依賴父頁面 CSS）
+		 No column divider once stacked (scoped to this component; no parent-page CSS) */
+	.battle-team-row .ttd1
+	{
+		border-left: none;
+	}
 }

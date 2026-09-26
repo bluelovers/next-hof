@@ -2,8 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { InMemoryRepository } from './repository';
 import { createSeedRepository, SEED } from './seed-data';
 
-describe('IDataRepository', () => {
-	it('InMemoryRepository returns records by key and undefined for missing', () => {
+describe('IDataRepository', () =>
+{
+	it('InMemoryRepository returns records by key and undefined for missing', () =>
+	{
 		const repo = new InMemoryRepository();
 		repo.addSkill(SEED.skills[0]);
 		expect(repo.getSkill(1000)?.name).toBe('Attack');
@@ -14,7 +16,8 @@ describe('IDataRepository', () => {
 		expect(repo.getCharBase(1)).toBeUndefined();
 	});
 
-	it('seed repository loads representative records', () => {
+	it('seed repository loads representative records', () =>
+	{
 		const repo = createSeedRepository();
 		expect(repo.getJob(100)?.job_name).toBe('Warrior');
 		expect(repo.getSkill(1000)?.name).toBe('Attack');
@@ -26,7 +29,8 @@ describe('IDataRepository', () => {
 
 	// 展示頁 roster：6 名玩家角色、2 個新職業、入門怪物（OpenSpec 任務 2.1）
 	// Showcase roster: 6 player chars, 2 new jobs, entry monster (OpenSpec task 2.1)
-	it('seed repository loads showcase roster additions', () => {
+	it('seed repository loads showcase roster additions', () =>
+	{
 		const repo = createSeedRepository();
 		expect(repo.getJob(200)?.job_name).toBe('Mage');
 		expect(repo.getJob(300)?.job_name).toBe('Ranger');

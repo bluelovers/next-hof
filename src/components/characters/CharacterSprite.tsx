@@ -20,19 +20,20 @@ export type ISpriteVariant = EnumSpriteVariant;
 export type ISpriteSize = EnumSpriteSize;
 
 /** 單個精靈屬性 / Single sprite props */
-export interface ICharacterSpriteProps extends IStyleProps {
-  /** 精靈圖片 URL / Sprite image URL */
-  url: string;
-  /** 顯示模式 / Display variant */
-  variant?: ISpriteVariant;
-  /** 尺寸（boxed/raw 模式）/ Size (boxed/raw only) */
-  size?: ISpriteSize;
-  /** 顯示背景（boxed 模式）/ Show background (boxed only) */
-  background?: boolean;
-  /** 顯示邊框（boxed 模式）/ Show border (boxed only) */
-  border?: boolean;
-  /** alt 文字 / Alt text */
-  alt?: string;
+export interface ICharacterSpriteProps extends IStyleProps
+{
+	/** 精靈圖片 URL / Sprite image URL */
+	url: string;
+	/** 顯示模式 / Display variant */
+	variant?: ISpriteVariant;
+	/** 尺寸（boxed/raw 模式）/ Size (boxed/raw only) */
+	size?: ISpriteSize;
+	/** 顯示背景（boxed 模式）/ Show background (boxed only) */
+	background?: boolean;
+	/** 顯示邊框（boxed 模式）/ Show border (boxed only) */
+	border?: boolean;
+	/** alt 文字 / Alt text */
+	alt?: string;
 }
 
 /**
@@ -40,41 +41,43 @@ export interface ICharacterSpriteProps extends IStyleProps {
  * Character sprite component
  */
 export const CharacterSprite: React.FC<ICharacterSpriteProps> = ({
-  url,
-  variant = EnumSpriteVariant.Boxed,
-  size = EnumSpriteSize.Normal,
-  background = true,
-  border = true,
-  alt = '',
-  style,
-  className = '',
-}) => {
-  // avatar / original — 直接用 <img>，無 frame
-  if (variant === EnumSpriteVariant.Avatar || variant === EnumSpriteVariant.Original) {
-    return (
-      <img
-        src={url}
-        className={`character-sprite character-sprite--${variant} ${className}`}
-        alt={alt}
-        style={style}
-      />
-    );
-  }
+	url,
+	variant = EnumSpriteVariant.Boxed,
+	size = EnumSpriteSize.Normal,
+	background = true,
+	border = true,
+	alt = '',
+	style,
+	className = '',
+}) =>
+{
+	// avatar / original — 直接用 <img>，無 frame
+	if (variant === EnumSpriteVariant.Avatar || variant === EnumSpriteVariant.Original)
+	{
+		return (
+			<img
+				src={url}
+				className={`character-sprite character-sprite--${variant} ${className}`}
+				alt={alt}
+				style={style}
+			/>
+		);
+	}
 
-  // boxed / raw — 用 background-image
-  const classes = [
-    'character-sprite',
-    `character-sprite--${variant}`,
-    size !== EnumSpriteSize.Normal ? `character-sprite--${size}` : '',
-    !background ? 'character-sprite--no-bg' : '',
-    !border ? 'character-sprite--no-border' : '',
-    className,
-  ].filter(Boolean).join(' ');
+	// boxed / raw — 用 background-image
+	const classes = [
+		'character-sprite',
+		`character-sprite--${variant}`,
+		size !== EnumSpriteSize.Normal ? `character-sprite--${size}` : '',
+		!background ? 'character-sprite--no-bg' : '',
+		!border ? 'character-sprite--no-border' : '',
+		className,
+	].filter(Boolean).join(' ');
 
-  return (
-    <span
-      className={classes}
-      style={{ backgroundImage: `url(${url})`, ...style }}
-    />
-  );
+	return (
+		<span
+			className={classes}
+			style={{ backgroundImage: `url(${url})`, ...style }}
+		/>
+	);
 };

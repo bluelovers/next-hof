@@ -9,19 +9,26 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { BattleStageDarkDecorator } from '../decorators';
 import { BattleFieldScene } from '../../src/components/battle/BattleFieldScene';
-import { sampleSprites, sampleEnemySprites, sampleAllySprites, sampleSpritesMixed, sampleSpritesFlat, createSampleConfig } from './sampleData';
+import {
+	sampleSprites,
+	sampleEnemySprites,
+	sampleAllySprites,
+	sampleSpritesMixed,
+	sampleSpritesFlat,
+	createSampleConfig,
+} from './sampleData';
 
 const meta: Meta<typeof BattleFieldScene> = {
-  title: 'BattleField/BattleFieldScene',
-  component: BattleFieldScene,
-  parameters: {
-    layout: 'centered',
-    docs: { description: { component: '戰場畫面：使用巢狀 div 疊加方式顯示雙方角色精靈。\nBattlefield scene: nested div layers displaying character sprites.' } },
-  },
-  tags: ['autodocs'],
-  decorators: [
-    BattleStageDarkDecorator,
-  ],
+	title: 'BattleField/BattleFieldScene',
+	component: BattleFieldScene,
+	parameters: {
+		layout: 'centered',
+		docs: { description: { component: '戰場畫面：使用巢狀 div 疊加方式顯示雙方角色精靈。\nBattlefield scene: nested div layers displaying character sprites.' } },
+	},
+	tags: ['autodocs'],
+	decorators: [
+		BattleStageDarkDecorator,
+	],
 };
 
 export default meta;
@@ -29,55 +36,55 @@ type Story = StoryObj<typeof BattleFieldScene>;
 
 /** 預設戰場—ゴブリン vs TestTeam / Default battlefield — Goblins vs TestTeam */
 export const DefaultBattle: Story = {
-  args: {
-    sprites: sampleSprites,
-    config: createSampleConfig('grass'),
-    showSpriteLabels: true,
-  },
+	args: {
+		sprites: sampleSprites,
+		config: createSampleConfig('grass'),
+		showSpriteLabels: true,
+	},
 };
 
 /** 僅有敵人 / Enemies only */
 export const EnemiesOnly: Story = {
-  args: {
-    sprites: sampleEnemySprites,
-    config: createSampleConfig('cave'),
-    showSpriteLabels: true,
-  },
+	args: {
+		sprites: sampleEnemySprites,
+		config: createSampleConfig('cave'),
+		showSpriteLabels: true,
+	},
 };
 
 /** 僅有友軍 / Allies only */
 export const AlliesOnly: Story = {
-  args: {
-    sprites: sampleAllySprites,
-    config: createSampleConfig('grass01'),
-    showSpriteLabels: true,
-  },
+	args: {
+		sprites: sampleAllySprites,
+		config: createSampleConfig('grass01'),
+		showSpriteLabels: true,
+	},
 };
 
 /** 雪地戰場 / Snow battlefield */
 export const SnowBattlefield: Story = {
-  args: {
-    sprites: sampleSprites,
-    config: createSampleConfig('snow'),
-    showSpriteLabels: true,
-  },
+	args: {
+		sprites: sampleSprites,
+		config: createSampleConfig('snow'),
+		showSpriteLabels: true,
+	},
 };
 
 /** 沙漠戰場 / Desert battlefield */
 export const DesertBattlefield: Story = {
-  args: {
-    sprites: sampleSprites,
-    config: createSampleConfig('sand'),
-    showSpriteLabels: true,
-  },
+	args: {
+		sprites: sampleSprites,
+		config: createSampleConfig('sand'),
+		showSpriteLabels: true,
+	},
 };
 
 /** 不顯示名稱 / No labels */
 export const NoLabels: Story = {
-  args: {
-    ...DefaultBattle.args,
-    showSpriteLabels: false,
-  } as any,
+	args: {
+		...DefaultBattle.args,
+		showSpriteLabels: false,
+	} as any,
 };
 
 /**
@@ -91,11 +98,11 @@ export const NoLabels: Story = {
  * consistent facing (left).
  */
 export const MixedCharRevTeam: Story = {
-  args: {
-    sprites: sampleSpritesMixed,
-    config: createSampleConfig('grass'),
-    showSpriteLabels: true,
-  },
+	args: {
+		sprites: sampleSpritesMixed,
+		config: createSampleConfig('grass'),
+		showSpriteLabels: true,
+	},
 };
 
 /**
@@ -109,9 +116,9 @@ export const MixedCharRevTeam: Story = {
  * character's side / position (see sampleData.flatRosterSample).
  */
 export const FlatRosterGrouped: Story = {
-  args: {
-    sprites: sampleSpritesFlat,
-    config: createSampleConfig('grass'),
-    showSpriteLabels: true,
-  },
+	args: {
+		sprites: sampleSpritesFlat,
+		config: createSampleConfig('grass'),
+		showSpriteLabels: true,
+	},
 };

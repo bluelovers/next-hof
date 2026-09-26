@@ -13,11 +13,12 @@ import './CharacterCardBase.css';
 import './CharacterList.css';
 
 /** CharacterList 屬性 / CharacterList props */
-export interface ICharacterListProps {
-  /** 角色資料陣列 / Character data array */
-  characters?: ICharacterData[];
-  /** 選取變更回調 / Selection change callback */
-  onSelect?: (id: string) => void;
+export interface ICharacterListProps
+{
+	/** 角色資料陣列 / Character data array */
+	characters?: ICharacterData[];
+	/** 選取變更回調 / Selection change callback */
+	onSelect?: (id: string) => void;
 }
 
 /**
@@ -25,22 +26,23 @@ export interface ICharacterListProps {
  * CharacterList component
  */
 export const CharacterList: React.FC<ICharacterListProps> = ({
-  characters = [],
-  onSelect,
-}) => {
-  return (
-    <div className="dashboard-characters margin15">
-      {characters.map((char, index) => (
-        <CharacterCard
-          key={char.id}
-          character={char}
-          index={index}
-          selection="radio"
-          avatarHref={buildCharacterUrl(char.id)}
-          onActiveChange={(id) => onSelect?.(id)}
-        />
-      ))}
-      <div className="clearfix" />
-    </div>
-  );
+	characters = [],
+	onSelect,
+}) =>
+{
+	return (
+		<div className="dashboard-characters margin15">
+			{characters.map((char, index) => (
+				<CharacterCard
+					key={char.id}
+					character={char}
+					index={index}
+					selection="radio"
+					avatarHref={buildCharacterUrl(char.id)}
+					onActiveChange={(id) => onSelect?.(id)}
+				/>
+			))}
+			<div className="clearfix" />
+		</div>
+	);
 };

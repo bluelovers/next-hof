@@ -7,8 +7,10 @@ import {
 	EnumTeamSide, EnumState, EnumPosition,
 } from './constants';
 
-describe('game constants', () => {
-	it('exposes documented values', () => {
+describe('game constants', () =>
+{
+	it('exposes documented values', () =>
+	{
 		expect(MAX_TIME).toBe(1000);
 		expect(START_TIME).toBe(900);
 		expect(TIME_GAIN_DAY).toBe(6000);
@@ -29,12 +31,14 @@ describe('game constants', () => {
 		expect(UNION_BATTLE_NEXT).toBe(1200);
 	});
 
-	it('EnumTeamSide has numeric values', () => {
+	it('EnumTeamSide has numeric values', () =>
+	{
 		expect(EnumTeamSide.Team0).toBe(0);
 		expect(EnumTeamSide.Team1).toBe(1);
 	});
 
-	it('EnumState has numeric values', () => {
+	it('EnumState has numeric values', () =>
+	{
 		expect(EnumState.Alive).toBe(0);
 		expect(EnumState.Dead).toBe(1);
 	});

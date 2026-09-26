@@ -9,20 +9,23 @@
  * 所有需要隨機性的系統（敵方生成、守護機率、中毒、AI 1940 等）皆依賴此類。
  * Every system needing randomness (enemy generation, guard chance, poison, AI 1940, ...) depends on this class.
  */
-export class RNG {
+export class RNG
+{
 	private state: number;
 
 	/**
 	 * 建立可重現的隨機源 / Create a reproducible random source
 	 * @param seed 32-bit 種子（預設 1）/ 32-bit seed (default 1)
 	 */
-	constructor(seed = 1) {
+	constructor(seed = 1)
+	{
 		// 確保 32-bit 無號整數種子 / normalize to a 32-bit unsigned seed
 		this.state = seed >>> 0;
 	}
 
 	/** 內部產生 [0,1) 浮點數 / internal [0,1) float */
-	private next(): number {
+	private next(): number
+	{
 		this.state = (this.state + 0x6d2b79f5) | 0;
 		let t = Math.imul(this.state ^ (this.state >>> 15), 1 | this.state);
 		t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
@@ -30,20 +33,24 @@ export class RNG {
 	}
 
 	/** 整數 [min,max] 含兩端，對應 mt_rand(min,max) / inclusive integer in [min,max], mirroring mt_rand(min,max) */
-	randInt(min: number, max: number): number {
+	randInt(min: number, max: number): number
+	{
 		if (max < min) [min, max] = [max, min];
 		return min + Math.floor(this.next() * (max - min + 1));
 	}
 
 	/** 浮點 [0,1) / float in [0,1) */
-	randFloat(): number {
+	randFloat(): number
+	{
 		return this.next();
 	}
 
 	/** Fisher-Yates 洗牌（回傳新陣列，不改變原陣列）/ Fisher-Yates shuffle (returns a new array; input untouched) */
-	shuffle<T>(arr: readonly T[]): T[] {
+	shuffle<T>(arr: readonly T[]): T[]
+	{
 		const out = arr.slice();
-		for (let i = out.length - 1; i > 0; i--) {
+		for (let i = out.length - 1; i > 0; i--)
+		{
 			const j = Math.floor(this.next() * (i + 1));
 			[out[i], out[j]] = [out[j], out[i]];
 		}

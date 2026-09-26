@@ -25,8 +25,8 @@ import { BattleDisplay } from '#/components/pages/BattleDisplay';
 import { PartySelect } from '#/components/showcase/PartySelect';
 import { EncounterSelect } from '#/components/showcase/EncounterSelect';
 import {
-  runShowcaseBattle,
-  DEFAULT_SHOWCASE_SEED,
+	runShowcaseBattle,
+	DEFAULT_SHOWCASE_SEED,
 } from '#/lib/showcase/battle-adapter';
 import type { IShowcaseBattleOutcome } from '#/lib/showcase/battle-adapter';
 import { DEFAULT_ENCOUNTER, getEncounter } from '#/lib/showcase/encounters';
@@ -41,127 +41,137 @@ export type IShowcasePhase = EnumShowcasePhase;
  * ShowcasePage 組隊與戰鬥展示頁主元件
  * Showcase page main component
  */
-export const ShowcasePage: React.FC = () => {
-  /** 已選隊員 def no / selected member def nos */
-  const [selected, setSelected] = useState<number[]>([100]);
-  /** 已選編選 id / selected encounter id */
-  const [encounterId, setEncounterId] = useState<string>(DEFAULT_ENCOUNTER.id);
-  /** 流程階段 / flow phase */
-  const [phase, setPhase] = useState<EnumShowcasePhase>(EnumShowcasePhase.Setup);
-  /** 已完成的戰鬥資料 / completed battle data */
-  const [battle, setBattle] = useState<IShowcaseBattleOutcome | null>(null);
-  /** 錯誤提示（開戰失敗時顯示）/ error message (shown when a battle fails) */
-  const [error, setError] = useState<string | null>(null);
+export const ShowcasePage: React.FC = () =>
+{
+	/** 已選隊員 def no / selected member def nos */
+	const [selected, setSelected] = useState<number[]>([100]);
+	/** 已選編選 id / selected encounter id */
+	const [encounterId, setEncounterId] = useState<string>(DEFAULT_ENCOUNTER.id);
+	/** 流程階段 / flow phase */
+	const [phase, setPhase] = useState<EnumShowcasePhase>(EnumShowcasePhase.Setup);
+	/** 已完成的戰鬥資料 / completed battle data */
+	const [battle, setBattle] = useState<IShowcaseBattleOutcome | null>(null);
+	/** 錯誤提示（開戰失敗時顯示）/ error message (shown when a battle fails) */
+	const [error, setError] = useState<string | null>(null);
 
-  /**
-   * 隊員勾選切換：滿 MAX_CHAR 時拒絕新增（PartySelect 同步禁用未勾選項）
-   * Toggle a member: refuse additions at MAX_CHAR (PartySelect also disables unchecked boxes)
-   */
-  const handleToggle = (no: number): void => {
-    setSelected((prev) => {
-      if (prev.includes(no)) return prev.filter((n) => n !== no);
-      if (prev.length >= MAX_CHAR) return prev;
-      return [...prev, no];
-    });
-  };
+	/**
+	 * 隊員勾選切換：滿 MAX_CHAR 時拒絕新增（PartySelect 同步禁用未勾選項）
+	 * Toggle a member: refuse additions at MAX_CHAR (PartySelect also disables unchecked boxes)
+	 */
+	const handleToggle = (no: number): void =>
+	{
+		setSelected((prev) =>
+		{
+			if (prev.includes(no)) return prev.filter((n) => n !== no);
+			if (prev.length >= MAX_CHAR) return prev;
+			return [...prev, no];
+		});
+	};
 
-  /**
-   * 開戰：0 人不執行並提示；成功即進入 result
-   * Start battle: 0 members never runs and shows a hint; success moves to result
-   */
-  const handleBattle = (): void => {
-    if (selected.length < 1) {
-      setError('請至少選擇 1 名隊員 / Select at least one member first.');
-      return;
-    }
-    if (selected.length > MAX_CHAR) {
-      setError(`隊伍最多 ${MAX_CHAR} 人 / Party is limited to ${MAX_CHAR} members.`);
-      return;
-    }
-    const encounter = getEncounter(encounterId) ?? DEFAULT_ENCOUNTER;
-    try {
-      const outcome = runShowcaseBattle({
-        charNos: selected,
-        monNos: encounter.monNos,
-        seed: DEFAULT_SHOWCASE_SEED,
-        enemyTeamName: encounter.teamName,
-      });
-      setBattle(outcome);
-      setError(null);
-      setPhase(EnumShowcasePhase.Result);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    }
-  };
+	/**
+	 * 開戰：0 人不執行並提示；成功即進入 result
+	 * Start battle: 0 members never runs and shows a hint; success moves to result
+	 */
+	const handleBattle = (): void =>
+	{
+		if (selected.length < 1)
+		{
+			setError('請至少選擇 1 名隊員 / Select at least one member first.');
+			return;
+		}
+		if (selected.length > MAX_CHAR)
+		{
+			setError(`隊伍最多 ${MAX_CHAR} 人 / Party is limited to ${MAX_CHAR} members.`);
+			return;
+		}
+		const encounter = getEncounter(encounterId) ?? DEFAULT_ENCOUNTER;
+		try
+		{
+			const outcome = runShowcaseBattle({
+				charNos: selected,
+				monNos: encounter.monNos,
+				seed: DEFAULT_SHOWCASE_SEED,
+				enemyTeamName: encounter.teamName,
+			});
+			setBattle(outcome);
+			setError(null);
+			setPhase(EnumShowcasePhase.Result);
+		}
+		catch (e)
+		{
+			setError(e instanceof Error ? e.message : String(e));
+		}
+	};
 
-  /**
-   * 再戰一場：清空戰鬥資料並回到 setup（狀態全新）
-   * Fight again: clear battle data and return to setup (fresh state)
-   */
-  const handleReset = (): void => {
-    setBattle(null);
-    setError(null);
-    setPhase(EnumShowcasePhase.Setup);
-  };
+	/**
+	 * 再戰一場：清空戰鬥資料並回到 setup（狀態全新）
+	 * Fight again: clear battle data and return to setup (fresh state)
+	 */
+	const handleReset = (): void =>
+	{
+		setBattle(null);
+		setError(null);
+		setPhase(EnumShowcasePhase.Setup);
+	};
 
-  const emptyParty = selected.length === 0;
+	const emptyParty = selected.length === 0;
 
-  return (
-    <div className="showcase">
-      <header className="showcase-header">
-        <h1 className="showcase-title">組隊與戰鬥展示頁 / Team Battle Showcase</h1>
-        <p className="showcase-desc">
-          選隊員、選敵方編選，即時結算一整場戰鬥 / Pick your party and an encounter,
-          then settle a full battle instantly.
-        </p>
-      </header>
+	return (
+		<div className="showcase">
+			<header className="showcase-header">
+				<h1 className="showcase-title">組隊與戰鬥展示頁 / Team Battle Showcase</h1>
+				<p className="showcase-desc">
+					選隊員、選敵方編選，即時結算一整場戰鬥 / Pick your party and an encounter,
+					then settle a full battle instantly.
+				</p>
+			</header>
 
-      {phase === EnumShowcasePhase.Setup || !battle ? (
-        <section className="showcase-setup" aria-label="battle setup">
-          <PartySelect selected={selected} onToggle={handleToggle} />
-          <EncounterSelect selectedId={encounterId} onChange={setEncounterId} />
+			{phase === EnumShowcasePhase.Setup || !battle ? (
+				<section className="showcase-setup" aria-label="battle setup">
+					<PartySelect selected={selected} onToggle={handleToggle} />
+					<EncounterSelect selectedId={encounterId} onChange={setEncounterId} />
 
-          <div className="showcase-actions">
-            <button
-              type="button"
-              className="showcase-battle-button"
-              disabled={emptyParty}
-              onClick={handleBattle}
-            >
-              Battle！開戰
-            </button>
-            {emptyParty && (
-              <span className="showcase-hint" role="alert">
+					<div className="showcase-actions">
+						<button
+							type="button"
+							className="showcase-battle-button"
+							disabled={emptyParty}
+							onClick={handleBattle}
+						>
+							Battle！開戰
+						</button>
+						{emptyParty && (
+							<span className="showcase-hint" role="alert">
                 ⚠ 至少選擇 1 名隊員才能開戰 / Select at least one member to battle.
               </span>
-            )}
-          </div>
+						)}
+					</div>
 
-          {error && (
-            <p className="showcase-error" role="alert">
-              {error}
-            </p>
-          )}
-        </section>
-      ) : (
-        <section className="showcase-result" aria-label="battle result">
-          {/* 展示頁全員顯示單位精靈（資料由轉接層帶入，showUnitSprites 開啟） */}
-          {/* Show every unit's sprite on the showcase page (data comes from the adapter; showUnitSprites on) */}
-          <BattleDisplay data={battle.data} showSpriteLabels showUnitSprites />
-          <div className="showcase-actions">
-            <button
-              type="button"
-              className="showcase-battle-button"
-              onClick={handleReset}
-            >
-              再戰一場 / Fight Again
-            </button>
-            <span className="showcase-hint">
+					{error && (
+						<p className="showcase-error" role="alert">
+							{error}
+						</p>
+					)}
+				</section>
+			) : (
+				<section className="showcase-result" aria-label="battle result">
+					{/* 展示頁全員顯示單位精靈（資料由轉接層帶入，showUnitSprites 開啟） */}
+					{/* Show every unit's sprite on the showcase page (data comes from the adapter; showUnitSprites on) */}
+					<BattleDisplay data={battle.data} showSpriteLabels showUnitSprites />
+					<div className="showcase-actions">
+						<button
+							type="button"
+							className="showcase-battle-button"
+							onClick={handleReset}
+						>
+							再戰一場 / Fight Again
+						</button>
+						<span className="showcase-hint">
               回到組隊畫面可更換隊員與編選 / Back to setup to change party or encounter.
             </span>
-          </div>
-        </section>
-      )}
-    </div>
-  );
+					</div>
+				</section>
+			)}
+		</div>
+	);
 };

@@ -17,7 +17,14 @@ import type { IDataRepository } from '#/lib/game/data/repository';
 import { EnumBattleEventType, EnumSkillDamageType } from '#/lib/game/types';
 import type { IBattleEvent, IBattleSnapshot, ISkillDef } from '#/lib/game/types';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
-import { EnumTeamSideUI, EnumChargeKind, EnumUnitStatus, EnumActionType, EnumAttributeType, EnumMagicCircleKind } from '#/components/battle/enums';
+import {
+	EnumTeamSideUI,
+	EnumChargeKind,
+	EnumUnitStatus,
+	EnumActionType,
+	EnumAttributeType,
+	EnumMagicCircleKind,
+} from '#/components/battle/enums';
 import type {
 	IBattleAction,
 	IBattleDisplayData,
@@ -71,7 +78,8 @@ const SHOWCASE_BATTLEFIELD_BG = '/image/land/bg_grass.png';
  * 單位名稱／側別查詢條目（事件 actor/target 為 `String(no)`，需 no → 名稱/side）
  * Unit name/side lookup entry (event actor/target are `String(no)`; needs no → name/side)
  */
-export interface IUnitRef {
+export interface IUnitRef
+{
 	/** 單位名稱（查無時回傳原始 no 字串）/ Unit name (raw no string when unknown) */
 	name: string;
 	/** 隊伍側 / Team side */
@@ -79,7 +87,8 @@ export interface IUnitRef {
 }
 
 /** no → 單位查詢表 / no → unit lookup */
-export interface IUnitLookup extends ReadonlyMap<number, IUnitRef> {}
+export interface IUnitLookup extends ReadonlyMap<number, IUnitRef>
+{}
 
 /**
  * 轉接層輸入：我方角色 def no、敵方怪物 def no、固定種子與隊名
@@ -90,7 +99,8 @@ export interface IUnitLookup extends ReadonlyMap<number, IUnitRef> {}
  * `title` / `time` inherit IBattleDisplayMeta (shared definition with IBattleDisplayData);
  * when `title` is omitted, runShowcaseBattle falls back to DEFAULT_SHOWCASE_TITLE.
  */
-export interface IShowcaseBattleInput extends IBattleDisplayMeta {
+export interface IShowcaseBattleInput extends IBattleDisplayMeta
+{
 	/** 我方角色 def no（1–MAX_CHAR 人，順序即隊伍順序）/ ally char def nos (1–MAX_CHAR) */
 	charNos: readonly number[];
 	/** 敵方怪物 def no（來自 encounter 選項）/ enemy monster def nos (from encounter) */
@@ -107,7 +117,8 @@ export interface IShowcaseBattleInput extends IBattleDisplayMeta {
  * 轉接層輸出：完整展示資料＋引擎判定
  * Adapter output: full display data plus the engine outcome
  */
-export interface IShowcaseBattleOutcome {
+export interface IShowcaseBattleOutcome
+{
 	/** 展示頁完整資料 / Full display data */
 	data: IBattleDisplayData;
 	/** 引擎判定（team0＝我方視角）/ Engine outcome (team0 = our side) */
@@ -127,13 +138,16 @@ export function buildShowcaseTeams(
 	monNos: readonly number[],
 	repo: IDataRepository,
 	rng: RNG,
-): { allies: Character[]; enemies: Character[] } {
-	const allies = charNos.map((no) => {
+): { allies: Character[]; enemies: Character[] }
+{
+	const allies = charNos.map((no) =>
+	{
 		const def = repo.getCharBase(no);
 		if (!def) throw new Error(`Unknown char def no: ${no} / 找不到角色定義 no=${no}`);
 		return newChar(def, repo, rng);
 	});
-	const enemies = monNos.map((no) => {
+	const enemies = monNos.map((no) =>
+	{
 		const def = repo.getMon(no);
 		if (!def) throw new Error(`Unknown mon def no: ${no} / 找不到怪物定義 no=${no}`);
 		return newMon(def, repo, rng);
@@ -150,7 +164,8 @@ export function buildShowcaseTeams(
  * Shared by unit sprites (IBattleUnit.sprite) and snapshot unit appearance
  * (imageUrl); the two def-no tables are disjoint, so `isMon` picks the right one.
  */
-function spriteUrlFor(no: number, isMon: boolean): string {
+function spriteUrlFor(no: number, isMon: boolean): string
+{
 	return isMon ? getMonSpriteUrl(no) : getCharSpriteUrl(no);
 }
 
@@ -163,7 +178,8 @@ function spriteUrlFor(no: number, isMon: boolean): string {
  * Display hp/sp clamp at 0 (engine may leave negatives); status from STATE/charging.
  * Also carries the unit sprite (sprite-map lookup by def no) for the status column.
  */
-export function toBattleUnit(c: Character, side: ITeamSide): IBattleUnit {
+export function toBattleUnit(c: Character, side: ITeamSide): IBattleUnit
+{
 	return {
 		name: c.name,
 		level: c.level,
@@ -171,7 +187,9 @@ export function toBattleUnit(c: Character, side: ITeamSide): IBattleUnit {
 		maxHp: c.MAXHP,
 		sp: Math.max(0, c.SP),
 		maxSp: c.MAXSP,
-		status: c.STATE === EnumState.Dead ? EnumUnitStatus.Down : c.expect !== null ? EnumUnitStatus.Casting : EnumUnitStatus.Alive,
+		status: c.STATE === EnumState.Dead ? EnumUnitStatus.Down : c.expect !== null
+			? EnumUnitStatus.Casting
+			: EnumUnitStatus.Alive,
 		unitUuid: c.unitUuid,
 		side,
 		spd: c.SPD,
@@ -188,7 +206,8 @@ export function buildTeam(
 	name: string,
 	members: readonly Character[],
 	side: ITeamSide,
-): IBattleTeam {
+): IBattleTeam
+{
 	return { name, units: members.map((c) => toBattleUnit(c, side)), side };
 }
 
@@ -202,7 +221,8 @@ export function buildTeam(
 export function buildUnitLookup(
 	allies: readonly Character[],
 	enemies: readonly Character[],
-): IUnitLookup {
+): IUnitLookup
+{
 	const lookup = new Map<number, IUnitRef>();
 	for (const c of allies) lookup.set(c.no, { name: c.name, side: EnumTeamSideUI.Right });
 	for (const c of enemies) lookup.set(c.no, { name: c.name, side: EnumTeamSideUI.Left });
@@ -210,7 +230,8 @@ export function buildUnitLookup(
 }
 
 /** 事件角色解析結果（轉接上下文的元件，供測試直接比對）/ Resolved event participant (a building block of the context, directly assertable in tests) */
-export interface IResolvedRef {
+export interface IResolvedRef
+{
 	/** 名稱（查無時為原始 no 字串；未提供時 undefined）/ name (raw no when unknown; undefined if absent) */
 	name?: string;
 	/** 隊伍側（查無時 undefined）/ team side (undefined when unknown) */
@@ -221,7 +242,8 @@ export interface IResolvedRef {
  * 將事件的 actor/target no 字串解析為名稱與側別（查無時名稱退回原始 no 字串）
  * Resolve an event actor/target no string into a name and side (unknown refs keep the raw no string)
  */
-export function resolveRef(key: string | undefined, lookup: IUnitLookup): IResolvedRef {
+export function resolveRef(key: string | undefined, lookup: IUnitLookup): IResolvedRef
+{
 	if (key === undefined) return {};
 	const info = lookup.get(Number(key));
 	return { name: info?.name ?? key, side: info?.side };
@@ -241,7 +263,8 @@ export function resolveRef(key: string | undefined, lookup: IUnitLookup): IResol
  * Fail cannot be derived from the skill definition (it is a cost-check failure) and awaits
  * an engine-side producer.
  */
-function resolveMagicCircleKind(def?: ISkillDef): EnumMagicCircleKind {
+function resolveMagicCircleKind(def?: ISkillDef): EnumMagicCircleKind
+{
 	if (def?.MagicCircleAdd) return EnumMagicCircleKind.Draw;
 	if (def?.MagicCircleDeleteEnemy) return EnumMagicCircleKind.EraseEnemy;
 	if (def?.MagicCircleDeleteTeam) return EnumMagicCircleKind.Use;
@@ -249,8 +272,10 @@ function resolveMagicCircleKind(def?: ISkillDef): EnumMagicCircleKind {
 }
 
 /** 該種類在技能定義中的魔方陣數量（無則 undefined）/ That kind's amount in the skill definition (undefined when absent) */
-function magicCircleAmount(def: ISkillDef | undefined, kind: EnumMagicCircleKind): number | undefined {
-	switch (kind) {
+function magicCircleAmount(def: ISkillDef | undefined, kind: EnumMagicCircleKind): number | undefined
+{
+	switch (kind)
+	{
 		case EnumMagicCircleKind.EraseEnemy:
 			return def?.MagicCircleDeleteEnemy;
 		case EnumMagicCircleKind.Use:
@@ -311,7 +336,8 @@ export const DEFAULT_EVENT_TEXT: Readonly<{
  * @param key - 事件的 no 欄位（字串）/ the event's no field (string)
  * @returns def no / def no
  */
-export function parseDefNo(key: string | undefined): number | undefined {
+export function parseDefNo(key: string | undefined): number | undefined
+{
 	if (key === undefined) return undefined;
 	const no = Number(key);
 	return Number.isNaN(no) ? undefined : no;
@@ -328,12 +354,14 @@ export function parseDefNo(key: string | undefined): number | undefined {
  * @param def - 技能定義（可省略）/ skill definition (optional)
  * @returns 蓄力種類 / charge kind
  */
-export function chargeKindOf(def?: ISkillDef): EnumChargeKind {
+export function chargeKindOf(def?: ISkillDef): EnumChargeKind
+{
 	return def?.type === EnumSkillDamageType.Physical ? EnumChargeKind.Charging : EnumChargeKind.Casting;
 }
 
 /** 事件轉接上下文（每個事件解析一次，所有轉接器共用）/ Event adapter context (resolved once per event, shared by every mapper) */
-export interface IEventContext {
+export interface IEventContext
+{
 	/** 行動者 / actor */
 	actor: IResolvedRef;
 	/** 目標 / target */
@@ -365,7 +393,8 @@ export function resolveEventContext(
 	ev: IBattleEvent,
 	lookup: IUnitLookup,
 	repo?: IDataRepository,
-): IEventContext {
+): IEventContext
+{
 	const actor = resolveRef(ev.actor, lookup);
 	const target = resolveRef(ev.target, lookup);
 	const skillDef = ev.skill !== undefined ? repo?.getSkill(ev.skill) : undefined;
@@ -413,7 +442,8 @@ export type IActionFields = Pick<IBattleAction, 'type'> & Partial<IBattleAction>
  * @param fields - 型別專屬欄位 / type-specific fields
  * @returns 日誌條目 / log entry
  */
-export function composeAction(ctx: IEventContext, fields: IActionFields): IBattleAction {
+export function composeAction(ctx: IEventContext, fields: IActionFields): IBattleAction
+{
 	const source = fields.source ?? ctx.actor.name;
 	// 給 text 時在此合併一次；渲染端只讀 source／text，不會再切割 message
 	// Joined here once when `text` is given; renderers read source / text and never slice message
@@ -443,7 +473,8 @@ const mapAct: IEventMapper = (_ev, ctx) =>
 	});
 
 /** Cast → 詠唱／蓄力（Physical 技能 → charging，其餘 → casting）/ Cast → charge line (Physical → charging, otherwise casting) */
-const mapCast: IEventMapper = (_ev, ctx) => {
+const mapCast: IEventMapper = (_ev, ctx) =>
+{
 	const castType = chargeKindOf(ctx.skillDef);
 	return composeAction(ctx, {
 		type: EnumActionType.Casting,
@@ -475,7 +506,8 @@ const mapCharge: IEventMapper = (_ev, ctx) =>
  * is left to the layout; only without hp info does it fall back to the pre-assembled
  * `by attacker`)
  */
-const mapDamage: IEventMapper = (ev, ctx) => {
+const mapDamage: IEventMapper = (ev, ctx) =>
+{
 	const value = ev.value ?? 0;
 	const hasHp = ev.hpBefore !== undefined && ev.hpAfter !== undefined;
 	return composeAction(ctx, {
@@ -497,7 +529,8 @@ const mapDamage: IEventMapper = (ev, ctx) => {
  * Heal → 回復（結構化 valueChange、固定 HP 單位）
  * Heal (structured `valueChange`, HP unit)
  */
-const mapHeal: IEventMapper = (ev, ctx) => {
+const mapHeal: IEventMapper = (ev, ctx) =>
+{
 	const value = ev.value ?? 0;
 	return composeAction(ctx, {
 		type: EnumActionType.Heal,
@@ -520,7 +553,8 @@ const mapGuard: IEventMapper = (_ev, ctx) =>
 	});
 
 /** Death → 倒下（來源＝倒下者、側別＝目標側）/ Death (source = the fallen unit, side = the target's side) */
-const mapDeath: IEventMapper = (_ev, ctx) => {
+const mapDeath: IEventMapper = (_ev, ctx) =>
+{
 	const name = ctx.target.name ?? 'Unknown';
 	return composeAction(ctx, {
 		type: EnumActionType.Down,
@@ -532,7 +566,8 @@ const mapDeath: IEventMapper = (_ev, ctx) => {
 };
 
 /** Summon → 召喚（target＝被召喚 def no、value＝等級、圖依 def no 查怪物表）/ Summon (target = summoned def no, value = level, image from the mon table) */
-const mapSummon: IEventMapper = (ev, ctx) => {
+const mapSummon: IEventMapper = (ev, ctx) =>
+{
 	// 召喚事件契約（生產點：Battle.UseSkill 的 applySummon，見 #/lib/game/types 的 EnumBattleEventType.Summon）：
 	// target＝被召喚單位的 def no、value＝其等級；圖片依 def no 查 sprite-map 怪物表。
 	// Summon event contract (producer: Battle.UseSkill's applySummon; see EnumBattleEventType.Summon in
@@ -541,14 +576,14 @@ const mapSummon: IEventMapper = (ev, ctx) => {
 	const summonedNo = parseDefNo(ev.target);
 	const summoned: ISummonedUnit[] = ctx.target.name
 		? [
-				{
-					name: ctx.target.name,
-					level: ev.value,
-					imageUrl: summonedNo !== undefined && ctx.repo?.getMon(summonedNo)
-						? getMonSpriteUrl(summonedNo)
-						: undefined,
-				},
-			]
+			{
+				name: ctx.target.name,
+				level: ev.value,
+				imageUrl: summonedNo !== undefined && ctx.repo?.getMon(summonedNo)
+					? getMonSpriteUrl(summonedNo)
+					: undefined,
+			},
+		]
 		: [];
 	return composeAction(ctx, {
 		type: EnumActionType.Summon,
@@ -571,7 +606,8 @@ const mapSummon: IEventMapper = (ev, ctx) => {
  * falling back to the matching skill-definition field. The colour does not travel on `attribute`:
  * it comes from the record kind via getMagicCircleClass (single source of truth).
  */
-const mapMagicCircle: IEventMapper = (ev, ctx) => {
+const mapMagicCircle: IEventMapper = (ev, ctx) =>
+{
 	const kind = resolveMagicCircleKind(ctx.skillDef);
 	const magicCircle: IMagicCircleRecord = {
 		kind,
@@ -614,11 +650,13 @@ const mapDebuff: IEventMapper = (ev, ctx) =>
  * - without `value` = poison applied (produced by statusChanges): the default copy, or the event's
  *   own `text`, is used.
  */
-const mapPoison: IEventMapper = (ev, ctx) => {
+const mapPoison: IEventMapper = (ev, ctx) =>
+{
 	const name = ctx.target.name ?? ctx.actor.name;
 	const side = ctx.target.side ?? ctx.side;
 	const hasHp = ev.hpBefore !== undefined && ev.hpAfter !== undefined;
-	if (ev.value !== undefined) {
+	if (ev.value !== undefined)
+	{
 		return composeAction(ctx, {
 			type: EnumActionType.Poison,
 			source: name,
@@ -690,7 +728,8 @@ export const EVENT_MAPPERS: Readonly<Partial<Record<EnumBattleEventType, IEventM
  * @param ctx - 轉接上下文 / adapter context
  * @returns 日誌條目（type 恆為 Result）/ log entry (type is always Result)
  */
-export function mapUnknownEvent(ev: IBattleEvent, ctx: IEventContext): IBattleAction {
+export function mapUnknownEvent(ev: IBattleEvent, ctx: IEventContext): IBattleAction
+{
 	const message =
 		ev.text ??
 		`${ctx.actor.name ?? ''} ${ev.type}${ctx.target.name ? ` ${ctx.target.name}` : ''}`.trim();
@@ -710,13 +749,15 @@ export function mapBattleEvent(
 	ev: IBattleEvent,
 	lookup: IUnitLookup,
 	repo?: IDataRepository,
-): IBattleAction {
+): IBattleAction
+{
 	const ctx = resolveEventContext(ev, lookup, repo);
 	return (EVENT_MAPPERS[ev.type] ?? mapUnknownEvent)(ev, ctx);
 }
 
 /** 結果轉接輸入 / Result adapter input */
-export interface IResultDataInput {
+export interface IResultDataInput
+{
 	/** 引擎判定 / Engine outcome */
 	outcome: EnumOutcome;
 	/** 敵方（左隊）名稱 / Enemy (left team) name */
@@ -737,7 +778,8 @@ export interface IResultDataInput {
  * 單隊 HP 統計的最小單位形狀（Character 與展示用 IBattleUnit 皆可映射至此）
  * Minimal unit shape for one-team HP stats (both Character and showcase IBattleUnit map to this)
  */
-export interface ITeamHpUnit {
+export interface ITeamHpUnit
+{
 	/** 目前 HP / current HP */
 	hp: number;
 	/** 最大 HP / max HP */
@@ -761,11 +803,13 @@ export function computeTeamHpStats(units: readonly ITeamHpUnit[]): {
 	totalMaxHp: number;
 	alive: number;
 	totalUnits: number;
-} {
+}
+{
 	let hpRemain = 0;
 	let totalMaxHp = 0;
 	let alive = 0;
-	for (const u of units) {
+	for (const u of units)
+	{
 		hpRemain += Math.max(0, u.hp);
 		totalMaxHp += u.maxHp;
 		if (!u.dead) alive++;
@@ -790,9 +834,11 @@ export function computeSideDamage(
 	events: readonly IBattleEvent[] | undefined,
 	lookup: IUnitLookup | undefined,
 	side: ITeamSide,
-): number {
+): number
+{
 	let total = 0;
-	for (const ev of events ?? []) {
+	for (const ev of events ?? [])
+	{
 		if (ev.type !== EnumBattleEventType.Damage) continue;
 		const info = ev.actor !== undefined ? lookup?.get(Number(ev.actor)) : undefined;
 		if (info?.side === side) total += ev.value ?? 0;
@@ -809,7 +855,8 @@ function buildTeamStats(
 	side: ITeamSide,
 	events: readonly IBattleEvent[] | undefined,
 	lookup: IUnitLookup | undefined,
-): ITeamFinalStats {
+): ITeamFinalStats
+{
 	// HP 統計抽離為共用邏輯（展示資料亦使用 computeTeamHpStats）
 	// HP stats extracted into the shared helper (the showcase data also uses computeTeamHpStats)
 	const hp = computeTeamHpStats(
@@ -825,7 +872,8 @@ function buildTeamStats(
  * Win → winner＝我方名（右隊）、winnerSide='right'；Lose → winner＝敵方名（左隊）、winnerSide='left'；
  * Draw → winner ''＋isDraw true。
  */
-export function buildResultData(input: IResultDataInput): IBattleResult {
+export function buildResultData(input: IResultDataInput): IBattleResult
+{
 	const { outcome, allyTeamName, enemyTeamName, allyMembers, enemyMembers } = input;
 	const isDraw = outcome === EnumOutcome.Draw;
 	const winner =
@@ -861,7 +909,8 @@ export function buildResultData(input: IResultDataInput): IBattleResult {
 export function buildPositionRoster(
 	allies: readonly Character[],
 	enemies: readonly Character[],
-): IBattlePositionChar[] {
+): IBattlePositionChar[]
+{
 	const toEntry = (c: Character, side: ITeamSide, imageUrl: string): IBattlePositionChar => ({
 		unitUuid: c.unitUuid,
 		name: c.name,
@@ -883,7 +932,8 @@ export function buildPositionRoster(
 export function buildSprites(
 	allies: readonly Character[],
 	enemies: readonly Character[],
-): IBattleSprite[] {
+): IBattleSprite[]
+{
 	const roster = buildPositionRoster(allies, enemies);
 	return computeBattleSpritePositions(groupBattleChars(roster), {
 		width: SPRITE_LAYOUT_WIDTH,
@@ -905,7 +955,8 @@ export function buildSprites(
 function snapshotChargeKind(
 	repo: IDataRepository | undefined,
 	expectSkill: number | null | undefined,
-): EnumChargeKind | undefined {
+): EnumChargeKind | undefined
+{
 	if (!repo || expectSkill === null || expectSkill === undefined) return undefined;
 	const sk = repo.getSkill(expectSkill);
 	return sk ? chargeKindOf(sk) : undefined;
@@ -920,10 +971,12 @@ function snapshotChargeKind(
  * identified by their instance uid. `imageUrl` is resolved from sprite-map by def no
  * (char table first) and serves as the unit sprite's data source.
  */
-function toSnapshotDisplay(snap: IBattleSnapshot, repo?: IDataRepository): IBattleSnapshotDisplay {
+function toSnapshotDisplay(snap: IBattleSnapshot, repo?: IDataRepository): IBattleSnapshotDisplay
+{
 	return {
 		at: snap.at,
-		units: snap.units.map((u) => {
+		units: snap.units.map((u) =>
+		{
 			const side = u.team === EnumTeamSide.Team1 ? EnumTeamSideUI.Left : EnumTeamSideUI.Right;
 			const dead = u.dead;
 			// def no → 精靈圖（角色表優先，怪物表次之）/ def no → sprite image (char table first, then mon)
@@ -959,13 +1012,16 @@ function toSnapshotDisplay(snap: IBattleSnapshot, repo?: IDataRepository): IBatt
  *
  * @param input - 轉接層輸入（僅需 charNos／monNos）/ adapter input (charNos / monNos only)
  */
-export function validateShowcaseInput(input: Pick<IShowcaseBattleInput, 'charNos' | 'monNos'>): void {
-	if (input.charNos.length < 1 || input.charNos.length > MAX_CHAR) {
+export function validateShowcaseInput(input: Pick<IShowcaseBattleInput, 'charNos' | 'monNos'>): void
+{
+	if (input.charNos.length < 1 || input.charNos.length > MAX_CHAR)
+	{
 		throw new Error(
 			`Party size must be 1..${MAX_CHAR}: got ${input.charNos.length} / 隊伍人數須為 1–${MAX_CHAR} 人`,
 		);
 	}
-	if (input.monNos.length < 1) {
+	if (input.monNos.length < 1)
+	{
 		throw new Error('Encounter needs at least one monster / encounter 至少要有 1 隻怪物');
 	}
 }
@@ -979,7 +1035,8 @@ export function validateShowcaseInput(input: Pick<IShowcaseBattleInput, 'charNos
  * Assembling display data does not need the party picks (charNos / monNos), only the page-level
  * fields, so fabricated data can produce a complete display payload.
  */
-export interface IDisplayDataMeta extends IBattleDisplayMeta {
+export interface IDisplayDataMeta extends IBattleDisplayMeta
+{
 	/** 我方隊名（預設 DEFAULT_ALLY_TEAM_NAME）/ ally team name (default DEFAULT_ALLY_TEAM_NAME) */
 	allyTeamName?: string;
 	/** 敵方隊名（預設 DEFAULT_ENEMY_TEAM_NAME）/ enemy team name (default DEFAULT_ENEMY_TEAM_NAME) */
@@ -987,7 +1044,8 @@ export interface IDisplayDataMeta extends IBattleDisplayMeta {
 }
 
 /** 展示資料組裝輸入 / Display-data assembly input */
-export interface IDisplayDataInput {
+export interface IDisplayDataInput
+{
 	/** 頁面層欄位（title／time／隊名）/ page-level fields (title / time / team names) */
 	input: IDisplayDataMeta;
 	/** 我方（右隊）最終成員（含中途召喚）/ final ally members (mid-battle summons included) */
@@ -1012,7 +1070,8 @@ export interface IDisplayDataInput {
  * Kept apart from the engine run: given members, events and snapshots it builds the full display
  * data, so display-layer tests do not have to run a real battle.
  */
-export function buildDisplayData(args: IDisplayDataInput): IBattleDisplayData {
+export function buildDisplayData(args: IDisplayDataInput): IBattleDisplayData
+{
 	const allyTeamName = args.input.allyTeamName ?? DEFAULT_ALLY_TEAM_NAME;
 	const enemyTeamName = args.input.enemyTeamName ?? DEFAULT_ENEMY_TEAM_NAME;
 	const lookup = buildUnitLookup(args.allies, args.enemies);
@@ -1064,7 +1123,8 @@ export function buildDisplayData(args: IDisplayDataInput): IBattleDisplayData {
  * @param input - 展示戰鬥輸入 / showcase battle input
  * @returns 展示資料與引擎判定 / display data plus the engine outcome
  */
-export function runShowcaseBattle(input: IShowcaseBattleInput): IShowcaseBattleOutcome {
+export function runShowcaseBattle(input: IShowcaseBattleInput): IShowcaseBattleOutcome
+{
 	validateShowcaseInput(input);
 
 	const repo = createSeedRepository();

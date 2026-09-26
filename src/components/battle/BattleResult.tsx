@@ -16,13 +16,14 @@ import './BattleResult.css';
 import '#/components/shared/SharedBase.css';
 
 /** 戰鬥結果屬性 / Battle result props */
-export interface IBattleResultProps {
-  /** 結果資料 / Result data */
-  result: IBattleResult;
-  /** 左側隊伍名稱 / Left team name */
-  leftTeamName: string;
-  /** 右側隊伍名稱 / Right team name */
-  rightTeamName: string;
+export interface IBattleResultProps
+{
+	/** 結果資料 / Result data */
+	result: IBattleResult;
+	/** 左側隊伍名稱 / Left team name */
+	leftTeamName: string;
+	/** 右側隊伍名稱 / Right team name */
+	rightTeamName: string;
 }
 
 /**
@@ -37,35 +38,35 @@ export interface IBattleResultProps {
  * still appending result-stats (this component's own stat-row spacing styles).
  */
 const TeamStats: React.FC<{
-  name: string;
-  stats: ITeamFinalStats;
-  sideClass: EnumTeamSideClass;
+	name: string;
+	stats: ITeamFinalStats;
+	sideClass: EnumTeamSideClass;
 }> = ({ name, stats, sideClass }) => (
-  <BattleSidePanel sideClass={sideClass} className="result-stats">
-    {/* 隊伍名稱（統計欄標題）/ Team name (stats-column heading) */}
-    <div className="result-team-name bold">{name}</div>
-    {/* HP remain ＝ 剩餘 HP／隊伍最大 HP 總和（totalMaxHp 缺省時退回剩餘 HP，避免誤報）
+	<BattleSidePanel sideClass={sideClass} className="result-stats">
+		{/* 隊伍名稱（統計欄標題）/ Team name (stats-column heading) */}
+		<div className="result-team-name bold">{name}</div>
+		{/* HP remain ＝ 剩餘 HP／隊伍最大 HP 總和（totalMaxHp 缺省時退回剩餘 HP，避免誤報）
         HP remain = remaining HP / total max HP (falls back to the remaining HP when totalMaxHp is absent, to avoid a wrong denominator) */}
-    <div className="stat-row">
-      HP remain : {stats.hpRemain}/{stats.totalMaxHp ?? stats.hpRemain}
-    </div>
-    <div className="stat-row">
-      Alive : {stats.alive}/{stats.totalUnits}
-    </div>
-    <div className="stat-row">
-      TotalDamage : {stats.totalDamage ?? 0}
-    </div>
-    {stats.totalExp !== undefined && (
-      <div className="stat-row">
-        TotalExp : {stats.totalExp}
-      </div>
-    )}
-    {stats.funds !== undefined && (
-      <div className="stat-row">
-        Funds : $&nbsp;{stats.funds}
-      </div>
-    )}
-  </BattleSidePanel>
+		<div className="stat-row">
+			HP remain : {stats.hpRemain}/{stats.totalMaxHp ?? stats.hpRemain}
+		</div>
+		<div className="stat-row">
+			Alive : {stats.alive}/{stats.totalUnits}
+		</div>
+		<div className="stat-row">
+			TotalDamage : {stats.totalDamage ?? 0}
+		</div>
+		{stats.totalExp !== undefined && (
+			<div className="stat-row">
+				TotalExp : {stats.totalExp}
+			</div>
+		)}
+		{stats.funds !== undefined && (
+			<div className="stat-row">
+				Funds : $&nbsp;{stats.funds}
+			</div>
+		)}
+	</BattleSidePanel>
 );
 
 /**
@@ -73,34 +74,35 @@ const TeamStats: React.FC<{
  * Battle result component
  */
 export const BattleResult: React.FC<IBattleResultProps> = ({
-  result,
-  leftTeamName,
-  rightTeamName,
-}) => {
-  const { winner, leftTeam, rightTeam, isDraw } = result;
+	result,
+	leftTeamName,
+	rightTeamName,
+}) =>
+{
+	const { winner, leftTeam, rightTeam, isDraw } = result;
 
-  /**
-   * 判斷左側是否勝利
-   * Determine if left side wins
-   */
-  const leftWins = winner === leftTeamName;
+	/**
+	 * 判斷左側是否勝利
+	 * Determine if left side wins
+	 */
+	const leftWins = winner === leftTeamName;
 
-  /**
-   * 標題樣式與文字：平手時不帶 win/lose 配色，改顯示「Draw!」
-   * Title style/text: a draw gets no win/lose colouring and shows "Draw!"
-   */
-  const titleClass = isDraw ? 'result-title' : leftWins ? 'result-title win' : 'result-title lose';
-  const titleText = isDraw ? 'Draw!' : `${winner} Wins!`;
+	/**
+	 * 標題樣式與文字：平手時不帶 win/lose 配色，改顯示「Draw!」
+	 * Title style/text: a draw gets no win/lose colouring and shows "Draw!"
+	 */
+	const titleClass = isDraw ? 'result-title' : leftWins ? 'result-title win' : 'result-title lose';
+	const titleText = isDraw ? 'Draw!' : `${winner} Wins!`;
 
-  return (
-    <div className="battle-result">
-      <div className="result-title-row divider-bottom divider-top">
-        <div className={titleClass}>{titleText}</div>
-      </div>
-      <div className="result-stats-row">
-        <TeamStats name={leftTeamName} stats={leftTeam} sideClass={getSideClass(EnumTeamSideUI.Left)} />
-        <TeamStats name={rightTeamName} stats={rightTeam} sideClass={getSideClass(EnumTeamSideUI.Right)} />
-      </div>
-    </div>
-  );
+	return (
+		<div className="battle-result">
+			<div className="result-title-row divider-bottom divider-top">
+				<div className={titleClass}>{titleText}</div>
+			</div>
+			<div className="result-stats-row">
+				<TeamStats name={leftTeamName} stats={leftTeam} sideClass={getSideClass(EnumTeamSideUI.Left)} />
+				<TeamStats name={rightTeamName} stats={rightTeam} sideClass={getSideClass(EnumTeamSideUI.Right)} />
+			</div>
+		</div>
+	);
 };

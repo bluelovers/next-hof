@@ -4,15 +4,17 @@
  * Page-level rules only (fonts, page container) — no component-specific classes.
  */
 
-body {
-  margin: 0;
-  font-family: メイリオ, Meiryo, "MS PGothic", "Microsoft JhengHei", sans-serif;
-  background: #f5f0e6;
-  color: #2b2b2b;
+body
+{
+	margin: 0;
+	font-family: メイリオ, Meiryo, "MS PGothic", "Microsoft JhengHei", sans-serif;
+	background: #f5f0e6;
+	color: #2b2b2b;
 }
 
-.showcase-page {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 24px 16px 48px;
+.showcase-page
+{
+	max-width: 960px;
+	margin: 0 auto;
+	padding: 24px 16px 48px;
 }

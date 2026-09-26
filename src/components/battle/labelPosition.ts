@@ -25,54 +25,57 @@ import type { ISpriteImageSize } from './spriteImageSizes';
 import { EnumSpriteLabelPlacement } from './enums';
 
 /** 精靈圖層（角色）矩形（frame 座標系） / Sprite-layer (character) rectangle (frame coordinate space) */
-export interface IRect {
-  /** 左緣（相對 frame 左緣） / Left edge (from frame left) */
-  left: number;
-  /** 上緣（相對 frame 上緣） / Top edge (from frame top) */
-  top: number;
-  /** 寬度 / Width */
-  width: number;
-  /** 高度 / Height */
-  height: number;
+export interface IRect
+{
+	/** 左緣（相對 frame 左緣） / Left edge (from frame left) */
+	left: number;
+	/** 上緣（相對 frame 上緣） / Top edge (from frame top) */
+	top: number;
+	/** 寬度 / Width */
+	width: number;
+	/** 高度 / Height */
+	height: number;
 }
 
 /** 標籤演算法：角色上方 / 下方 / Label placement: above / below the character */
 export type ISpriteLabelPlacement = EnumSpriteLabelPlacement;
 
 /** 標籤位置計算輸入 / Label position computation input */
-export interface ISpriteLabelPositionInput {
-  /** 角色圖像左上角 x（background-position x） / Character image top-left x */
-  x: number;
-  /** 角色圖像左上角 y（background-position y） / Character image top-left y */
-  y: number;
-  /** 角色圖像尺寸（由呼叫端提供，組件內禁止 IO） / Character image size (caller-supplied, no IO in component) */
-  imageSize: ISpriteImageSize;
-  /** 標籤演算法：角色上方 / 下方 / Placement algorithm */
-  placement: ISpriteLabelPlacement;
-  /** 顯示範圍（戰場精靈框）尺寸 / Display range (sprite frame) size */
-  frameSize: ISpriteImageSize;
-  /** 標籤預估尺寸（邊界收斂用；缺省寬度＝圖像寬度、高度＝DEFAULT_LABEL_HEIGHT） / Estimated label size for clamping (default width = image width, height = DEFAULT_LABEL_HEIGHT) */
-  labelSize?: ISpriteImageSize;
-  /** 標籤與角色圖像間距 / Gap between label and character */
-  gap?: number;
-  /** 已放置標籤的最終矩形（frame 座標），用於避免與既有標籤重疊 / Final rects of already-placed labels, used to avoid overlap */
-  occupied?: IRect[];
+export interface ISpriteLabelPositionInput
+{
+	/** 角色圖像左上角 x（background-position x） / Character image top-left x */
+	x: number;
+	/** 角色圖像左上角 y（background-position y） / Character image top-left y */
+	y: number;
+	/** 角色圖像尺寸（由呼叫端提供，組件內禁止 IO） / Character image size (caller-supplied, no IO in component) */
+	imageSize: ISpriteImageSize;
+	/** 標籤演算法：角色上方 / 下方 / Placement algorithm */
+	placement: ISpriteLabelPlacement;
+	/** 顯示範圍（戰場精靈框）尺寸 / Display range (sprite frame) size */
+	frameSize: ISpriteImageSize;
+	/** 標籤預估尺寸（邊界收斂用；缺省寬度＝圖像寬度、高度＝DEFAULT_LABEL_HEIGHT） / Estimated label size for clamping (default width = image width, height = DEFAULT_LABEL_HEIGHT) */
+	labelSize?: ISpriteImageSize;
+	/** 標籤與角色圖像間距 / Gap between label and character */
+	gap?: number;
+	/** 已放置標籤的最終矩形（frame 座標），用於避免與既有標籤重疊 / Final rects of already-placed labels, used to avoid overlap */
+	occupied?: IRect[];
 }
 
 /** 標籤位置計算結果 / Label position result */
-export interface ISpriteLabelPositionResult {
-  /** 水平：left 像素（相對 frame 左緣） / Horizontal: left px from frame left */
-  left: number;
-  /** 垂直：top 像素（相對 frame 上緣） / Vertical: top px from frame top */
-  top: number;
-  /** 標籤最終寬度（邊界收斂後；目前寬度不縮減，僅高度會縮減） / Final label width (only height is reduced, width is unchanged) */
-  width: number;
-  /** 標籤最終高度（可能因超出邊界或避免重疊而被縮減） / Final label height (may be reduced to fit boundary / avoid overlap) */
-  height: number;
-  /** 標籤最終矩形（供呼叫端紀錄以預防重疊） / Final label rect (for the caller to record & prevent overlap) */
-  rect: IRect;
-  /** 實際落點演算法（移除自動翻轉後，永遠等於請求的 placement） / Actual placement (no auto-flip now, always equals the requested placement) */
-  actualPlacement: ISpriteLabelPlacement;
+export interface ISpriteLabelPositionResult
+{
+	/** 水平：left 像素（相對 frame 左緣） / Horizontal: left px from frame left */
+	left: number;
+	/** 垂直：top 像素（相對 frame 上緣） / Vertical: top px from frame top */
+	top: number;
+	/** 標籤最終寬度（邊界收斂後；目前寬度不縮減，僅高度會縮減） / Final label width (only height is reduced, width is unchanged) */
+	width: number;
+	/** 標籤最終高度（可能因超出邊界或避免重疊而被縮減） / Final label height (may be reduced to fit boundary / avoid overlap) */
+	height: number;
+	/** 標籤最終矩形（供呼叫端紀錄以預防重疊） / Final label rect (for the caller to record & prevent overlap) */
+	rect: IRect;
+	/** 實際落點演算法（移除自動翻轉後，永遠等於請求的 placement） / Actual placement (no auto-flip now, always equals the requested placement) */
+	actualPlacement: ISpriteLabelPlacement;
 }
 
 /** 標籤預設高度與間距（寬度預設為「圖像寬度」，由呼叫端以 imageSize 帶入） / Default label height & gap (width defaults to the image width via imageSize) */
@@ -90,18 +93,19 @@ export const DEFAULT_IMAGE_SIZE: ISpriteImageSize = { width: 56, height: 72 };
  * Generic clamp (exported so tests & other logic share one implementation, not a copy).
  */
 export const clamp = (v: number, min: number, max: number): number =>
-  Math.min(Math.max(v, min), max);
+	Math.min(Math.max(v, min), max);
 
 /**
  * 標籤水平落點：以角色圖像中心對齊（尚未收斂到 frame 邊界）
  * Label horizontal anchor: centered on the character (pre-clamp).
  */
 export function computeLabelLeft(
-  x: number,
-  imageSize: ISpriteImageSize,
-  labelSize: ISpriteImageSize,
-): number {
-  return Math.round(x + imageSize.width / 2 - labelSize.width / 2);
+	x: number,
+	imageSize: ISpriteImageSize,
+	labelSize: ISpriteImageSize,
+): number
+{
+	return Math.round(x + imageSize.width / 2 - labelSize.width / 2);
 }
 
 /**
@@ -109,15 +113,16 @@ export function computeLabelLeft(
  * Label vertical anchor: above → over the image; below → under the image (pre-clamp).
  */
 export function computeLabelTop(
-  placement: ISpriteLabelPlacement,
-  y: number,
-  imageSize: ISpriteImageSize,
-  labelSize: ISpriteImageSize,
-  gap: number,
-): number {
-  return placement === EnumSpriteLabelPlacement.Above
-    ? y - gap - labelSize.height
-    : y + imageSize.height + gap;
+	placement: ISpriteLabelPlacement,
+	y: number,
+	imageSize: ISpriteImageSize,
+	labelSize: ISpriteImageSize,
+	gap: number,
+): number
+{
+	return placement === EnumSpriteLabelPlacement.Above
+		? y - gap - labelSize.height
+		: y + imageSize.height + gap;
 }
 
 /**
@@ -128,14 +133,15 @@ export function computeLabelTop(
  * Kept for backward-compat & tests; the main path now reduces height via clampLabelToBoundary.
  */
 export function labelFitsInFrame(
-  placement: ISpriteLabelPlacement,
-  top: number,
-  labelSize: ISpriteImageSize,
-  frameSize: ISpriteImageSize,
-): boolean {
-  return placement === EnumSpriteLabelPlacement.Above
-    ? top >= 0
-    : top + labelSize.height <= frameSize.height - FRAME_BOTTOM_MARGIN;
+	placement: ISpriteLabelPlacement,
+	top: number,
+	labelSize: ISpriteImageSize,
+	frameSize: ISpriteImageSize,
+): boolean
+{
+	return placement === EnumSpriteLabelPlacement.Above
+		? top >= 0
+		: top + labelSize.height <= frameSize.height - FRAME_BOTTOM_MARGIN;
 }
 
 /**
@@ -151,45 +157,50 @@ export function labelFitsInFrame(
  * - below & below the frame bottom (bottom > height) → shrink height and clamp inside the frame.
  */
 export function clampLabelToBoundary(
-  placement: ISpriteLabelPlacement,
-  y: number,
-  imageSize: ISpriteImageSize,
-  labelSize: ISpriteImageSize,
-  gap: number,
-  frameSize: ISpriteImageSize,
-): { top: number; height: number } {
-  const top0 = computeLabelTop(placement, y, imageSize, labelSize, gap);
-  if (placement === EnumSpriteLabelPlacement.Above) {
-    const bandBottom = Math.max(0, y - gap);
-    if (top0 < 0) {
-      // 高於邊界 → 貼齊頂緣並縮減高度 / Above boundary → pin to top, shrink height.
-      return { top: 0, height: Math.max(0, bandBottom) };
-    }
-    return { top: top0, height: labelSize.height };
-  }
-  // below
-  // 觸底時與 frame 底邊保留 FRAME_BOTTOM_MARGIN，避免完全貼底
-  // Keep FRAME_BOTTOM_MARGIN from the frame bottom so the label never fully sticks to it.
-  const bandBottom = Math.max(0, frameSize.height - FRAME_BOTTOM_MARGIN);
-  if (top0 + labelSize.height > bandBottom) {
-    // 低於邊界 → 縮減高度並收斂到 frame 內 / Below boundary → shrink height, clamp inside.
-    const height = Math.max(0, bandBottom - top0);
-    return { top: Math.min(top0, Math.max(0, bandBottom - height)), height };
-  }
-  return { top: top0, height: labelSize.height };
+	placement: ISpriteLabelPlacement,
+	y: number,
+	imageSize: ISpriteImageSize,
+	labelSize: ISpriteImageSize,
+	gap: number,
+	frameSize: ISpriteImageSize,
+): { top: number; height: number }
+{
+	const top0 = computeLabelTop(placement, y, imageSize, labelSize, gap);
+	if (placement === EnumSpriteLabelPlacement.Above)
+	{
+		const bandBottom = Math.max(0, y - gap);
+		if (top0 < 0)
+		{
+			// 高於邊界 → 貼齊頂緣並縮減高度 / Above boundary → pin to top, shrink height.
+			return { top: 0, height: Math.max(0, bandBottom) };
+		}
+		return { top: top0, height: labelSize.height };
+	}
+	// below
+	// 觸底時與 frame 底邊保留 FRAME_BOTTOM_MARGIN，避免完全貼底
+	// Keep FRAME_BOTTOM_MARGIN from the frame bottom so the label never fully sticks to it.
+	const bandBottom = Math.max(0, frameSize.height - FRAME_BOTTOM_MARGIN);
+	if (top0 + labelSize.height > bandBottom)
+	{
+		// 低於邊界 → 縮減高度並收斂到 frame 內 / Below boundary → shrink height, clamp inside.
+		const height = Math.max(0, bandBottom - top0);
+		return { top: Math.min(top0, Math.max(0, bandBottom - height)), height };
+	}
+	return { top: top0, height: labelSize.height };
 }
 
 /**
  * 兩矩形是否重疊（frame 座標系，邊界不計；對外匯出供測試與防重疊邏輯共用）
  * Whether two rects overlap (frame coords, edges excluded; exported for tests & overlap logic).
  */
-export function rectsOverlap(a: IRect, b: IRect): boolean {
-  return (
-    a.left < b.left + b.width &&
-    a.left + a.width > b.left &&
-    a.top < b.top + b.height &&
-    a.top + a.height > b.top
-  );
+export function rectsOverlap(a: IRect, b: IRect): boolean
+{
+	return (
+		a.left < b.left + b.width &&
+		a.left + a.width > b.left &&
+		a.top < b.top + b.height &&
+		a.top + a.height > b.top
+	);
 }
 
 /**
@@ -202,37 +213,41 @@ export function rectsOverlap(a: IRect, b: IRect): boolean {
  *          the top & size of the largest gap; { top: bandTop, size: 0 } if fully occupied
  */
 export function largestFreeGap(
-  occupied: IRect[],
-  bandTop: number,
-  bandBottom: number,
-  left: number,
-  width: number,
-): { top: number; size: number } {
-  const blockers = occupied
-    .filter((o) => left < o.left + o.width && left + width > o.left)
-    .map(
-      (o) =>
-        [Math.max(bandTop, o.top), Math.min(bandBottom, o.top + o.height)] as [
-          number,
-          number,
-        ],
-    )
-    .sort((p, q) => p[0] - q[0]);
+	occupied: IRect[],
+	bandTop: number,
+	bandBottom: number,
+	left: number,
+	width: number,
+): { top: number; size: number }
+{
+	const blockers = occupied
+		.filter((o) => left < o.left + o.width && left + width > o.left)
+		.map(
+			(o) =>
+				[Math.max(bandTop, o.top), Math.min(bandBottom, o.top + o.height)] as [
+					number,
+					number,
+				],
+		)
+		.sort((p, q) => p[0] - q[0]);
 
-  let cursor = bandTop;
-  let best: { top: number; size: number } | null = null;
-  for (const [s, e] of blockers) {
-    if (s > cursor) {
-      const size = s - cursor;
-      if (!best || size > best.size) best = { top: cursor, size };
-    }
-    cursor = Math.max(cursor, e);
-  }
-  if (cursor < bandBottom) {
-    const size = bandBottom - cursor;
-    if (!best || size > best.size) best = { top: cursor, size };
-  }
-  return best ?? { top: bandTop, size: 0 };
+	let cursor = bandTop;
+	let best: { top: number; size: number } | null = null;
+	for (const [s, e] of blockers)
+	{
+		if (s > cursor)
+		{
+			const size = s - cursor;
+			if (!best || size > best.size) best = { top: cursor, size };
+		}
+		cursor = Math.max(cursor, e);
+	}
+	if (cursor < bandBottom)
+	{
+		const size = bandBottom - cursor;
+		if (!best || size > best.size) best = { top: cursor, size };
+	}
+	return best ?? { top: bandTop, size: 0 };
 }
 
 /**
@@ -257,69 +272,76 @@ export function largestFreeGap(
  *   frame for a free slot; if still overlapping, shrink the height into the largest free gap.
  *   The final rect is returned so the caller can record it.
  */
-export function computeSpriteLabelPosition(input: ISpriteLabelPositionInput): ISpriteLabelPositionResult {
-  const { x, y, imageSize, placement, frameSize, occupied } = input;
-  // 標籤預設寬度＝圖像寬度（對應組件 min-width: imageSize.width），高度用預設值
-  // Default label width = image width (matches the component's min-width: imageSize.width); height uses the default.
-  const labelSize = input.labelSize ?? { width: imageSize.width, height: DEFAULT_LABEL_HEIGHT };
-  const gap = input.gap ?? DEFAULT_GAP;
+export function computeSpriteLabelPosition(input: ISpriteLabelPositionInput): ISpriteLabelPositionResult
+{
+	const { x, y, imageSize, placement, frameSize, occupied } = input;
+	// 標籤預設寬度＝圖像寬度（對應組件 min-width: imageSize.width），高度用預設值
+	// Default label width = image width (matches the component's min-width: imageSize.width); height uses the default.
+	const labelSize = input.labelSize ?? { width: imageSize.width, height: DEFAULT_LABEL_HEIGHT };
+	const gap = input.gap ?? DEFAULT_GAP;
 
-  // 水平：以角色圖像中心對齊，再收斂在 frame 左右邊界內
-  // Horizontal: center on the character, then clamp within the frame's left/right edges.
-  const left = clamp(
-    computeLabelLeft(x, imageSize, labelSize),
-    0,
-    Math.max(0, frameSize.width - labelSize.width),
-  );
+	// 水平：以角色圖像中心對齊，再收斂在 frame 左右邊界內
+	// Horizontal: center on the character, then clamp within the frame's left/right edges.
+	const left = clamp(
+		computeLabelLeft(x, imageSize, labelSize),
+		0,
+		Math.max(0, frameSize.width - labelSize.width),
+	);
 
-  // 垂直：先以邊界收斂（超界則縮減高度，不翻轉）
-  // Vertical: boundary clamp first (shrink height on overflow, no flip).
-  const boundary = clampLabelToBoundary(placement, y, imageSize, labelSize, gap, frameSize);
-  let top = boundary.top;
-  let height = boundary.height;
-  const width = labelSize.width;
+	// 垂直：先以邊界收斂（超界則縮減高度，不翻轉）
+	// Vertical: boundary clamp first (shrink height on overflow, no flip).
+	const boundary = clampLabelToBoundary(placement, y, imageSize, labelSize, gap, frameSize);
+	let top = boundary.top;
+	let height = boundary.height;
+	const width = labelSize.width;
 
-  // 防重疊：沿 placement 方向在 frame 內找空位；仍重疊則縮減高度塞進帶內最大空隙
-  // Anti-overlap: scan along the placement direction inside the frame; if still overlapping,
-  // shrink the height into the largest free gap.
-  if (occupied && occupied.length > 0) {
-    const rect0: IRect = { left, top, width, height };
-    if (occupied.some((o) => rectsOverlap(rect0, o))) {
-      const end =
-        placement === EnumSpriteLabelPlacement.Above
-          ? 0
-          : Math.max(0, frameSize.height - FRAME_BOTTOM_MARGIN - height);
-      const step = placement === EnumSpriteLabelPlacement.Above ? -1 : 1;
-      let found = false;
-      for (let t = top; placement === EnumSpriteLabelPlacement.Above ? t >= end : t <= end; t += step) {
-        const cand: IRect = { left, top: Math.round(t), width, height };
-        if (!occupied.some((o) => rectsOverlap(cand, o))) {
-          top = Math.round(t);
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        const bandTop = placement === EnumSpriteLabelPlacement.Above ? 0 : y + imageSize.height + gap;
-        const bandBottom =
-          placement === EnumSpriteLabelPlacement.Above
-            ? Math.max(0, y - gap)
-            : Math.max(0, frameSize.height - FRAME_BOTTOM_MARGIN);
-        const gapInfo = largestFreeGap(occupied, bandTop, bandBottom, left, width);
-        if (gapInfo.size > 0) {
-          height = Math.max(0, Math.min(height, Math.floor(gapInfo.size)));
-          top = gapInfo.top;
-        }
-      }
-    }
-  }
+	// 防重疊：沿 placement 方向在 frame 內找空位；仍重疊則縮減高度塞進帶內最大空隙
+	// Anti-overlap: scan along the placement direction inside the frame; if still overlapping,
+	// shrink the height into the largest free gap.
+	if (occupied && occupied.length > 0)
+	{
+		const rect0: IRect = { left, top, width, height };
+		if (occupied.some((o) => rectsOverlap(rect0, o)))
+		{
+			const end =
+				placement === EnumSpriteLabelPlacement.Above
+					? 0
+					: Math.max(0, frameSize.height - FRAME_BOTTOM_MARGIN - height);
+			const step = placement === EnumSpriteLabelPlacement.Above ? -1 : 1;
+			let found = false;
+			for (let t = top; placement === EnumSpriteLabelPlacement.Above ? t >= end : t <= end; t += step)
+			{
+				const cand: IRect = { left, top: Math.round(t), width, height };
+				if (!occupied.some((o) => rectsOverlap(cand, o)))
+				{
+					top = Math.round(t);
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+			{
+				const bandTop = placement === EnumSpriteLabelPlacement.Above ? 0 : y + imageSize.height + gap;
+				const bandBottom =
+					placement === EnumSpriteLabelPlacement.Above
+						? Math.max(0, y - gap)
+						: Math.max(0, frameSize.height - FRAME_BOTTOM_MARGIN);
+				const gapInfo = largestFreeGap(occupied, bandTop, bandBottom, left, width);
+				if (gapInfo.size > 0)
+				{
+					height = Math.max(0, Math.min(height, Math.floor(gapInfo.size)));
+					top = gapInfo.top;
+				}
+			}
+		}
+	}
 
-  return {
-    left,
-    top,
-    width,
-    height,
-    rect: { left, top, width, height },
-    actualPlacement: placement,
-  };
+	return {
+		left,
+		top,
+		width,
+		height,
+		rect: { left, top, width, height },
+		actualPlacement: placement,
+	};
 }
