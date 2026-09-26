@@ -15,6 +15,17 @@ export default defineConfig({
 	// 單元測試專案：純邏輯（src/lib 遊戲系統）以 node 環境執行，可確定性重現。
 	// 執行：node_modules/.bin/vitest run --project unit src/lib/game
 	test: {
+		// fake-timer 的 ESM 建置以無副檔名的子路徑載入 dayjs 插件
+		// （`import 'dayjs/plugin/duration'`），Node 原生 ESM 會直接拒絕該解析；
+		// 強制由 Vite 內聯處理，Vite 的解析器會補上副檔名。
+		// fake-timer's ESM build imports dayjs plugins by extension-less subpath
+		// (`import 'dayjs/plugin/duration'`), which native Node ESM rejects; inline
+		// the package so Vite resolves it (Vite's resolver appends the extension).
+		server: {
+			deps: {
+				inline: ['fake-timer'],
+			},
+		},
 		projects: [
 			{
 				test: {

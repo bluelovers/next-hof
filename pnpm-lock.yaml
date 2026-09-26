@@ -47,6 +47,9 @@ importers:
       colord-rand-loop:
         specifier: ^1.0.6
         version: 1.0.6(ts-toolbelt@9.6.0)
+      dayjs:
+        specifier: ^1.11.23
+        version: 1.11.23
       dayjs-tz-helper:
         specifier: ^1.0.8
         version: 1.0.8
@@ -54,8 +57,8 @@ importers:
         specifier: ^1.0.13
         version: 1.0.13
       fake-timer:
-        specifier: ^2.0.1
-        version: 2.0.1
+        specifier: ^3.0.3
+        version: 3.0.3
       loop-colors:
         specifier: ^1.0.12
         version: 1.0.12(ts-toolbelt@9.6.0)
@@ -1823,8 +1826,8 @@ packages:
     resolution: {integrity: sha512-KfYbmpRm0VbLjEvVa9yGwCi9GI34xvi7A/HXYWQO65CSD2u3MczUJSuwXKFIxlGsgBQizV9q5J9NHj4VG0n+pA==}
     engines: {node: '>=12.0.0'}
 
-  fake-timer@2.0.1:
-    resolution: {integrity: sha512-jsjL8S+EodaLs6m2lVulBlV7Eb9pTCSvUGe/kB86UO3gb2NdDTRf9hl0CoarJ5u0o3KDFGH9iM7D6040SjQxmw==}
+  fake-timer@3.0.3:
+    resolution: {integrity: sha512-LcF6XZmD902AgK/z18i9ChmbaP5N/AOiPUWp2V5Kxp+j2TAhUT6qgsbSXQLed9uyxNOUyqGDcq1o8K54TFjPPw==}
 
   fdir@6.5.0:
     resolution: {integrity: sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==}
@@ -3949,7 +3952,7 @@ snapshots:
 
   expect-type@1.4.0: {}
 
-  fake-timer@2.0.1:
+  fake-timer@3.0.3:
     dependencies:
       dayjs: 1.11.23
       nanoid: 5.1.16
