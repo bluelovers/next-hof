@@ -4,7 +4,16 @@ allowBuilds:
   sharp: true
 
 minimumReleaseAgeExclude:
-  - '@ts-type/is-array
+  - '@ts-type/is-array'
   - ts-type-object-entries
   - ts-type
   - ts-type-predicates
+  - '@vitest/browser-playwright@5.0.2'
+  - '@vitest/browser@5.0.2'
+  - '@vitest/coverage-v8@5.0.2'
+  - '@vitest/mocker@5.0.2'
+  - '@vitest/pretty-format@5.0.2'
+  - '@vitest/spy@5.0.2'
+  - '@vitest/ui@5.0.2'
+  - '@vitest/utils@5.0.2'
+  - vitest@5.0.2
