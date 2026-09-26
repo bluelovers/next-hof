@@ -1,63 +1,45 @@
+// 遊戲虛擬時鐘（基於 fake-timer）/ Game virtual clock (built on fake-timer)
+//
+// 本模組取代已廢棄的 FakeTimeService / ITimeService：不再自刻計數器與冷卻 helper
+// （isReady / nextReadyAt 一併廢棄），也不添加任何與 fake-timer 衝突的自創 API
+// （不覆寫 now()、不改寫回呼簽章）——GameTime 只是 FakeTimer 的遊戲側子類，
+// 排程、推進、執行與取消全部沿用 fake-timer 的公開行為。
+//
+// This module replaces the deprecated FakeTimeService / ITimeService: no hand-rolled counter,
+// no cooldown helpers (isReady / nextReadyAt dropped), and no custom API that would conflict
+// with fake-timer (no now() override, no reshaped callback signature) — GameTime is merely the
+// game-facing subclass of FakeTimer; scheduling, advancing, running and cancelling all keep
+// fake-timer's public behaviour.
+//
+// 用法 / Usage:
+//   const t = new GameTime();
+//   t.setTimeout(cb, 1000);                              // 排程 / schedule
+//   t.start(1000);                                       // 推進 + 執行到期回呼 / advance + run
+//   t.timer.now().diff(t.initTime);                      // 自建立以來的虛擬毫秒 / virtual ms elapsed
+//
+// 完整語意（回呼讀到最終時間、time-jump 防護、start(-1) 逐格前進、回呼簽章 current/self/...params）
+// 見 node_modules/fake-timer/docs；請只用公開 API，勿碰 timer.sort / timer.cache / timer.data。
+// Full semantics (callbacks read the final time, the time-jump guard, start(-1) stepping, the
+// callback signature current/self/...params) live in node_modules/fake-timer/docs; use only the
+// public API and avoid timer.sort / timer.cache / timer.data.
+
+import { FakeTimer } from 'fake-timer';
 
 /**
- * 時間服務介面 / Time service interface
- * 介面 / interface
+ * 遊戲虛擬時鐘：fake-timer `FakeTimer` 的遊戲側子類（目前不新增任何成員）。
+ * Game virtual clock: the game-facing subclass of fake-timer's `FakeTimer` (adds no members yet).
+ *
+ * 為什麼是子類而不是型別別名：讓遊戲側有獨立名稱可注入（如 `IBattleConfig.timeService`），
+ * 並保留日後集中擴充的位置；擴充時必須以 fake-timer 公開 API 為基礎，不得改寫其語意。
+ *
+ * Why a subclass instead of a type alias: it gives the game side its own injectable name
+ * (e.g. `IBattleConfig.timeService`) and a single place for future extensions; any extension
+ * must build on fake-timer's public API without altering its semantics.
+ *
+ * 讀時間一律走 fake-timer：絕對時鐘 `t.timer.now()`（`dayjs`），經過毫秒
+ * `t.timer.now().diff(t.initTime)`（`initTime` 為公開取值）。
+ * Read time the fake-timer way: the absolute clock `t.timer.now()` (`dayjs`), elapsed ms via
+ * `t.timer.now().diff(t.initTime)` (`initTime` is the public accessor).
  */
-export interface ITimeService {
-	/** 目前虛擬時間（毫秒）/ current virtual time (ms) */
-	now(): number;
-	/** 推進虛擬時鐘 / advance the virtual clock */
-	advance(ms: number): void;
-	/**
-	 * 冷卻狀態判斷。
-	 * 對應規格場景：now()=1200 時，isReady(0,1000)=false、isReady(0,1500)=true。
-	 * 語意：回傳 true 表示 at+cooldownMs 尚未到達（仍在冷卻中）。
-	 *
-	 * Cooldown check.
-	 * Spec scenario: with now()=1200, isReady(0,1000)=false and isReady(0,1500)=true.
-	 * Semantics: returns true while at+cooldownMs has NOT been reached (still cooling down).
-	 */
-	isReady(at: number, cooldownMs: number): boolean;
-	/** 冷卻結束的絕對時間 / absolute time when the cooldown ends */
-	nextReadyAt(at: number, cooldownMs: number): number;
-}
-
-/** 測試用：以計數器模擬時間 / For tests: virtual time simulated by a counter */
-export class FakeTimeService implements ITimeService {
-	private t = 0;
-
-	now(): number {
-		return this.t;
-	}
-
-	advance(ms: number): void {
-		this.t += ms;
-	}
-
-	isReady(at: number, cooldownMs: number): boolean {
-		return this.t < at + cooldownMs;
-	}
-
-	nextReadyAt(at: number, cooldownMs: number): number {
-		return at + cooldownMs;
-	}
-}
-
-/** 正式環境：以真實 Date.now() 為基礎（無法 advance）/ production: based on real Date.now() (advance not supported) */
-export class RealTimeService implements ITimeService {
-	now(): number {
-		return Date.now();
-	}
-
-	advance(): void {
-		throw new Error('RealTimeService cannot advance virtual clock');
-	}
-
-	isReady(at: number, cooldownMs: number): boolean {
-		return this.now() < at + cooldownMs;
-	}
-
-	nextReadyAt(at: number, cooldownMs: number): number {
-		return at + cooldownMs;
-	}
+export class GameTime extends FakeTimer {
 }

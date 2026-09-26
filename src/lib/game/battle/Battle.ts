@@ -21,7 +21,7 @@ import { EnumJudgeCode } from './judge-codes';
 import { resolveCorpsePolicy, type ICorpsePolicy, type ICorpsePolicyField } from './corpse-policy';
 import type { IDataRepository } from '../data/repository';
 import type { RNG } from '../core/rng';
-import type { ITimeService } from '../core/time-service';
+import type { GameTime } from '../core/time-service';
 import type { ISkillDef, IBattleEvent, IBattleSnapshot } from '../types';
 import { EnumTargetType, EnumTargetMethod, EnumBattleEventType } from '../types';
 
@@ -36,14 +36,15 @@ export interface IBattleConfig extends ICorpsePolicyField {
 	/** 可注入的隨機源 / injectable random source */
 	rng: RNG;
 	/**
-	 * 虛擬時間服務（省略時不啟用時間相關功能）/ virtual time service (time features disabled when omitted)
+	 * 虛擬時間時鐘（基於 fake-timer；省略時不啟用時間相關功能）/
+	 * virtual clock (built on fake-timer; time features disabled when omitted)
 	 *
 	 * 命名 `timeService` 而非 `time`，以明確區別展示層同名的 time 時間字串
 	 * （IShowcaseBattleInput／IBattleDisplayData 的 `time?: IDisplayTimeString`）。
 	 * Named `timeService` (not `time`) to distinguish it from the same-named display-side
 	 * time string (`time?: IDisplayTimeString` on IShowcaseBattleInput / IBattleDisplayData).
 	 */
-	timeService?: ITimeService;
+	timeService?: GameTime;
 	/**
 	 * 隊伍級屍體政策覆寫（某側未提供＝沿用戰鬥級）。
 	 * Team-level corpse policy overrides (an omitted side inherits the battle-level value).
@@ -56,8 +57,8 @@ export class Battle implements IBattleConfig {
 	repo: IDataRepository;
 	/** 隨機源 / random source */
 	rng: RNG;
-	/** 時間服務（來自 IBattleConfig.timeService；省略＝未注入）/ time service (from IBattleConfig.timeService; omitted when not injected) */
-	timeService?: ITimeService;
+	/** 虛擬時間時鐘（來自 IBattleConfig.timeService，基於 fake-timer；省略＝未注入）/ virtual clock (from IBattleConfig.timeService, built on fake-timer; omitted when not injected) */
+	timeService?: GameTime;
 	/** 雙方隊伍（鍵 EnumTeamSide.Team0／EnumTeamSide.Team1）/ both teams */
 	teams: Record<EnumTeamSide, BattleTeam>;
 	/** 當前回合數 / current turn counter */
