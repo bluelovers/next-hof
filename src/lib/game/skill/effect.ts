@@ -101,8 +101,9 @@ export function calcRecoveryValue(skill: ISkillDef, user: Character): number {
 
 
 /**
- * 套用技能的状态變化（對應 StatusChanges）。
- * Apply the skill's status changes (mirrors StatusChanges).
+ * 套用技能的状态變化，並回傳這段處理產生的戰鬥紀錄（對應 StatusChanges）。
+ * Apply the skill's status changes and return the battle records this processing produced
+ * (mirrors StatusChanges).
  *
  * 對齊原始 HOF/Class/Skill/Effect.php::StatusChanges：Up* / Down* / Plus* 全部作用在「目標」。
  * Mirrors the original StatusChanges: Up* / Down* / Plus* all apply to the *target*.
@@ -113,30 +114,65 @@ export function calcRecoveryValue(skill: ISkillDef, user: Character): number {
  *   umove 與 sacrifice 因「每次施法只作用一次」，改由 Battle.UseSkill 處理（不直接寫入本函式）。
  *   also handles poison / CurePoison / HpRegen / SpRegen / poisonResist / knockback / move (target).
  *   umove and sacrifice are applied once per cast (not per target), so Battle.UseSkill handles them.
+ *
+ * 生產的紀錄（由呼叫方併入 Battle.log，再交給上級事件引擎分派）：
+ * Records produced here (the caller merges them into Battle.log, where the upper event engine
+ * dispatches them):
+ * - Up*／Plus* 任一生效 → Buff 一筆、Down* 生效 → Debuff 一筆（每次施放對同一目標各記一筆；
+ *   事件不帶原文，文案歸展示層 EnumLogCopy）。
+ *   one Buff when any Up* / Plus* applied, one Debuff when any Down* applied (one each per target
+ *   per cast; the event carries no copy — copy belongs to the display layer's EnumLogCopy)。
+ * - 施毒成功 → Poison 一筆；抗性抵抗（'BLOCK'）與已中毒（false）不記——事件上沒有可表達
+ *   「抵抗」的結構欄位，硬記會被展示成「已中毒」。
+ *   poison applied → one Poison record; a resisted roll ('BLOCK') and an already-poisoned target
+ *   (false) record nothing — the event has no field that could express "resisted", and logging it
+ *   would render as "poisoned".
+ *
+ * @param skill - 技能定義 / skill definition
+ * @param actor - 施放者（紀錄的 actor）/ the caster (the record's actor)
+ * @param target - 目標 / target
+ * @param rng - 隨機源（施毒機率判定）/ random source (poison chance roll)
+ * @returns 產生的戰鬥紀錄 / produced battle records
  */
-export function statusChanges(skill: ISkillDef, target: Character, rng?: RNG): void {
+export function statusChanges(skill: ISkillDef, actor: Character, target: Character, rng?: RNG): IBattleEvent[] {
+	const events: IBattleEvent[] = [];
+	let buffed = false;
+	let debuffed = false;
+
 	// 對齊原始 StatusChanges：Up/Down/Plus 全部作用在目標（$target）。
 	// Mirrors original StatusChanges: Up/Down/Plus all apply to the target ($target).
 	for (const key of Object.keys(skill)) {
 		const n = (skill as unknown as Record<string, unknown>)[key];
 		if (typeof n !== 'number') continue;
-		if (UPMAP[key]) UPMAP[key](target, n);
-		else if (DOWNMAP[key]) DOWNMAP[key](target, n);
-		else if (PLUSMAP[key]) PLUSMAP[key](target, n);
+		if (UPMAP[key]) { UPMAP[key](target, n); buffed = true; }
+		else if (DOWNMAP[key]) { DOWNMAP[key](target, n); debuffed = true; }
+		else if (PLUSMAP[key]) { PLUSMAP[key](target, n); buffed = true; }
 	}
+	if (buffed) events.push({ type: EnumBattleEventType.Buff, actor: charIdToString(actor.no), target: charIdToString(target.no), skill: skill.no });
+	if (debuffed) events.push({ type: EnumBattleEventType.Debuff, actor: charIdToString(actor.no), target: charIdToString(target.no), skill: skill.no });
 
 	if (skill.poison) {
-		getPoison(target, skill.poison, rng);
+		const applied = getPoison(target, skill.poison, rng);
+		if (applied === true) {
+			events.push({ type: EnumBattleEventType.Poison, actor: charIdToString(actor.no), target: charIdToString(target.no), skill: skill.no });
+		}
 	}
 	/**
 	 * CurePoison 反向條件（既有實作）：目標「非」中毒時才呼叫 getNormal。
 	 * Reversed CurePoison condition (as implemented): getNormal runs only when the target is NOT poisoned.
+	 *
+	 * 該分支與「解除中毒」語意相反，因此刻意不產紀錄（記錄「解毒」會與實際狀態不符）。
+	 * That branch contradicts cure semantics, so it deliberately records nothing (a "cured" record
+	 * would disagree with the actual state).
 	 */
 	if (skill.CurePoison && target.STATE !== EnumState.Poison) {
 		getNormal(target);
 	}
 	if (skill.HpRegen) target.SPECIAL.HpRegen += skill.HpRegen;
 	if (skill.SpRegen) target.SPECIAL.SpRegen += skill.SpRegen;
+	// 抗毒只累加 SPECIAL.PoisonResist：抵抗當下已在 getPoison 決定，此處不另記紀錄。
+	// Poison resist only accumulates SPECIAL.PoisonResist: the block itself was decided in
+	// getPoison, so no separate record is added here.
 	if (skill.poisonResist) getPoisonResist(target, skill.poisonResist);
 	// 擊退：強制目標移至後排（對齊原始 KnockBack；POSITION 已為 Back 時為 no-op）。
 	// Knockback: force the target to the back row (mirrors original KnockBack; no-op if already Back).
@@ -144,6 +180,8 @@ export function statusChanges(skill: ISkillDef, target: Character, rng?: RNG): v
 	// 技能指定目標移動方向（對齊原始 Move）。
 	// Skill-specified target movement (mirrors original Move).
 	if (skill.move) target.POSITION = skill.move;
+
+	return events;
 }
 
 /**
@@ -163,7 +201,7 @@ export function applySkill(skill: ISkillDef, user: Character, target: Character,
 		const heal = calcRecoveryValue(skill, user);
 		const applied = hpRecover(target, heal);
 		events.push({ type: EnumBattleEventType.Heal, actor: charIdToString(user.no), target: charIdToString(target.no), skill: skill.no, value: applied, hpBefore, hpAfter: target.HP });
-		statusChanges(skill, target, rng);
+		events.push(...statusChanges(skill, user, target, rng));
 		return { heal: applied, events };
 	}
 
@@ -172,13 +210,16 @@ export function applySkill(skill: ISkillDef, user: Character, target: Character,
 	// 絕對防禦 Barrier：消耗一次，完全抵擋
 	if (target.SPECIAL.Barrier > 0 && !skill.pierce) {
 		target.SPECIAL.Barrier--;
-		events.push({ type: EnumBattleEventType.Guard, actor: charIdToString(target.no), target: charIdToString(target.no), text: 'barrier' });
+		// 帶 skill 編號：攔截是「這次技能」造成的，上級事件引擎才能掛回同一筆技能事件。
+		// Carries the skill number: the interception belongs to *this* skill use, so the upper event
+		// engine can attach it to the same skill event.
+		events.push({ type: EnumBattleEventType.Guard, actor: charIdToString(target.no), target: charIdToString(target.no), skill: skill.no, text: 'barrier' });
 		return { damage: 0, events };
 	}
 
 	const hpBefore = target.HP;
 	const applied = hpDamage(target, dmg);
 	events.push({ type: EnumBattleEventType.Damage, actor: charIdToString(user.no), target: charIdToString(target.no), skill: skill.no, value: applied, hpBefore, hpAfter: target.HP });
-	statusChanges(skill, target, rng);
+	events.push(...statusChanges(skill, user, target, rng));
 	return { damage: applied, events };
 }

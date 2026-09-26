@@ -40,6 +40,7 @@ import {
 	buildDownMessage,
 	buildHealMessage,
 	buildMagicCircleMessage,
+	buildPoisonDamageText,
 	buildProtectMessage,
 	buildSummonMessage,
 } from '#/components/battle/battleUtils';
@@ -532,9 +533,9 @@ const mapDeath: IEventMapper = (_ev, ctx) => {
 
 /** Summon → 召喚（target＝被召喚 def no、value＝等級、圖依 def no 查怪物表）/ Summon (target = summoned def no, value = level, image from the mon table) */
 const mapSummon: IEventMapper = (ev, ctx) => {
-	// 召喚事件契約（引擎目前尚無生產點，見 #/lib/game/types 的 EnumBattleEventType.Summon）：
+	// 召喚事件契約（生產點：Battle.UseSkill 的 applySummon，見 #/lib/game/types 的 EnumBattleEventType.Summon）：
 	// target＝被召喚單位的 def no、value＝其等級；圖片依 def no 查 sprite-map 怪物表。
-	// Summon event contract (the engine has no producer yet; see EnumBattleEventType.Summon in
+	// Summon event contract (producer: Battle.UseSkill's applySummon; see EnumBattleEventType.Summon in
 	// #/lib/game/types): target = the summoned unit's def no, value = its level; the image comes
 	// from sprite-map's monster table by that def no.
 	const summonedNo = parseDefNo(ev.target);
@@ -560,11 +561,11 @@ const mapSummon: IEventMapper = (ev, ctx) => {
  * MagicCircle → 魔方陣紀錄（種類由技能定義判定、數量優先取 event.value）
  * MagicCircle → magic-circle record (kind from the skill definition, amount prefers event.value)
  *
- * 魔方陣事件契約（引擎目前尚無生產點，見 #/lib/game/types 的 EnumBattleEventType.MagicCircle）：
+ * 魔方陣事件契約（生產點：Battle.UseSkill，見 #/lib/game/types 的 EnumBattleEventType.MagicCircle）：
  *   skill＝施放的技能編號，用以判定是哪一種 MagicCircle* 效果（同 PHP 依 $skill[...] 分支）；
  *   value＝變更數量，缺省時取技能定義的對應欄位值。
  * 配色不經 attribute：由紀錄種類經 getMagicCircleClass 決定（單一事實來源）。
- * Magic-circle event contract (the engine has no producer yet; see
+ * Magic-circle event contract (producer: Battle.UseSkill; see
  * EnumBattleEventType.MagicCircle in #/lib/game/types): skill = the cast skill no, used to decide
  * which MagicCircle* effect fired (PHP branches on $skill[...] the same way); value = the amount,
  * falling back to the matching skill-definition field. The colour does not travel on `attribute`:
@@ -598,13 +599,42 @@ const mapDebuff: IEventMapper = (ev, ctx) =>
 		text: ev.text ?? DEFAULT_EVENT_TEXT.debuff,
 	});
 
-/** Poison → 中毒（來源＝中毒單位、側別優先取目標側）/ Poison (source = the poisoned unit, side prefers the target) */
+/**
+ * Poison → 中毒（來源＝中毒單位、側別優先取目標側）
+ * Poison (source = the poisoned unit, side prefers the target)
+ *
+ * 兩種形狀由同一轉接器判定，展示端只認結構化欄位：
+ * - 帶 value＝每回合毒傷（Battle.Action 生產）：value／valueChange 交給 PoisonMessage 渲染，
+ *   text 是同一行的純文字鏡像（buildPoisonDamageText，單一事實來源）。
+ * - 無 value＝施毒成功（statusChanges 生產）：沿用預設文案，或事件自帶的 text。
+ * Two shapes decided inside one mapper; the renderer only reads structured fields:
+ * - with `value` = per-turn poison damage (produced by Battle.Action): value / valueChange go to
+ *   PoisonMessage and `text` is the plain-text mirror of that same line (buildPoisonDamageText,
+ *   single source of truth).
+ * - without `value` = poison applied (produced by statusChanges): the default copy, or the event's
+ *   own `text`, is used.
+ */
 const mapPoison: IEventMapper = (ev, ctx) => {
 	const name = ctx.target.name ?? ctx.actor.name;
+	const side = ctx.target.side ?? ctx.side;
+	const hasHp = ev.hpBefore !== undefined && ev.hpAfter !== undefined;
+	if (ev.value !== undefined) {
+		return composeAction(ctx, {
+			type: EnumActionType.Poison,
+			source: name,
+			side,
+			value: ev.value,
+			valueChange: hasHp ? { from: ev.hpBefore, to: ev.hpAfter } : undefined,
+			text: buildPoisonDamageText(ev.value),
+			attribute: EnumAttributeType.Spdmg,
+			hpBefore: ev.hpBefore,
+			hpAfter: ev.hpAfter,
+		});
+	}
 	return composeAction(ctx, {
 		type: EnumActionType.Poison,
 		source: name,
-		side: ctx.target.side ?? ctx.side,
+		side,
 		text: ev.text ?? DEFAULT_EVENT_TEXT.poison,
 		attribute: EnumAttributeType.Spdmg,
 	});

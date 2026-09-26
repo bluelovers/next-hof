@@ -4,9 +4,10 @@ import { EnumState, EnumTeamSide } from '../constants';
 import { FakeTimeService } from '../core/time-service';
 import { Character } from '../character/Character';
 import { createSeedRepository } from '../data/seed-data';
+import { InMemoryRepository } from '../data/repository';
 import { newChar, newMon } from '../character/factory';
 import { Battle } from './Battle';
-import { EnumCharType } from '../types';
+import { EnumCharType, EnumSkillDamageType, EnumTargetMethod, EnumTargetType } from '../types';
 import { EnumOutcome } from './BattleResult';
 import { EnumBattleEventType } from '../types';
 
@@ -43,6 +44,77 @@ describe('Battle action (9.2)', () => {
 
 		attacker.STATE = EnumState.Dead;
 		expect(battle.NextActer()).not.toBe(attacker);
+	});
+});
+
+describe('Battle event producers (9.6)', () => {
+	/**
+	 * 私有倉庫：createSeedRepository 回傳 IDataRepository 介面，注入自訂技能需要具體型別；
+	 * 每個測試各自建立，不污染共用 repo。
+	 * Private repo: createSeedRepository returns the IDataRepository interface, while injecting a
+	 * custom skill needs the concrete type; each test builds its own so the shared repo stays clean.
+	 */
+	const createLocalRepo = (): InMemoryRepository => createSeedRepository() as InMemoryRepository;
+
+	it('a summon skill joins the summoned unit and records summon + magic circle', () => {
+		// 倉庫自行加技能：不污染共用 repo / add the skill to a private repo so the shared one stays clean
+		const localRepo = createLocalRepo();
+		localRepo.addSkill({
+			no: 9001, name: 'SummonSlime', sp: 0, type: EnumSkillDamageType.Physical,
+			target: [EnumTargetType.Self, EnumTargetMethod.Individual, 1], pow: 100, support: 1,
+			MagicCircleAdd: 1, summon: 1002,
+		});
+		const rng = new RNG(3);
+		const caster = newChar({ ...localRepo.getCharBase(100)! }, localRepo, rng);
+		const enemy = newMon(localRepo.getMon(1000)!, localRepo, rng);
+		const battle = new Battle([caster], [enemy], { repo: localRepo, rng });
+
+		battle.UseSkill(caster, 9001);
+
+		const team = battle.teams[EnumTeamSide.Team0];
+		expect(team.members).toHaveLength(2);
+		expect(team.members[1].isSummon()).toBe(true);
+		// 契約：target＝def no、value＝等級（展示層 mapMagicCircle／mapSummon 依此回推）
+		// Contract: target = def no, value = level (the display's mapMagicCircle / mapSummon reads it back)
+		expect(battle.log.filter((e) => e.type === EnumBattleEventType.Summon)).toEqual([
+			{ type: EnumBattleEventType.Summon, actor: '100', target: '1002', value: 1, skill: 9001 },
+		]);
+		expect(battle.log.filter((e) => e.type === EnumBattleEventType.MagicCircle)).toEqual([
+			{ type: EnumBattleEventType.MagicCircle, actor: '100', skill: 9001 },
+		]);
+	});
+
+	it('an unknown summon monster number produces no record and joins nobody', () => {
+		const localRepo = createLocalRepo();
+		localRepo.addSkill({
+			no: 9002, name: 'SummonGhost', sp: 0, type: EnumSkillDamageType.Physical,
+			target: [EnumTargetType.Self, EnumTargetMethod.Individual, 1], pow: 100, support: 1, summon: 9999,
+		});
+		const rng = new RNG(3);
+		const caster = newChar({ ...localRepo.getCharBase(100)! }, localRepo, rng);
+		const enemy = newMon(localRepo.getMon(1000)!, localRepo, rng);
+		const battle = new Battle([caster], [enemy], { repo: localRepo, rng });
+
+		battle.UseSkill(caster, 9002);
+
+		expect(battle.teams[EnumTeamSide.Team0].members).toHaveLength(1);
+		expect(battle.log.some((e) => e.type === EnumBattleEventType.Summon)).toBe(false);
+	});
+
+	it('per-turn poison damage is logged without a skill number (general-event material)', () => {
+		const rng = new RNG(4);
+		const actor = newChar({ ...repo.getCharBase(100)! }, repo, rng);
+		const enemy = newMon(repo.getMon(1000)!, repo, rng);
+		const battle = new Battle([actor], [enemy], { repo, rng });
+		actor.STATE = EnumState.Poison;
+
+		battle.Action(actor);
+
+		const poison = battle.log.filter((e) => e.type === EnumBattleEventType.Poison);
+		expect(poison).toHaveLength(1);
+		expect(poison[0].skill).toBeUndefined();
+		expect(poison[0].value).toBeGreaterThan(0);
+		expect(poison[0].hpAfter).toBe((poison[0].hpBefore ?? 0) - (poison[0].value ?? 0));
 	});
 });
 

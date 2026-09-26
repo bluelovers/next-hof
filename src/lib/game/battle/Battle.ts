@@ -9,6 +9,7 @@ import {
 } from '../constants';
 import { Character, charIdToString } from '../character/Character';
 import { setBattleVariable } from '../character/battle-variable';
+import { newMonSummon } from '../character/factory';
 import { autoRegeneration, poisonDamage, sacrificeHp } from '../character/status';
 import { getSkill } from '../skill/Skill';
 import { applySkill } from '../skill/effect';
@@ -188,9 +189,11 @@ export class Battle implements IBattleConfig {
 	 * 施放技能 / Execute a skill
 	 *
 	 * 流程 / flow: 取技能 → 詠唱/蓄力門檻（charge）→ SP 檢查（怪物 ×0.7）→ 選目標 →
-	 * 守護攔截（非 support/invalid/All）→ applySkill → HP<=0 標記死亡。
+	 * 守護攔截（非 support/invalid/All）→ applySkill → HP<=0 標記死亡 →
+	 * 魔方陣／召喚紀錄（每次施放一次）→ 使用者移動。
 	 * fetch skill → charge gate → SP check (monsters ×0.7) → pick targets →
-	 * guard interception (unless support/invalid/All) → applySkill → mark death at HP<=0.
+	 * guard interception (unless support/invalid/All) → applySkill → mark death at HP<=0 →
+	 * magic-circle / summon records (once per cast) → caster movement.
 	 */
 	UseSkill(actor: Character, skillNo: number): void {
 		const skill = getSkill(skillNo, this.repo);
@@ -244,9 +247,53 @@ export class Battle implements IBattleConfig {
 			}
 		}
 
+		// 魔方陣：只產紀錄（value 省略，數量與種類由展示層依技能定義回推）。
+		// 魔方陣數（BattleTeam.mc）目前沒有任何引擎決策消費者，故不改動戰鬥狀態。
+		// Magic circle: record only (no `value`; the display derives amount and kind from the skill
+		// definition). BattleTeam.mc has no engine-side consumer yet, so battle state stays untouched.
+		if (skill.MagicCircleAdd || skill.MagicCircleDelete || skill.MagicCircleDeleteTeam || skill.MagicCircleDeleteEnemy) {
+			this.log.push({ type: EnumBattleEventType.MagicCircle, actor: charIdToString(actor.no), skill: skillNo });
+		}
+
+		// 召喚：每次施放一次，建立召喚物加入施放者隊伍（入場事件由上級事件引擎衍生）。
+		// Summon: once per cast, the summoned unit joins the caster's team (the entry event is
+		// derived by the upper event engine).
+		if (skill.summon) this.applySummon(skill, actor);
+
 		// 使用後使用者移動方向（對齊原始 Skill.php:206 umove，每次施法一次）。
 		// Post-use user movement (mirrors original Skill.php:206 umove, once per cast).
 		if (skill.umove) actor.POSITION = skill.umove;
+	}
+
+	/**
+	 * 套用召喚：建立召喚物、加入施放者隊伍，並 push 召喚紀錄
+	 * Apply a summon: create the unit, join it to the caster's team, and push the summon record
+	 *
+	 * 契約（見 showcase/battle-adapter 的 mapSummon）：target＝被召喚單位 def no、value＝等級。
+	 * 未知怪物編號直接略過（不產半成品紀錄）。
+	 * Contract (see mapSummon in showcase/battle-adapter): target = the summoned unit's def no,
+	 * value = its level. An unknown monster number is skipped (no half-built record).
+	 *
+	 * @param skill - 帶 summon 欄位的技能定義 / the skill definition carrying `summon`
+	 * @param actor - 施放者 / the caster
+	 */
+	private applySummon(skill: ISkillDef, actor: Character): void {
+		const summon = skill.summon;
+		if (summon === undefined) return;
+		const defNos = Array.isArray(summon) ? summon : [summon];
+		for (const monNo of defNos) {
+			const def = this.repo.getMon(monNo);
+			if (!def) continue;
+			const summoned = newMonSummon(def, this.repo, this.rng);
+			(actor.team as BattleTeam).add(summoned);
+			this.log.push({
+				type: EnumBattleEventType.Summon,
+				actor: charIdToString(actor.no),
+				target: charIdToString(monNo),
+				value: summoned.level,
+				skill: skill.no,
+			});
+		}
 	}
 
 	/** 執行單一單位的回合 / Run one unit's turn
@@ -255,7 +302,21 @@ export class Battle implements IBattleConfig {
 	 */
 	Action(actor: Character): void {
 		autoRegeneration(actor);
-		poisonDamage(actor);
+		const hpBeforePoison = actor.HP;
+		const poisonLost = poisonDamage(actor);
+		// 每回合毒傷：不依附任何技能（帶 value 與前後 HP，展示層據此渲染毒傷行），
+		// 因此上級事件引擎會把它歸類為一般事件。
+		// Per-turn poison damage: attached to no skill (it carries the value and before/after HP the
+		// display needs), so the upper event engine classes it as a general event.
+		if (poisonLost > 0) {
+			this.log.push({
+				type: EnumBattleEventType.Poison,
+				target: charIdToString(actor.no),
+				value: poisonLost,
+				hpBefore: hpBeforePoison,
+				hpAfter: actor.HP,
+			});
+		}
 		if (actor.STATE === EnumState.Dead) return;
 		const skillNo = this.ChooseSkill(actor);
 		this.UseSkill(actor, skillNo);

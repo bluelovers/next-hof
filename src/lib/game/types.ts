@@ -765,10 +765,16 @@ export interface IMonDef extends ICharCore {
 /**
  * 戰鬥事件類型 / Battle event type
  * 列舉 / enumeration
- * 實際被 push 的事件：Damage, Heal, Guard, Death, Cast（Battle.UseSkill / applySkill）。
- * Currently pushed events: Damage, Heal, Guard, Death, Cast (Battle.UseSkill / applySkill).
- * 其餘成員（Buff, Debuff, Poison, Charge, MagicCircle, Summon, Miss, Info）目前無生產點。
- * Remaining members (Buff, Debuff, Poison, Charge, MagicCircle, Summon, Miss, Info) have no producer yet.
+ *
+ * 生產點（單一事實來源，見各成員註解）/ Producers (single source of truth; see each member):
+ * - Battle.UseSkill → Act、Cast、Death、MagicCircle、Summon
+ * - skill/effect（applySkill／statusChanges）→ Damage、Heal、Guard、Buff、Debuff、Poison（施毒成功）
+ * - Battle.Action → Poison（每回合毒傷，不帶 skill，故屬一般事件）
+ * - 無生產點：Charge（蓄力開始以 Cast 記錄）、Miss（引擎未讀取 hit，無判定可記）、
+ *   Info（文案種類屬展示層 EnumLogCopy，引擎層無法結構化）
+ * - No producer: Charge (a charge start is recorded as Cast), Miss (the engine never reads `hit`,
+ *   so there is no decision to record), Info (its copy variants live in the display layer's
+ *   EnumLogCopy and cannot be structured at the engine layer).
  */
 export enum EnumBattleEventType {
 	/** 造成傷害 / damage dealt */
@@ -779,17 +785,22 @@ export enum EnumBattleEventType {
 	Guard = 'guard',
 	/**
 	 * 增益（Up* 與 Plus* 能力變化）/ buff (Up* and Plus* stat change)
-	 * 目前無生產點 / currently no producer
+	 * statusChanges 生產（任一 Up*／Plus* 生效時，每次施放對同一目標記一筆；事件不帶原文）
+	 * produced by statusChanges (one record per target per cast when any Up* / Plus* applied; carries no copy)
 	 */
 	Buff = 'buff',
 	/**
 	 * 減益（Down* 能力變化）/ debuff (Down* stat change)
-	 * 目前無生產點 / currently no producer
+	 * statusChanges 生產（任一 Down* 生效時，每次施放對同一目標記一筆；事件不帶原文）
+	 * produced by statusChanges (one record per target per cast when any Down* applied; carries no copy)
 	 */
 	Debuff = 'debuff',
 	/**
 	 * 中毒狀態 / poison state
-	 * 目前無生產點 / currently no producer
+	 * 兩個生產點：statusChanges（施毒成功，帶 skill）與 Battle.Action（每回合毒傷，帶 value
+	 * 與前後 HP、不帶 skill）
+	 * two producers: statusChanges (poison applied; carries the skill) and Battle.Action (per-turn
+	 * poison damage; carries the value plus before/after HP and no skill)
 	 */
 	Poison = 'poison',
 	/** 死亡 / death */
@@ -800,27 +811,35 @@ export enum EnumBattleEventType {
 	Act = 'act',
 	/**
 	 * 詠唱／蓄力開始 / charge (cast time) started
-	 * 目前無生產點 / currently no producer
+	 * 目前無生產點：蓄力開始改以 Cast 記錄（chargeKindOf 決定 casting／charging）
+	 * no producer yet: a charge start is recorded as Cast instead (chargeKindOf picks the kind)
 	 */
 	Charge = 'charge',
 	/**
 	 * 魔方陣增減 / magic circle change
-	 * 目前無生產點 / currently no producer
+	 * Battle.UseSkill 生產（技能帶任一 MagicCircle* 欄位時，每次施放一筆；value 省略，
+	 * 數量與種類由展示層依技能定義回推）
+	 * produced by Battle.UseSkill (one record per cast when the skill carries any MagicCircle*
+	 * field; no `value` — the display derives amount and kind from the skill definition)
 	 */
 	MagicCircle = 'magiccircle',
 	/**
 	 * 召喚 / summon
-	 * 目前無生產點 / currently no producer
+	 * Battle.UseSkill 生產（target＝被召喚單位 def no、value＝等級，單位加入施放者隊伍）
+	 * produced by Battle.UseSkill (target = the summoned unit's def no, value = its level; the unit
+	 * joins the caster's team)
 	 */
 	Summon = 'summon',
 	/**
 	 * 未命中 / miss
-	 * 目前無生產點（hit 未進引擎，無 Miss 判定）/ currently no producer (hit is not in the engine, so no Miss branch)
+	 * 目前無生產點（hit 未進引擎，無 Miss 判定）/ no producer (hit is not in the engine, so no Miss branch)
 	 */
 	Miss = 'miss',
 	/**
 	 * 一般資訊訊息 / informational message
-	 * 目前無生產點 / currently no producer
+	 * 目前無生產點：文案種類（回合延長等）屬展示層 EnumLogCopy，引擎層無法結構化選擇
+	 * no producer yet: its copy variants (turn extension etc.) belong to the display layer's
+	 * EnumLogCopy, which the engine layer cannot choose between structurally
 	 */
 	Info = 'info',
 }

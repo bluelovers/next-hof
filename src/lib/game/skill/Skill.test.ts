@@ -1,12 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { RNG } from '../core/rng';
+import { EnumState } from '../constants';
 import { Character } from '../character/Character';
 import { createSeedRepository } from '../data/seed-data';
 import { InMemoryRepository } from '../data/repository';
 import { getSkill } from './Skill';
 import { skillPassive } from './passive';
 import { calcBasicDamage, calcRecoveryValue, applySkill } from './effect';
-import { EnumCharType, EnumTargetType, EnumTargetMethod, EnumSkillDamageType, type ISkillDef } from '../types';
+import { EnumBattleEventType, EnumCharType, EnumTargetType, EnumTargetMethod, EnumSkillDamageType, type ISkillDef } from '../types';
 
 const repo = createSeedRepository();
 
@@ -73,6 +74,41 @@ describe('Skill effect (6.2)', () => {
 		const res = applySkill(heal, user, target);
 		expect(res.heal).toBe(200);
 		expect(target.HP).toBe(300);
+	});
+
+	it('a multi-effect skill emits damage / debuff / poison records for one skill use', () => {
+		const user = new Character({
+			no: 1, name: 'u', types: [EnumCharType.Char], level: 1,
+			str: 100, int: 10, dex: 10, spd: 10, luk: 10, maxhp: 300, maxsp: 50,
+		});
+		user.STR = 100;
+		user.atk = [0, 0];
+
+		const target = new Character({
+			no: 2, name: 't', types: [EnumCharType.Mon], level: 1,
+			str: 10, int: 10, dex: 10, spd: 10, luk: 10, maxhp: 300, maxsp: 50,
+		});
+		target.def = [0, 0, 0, 0];
+		target.HP = 300;
+		target.MAXHP = 300;
+
+		// 一個技能同時具備 傷害＋施毒＋減益 / one skill carrying damage + poison + debuff
+		const curse: ISkillDef = {
+			no: 1210, name: 'PlagueHex', sp: 0, type: EnumSkillDamageType.Physical,
+			target: [EnumTargetType.Enemy, EnumTargetMethod.Individual, 1], pow: 100, poison: 100, DownSTR: 15,
+		};
+		const res = applySkill(curse, user, target);
+
+		expect(target.STATE).toBe(EnumState.Poison);
+		expect(res.events.map((e) => e.type)).toEqual([
+			EnumBattleEventType.Damage,
+			EnumBattleEventType.Debuff,
+			EnumBattleEventType.Poison,
+		]);
+		// 每筆都帶 skill 編號 → 上級事件引擎會分派到同一次技能事件的各效果系統
+		// Every record carries the skill number → the upper event engine dispatches them into the
+		// effect systems of one skill event
+		expect(res.events.every((e) => e.skill === curse.no)).toBe(true);
 	});
 });
 

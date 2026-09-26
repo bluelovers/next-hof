@@ -1,0 +1,314 @@
+/**
+ * BattleEventDispatch 元件樣式
+ * BattleEventDispatch component styles
+ *
+ * 自包含：只使用 SharedBase.css 的色票變數（:root 定義），
+ * 不依賴任何父頁面 wrapper class（AGENTS.md：元件樣式必須自包含）。
+ * Self-contained: uses only the palette variables defined on :root by SharedBase.css,
+ * with no dependency on any parent-page wrapper class.
+ */
+
+.event-dispatch {
+  box-sizing: border-box;
+  width: min(760px, 92vw);
+  padding: 16px;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-mid);
+  border-radius: 6px;
+  font-family: var(--font-primary);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.event-dispatch *,
+.event-dispatch *::before,
+.event-dispatch *::after {
+  box-sizing: inherit;
+}
+
+/* ==================== 標題區 / Header ==================== */
+
+.event-dispatch__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border-mid);
+}
+
+.event-dispatch__title {
+  margin: 0;
+  font-size: 18px;
+  color: var(--color-border-heading);
+}
+
+.event-dispatch__summary {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.event-dispatch__count {
+  padding: 1px 8px;
+  border: 1px solid var(--color-border-mid);
+  border-radius: 10px;
+  color: var(--color-text-secondary);
+}
+
+.event-dispatch__count--skill {
+  border-color: var(--color-support);
+  color: var(--color-support);
+}
+
+.event-dispatch__count--general {
+  border-color: var(--color-text-dim);
+}
+
+/* ==================== 事件清單 / Record list ==================== */
+
+.event-dispatch__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 分類徽章：兩類共用外觀、以修飾 class 換色
+   Class badge: shared shape, recoloured by the modifier */
+.event-badge {
+  flex: 0 0 auto;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.event-badge--skill {
+  background: rgba(102, 204, 102, 0.15);
+  border: 1px solid var(--color-support);
+  color: var(--color-support);
+}
+
+.event-badge--general {
+  background: rgba(90, 112, 143, 0.18);
+  border: 1px solid var(--color-text-dim);
+  color: var(--color-text-secondary);
+}
+
+/* ==================== 技能事件卡片 / Skill event card ==================== */
+
+.event-card {
+  background: var(--color-bg-page);
+  border: 1px solid var(--color-border-mid);
+  border-radius: 4px;
+}
+
+.event-card--skill {
+  padding: 10px 12px;
+}
+
+.event-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.event-card__sentence {
+  color: var(--color-text-primary);
+}
+
+.event-card__actor {
+  color: var(--color-text-hover);
+}
+
+.event-card__skill {
+  color: var(--color-accent-gold-bright);
+}
+
+/* 偵測到的效果（技能定義 → 引擎偵測）/ Detected effects (skill definition → engine detection) */
+.event-card__effects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.effect-chip {
+  padding: 1px 8px;
+  background: var(--color-bg-mid);
+  border: 1px solid var(--color-border-mid);
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.effect-chip--damage {
+  border-color: var(--color-dmg);
+  color: var(--color-dmg-glow);
+}
+
+.effect-chip--heal {
+  border-color: var(--color-recover);
+  color: var(--color-recover-glow);
+}
+
+.effect-chip--poison,
+.effect-chip--debuff {
+  border-color: var(--color-support);
+  color: var(--color-support);
+}
+
+.effect-chip--buff,
+.effect-chip--magiccircle {
+  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold-bright);
+}
+
+.effect-chip--summon {
+  border-color: var(--color-accent-gold-bright);
+  color: var(--color-accent-gold-bright);
+}
+
+/* ==================== 效果系統區塊 / Effect system section ==================== */
+
+.event-card__dispatch {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.dispatch {
+  padding: 8px 10px;
+  background: var(--color-bg-surface);
+  border-left: 3px solid var(--color-text-dim);
+  border-radius: 0 4px 4px 0;
+}
+
+.dispatch--damage {
+  border-left-color: var(--color-dmg);
+}
+
+.dispatch--heal {
+  border-left-color: var(--color-recover);
+}
+
+.dispatch--poison,
+.dispatch--debuff {
+  border-left-color: var(--color-support);
+}
+
+.dispatch--buff,
+.dispatch--magiccircle,
+.dispatch--summon {
+  border-left-color: var(--color-accent-gold);
+}
+
+.dispatch--guard,
+.dispatch--miss {
+  border-left-color: var(--color-border-heading);
+}
+
+.dispatch__label {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: var(--color-border-heading);
+}
+
+.dispatch__records,
+.dispatch__followups {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dispatch__record {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.dispatch__type {
+  flex: 0 0 auto;
+  min-width: 92px;
+  color: var(--color-text-dim);
+}
+
+.dispatch__detail {
+  color: var(--color-text-primary);
+}
+
+/* 系統衍生的後續事件（例：召喚 → 入場）/ Follow-up derived by a system (e.g. summon → entry) */
+.dispatch__followups {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--color-border-mid);
+}
+
+.followup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.followup__label {
+  color: var(--color-text-dim);
+}
+
+.followup__type {
+  color: var(--color-accent-gold-bright);
+  font-weight: bold;
+}
+
+.followup__detail {
+  color: var(--color-text-primary);
+}
+
+.event-card__empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-dim);
+}
+
+/* ==================== 一般事件列 / General event row ==================== */
+
+.event-card--general {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+}
+
+.event-card__type {
+  flex: 0 0 auto;
+  min-width: 92px;
+  color: var(--color-text-secondary);
+}
+
+.event-card__detail {
+  color: var(--color-text-primary);
+}
+
+/* ==================== 窄螢幕 / Narrow screens ==================== */
+
+@media (max-width: 640px) {
+  .dispatch__record,
+  .event-card--general {
+    flex-direction: column;
+    gap: 2px;
+  }
+}

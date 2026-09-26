@@ -278,6 +278,33 @@ describe('3.3 mapBattleEvent', () => {
 		expect(action.message).toContain('joined to the team');
 	});
 
+	it('poison damage event carries the structured value, poison apply keeps the default copy', () => {
+		// 每回合毒傷（Battle.Action 生產）：value 與前後 HP 交給 PoisonMessage 結構化渲染，
+		// text 是同一行的純文字鏡像（buildPoisonDamageText）
+		// Per-turn poison damage (produced by Battle.Action): value and before/after HP go to
+		// PoisonMessage as structured fields, and `text` mirrors that same line
+		const damage = mapBattleEvent(
+			{ type: EnumBattleEventType.Poison, target: '1000', value: 31, hpBefore: 140, hpAfter: 109 },
+			lookup,
+			repo,
+		);
+		expect(damage.type).toBe(EnumActionType.Poison);
+		expect(damage.source).toBe('GoblinAxe');
+		expect(damage.value).toBe(31);
+		expect(damage.valueChange).toEqual({ from: 140, to: 109 });
+		expect(damage.message).toBe('GoblinAxe got 31 damage by poison.');
+
+		// 施毒成功（statusChanges 生產，無 value）沿用預設文案
+		// Poison applied (produced by statusChanges, no value) keeps the default copy
+		const applied = mapBattleEvent(
+			{ type: EnumBattleEventType.Poison, actor: '100', target: '1000', skill: 1000 },
+			lookup,
+			repo,
+		);
+		expect(applied.value).toBeUndefined();
+		expect(applied.message).toBe(`GoblinAxe ${DEFAULT_EVENT_TEXT.poison}`);
+	});
+
 	// 魔方陣事件：種類由技能定義中哪個 MagicCircle* 欄位決定，數量優先取 event.value
 	// Magic-circle events: the kind comes from whichever MagicCircle* field the skill
 	// definition carries, and the amount prefers `value` on the event
