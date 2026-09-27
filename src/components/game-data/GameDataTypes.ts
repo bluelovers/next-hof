@@ -7,10 +7,8 @@
  */
 
 import { EnumSkillType } from '../battle/enums';
-import type {
-	EnumStatusAttr,
-	IPrimaryStat,
-} from '#/lib/game/character/status-attrs';
+import type { IPrimaryStat } from '#/lib/game/character/status-attrs';
+import type { EnumStatusAttr } from '#/lib/game/character/status-enum';
 import {
 	EnumTargetType,
 	EnumTargetMethod,

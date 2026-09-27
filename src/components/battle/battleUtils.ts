@@ -20,7 +20,7 @@ import {
 import { TEAM_SIDE_CLASS } from './types';
 import { computeSpriteFlipped } from './spriteFlip';
 import { corpseSpecOf } from '#/lib/game/battle/corpse-policy';
-import type { EnumStatusAttr } from '#/lib/game/character/status-attrs';
+import type { EnumStatusAttr } from '#/lib/game/character/status-enum';
 import type {
 	IBattleAction,
 	IBattleSegment,

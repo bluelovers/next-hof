@@ -16,7 +16,7 @@ import { createSeedRepository } from '#/lib/game/data/seed-data';
 import type { IDataRepository } from '#/lib/game/data/repository';
 import { EnumBattleEventType, EnumInfoText, EnumResource, EnumSkillDamageType, EnumValueWho } from '#/lib/game/types';
 import type { IBattleEvent, IBattleSnapshot, ISkillDef } from '#/lib/game/types';
-import { EnumStatusAttr } from '#/lib/game/character/status-attrs';
+import { EnumStatusAttr } from '#/lib/game/character/status-enum';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
 import {
 	EnumTeamSideUI,

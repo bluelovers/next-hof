@@ -43,3 +43,20 @@ export enum EnumStatusAttr
 	/** 最大 SP / Max SP */
 	MAXSP = 'MAXSP',
 }
+
+/**
+ * 生命／精神當前值（單一事實來源）/ Current HP / SP vital (single source of truth)
+ *
+ * 與 EnumStatusAttr 的 MAXHP / MAXSP 上限成對：上限降低時須同步夾制當前值。
+ * 用以取代原先 downCap 演算法中的 'HP' | 'SP' 字串聯合，使「當前值」亦受 enum 約束。
+ * Pairs with the MAXHP / MAXSP caps in EnumStatusAttr: when a cap drops, the current
+ * value must be clamped. Replaces the previous 'HP' | 'SP' string union in the cap-debuff
+ * algorithm so the current value is also governed by an enum.
+ */
+export enum EnumVital
+{
+	/** 當前 HP / Current HP */
+	HP = 'HP',
+	/** 當前 SP / Current SP */
+	SP = 'SP',
+}

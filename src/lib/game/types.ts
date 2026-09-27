@@ -2,7 +2,8 @@
 // 欄位對應 docs/data/{char,job,skill,item,mon}.md 分析的 YAML 結構。
 
 import { EnumState, EnumPosition, EnumTeamSide } from './constants';
-import type { ICompField, EnumStatusAttr, IStatusUpKey, IStatusDownKey } from './character/status-attrs';
+import type { ICompField, IStatusUpKey, IStatusDownKey } from './character/status-attrs';
+import type { EnumStatusAttr } from './character/status-enum';
 import type { ICorpsePolicy, ICorpsePolicyField } from './battle/corpse-policy';
 
 /**
@@ -282,8 +283,6 @@ export type ITargetSpec = [
  * 狀態屬性 / Status attribute
  * 型別別名 / type alias
  */
-export type { EnumStatusAttr } from './character/status-attrs';
-
 /**
  * 補正欄位型別（P_* / M_*，單一事實來源由 COMP_FIELDS 衍生）/ Compensation bonus type
  * 型別別名 / type alias

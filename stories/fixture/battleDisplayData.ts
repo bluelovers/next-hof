@@ -77,7 +77,7 @@ import {
 } from '#/components/battle/battleUtils';
 import { EnumPosition } from '#/lib/game/constants';
 import { EnumValueWho } from '#/lib/game/types';
-import { EnumStatusAttr } from '#/lib/game/character/status-attrs';
+import { EnumStatusAttr } from '#/lib/game/character/status-enum';
 import { computeTeamHpStats, type ITeamHpUnit } from '#/lib/showcase/battle-adapter';
 
 // ==================== 常數 / Constants ====================

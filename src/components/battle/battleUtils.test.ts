@@ -46,7 +46,7 @@ import type {
 	IBattleSnapshotDisplayUnit,
 	IBattleSprite,
 } from './types';
-import { EnumStatusAttr } from '#/lib/game/character/status-attrs';
+import { EnumStatusAttr } from '#/lib/game/character/status-enum';
 
 /** 建立最小可用行動 / Build a minimal action */
 function action(message: string, side?: EnumTeamSideUI): IBattleAction

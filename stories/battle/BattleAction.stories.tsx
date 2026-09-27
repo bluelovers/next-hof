@@ -17,7 +17,7 @@ import { BattleAction } from '../../src/components/battle/BattleAction';
 import type { IBattleAction } from '../../src/components/battle/types';
 import { EnumActionType, EnumAttributeType, EnumStatDirection } from '#/components/battle/enums';
 import { EnumValueWho } from '#/lib/game/types';
-import { EnumStatusAttr } from '#/lib/game/character/status-attrs';
+import { EnumStatusAttr } from '#/lib/game/character/status-enum';
 import {
 	buildActionMessage,
 	buildDamageCountMessage,
