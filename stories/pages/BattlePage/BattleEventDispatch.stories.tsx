@@ -16,6 +16,7 @@ import {
 	dispatchUnitNames,
 	mixedLogRecords,
 	multiEffectRecords,
+	skillEffectRecords,
 	summonEntryRecords,
 } from '../../fixture/battleEventDispatchData';
 
@@ -85,6 +86,34 @@ export const MixedLog: Story = {
 			description: {
 				story:
 					'技能事件與一般事件（死亡）交錯出現，兩類共同涵蓋整段日誌；查不到技能定義時偵測效果為空，但分派照常進行。\nSkill events interleave with general events (death); together the two classes cover the whole log. When a skill definition is unknown the detected effects are empty, but dispatch still runs.',
+			},
+		},
+	},
+};
+
+/**
+ * SkillEffect 移植的 13 種新事件型別：逐型別各一筆，驗證型別標籤與效果系統歸屬
+ * The 13 new event types brought by the SkillEffect port: one record per type, verifying the type
+ * label and the effect-system routing of each
+ *
+ * SpDamage／Drain → 傷害系統，SpHeal／Regen／Revive → 恢復系統，Quick／CastShort／BarrierGain／
+ * StatChange／EnergyExchange → 增益系統，PoisonResist → 毒系統；Move／Delay／Info 刻意不入
+ * EVENT_EFFECT，因此即使帶 skill 也歸一般事件。
+ * SpDamage / Drain → damage, SpHeal / Regen / Revive → heal, Quick / CastShort / BarrierGain /
+ * StatChange / EnergyExchange → buff, PoisonResist → poison; Move / Delay / Info stay out of
+ * EVENT_EFFECT, so they are general events even when carrying a skill number.
+ */
+export const SkillEffectEvents: Story = {
+	args: {
+		records: skillEffectRecords,
+		unitNames: dispatchUnitNames,
+		title: 'SkillEffect 新事件 / SkillEffect new events',
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'逐一對應 SkillEffect.ts 生產的 13 種新事件：傷害／恢復／增益／毒系統各自收下該歸屬的型別，而位移、延遲、純資訊三類因無法歸因到單一效果系統，即使帶 skill 也留在一般事件。\nOne record per each of the 13 new event types produced by SkillEffect.ts: damage / heal / buff / poison systems each take their own types, while Move, Delay and plain Info stay in the general class because they cannot be attributed to one effect system.',
 			},
 		},
 	},

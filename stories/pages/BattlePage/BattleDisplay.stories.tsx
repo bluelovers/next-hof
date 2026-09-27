@@ -159,7 +159,7 @@ export const WithLogMessages: Story = {
 		docs: {
 			description: {
 				story:
-					'每個訊息族系各示範一次',
+					'逐一示範 EnumActionType 的全部 30 個成員（Skill / Attack / Damage / Heal / Protect / Enter / Summon / MagicCircle / Casting / Down / Result / SpDamage / Recover / Drain / Regen / Revive / Buff / Debuff / Poison / StatChange / Move / Delay / Sacrifice / Fail / Miss / LevelUp / ItemDrop / Info / EnergyExchange / Leave），確保 BattleDisplay 在完整戰鬥記錄下能正確渲染每一種技能／行動型別。\nOne demonstration of every one of the 30 EnumActionType members so BattleDisplay is proven to render each skill / action type correctly inside a full battle record.',
 			},
 		},
 	},

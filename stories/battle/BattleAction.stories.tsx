@@ -11,8 +11,21 @@ import { BattleActionDarkDecorator } from '../decorators';
 import { BattleAction } from '../../src/components/battle/BattleAction';
 import type { IBattleAction } from '../../src/components/battle/types';
 import {
+	buildActionMessage,
+	buildDamageCountMessage,
 	buildDamageMessage,
+	buildDrainMessage,
+	buildHealCountMessage,
 	buildHealMessage,
+	buildPoisonDamageText,
+	buildPoisonResistText,
+	buildPossessiveText,
+	buildRecoveredText,
+	buildRegenText,
+	buildSpDamageMessage,
+	buildStatToText,
+	buildValueChangeFromDelay,
+	EnumLogCopy,
 } from '#/components/battle/battleUtils';
 
 const meta: Meta<typeof BattleAction> = {
@@ -154,6 +167,295 @@ export const HealAction: Story = {
 			attribute: 'recover',
 		},
 	} as StoryArgs,
+};
+
+// ==================== SkillEffect 移植帶來的行動型別 ====================
+// 對應 #/lib/game/skill/SkillEffect.ts 生產、由 battle-adapter 轉接的事件；
+// 文案一律引用 battleUtils 的建構器，不在此重打字串（與 fixture 同源）。
+// Action types brought by the SkillEffect port: events produced by
+// #/lib/game/skill/SkillEffect.ts and adapted by battle-adapter; the copy always comes from
+// battleUtils' builders and is never retyped here (same source as the fixture).
+
+/** SP 傷害（`40SP Damage to GoblinAxe`，行首無施放者名稱）/ SP damage (`40SP Damage to GoblinAxe`, no caster name at the head) */
+export const SpDamageAction: Story = {
+	args: {
+		action: {
+			type: 'spdamage',
+			source: undefined,
+			target: 'GoblinAxe',
+			value: 40,
+			valueUnit: 'SP',
+			message: buildSpDamageMessage(40, 'GoblinAxe'),
+			attribute: 'spdmg',
+		},
+} as StoryArgs,
+};
+
+/** 吸取（`Drained 40 HP from GoblinAxe(1000 ↘ 960)Warrior(200 ↗ 240)`）/ Drain */
+export const DrainAction: Story = {
+	args: {
+		action: {
+			type: 'drain',
+			source: undefined,
+			target: 'GoblinAxe',
+			value: 40,
+			valueUnit: 'HP',
+			message: buildDrainMessage(40, 'HP', 'GoblinAxe'),
+			valueChanges: [{ from: 1000, to: 960 }, { who: 'Warrior', from: 200, to: 240 }],
+			attribute: 'recover',
+		},
+} as StoryArgs,
+};
+
+/** SP 回復（`Warrior Recovered 30 SP`；與 HP 回復共用版面，依 valueUnit 配 support 色）/ SP heal */
+export const RecoverSpAction: Story = {
+	args: {
+		action: {
+			type: 'recover',
+			source: 'Warrior',
+			value: 30,
+			valueUnit: 'SP',
+			valueChange: { from: 60, to: 90 },
+			text: buildRecoveredText(30, 'SP'),
+			message: buildActionMessage({ source: 'Warrior', text: buildRecoveredText(30, 'SP') }),
+			attribute: 'support',
+		},
+} as StoryArgs,
+};
+
+/** 持續回復（`gained SP regeneration +15%`）/ Regeneration (`gained SP regeneration +15%`) */
+export const RegenAction: Story = {
+	args: {
+		action: {
+			type: 'regen',
+			source: 'Mage1',
+			valueUnit: 'SP',
+			text: buildRegenText('SP', 15),
+			message: buildActionMessage({ source: 'Mage1', text: buildRegenText('SP', 15) }),
+			attribute: 'support',
+		},
+} as StoryArgs,
+};
+
+/** 復活（`Hero1 revived!`，只有 revived 上 recover 色）/ Revive (`Hero1 revived!`) */
+export const ReviveAction: Story = {
+	args: {
+		action: {
+			type: 'revive',
+			source: 'Hero1',
+			text: EnumLogCopy.Revived,
+			message: buildActionMessage({ source: 'Hero1', text: EnumLogCopy.Revived }),
+			emphasis: 'revived',
+			attribute: 'recover',
+		},
+} as StoryArgs,
+};
+
+/** 增益：障壁／加速／施法縮短（三句皆 support 色）/ Buff: barrier / quick / cast shortened */
+export const BuffAction: Story = {
+	args: {
+		action: {
+			type: 'buff',
+			source: 'Mage1',
+			text: EnumLogCopy.Barriered,
+			message: buildActionMessage({ source: 'Mage1', text: EnumLogCopy.Barriered }),
+			attribute: 'support',
+		},
+} as StoryArgs,
+};
+
+/** 施法縮短（`casting shorted!`）/ Cast shortened (`casting shorted!`) */
+export const CastShortAction: Story = {
+	args: {
+		action: {
+			type: 'buff',
+			source: 'Mage1',
+			text: EnumLogCopy.CastingShorted,
+			message: buildActionMessage({ source: 'Mage1', text: EnumLogCopy.CastingShorted }),
+			attribute: 'support',
+		},
+} as StoryArgs,
+};
+
+/** 加速（`got quicked!`）/ Quick (`got quicked!`) */
+export const QuickAction: Story = {
+	args: {
+		action: {
+			type: 'buff',
+			source: 'Hero1',
+			text: EnumLogCopy.Quicked,
+			message: buildActionMessage({ source: 'Hero1', text: EnumLogCopy.Quicked }),
+			attribute: 'support',
+		},
+} as StoryArgs,
+};
+
+/** 上限變化（`MAXSP extended to 400`，原始日誌無 span）/ Cap change (`MAXSP extended to 400`, no span) */
+export const StatChangeAction: Story = {
+	args: {
+		action: {
+			type: 'statchange',
+			source: 'Mage1',
+			text: buildStatToText('MAXSP', 'extended', 400),
+			message: buildActionMessage({ source: 'Mage1', text: buildStatToText('MAXSP', 'extended', 400) }),
+			attribute: 'normal',
+		},
+} as StoryArgs,
+};
+
+/** 位移（`moved to front.`，原始日誌無 span）/ Move (`moved to front.`, no span) */
+export const MoveAction: Story = {
+	args: {
+		action: {
+			type: 'move',
+			source: 'Hero1',
+			text: EnumLogCopy.MoveToFront,
+			message: buildActionMessage({ source: 'Hero1', text: EnumLogCopy.MoveToFront }),
+			attribute: 'normal',
+		},
+} as StoryArgs,
+};
+
+/** 延遲（`Mage1 Delayed（15 ⏳↘ 25/100）`；符號 `⏳↘` 由版面依型別決定）/ Delay */
+export const DelayAction: Story = {
+	args: {
+		action: {
+			type: 'delay',
+			source: 'Mage1',
+			text: EnumLogCopy.Delay,
+			message: buildActionMessage({ source: 'Mage1', text: EnumLogCopy.Delay }),
+			valueChange: buildValueChangeFromDelay(15, 25, 100),
+			attribute: 'normal',
+		},
+} as StoryArgs,
+};
+
+/** 中毒施加（`get poisoned!`，只有 poisoned 上 spdmg 色）/ Poison applied (`get poisoned!`) */
+export const PoisonAction: Story = {
+	args: {
+		action: {
+			type: 'poison',
+			source: 'GoblinAxe',
+			text: EnumLogCopy.PoisonApplied,
+			message: buildActionMessage({ source: 'GoblinAxe', text: EnumLogCopy.PoisonApplied }),
+			emphasis: 'poisoned',
+			attribute: 'spdmg',
+		},
+} as StoryArgs,
+};
+
+/** 每回合毒傷（`got 12 damage by poison.`，帶前後 HP）/ Per-turn poison damage */
+export const PoisonDamageAction: Story = {
+	args: {
+		action: {
+			type: 'poison',
+			source: 'GoblinAxe',
+			value: 12,
+			valueChange: { from: 1200, to: 1050 },
+			text: buildPoisonDamageText(12),
+			message: buildActionMessage({ source: 'GoblinAxe', text: buildPoisonDamageText(12) }),
+			attribute: 'spdmg',
+		},
+} as StoryArgs,
+};
+
+/** 解毒（`GoblinAxe's poison has cured.`；所有格片段不加空格、無 span）/ Cure (`GoblinAxe's poison has cured.`) */
+export const PoisonCureAction: Story = {
+	args: {
+		action: {
+			type: 'poison',
+			source: 'GoblinAxe',
+			text: buildPossessiveText(EnumLogCopy.PoisonCured),
+			message: buildActionMessage({ source: 'GoblinAxe', text: buildPossessiveText(EnumLogCopy.PoisonCured) }),
+			attribute: 'normal',
+		},
+} as StoryArgs,
+};
+
+/** 抗毒（`got PoisonResist!(50%)`，support 色）/ Poison resist (`got PoisonResist!(50%)`) */
+export const PoisonResistAction: Story = {
+	args: {
+		action: {
+			type: 'poison',
+			source: 'GoblinWarrior(A)',
+			text: buildPoisonResistText(50),
+			message: buildActionMessage({ source: 'GoblinWarrior(A)', text: buildPoisonResistText(50) }),
+			attribute: 'support',
+		},
+} as StoryArgs,
+};
+
+/** 自我中毒（`Got poisoned`，無主詞無 span）/ Self-poison (`Got poisoned`, unnamed) */
+export const PoisonSelfAction: Story = {
+	args: {
+		action: {
+			type: 'poison',
+			source: undefined,
+			text: EnumLogCopy.PoisonSelf,
+			message: EnumLogCopy.PoisonSelf,
+			attribute: 'normal',
+		},
+} as StoryArgs,
+};
+
+/** 未命中（無施放者時整段即 `Failed!`）/ Miss without an actor (the whole line is `Failed!`) */
+export const MissAction: Story = {
+	args: {
+		action: {
+			type: 'miss',
+			source: undefined,
+			text: EnumLogCopy.Miss,
+			message: EnumLogCopy.Miss,
+			attribute: 'normal',
+		},
+} as StoryArgs,
+};
+
+/** 純文字資訊（`Damage x6!`／`heal x2!`，無主詞無 span）/ Plain info (`Damage x6!` / `heal x2!`) */
+export const InfoAction: Story = {
+	args: {
+		action: {
+			type: 'info',
+			source: undefined,
+			message: buildDamageCountMessage(6),
+			attribute: 'normal',
+		},
+} as StoryArgs,
+};
+
+/** 回復倍數資訊（`heal x2!`；對照 SkillEffect 的 3005）/ Heal multiplier info (`heal x2!`) */
+export const HealCountInfoAction: Story = {
+	args: {
+		action: {
+			type: 'info',
+			source: undefined,
+			message: buildHealCountMessage(2),
+			attribute: 'normal',
+		},
+} as StoryArgs,
+};
+
+/** HP/SP 交換（3 行區塊：交換句＋HP 行＋SP 行）/ HP/SP exchange (3-line block) */
+export const EnergyExchangeAction: Story = {
+	args: {
+		action: {
+			type: 'energyexchange',
+			source: 'Hero1',
+			text: EnumLogCopy.EnergyExchange,
+			message: buildActionMessage({ source: 'Hero1', text: EnumLogCopy.EnergyExchange }),
+			energyExchange: {
+				hpFrom: 500,
+				hpFromRate: 50,
+				hpTo: 800,
+				hpToRate: 80,
+				spFrom: 80,
+				spFromRate: 80,
+				spTo: 50,
+				spToRate: 50,
+			},
+			attribute: 'normal',
+		},
+} as StoryArgs,
 };
 
 /** 多行日誌範例展示 / Multiple log entries example */

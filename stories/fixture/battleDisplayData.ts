@@ -54,6 +54,7 @@ import {
 	buildDamageMessage,
 	buildDownMessage,
 	buildDrainMessage,
+	buildHealMessage,
 	buildFailMessage,
 	buildItemDropMessage,
 	buildMagicCircleMessage,
@@ -1034,6 +1035,58 @@ const logMessagesActions: IBattleAction[] = [
 			spTo: 50,
 			spToRate: 50,
 		},
+	}),
+
+	// ==================== 基礎行動型別 / Basic action types ====================
+	// 以下在其它故事（Default / Summon / MagicCircle）已有更完整的情境；這裡各補一筆，
+	// 確保「完整日誌訊息覆蓋」真的涵蓋 EnumActionType 的全部 30 個成員。
+	// These already appear in richer context in other stories (Default / Summon / MagicCircle);
+	// one entry each here guarantees the full-log-coverage set actually spans all 30 EnumActionType members.
+
+	// ---- 技能行（施放者＋技能名，dmg 色）/ Skill line (caster + skill name) ----
+	skillAction(goblinWarriorB, SKILL_FATAL_STAB, EnumTeamSideUI.Left),
+	// ---- 普通攻擊（Attack 與 Skill 共用 SkillMessage）/ Normal attack (shares SkillMessage) ----
+	attackAction(goblinAxe, EnumTeamSideUI.Left),
+	// ---- 傷害（value＋前後 HP，dmg 色）/ Damage (value + before/after HP) ----
+	damageAction(goblinWarriorB, hero1, 182, { from: 349, to: 167 }, EnumTeamSideUI.Left),
+	// ---- 治療（Heal 與 Recover 共用 RecoverMessage 版面）/ Heal (shares RecoverMessage with Recover) ----
+	namedLogAction(EnumActionType.Heal, priest1, buildHealMessage(120, hero1.name), EnumTeamSideUI.Left, {
+		value: 120,
+		target: hero1.name,
+		valueChange: { from: 1, to: 121 },
+		attribute: EnumAttributeType.Recover,
+	}),
+	// ---- 保護（support 色）/ Protect (support colour) ----
+	protectAction(hero1, priest1, EnumTeamSideUI.Left),
+	// ---- 入場（enter the Battlefield）/ Enter ----
+	enterAction(summonHero1),
+	// ---- 召喚（施放者＋技能＋被召喚單位清單）/ Summon (caster + skill + summoned list) ----
+	logAction(
+		EnumActionType.Summon,
+		summonMage1,
+		`${buildActMessage(summonMage1.name, SKILL_GRAVEYARD.name)}: ${buildSummonMessage(summonedUnits[0].name)}`,
+		EnumTeamSideUI.Right,
+		{
+			skill: SKILL_GRAVEYARD,
+			summoned: summonedUnits.map((unit) => ({
+				name: unit.name,
+				level: unit.level,
+				imageUrl: logAvatarUrl(unit.imageUrl),
+			})),
+			attribute: EnumAttributeType.Normal,
+		},
+	),
+	// ---- 魔方陣紀錄（draw 種類）/ Magic-circle record (draw kind) ----
+	magicCircleAction(mage1, SKILL_MAGIC_CIRCLE, EnumMagicCircleKind.Draw, 1, EnumTeamSideUI.Right),
+	// ---- 擊倒（down，dmg 色）/ Down (dmg colour) ----
+	downAction(mage1, EnumTeamSideUI.Left),
+	// ---- 減益（能力下降；NamedLogMessage 共用 Buff 版面，dmg 色）/ Debuff (stat down; shares Buff layout, dmg colour) ----
+	namedLogAction(EnumActionType.Debuff, goblinWarriorA, 'STR fall 10%', EnumTeamSideUI.Left, {
+		attribute: EnumAttributeType.Dmg,
+	}),
+	// ---- 戰鬥結果（type 無專屬渲染，走 default 整行鏡像）/ Battle result (no dedicated renderer; default whole-line mirror) ----
+	logAction(EnumActionType.Result, undefined, 'Battle ended in victory.', EnumTeamSideUI.Left, {
+		attribute: EnumAttributeType.Normal,
 	}),
 ];
 
