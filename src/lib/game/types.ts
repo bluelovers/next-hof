@@ -2,7 +2,7 @@
 // 欄位對應 docs/data/{char,job,skill,item,mon}.md 分析的 YAML 結構。
 
 import { EnumState, EnumPosition, EnumTeamSide } from './constants';
-import type { ICompField, EnumStatusAttr } from './character/status-attrs';
+import type { ICompField, EnumStatusAttr, IStatusUpKey, IStatusDownKey } from './character/status-attrs';
 import type { ICorpsePolicy, ICorpsePolicyField } from './battle/corpse-policy';
 
 /**
@@ -395,31 +395,31 @@ export enum EnumSkillDamageType
  * 技能 Up* 臨時增益欄位 / Skill Up* temporary buff fields
  * 型別別名 / type alias
  *
- * 由 EnumStatusAttr 衍生（`Up${EnumStatusAttr}`，共 11 鍵），鍵名對應 status-key.ts 的
- * STATUS_UP_KEY_NAME 與 status-attrs.ts 的 UPMAP；新增狀態屬性時本型別自動跟隨，
+ * 由 EnumStatusAttr 衍生（IStatusUpKey，共 11 鍵），鍵名對應 status-attrs.ts 的
+ * STATUS_UP_KEY_NAME 與 UPMAP；新增狀態屬性時本型別自動跟隨，
  * 無需在 ISkillDef 重複宣告欄位（SSoT／型別追溯）。
- * Derived from EnumStatusAttr (`Up${EnumStatusAttr}`, 11 keys) mirroring STATUS_UP_KEY_NAME / UPMAP:
+ * Derived from EnumStatusAttr (IStatusUpKey, 11 keys) mirroring STATUS_UP_KEY_NAME / UPMAP:
  * adding a status attribute updates this type automatically — no hand-maintained copy inside
  * ISkillDef (SSoT / type traceability).
  *
  * statusChanges 命中 UPMAP 鍵時，以 % 作用於「目標」（對齊原始 StatusChanges 全部作用在 $target）。
  * When statusChanges hits a UPMAP key, the % value is applied to the *target* (mirrors original StatusChanges applying everything to $target).
  */
-export type ISkillUpFields = Partial<Record<`Up${EnumStatusAttr}`, number>>;
+export type ISkillUpFields = Partial<Record<IStatusUpKey, number>>;
 
 /**
  * 技能 Down* 臨時減益欄位 / Skill Down* temporary debuff fields
  * 型別別名 / type alias
  *
- * 由 EnumStatusAttr 衍生（`Down${EnumStatusAttr}`，共 11 鍵），鍵名對應 status-key.ts 的
- * STATUS_DOWN_KEY_NAME 與 status-attrs.ts 的 DOWNMAP（SSoT／型別追溯）。
- * Derived from EnumStatusAttr (`Down${EnumStatusAttr}`, 11 keys) mirroring STATUS_DOWN_KEY_NAME /
+ * 由 EnumStatusAttr 衍生（IStatusDownKey，共 11 鍵），鍵名對應 status-attrs.ts 的
+ * STATUS_DOWN_KEY_NAME 與 DOWNMAP（SSoT／型別追溯）。
+ * Derived from EnumStatusAttr (IStatusDownKey, 11 keys) mirroring STATUS_DOWN_KEY_NAME /
  * DOWNMAP (SSoT / type traceability).
  *
  * statusChanges 命中 DOWNMAP 鍵時，以 % 作用於「目標」。
  * When statusChanges hits a DOWNMAP key, the % value is applied to the *target*.
  */
-export type ISkillDownFields = Partial<Record<`Down${EnumStatusAttr}`, number>>;
+export type ISkillDownFields = Partial<Record<IStatusDownKey, number>>;
 
 /**
  * 技能定義 / Skill definition

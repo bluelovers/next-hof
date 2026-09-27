@@ -19,7 +19,8 @@
 // The engine never rewrites an input record: every IBattleEvent stays verbatim in the output
 // (single source of truth).
 
-import { DOWNMAP, PLUSMAP, UPMAP } from '../character/status-attrs';
+import { STATUS_UP_KEYS, STATUS_DOWN_KEYS, STATUS_PLUS_KEYS } from '../character/status-attrs';
+import type { IStatusUpKey, IStatusDownKey, IStatusPlusKey } from '../character/status-attrs';
 import type { IBattleEvent, ISkillDef } from '../types';
 import { EnumBattleEventType } from '../types';
 
@@ -221,15 +222,18 @@ export function detectSkillEffects(skill: ISkillDef): EnumSkillEffect[]
 
 	// Up*／Plus* → 增益、Down* → 減益：與 statusChanges 的分派表共用 UPMAP／DOWNMAP／PLUSMAP。
 	// Up* / Plus* → buff, Down* / debuff: shares UPMAP / DOWNMAP / PLUSMAP with statusChanges.
-	for (const key of Object.keys(skill))
+	const upFields = skill as Partial<Record<IStatusUpKey, number>>;
+	const downFields = skill as Partial<Record<IStatusDownKey, number>>;
+	const plusFields = skill as Partial<Record<IStatusPlusKey, number>>;
+
+	if (STATUS_UP_KEYS.some((k) => typeof upFields[k] === 'number')
+		|| STATUS_PLUS_KEYS.some((k) => typeof plusFields[k] === 'number'))
 	{
-		const n = (skill as unknown as Record<string, unknown>)[key];
-		if (typeof n !== 'number') continue;
-		if (UPMAP[key] || PLUSMAP[key])
-		{
-			add(EnumSkillEffect.Buff);
-		}
-		else if (DOWNMAP[key]) add(EnumSkillEffect.Debuff);
+		add(EnumSkillEffect.Buff);
+	}
+	if (STATUS_DOWN_KEYS.some((k) => typeof downFields[k] === 'number'))
+	{
+		add(EnumSkillEffect.Debuff);
 	}
 	return found;
 }

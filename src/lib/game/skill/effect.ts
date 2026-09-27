@@ -6,7 +6,8 @@ import { EnumPosition } from '../constants';
 import type { Character } from '../character/Character';
 import { charIdToString } from '../character/Character';
 import { hpDamage, hpRecover, getPoison, getPoisonResist } from '../character/status';
-import { UPMAP, DOWNMAP, PLUSMAP, EnumAtkSlot, EnumDefSlot } from '../character/status-attrs';
+import { UPMAP, DOWNMAP, PLUSMAP, STATUS_UP_KEYS, STATUS_DOWN_KEYS, STATUS_PLUS_KEYS, EnumAtkSlot, EnumDefSlot } from '../character/status-attrs';
+import type { IStatusUpKey, IStatusDownKey, IStatusPlusKey } from '../character/status-attrs';
 import type { ISkillDef, IBattleEvent } from '../types';
 import { EnumInfluence, EnumBattleEventType, EnumMoveText, EnumSkillDamageType } from '../types';
 import type { RNG } from '../core/rng';
@@ -199,23 +200,32 @@ export function statusChanges(skill: ISkillDef, actor: Character, target: Charac
 
 	// 對齊原始 StatusChanges：Up/Down/Plus 全部作用在目標（$target）。
 	// Mirrors original StatusChanges: Up/Down/Plus all apply to the target ($target).
-	for (const key of Object.keys(skill))
+	const upFields = skill as Partial<Record<IStatusUpKey, number>>;
+	const downFields = skill as Partial<Record<IStatusDownKey, number>>;
+	const plusFields = skill as Partial<Record<IStatusPlusKey, number>>;
+
+	for (const key of STATUS_UP_KEYS)
 	{
-		const n = (skill as unknown as Record<string, unknown>)[key];
+		const n = upFields[key];
 		if (typeof n !== 'number') continue;
-		if (UPMAP[key])
+		UPMAP[key](target, n);
+		buffed = true;
+	}
+	for (const key of STATUS_DOWN_KEYS)
+	{
+		const n = downFields[key];
+		if (typeof n !== 'number') continue;
+		DOWNMAP[key](target, n);
+		debuffed = true;
+	}
+	for (const key of STATUS_PLUS_KEYS)
+	{
+		const n = plusFields[key];
+		if (typeof n !== 'number') continue;
+		const plusFn = PLUSMAP[key];
+		if (plusFn)
 		{
-			UPMAP[key](target, n);
-			buffed = true;
-		}
-		else if (DOWNMAP[key])
-		{
-			DOWNMAP[key](target, n);
-			debuffed = true;
-		}
-		else if (PLUSMAP[key])
-		{
-			PLUSMAP[key](target, n);
+			plusFn(target, n);
 			buffed = true;
 		}
 	}
