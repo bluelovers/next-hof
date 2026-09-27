@@ -75,6 +75,7 @@ import {
 	getEnterBattlefieldText,
 } from '#/components/battle/battleUtils';
 import { EnumPosition } from '#/lib/game/constants';
+import { EnumValueWho } from '#/lib/game/types';
 import { computeTeamHpStats, type ITeamHpUnit } from '#/lib/showcase/battle-adapter';
 
 // ==================== 常數 / Constants ====================
@@ -763,7 +764,7 @@ const logMessagesActions: IBattleAction[] = [
 			valueUnit: 'HP',
 			target: hero1.name,
 			attribute: EnumAttributeType.Recover,
-			valueChanges: [{ from: 1000, to: 960 }, { who: '我方', from: 200, to: 240 }],
+			valueChanges: [{ from: 1000, to: 960 }, { who: EnumValueWho.Actor, from: 200, to: 240 }],
 		},
 	),
 	logAction(
@@ -776,7 +777,7 @@ const logMessagesActions: IBattleAction[] = [
 			valueUnit: 'SP',
 			target: hero1.name,
 			attribute: EnumAttributeType.Support,
-			valueChanges: [{ from: 100, to: 75 }, { who: '我方', from: 50, to: 75 }],
+			valueChanges: [{ from: 100, to: 75 }, { who: EnumValueWho.Actor, from: 50, to: 75 }],
 		},
 	),
 

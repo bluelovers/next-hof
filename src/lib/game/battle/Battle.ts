@@ -23,6 +23,7 @@ import type { RNG } from '../core/rng';
 import type { GameTime } from '../core/time-service';
 import type { ISkillDef, IBattleEvent, IBattleSnapshot } from '../types';
 import {
+	EnumInfoText,
 	EnumTargetType,
 	EnumTargetMethod,
 	EnumBattleEventType,
@@ -326,7 +327,7 @@ export class Battle implements IBattleConfig
 		// and the action line stays.
 		if (targets.length === 0)
 		{
-			this.log.push({ type: EnumBattleEventType.Info, text: 'no-target' });
+			this.log.push({ type: EnumBattleEventType.Info, text: EnumInfoText.NoTarget });
 		}
 		for (const tgt of targets)
 		{

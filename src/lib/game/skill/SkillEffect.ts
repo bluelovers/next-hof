@@ -57,15 +57,15 @@ import {
 } from '../character/status';
 import { DOWNMAP, UPMAP } from '../character/status-attrs';
 import type { IBattleEvent, ISkillDef } from '../types';
-import { EnumBattleEventType, EnumSkillPriority } from '../types';
+import { EnumBattleEventType, EnumInfoText, EnumMoveText, EnumResource, EnumSkillPriority, EnumValueWho } from '../types';
 import type { IDamageOption, ISkillResult } from './effect';
 import { applyDamage, applySkill, barrierGuard, calcBasicDamage, calcRecoveryValue, statusChanges } from './effect';
 
 /** Move 事件的 `text` token（展示層對照 EnumLogCopy 的位移成員）/ Move event `text` tokens (display maps them to EnumLogCopy's movement members) */
-type IMoveText = 'front' | 'back' | 'knockback' | 'forward';
+type IMoveText = EnumMoveText;
 
 /** Info 事件的 `text` token（展示層依 token 選 EnumLogCopy 成員或 buildXxx 建構器）/ Info event `text` tokens (the display picks an EnumLogCopy member or a buildXxx builder per token) */
-type IInfoText = 'over-cap' | 'multiply' | 'heal-multiply' | 'no-target';
+type IInfoText = EnumInfoText;
 
 /**
  * 技能效果執行器：移植 HOF/Class/Skill/Effect.php 的 `SkillEffect()`
@@ -145,7 +145,7 @@ export class SkillEffect
 				const option: IDamageOption | undefined = char.POSITION !== EnumPosition.Front ? { multiply: 4 } : undefined;
 				const dmg = calcBasicDamage(skill, char, target, option);
 				this.damageHp(events, skill, char, target, dmg);
-				this.moveUnit(events, skill, char, char, EnumPosition.Front, 'front');
+				this.moveUnit(events, skill, char, char, EnumPosition.Front, EnumMoveText.Front);
 				return { events, damage: dmg };
 			}
 
@@ -155,7 +155,7 @@ export class SkillEffect
 				const option: IDamageOption | undefined = char.POSITION === EnumPosition.Front ? { multiply: 3 } : undefined;
 				const dmg = calcBasicDamage(skill, char, target, option);
 				this.damageHp(events, skill, char, target, dmg);
-				this.moveUnit(events, skill, char, char, EnumPosition.Back, 'back');
+				this.moveUnit(events, skill, char, char, EnumPosition.Back, EnumMoveText.Back);
 				return { events, damage: dmg };
 			}
 
@@ -168,7 +168,7 @@ export class SkillEffect
 				{
 					if (value >= 1000)
 					{
-						this.info(events, 'over-cap');
+						this.info(events, EnumInfoText.OverCap);
 						value = 500;
 					}
 					this.damageHpRaw(events, skill, char, target, value);
@@ -189,7 +189,7 @@ export class SkillEffect
 				{
 					if (value >= 1000)
 					{
-						this.info(events, 'over-cap');
+						this.info(events, EnumInfoText.OverCap);
 						value = 500;
 					}
 					this.damageSp(events, skill, char, target, value);
@@ -225,7 +225,7 @@ export class SkillEffect
 				if (target.STATE === EnumState.Poison)
 				{
 					option.multiply = 6;
-					this.info(events, 'multiply', 6);
+					this.info(events, EnumInfoText.Multiply, 6);
 				}
 				if (this.blockedByBarrier(skill, target, events)) return { events, damage: 0 };
 				const dmg = calcBasicDamage(skill, char, target, option);
@@ -337,7 +337,7 @@ export class SkillEffect
 			{
 				const team = char.team as BattleTeam;
 				const count = team.CountDead() + 1;
-				this.info(events, 'multiply', count);
+				this.info(events, EnumInfoText.Multiply, count);
 				if (this.blockedByBarrier(skill, target, events)) return { events, damage: 0 };
 				const dmg = calcBasicDamage(skill, char, target, { multiply: count });
 				this.damageHp(events, skill, char, target, dmg);
@@ -450,7 +450,7 @@ export class SkillEffect
 				if (rate <= 30)
 				{
 					heal *= 2;
-					this.info(events, 'heal-multiply', 2);
+					this.info(events, EnumInfoText.HealMultiply, 2);
 				}
 				this.recoverHp(events, skill, char, target, heal);
 				return { events, heal };
@@ -529,8 +529,8 @@ export class SkillEffect
 					target: charIdToString(target.no),
 					skill: skill.no,
 					valueChanges: [
-						{ who: 'target', unit: 'hp', from: hpFrom, to: target.HP },
-						{ who: 'target', unit: 'sp', from: spFrom, to: target.SP },
+						{ who: EnumValueWho.Target, unit: EnumResource.Hp, from: hpFrom, to: target.HP },
+						{ who: EnumValueWho.Target, unit: EnumResource.Sp, from: spFrom, to: target.SP },
 					],
 				});
 				return { events };
@@ -604,7 +604,7 @@ export class SkillEffect
 				const want = target.behavior?.position;
 				if (want !== undefined && target.POSITION !== want)
 				{
-					this.moveUnit(events, skill, char, target, want, want === EnumPosition.Front ? 'front' : 'back');
+					this.moveUnit(events, skill, char, target, want, want === EnumPosition.Front ? EnumMoveText.Front : EnumMoveText.Back);
 				}
 				return { events };
 			}
@@ -621,7 +621,7 @@ export class SkillEffect
 					char.POSITION = EnumPosition.Back;
 					return { events };
 				}
-				this.moveUnit(events, skill, char, target, EnumPosition.Front, 'forward');
+				this.moveUnit(events, skill, char, target, EnumPosition.Front, EnumMoveText.Forward);
 				events.push(...statusChanges(skill, char, target, this.battle.rng));
 				return { events };
 			}
@@ -731,13 +731,13 @@ export class SkillEffect
 		if (skill.HpRegen)
 		{
 			target.addSpecial('HpRegen', skill.HpRegen);
-			this.regen(events, skill, char, target, 'hp', skill.HpRegen);
+			this.regen(events, skill, char, target, EnumResource.Hp, skill.HpRegen);
 		}
 		// SP 持続回復
 		if (skill.SpRegen)
 		{
 			target.addSpecial('SpRegen', skill.SpRegen);
-			this.regen(events, skill, char, target, 'sp', skill.SpRegen);
+			this.regen(events, skill, char, target, EnumResource.Sp, skill.SpRegen);
 		}
 
 		// 蓄力技能只對「已在詠唱／蓄力」的目標生效（原始 `break` → 不走 default 餘下流程）
@@ -948,7 +948,7 @@ export class SkillEffect
 			target: charIdToString(healed.no),
 			skill: skill.no,
 			value: applied,
-			unit: 'sp',
+			unit: EnumResource.Sp,
 			hpBefore: spBefore,
 			hpAfter: healed.SP,
 		});
@@ -1064,7 +1064,7 @@ export class SkillEffect
 			target: charIdToString(damaged.no),
 			skill: skill.no,
 			value: dmg,
-			unit: 'sp',
+			unit: EnumResource.Sp,
 			hpBefore: spBefore,
 			hpAfter: damaged.SP,
 		});
@@ -1103,10 +1103,10 @@ export class SkillEffect
 			target: charIdToString(target.no),
 			skill: skill.no,
 			value: dmg,
-			unit: 'hp',
+			unit: EnumResource.Hp,
 			valueChanges: [
-				{ who: 'target', unit: 'hp', from: targetBefore, to: target.HP },
-				{ who: 'actor', unit: 'hp', from: actorBefore, to: caster.HP },
+				{ who: EnumValueWho.Target, unit: EnumResource.Hp, from: targetBefore, to: target.HP },
+				{ who: EnumValueWho.Actor, unit: EnumResource.Hp, from: actorBefore, to: caster.HP },
 			],
 		});
 	}
@@ -1138,10 +1138,10 @@ export class SkillEffect
 			target: charIdToString(target.no),
 			skill: skill.no,
 			value: dmg,
-			unit: 'sp',
+			unit: EnumResource.Sp,
 			valueChanges: [
-				{ who: 'target', unit: 'sp', from: targetBefore, to: target.SP },
-				{ who: 'actor', unit: 'sp', from: actorBefore, to: caster.SP },
+				{ who: EnumValueWho.Target, unit: EnumResource.Sp, from: targetBefore, to: target.SP },
+				{ who: EnumValueWho.Actor, unit: EnumResource.Sp, from: actorBefore, to: caster.SP },
 			],
 		});
 	}
@@ -1160,7 +1160,7 @@ export class SkillEffect
 		skill: ISkillDef,
 		actor: Character,
 		recipient: Character,
-		unit: 'hp' | 'sp',
+		unit: EnumResource,
 		value: number,
 	): void
 	{
@@ -1337,7 +1337,7 @@ export class SkillEffect
 			actor: charIdToString(char.no),
 			target: charIdToString(target.no),
 			skill: skill.no,
-			valueChanges: [{ who: 'target', unit: 'delay', from, to: target.delay }],
+			valueChanges: [{ who: EnumValueWho.Target, unit: EnumResource.Delay, from, to: target.delay }],
 		});
 	}
 }

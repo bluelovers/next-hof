@@ -14,7 +14,7 @@ import type { Character } from '#/lib/game/character/Character';
 import { RNG } from '#/lib/game/core/rng';
 import { createSeedRepository } from '#/lib/game/data/seed-data';
 import type { IDataRepository } from '#/lib/game/data/repository';
-import { EnumBattleEventType, EnumSkillDamageType } from '#/lib/game/types';
+import { EnumBattleEventType, EnumInfoText, EnumSkillDamageType } from '#/lib/game/types';
 import type { IBattleEvent, IBattleSnapshot, ISkillDef } from '#/lib/game/types';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
 import {
@@ -797,10 +797,10 @@ const mapMiss: IEventMapper = (ev, ctx) =>
 const mapInfo: IEventMapper = (ev, ctx) =>
 {
 	const message =
-		ev.text === 'multiply' ? buildDamageCountMessage(ev.value ?? 0)
-			: ev.text === 'heal-multiply' ? buildHealCountMessage(ev.value ?? 0)
-				: ev.text === 'over-cap' ? EnumLogCopy.InfoOverCap
-					: ev.text === 'no-target' ? EnumLogCopy.InfoNoTarget
+		ev.text === EnumInfoText.Multiply ? buildDamageCountMessage(ev.value ?? 0)
+			: ev.text === EnumInfoText.HealMultiply ? buildHealCountMessage(ev.value ?? 0)
+				: ev.text === EnumInfoText.OverCap ? EnumLogCopy.InfoOverCap
+					: ev.text === EnumInfoText.NoTarget ? EnumLogCopy.InfoNoTarget
 						: ev.text ?? '';
 	// Info 一律是整行文案，刻意不帶 source（原版此類行無粗體主詞）
 	// Info is always a whole-line copy and deliberately carries no source (those original lines

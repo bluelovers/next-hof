@@ -38,9 +38,12 @@ import { runEventEngine } from '#/lib/game/battle/event-engine';
 import type { IBattleEventRecord } from '#/lib/game/battle/event-engine';
 import {
 	EnumBattleEventType,
+	EnumMoveText,
+	EnumResource,
 	EnumSkillDamageType,
 	EnumTargetMethod,
 	EnumTargetType,
+	EnumValueWho,
 } from '#/lib/game/types';
 import type { IBattleEvent, ISkillDef } from '#/lib/game/types';
 
@@ -244,7 +247,7 @@ const skillEffectEvents: IBattleEvent[] = [
 		target: 'GoblinAxe',
 		skill: soulLeech.no,
 		value: 40,
-		unit: 'sp',
+		unit: EnumResource.Sp,
 		hpBefore: 100,
 		hpAfter: 60,
 	},
@@ -254,14 +257,14 @@ const skillEffectEvents: IBattleEvent[] = [
 		target: 'GoblinAxe',
 		skill: soulLeech.no,
 		value: 40,
-		unit: 'hp',
+		unit: EnumResource.Hp,
 		valueChanges: [
-			{ who: 'target', unit: 'hp', from: 1000, to: 960 },
-			{ who: 'actor', unit: 'hp', from: 200, to: 240 },
+			{ who: EnumValueWho.Target, unit: EnumResource.Hp, from: 1000, to: 960 },
+			{ who: EnumValueWho.Actor, unit: EnumResource.Hp, from: 200, to: 240 },
 		],
 	},
 	// 位移不入 EVENT_EFFECT → 一般事件 / a row move stays out of EVENT_EFFECT → a general event
-	{ type: EnumBattleEventType.Move, actor: 'Warrior', target: 'GoblinAxe', skill: soulLeech.no, text: 'front' },
+	{ type: EnumBattleEventType.Move, actor: 'Warrior', target: 'GoblinAxe', skill: soulLeech.no, text: EnumMoveText.Front },
 
 	{ type: EnumBattleEventType.Act, actor: 'Priest', skill: soulBless.no },
 	// ---- 恢復系統：SP 回復／持續回復／復活 ---- / Heal system: SP heal / regen / revive
@@ -271,11 +274,11 @@ const skillEffectEvents: IBattleEvent[] = [
 		target: 'Warrior',
 		skill: soulBless.no,
 		value: 30,
-		unit: 'sp',
+		unit: EnumResource.Sp,
 		hpBefore: 60,
 		hpAfter: 90,
 	},
-	{ type: EnumBattleEventType.Regen, actor: 'Priest', target: 'Priest', skill: soulBless.no, value: 15, unit: 'sp' },
+	{ type: EnumBattleEventType.Regen, actor: 'Priest', target: 'Priest', skill: soulBless.no, value: 15, unit: EnumResource.Sp },
 	{ type: EnumBattleEventType.Revive, actor: 'Priest', target: 'Hero1', skill: soulBless.no },
 	// ---- 增益系統：加速／施法縮短／障壁／上限變化／HP-SP 交換 ----
 	// Buff system: quick / cast shortened / barrier / cap change / HP-SP exchange
@@ -296,8 +299,8 @@ const skillEffectEvents: IBattleEvent[] = [
 		target: 'Warrior',
 		skill: soulBless.no,
 		valueChanges: [
-			{ who: 'target', unit: 'hp', from: 500, to: 800 },
-			{ who: 'target', unit: 'sp', from: 80, to: 50 },
+			{ who: EnumValueWho.Target, unit: EnumResource.Hp, from: 500, to: 800 },
+			{ who: EnumValueWho.Target, unit: EnumResource.Sp, from: 80, to: 50 },
 		],
 	},
 	// ---- 毒系統：抗毒 ---- / Poison system: resist
@@ -309,7 +312,7 @@ const skillEffectEvents: IBattleEvent[] = [
 		actor: 'Warrior',
 		target: 'Mage1',
 		skill: soulBless.no,
-		valueChanges: [{ who: 'target', unit: 'delay', from: 15, to: 25 }],
+		valueChanges: [{ who: EnumValueWho.Target, unit: EnumResource.Delay, from: 15, to: 25 }],
 	},
 	{ type: EnumBattleEventType.Info, skill: soulBless.no, text: 'multiply', value: 6 },
 ];

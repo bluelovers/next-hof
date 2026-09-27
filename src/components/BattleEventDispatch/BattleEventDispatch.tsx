@@ -21,11 +21,11 @@
  */
 import React from 'react';
 import type { IBattleEvent } from '#/lib/game/types';
-import { EnumBattleEventType } from '#/lib/game/types';
 import {
 	EnumEventClass,
 	EnumFollowUpType,
 	EnumSkillEffect,
+	EVENT_TYPE_LABEL,
 } from '#/lib/game/battle/event-engine';
 import type {
 	IBattleEventRecord,
@@ -65,37 +65,6 @@ const EFFECT_LABEL: Record<EnumSkillEffect, string> = {
 	[EnumSkillEffect.MagicCircle]: '魔方陣系統 / MagicCircle',
 	[EnumSkillEffect.Guard]: '守護系統 / Guard',
 	[EnumSkillEffect.Miss]: '命中系統 / Miss',
-};
-
-/** 紀錄型別標籤（EnumBattleEventType 全員）/ Record type labels (every EnumBattleEventType member) */
-const EVENT_TYPE_LABEL: Record<EnumBattleEventType, string> = {
-	[EnumBattleEventType.Damage]: '傷害 Damage',
-	[EnumBattleEventType.Heal]: '回復 Heal',
-	[EnumBattleEventType.Guard]: '守護 Guard',
-	[EnumBattleEventType.Buff]: '增益 Buff',
-	[EnumBattleEventType.Debuff]: '減益 Debuff',
-	[EnumBattleEventType.Poison]: '中毒 Poison',
-	[EnumBattleEventType.Death]: '死亡 Death',
-	[EnumBattleEventType.Cast]: '詠唱 Cast',
-	[EnumBattleEventType.Act]: '行動 Act',
-	[EnumBattleEventType.Charge]: '蓄力 Charge',
-	[EnumBattleEventType.MagicCircle]: '魔方陣 MagicCircle',
-	[EnumBattleEventType.Summon]: '召喚 Summon',
-	[EnumBattleEventType.Miss]: '未命中 Miss',
-	[EnumBattleEventType.Info]: '資訊 Info',
-	[EnumBattleEventType.SpDamage]: 'SP 傷害 SpDamage',
-	[EnumBattleEventType.SpHeal]: 'SP 回復 SpHeal',
-	[EnumBattleEventType.Drain]: '吸取 Drain',
-	[EnumBattleEventType.Revive]: '復活 Revive',
-	[EnumBattleEventType.Move]: '位移 Move',
-	[EnumBattleEventType.Delay]: '延遲 Delay',
-	[EnumBattleEventType.Quick]: '加速 Quick',
-	[EnumBattleEventType.CastShort]: '施法縮短 CastShort',
-	[EnumBattleEventType.BarrierGain]: '障壁 BarrierGain',
-	[EnumBattleEventType.PoisonResist]: '抗毒 PoisonResist',
-	[EnumBattleEventType.Regen]: '持續回復 Regen',
-	[EnumBattleEventType.StatChange]: '上限變化 StatChange',
-	[EnumBattleEventType.EnergyExchange]: 'HP/SP 交換 EnergyExchange',
 };
 
 /** 後續事件標籤 / Follow-up labels */

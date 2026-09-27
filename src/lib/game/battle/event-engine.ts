@@ -115,6 +115,46 @@ export const EVENT_EFFECT: Readonly<Partial<Record<EnumBattleEventType, EnumSkil
 };
 
 /**
+ * 紀錄型別標籤（EnumBattleEventType 全員）
+ * Record type labels (every EnumBattleEventType member)
+ *
+ * 與 EVENT_EFFECT 同居事件引擎，作為「事件語意」的單一事實來源：型別如何分類（EVENT_EFFECT）、
+ * 型別如何顯示（EVENT_TYPE_LABEL）都在同一處，消費方（BattleEventDispatch）只從這裡取用。
+ * Co-located with EVENT_EFFECT as the single source of truth for event semantics: how a type is
+ * classified (EVENT_EFFECT) and how it is labelled (here) live together, and consumers
+ * (BattleEventDispatch) only import from this module.
+ */
+export const EVENT_TYPE_LABEL: Readonly<Record<EnumBattleEventType, string>> = {
+	[EnumBattleEventType.Damage]: '傷害 Damage',
+	[EnumBattleEventType.Heal]: '回復 Heal',
+	[EnumBattleEventType.Guard]: '守護 Guard',
+	[EnumBattleEventType.Buff]: '增益 Buff',
+	[EnumBattleEventType.Debuff]: '減益 Debuff',
+	[EnumBattleEventType.Poison]: '中毒 Poison',
+	[EnumBattleEventType.Death]: '死亡 Death',
+	[EnumBattleEventType.Cast]: '詠唱 Cast',
+	[EnumBattleEventType.Act]: '行動 Act',
+	[EnumBattleEventType.Charge]: '蓄力 Charge',
+	[EnumBattleEventType.MagicCircle]: '魔方陣 MagicCircle',
+	[EnumBattleEventType.Summon]: '召喚 Summon',
+	[EnumBattleEventType.Miss]: '未命中 Miss',
+	[EnumBattleEventType.Info]: '資訊 Info',
+	[EnumBattleEventType.SpDamage]: 'SP 傷害 SpDamage',
+	[EnumBattleEventType.SpHeal]: 'SP 回復 SpHeal',
+	[EnumBattleEventType.Drain]: '吸取 Drain',
+	[EnumBattleEventType.Revive]: '復活 Revive',
+	[EnumBattleEventType.Move]: '位移 Move',
+	[EnumBattleEventType.Delay]: '延遲 Delay',
+	[EnumBattleEventType.Quick]: '加速 Quick',
+	[EnumBattleEventType.CastShort]: '施法縮短 CastShort',
+	[EnumBattleEventType.BarrierGain]: '障壁 BarrierGain',
+	[EnumBattleEventType.PoisonResist]: '抗毒 PoisonResist',
+	[EnumBattleEventType.Regen]: '持續回復 Regen',
+	[EnumBattleEventType.StatChange]: '上限變化 StatChange',
+	[EnumBattleEventType.EnergyExchange]: 'HP/SP 交換 EnergyExchange',
+};
+
+/**
  * 判定單筆紀錄的分類（兩類之外無第三種）/ Classify one record (no third class exists)
  *
  * 規則：帶 skill 編號、且「是執行起點或可歸因到效果系統」＝技能事件；其餘皆為一般事件。

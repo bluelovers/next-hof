@@ -993,6 +993,82 @@ export enum EnumBattleEventType
  * of a Drain, the caster's own delay) and `unit` names the resource (hp / sp / delay). The display
  * layer turns these into valueChange (single) or valueChanges (multiple).
  */
+/**
+ * 數值變化的資源維度 / Resource dimension of a value change
+ * 列舉 / enumeration
+ *
+ * 單一事實來源：IBattleValueChange.unit 與 IBattleEvent.unit 共用，取代裸字串 'hp' / 'sp' / 'delay'。
+ * Single source of truth shared by IBattleValueChange.unit and IBattleEvent.unit, replacing the bare
+ * strings 'hp' / 'sp' / 'delay'.
+ */
+export enum EnumResource
+{
+	/** 生命值 / HP */
+	Hp = 'hp',
+	/** 技能值 / SP */
+	Sp = 'sp',
+	/** 延遲分數 / delay score */
+	Delay = 'delay',
+}
+
+/**
+ * 數值變化的歸屬 / Owner of a value change
+ * 列舉 / enumeration
+ *
+ * 單一事實來源：取代裸字串 'actor' / 'target'，指明這段變化是行動者還是目標的。
+ * Single source of truth replacing the bare strings 'actor' / 'target'; says whether the change is
+ * on the actor or the target.
+ */
+export enum EnumValueWho
+{
+	/** 行動者自身 / the actor itself */
+	Actor = 'actor',
+	/** 目標 / the target */
+	Target = 'target',
+}
+
+/**
+ * 資訊事件的結構化 token / Structured token of an Info event
+ * 列舉 / enumeration
+ *
+ * 「文字類」事件（Damage x6!／heal x2!／over-cap 等）的 text 不是可顯示字串，而是一個 token，
+ * 展示層依 token 選 EnumLogCopy 成員或 buildXxx 建構器。此 enum 是 token 的單一事實來源，
+ * SkillEffect 生產、battle-adapter 消費雙方共用，取代裸字串。
+ * An Info event's `text` is not display copy but a token that the display maps to an EnumLogCopy
+ * member or a buildXxx builder. This enum is the single source of truth for those tokens, shared by
+ * the producer (SkillEffect) and the consumer (battle-adapter) instead of bare strings.
+ */
+export enum EnumInfoText
+{
+	/** 超過上限 / over capacity */
+	OverCap = 'over-cap',
+	/** 傷害倍數 / damage multiplier */
+	Multiply = 'multiply',
+	/** 回復倍數 / heal multiplier */
+	HealMultiply = 'heal-multiply',
+	/** 無目標 / no target */
+	NoTarget = 'no-target',
+}
+
+/**
+ * 位移事件的結構化 token / Structured token of a Move event
+ * 列舉 / enumeration
+ *
+ * 單一事實來源：取代裸字串 'front' / 'back' / 'knockback' / 'forward'。
+ * Single source of truth replacing the bare strings 'front' / 'back' / 'knockback' / 'forward'.
+ */
+export enum EnumMoveText
+{
+	/** 前方 / front */
+	Front = 'front',
+	/** 後方 / back */
+	Back = 'back',
+	/** 擊退 / knockback */
+	Knockback = 'knockback',
+	/** 前進 / forward */
+	Forward = 'forward',
+}
+
 export interface IBattleValueChange
 {
 	/**
@@ -1000,9 +1076,9 @@ export interface IBattleValueChange
 	 * actor＝行動者自身的變化、target＝目標的變化；展示層以名字替換 who。
 	 * actor = a change on the actor, target = a change on the target; the display swaps in the name.
 	 */
-	who?: 'actor' | 'target';
+	who?: EnumValueWho;
 	/** 資源維度（缺省＝hp）/ resource dimension (defaults to hp) */
-	unit?: 'hp' | 'sp' | 'delay';
+	unit?: EnumResource;
 	/** 變化前 / value before */
 	from: number;
 	/** 變化後 / value after */
@@ -1032,7 +1108,7 @@ export interface IBattleEvent
 	 * 單資源事件的資源維度（SpDamage／SpHeal／Regen／Drain 用；缺省＝hp）
 	 * resource dimension of a single-resource event (SpDamage / SpHeal / Regen / Drain; defaults to hp)
 	 */
-	unit?: 'hp' | 'sp';
+	unit?: EnumResource;
 	/**
 	 * 結構化數值變化（Drain 雙方、EnergyExchange 的 hp／sp 對、Delay 的前後分數）
 	 * structured value changes (both sides of a Drain, EnergyExchange's hp / sp pair, a Delay's

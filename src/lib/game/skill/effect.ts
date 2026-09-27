@@ -8,7 +8,7 @@ import { charIdToString } from '../character/Character';
 import { hpDamage, hpRecover, getPoison, getPoisonResist } from '../character/status';
 import { UPMAP, DOWNMAP, PLUSMAP, EnumAtkSlot, EnumDefSlot } from '../character/status-attrs';
 import type { ISkillDef, IBattleEvent } from '../types';
-import { EnumInfluence, EnumBattleEventType, EnumSkillDamageType } from '../types';
+import { EnumInfluence, EnumBattleEventType, EnumMoveText, EnumSkillDamageType } from '../types';
 import type { RNG } from '../core/rng';
 
 /**
@@ -271,7 +271,7 @@ export function statusChanges(skill: ISkillDef, actor: Character, target: Charac
 			actor: charIdToString(actor.no),
 			target: charIdToString(target.no),
 			skill: skill.no,
-			text: 'knockback',
+			text: EnumMoveText.Knockback,
 		});
 	}
 	// 技能指定目標移動方向（對齊原始 Move：已在該站位時 no-op、不印字）。
@@ -279,7 +279,7 @@ export function statusChanges(skill: ISkillDef, actor: Character, target: Charac
 	// no-op and prints nothing).
 	if (skill.move && target.POSITION !== skill.move)
 	{
-		const text = skill.move === EnumPosition.Front ? 'front' : 'back';
+		const text = skill.move === EnumPosition.Front ? EnumMoveText.Front : EnumMoveText.Back;
 		target.POSITION = skill.move;
 		events.push({
 			type: EnumBattleEventType.Move,
