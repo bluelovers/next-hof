@@ -15,8 +15,9 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { BattleActionDarkDecorator } from '../decorators';
 import { BattleAction } from '../../src/components/battle/BattleAction';
 import type { IBattleAction } from '../../src/components/battle/types';
-import { EnumActionType, EnumAttributeType } from '#/components/battle/enums';
+import { EnumActionType, EnumAttributeType, EnumStatDirection } from '#/components/battle/enums';
 import { EnumValueWho } from '#/lib/game/types';
+import { EnumStatusAttr } from '#/lib/game/character/status-attrs';
 import {
 	buildActionMessage,
 	buildDamageCountMessage,
@@ -302,8 +303,8 @@ export const StatChangeAction: Story = {
 		action: {
 			type: EnumActionType.StatChange,
 			source: 'Mage1',
-			text: buildStatToText('MAXSP', 'extended', 400),
-			message: buildActionMessage({ source: 'Mage1', text: buildStatToText('MAXSP', 'extended', 400) }),
+			text: buildStatToText(EnumStatusAttr.MAXSP, EnumStatDirection.Extended, 400),
+			message: buildActionMessage({ source: 'Mage1', text: buildStatToText(EnumStatusAttr.MAXSP, EnumStatDirection.Extended, 400) }),
 			attribute: EnumAttributeType.Normal,
 		},
 	},

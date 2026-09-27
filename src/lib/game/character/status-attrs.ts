@@ -90,44 +90,67 @@ const plusAttr = (get: (c: Character) => number, set: (c: Character, v: number) 
 	(c, n) => set(c, get(c) + n);
 
 /**
- * 狀態屬性鍵（單一事實來源；對照表與型別皆由此衍生）/ Status attribute keys (single source)
- * 型別別名 / type alias
+ * 狀態屬性鍵（單一事實來源）/ Status attribute keys (single source of truth)
+ *
+ * 以 enum 取代舊有的 const 陣列＋union 衍生：STATUS_ATTR_KEYS 仍保留為 enum 值的陣列，
+ * 供需要執行期迭代的場景（status-key 衍生、建表迴圈）向後相容；型別位置全面改用 EnumStatusAttr。
+ * Replaces the old const-array + union derivation: STATUS_ATTR_KEYS stays as the array of enum
+ * values for runtime iteration (status-key derivation, table build loop) backward-compat; all
+ * type positions now use EnumStatusAttr.
  */
-export const STATUS_ATTR_KEYS = [
-	'STR', 'INT', 'DEX', 'SPD', 'LUK',
-	'ATK', 'MATK', 'DEF', 'MDEF', 'MAXHP', 'MAXSP',
-] as const;
+export enum EnumStatusAttr
+{
+	/** 力量 / Strength */
+	STR = 'STR',
+	/** 智力 / Intelligence */
+	INT = 'INT',
+	/** 靈巧 / Dexterity */
+	DEX = 'DEX',
+	/** 速度 / Speed */
+	SPD = 'SPD',
+	/** 運氣 / Luck */
+	LUK = 'LUK',
+	/** 物理攻擊 / Physical attack */
+	ATK = 'ATK',
+	/** 魔法攻擊 / Magic attack */
+	MATK = 'MATK',
+	/** 物理防禦 / Physical defense */
+	DEF = 'DEF',
+	/** 魔法防禦 / Magic defense */
+	MDEF = 'MDEF',
+	/** 最大 HP / Max HP */
+	MAXHP = 'MAXHP',
+	/** 最大 SP / Max SP */
+	MAXSP = 'MAXSP',
+}
 
-/**
- * 狀態屬性鍵型別 / Status attribute key type
- * 型別別名 / type alias（由 STATUS_ATTR_KEYS 衍生 / derived from STATUS_ATTR_KEYS）
- */
-export type IStatusAttr = typeof STATUS_ATTR_KEYS[number];
+/** 狀態屬性鍵陣列（由 EnumStatusAttr 衍生，供執行期迭代向後相容）/ Key array derived from EnumStatusAttr for runtime iteration, backward-compatible */
+export const STATUS_ATTR_KEYS: readonly EnumStatusAttr[] = Object.values(EnumStatusAttr);
 
 /**
  * 狀態屬性對照表（單一事實來源）/ Status attribute lookup table (single source of truth)
- * 鍵為 IStatusAttr；每個屬性描述其角色欄位讀寫與 up/down/plus 語意。
+ * 鍵為 EnumStatusAttr；每個屬性描述其角色欄位讀寫與 up/down/plus 語意。
  * DEF/MDEF 的 up/down 採百分比累計，與其他屬性不同，故自定。
  */
-export const STATUS_ATTR_TABLE: Record<IStatusAttr, IStatusAttrEntry> = {
-	STR: { get: (c) => c.STR, set: (c, v) => { c.STR = v; }, plus: plusAttr((c) => c.STR, (c, v) => { c.STR = v; }) },
-	INT: { get: (c) => c.INT, set: (c, v) => { c.INT = v; }, plus: plusAttr((c) => c.INT, (c, v) => { c.INT = v; }) },
-	DEX: { get: (c) => c.DEX, set: (c, v) => { c.DEX = v; }, plus: plusAttr((c) => c.DEX, (c, v) => { c.DEX = v; }) },
-	SPD: { get: (c) => c.SPD, set: (c, v) => { c.SPD = v; }, plus: plusAttr((c) => c.SPD, (c, v) => { c.SPD = v; }) },
-	LUK: { get: (c) => c.LUK, set: (c, v) => { c.LUK = v; }, plus: plusAttr((c) => c.LUK, (c, v) => { c.LUK = v; }) },
+export const STATUS_ATTR_TABLE: Record<EnumStatusAttr, IStatusAttrEntry> = {
+	[EnumStatusAttr.STR]: { get: (c) => c.STR, set: (c, v) => { c.STR = v; }, plus: plusAttr((c) => c.STR, (c, v) => { c.STR = v; }) },
+	[EnumStatusAttr.INT]: { get: (c) => c.INT, set: (c, v) => { c.INT = v; }, plus: plusAttr((c) => c.INT, (c, v) => { c.INT = v; }) },
+	[EnumStatusAttr.DEX]: { get: (c) => c.DEX, set: (c, v) => { c.DEX = v; }, plus: plusAttr((c) => c.DEX, (c, v) => { c.DEX = v; }) },
+	[EnumStatusAttr.SPD]: { get: (c) => c.SPD, set: (c, v) => { c.SPD = v; }, plus: plusAttr((c) => c.SPD, (c, v) => { c.SPD = v; }) },
+	[EnumStatusAttr.LUK]: { get: (c) => c.LUK, set: (c, v) => { c.LUK = v; }, plus: plusAttr((c) => c.LUK, (c, v) => { c.LUK = v; }) },
 	// ATK/MATK 增益無 MAX_STATUS_MAXIMUM 上限（對齊原始 UpATK/UpMATK：單純 round(orig*(1+n/100))）。
 	// ATK/MATK buffs have NO MAX_STATUS_MAXIMUM cap (mirrors original UpATK/UpMATK: plain round(orig*(1+n/100))).
-	ATK: {
+	[EnumStatusAttr.ATK]: {
 		get: (c) => c.atk[EnumAtkSlot.Phys],
 		set: (c, v) => { c.atk[EnumAtkSlot.Phys] = v; },
 		up: (c, n) => { c.atk[EnumAtkSlot.Phys] = Math.round(c.atk[EnumAtkSlot.Phys] * (1 + n / 100)); },
 	},
-	MATK: {
+	[EnumStatusAttr.MATK]: {
 		get: (c) => c.atk[EnumAtkSlot.Mag],
 		set: (c, v) => { c.atk[EnumAtkSlot.Mag] = v; },
 		up: (c, n) => { c.atk[EnumAtkSlot.Mag] = Math.round(c.atk[EnumAtkSlot.Mag] * (1 + n / 100)); },
 	},
-	DEF: {
+	[EnumStatusAttr.DEF]: {
 		/** DEF 掛在物理%減傷槽 / DEF maps to the physical-% reduction slot */
 		get: (c) => c.def[EnumDefSlot.PhysPct],
 		set: (c, v) => { c.def[EnumDefSlot.PhysPct] = v; },
@@ -139,7 +162,7 @@ export const STATUS_ATTR_TABLE: Record<IStatusAttr, IStatusAttrEntry> = {
 		/** 自定減益：現值乘以 (1-n/100) / custom down: multiplies current value by (1-n/100) */
 		down: (c, n) => { c.def[EnumDefSlot.PhysPct] = Math.round(c.def[EnumDefSlot.PhysPct] * (1 - n / 100)); },
 	},
-	MDEF: {
+	[EnumStatusAttr.MDEF]: {
 		/** MDEF 掛在魔法%減傷槽 / MDEF maps to the magic-% reduction slot */
 		get: (c) => c.def[EnumDefSlot.MagPct],
 		set: (c, v) => { c.def[EnumDefSlot.MagPct] = v; },
@@ -155,7 +178,7 @@ export const STATUS_ATTR_TABLE: Record<IStatusAttr, IStatusAttrEntry> = {
 	// MAXHP/MAXSP buffs have NO MAX_STATUS_MAXIMUM cap (mirrors original UpMAXHP/UpMAXSP).
 	// 減益須夾制當前 HP/SP：上限降低時同步壓低現值（對齊原始 DownMAXHP/DownMAXSP）。
 	// Debuffs clamp current HP/SP: when the cap drops, the current value is lowered too (mirrors original DownMAXHP/DownMAXSP).
-	MAXHP: {
+	[EnumStatusAttr.MAXHP]: {
 		get: (c) => c.MAXHP,
 		set: (c, v) => { c.MAXHP = v; },
 		up: (c, n) => { c.MAXHP = Math.round(c.MAXHP * (1 + n / 100)); },
@@ -167,7 +190,7 @@ export const STATUS_ATTR_TABLE: Record<IStatusAttr, IStatusAttrEntry> = {
 		},
 		plus: plusAttr((c) => c.MAXHP, (c, v) => { c.MAXHP = v; }),
 	},
-	MAXSP: {
+	[EnumStatusAttr.MAXSP]: {
 		get: (c) => c.MAXSP,
 		set: (c, v) => { c.MAXSP = v; },
 		up: (c, n) => { c.MAXSP = Math.round(c.MAXSP * (1 + n / 100)); },
@@ -200,7 +223,7 @@ function buildStatusMaps(): {
 	const UPMAP: Record<string, IAttrFn> = {};
 	const DOWNMAP: Record<string, IAttrFn> = {};
 	const PLUSMAP: Record<string, IAttrFn> = {};
-	for (const key of Object.keys(STATUS_ATTR_TABLE) as IStatusAttr[])
+	for (const key of Object.keys(STATUS_ATTR_TABLE) as EnumStatusAttr[])
 	{
 		const e = STATUS_ATTR_TABLE[key];
 		// 使用 STATUS_UP_KEY_NAME 靜態對照表取代 'Up' + key 字串聯合

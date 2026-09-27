@@ -33,6 +33,27 @@ export enum EnumUnitStatus
 	Casting = 'casting',
 }
 
+/**
+ * 屬性升降方向（buildStatChangeText / buildStatToText 的 `direction` 參數）
+ * Stat-change direction (the `direction` param of buildStatChangeText / buildStatToText)
+ *
+ * 單一事實來源：取代裸字串 'rise' / 'down' / 'extended' / 'down to'，讓數值升降的方向
+ * 只有這一組合法值，並保住 IDE 自動完成與安全改名。
+ * Single source of truth replacing the bare strings 'rise' / 'down' / 'extended' / 'down to', so the
+ * direction of a stat change has exactly one valid value set with IDE completion and safe renaming.
+ */
+export enum EnumStatDirection
+{
+	/** 上升 / rise */
+	Rise = 'rise',
+	/** 下降 / down */
+	Down = 'down',
+	/** 上限延長 / cap extended */
+	Extended = 'extended',
+	/** 上限下降 / cap down */
+	DownTo = 'down to',
+}
+
 /** 屬性數值顯示分類（UI 專用，無 domain 對應）/ Attribute display category (UI-only) */
 export enum EnumAttributeType
 {

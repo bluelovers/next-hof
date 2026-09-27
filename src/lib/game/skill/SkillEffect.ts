@@ -61,11 +61,10 @@ import { EnumBattleEventType, EnumInfoText, EnumMoveText, EnumResource, EnumSkil
 import type { IDamageOption, ISkillResult } from './effect';
 import { applyDamage, applySkill, barrierGuard, calcBasicDamage, calcRecoveryValue, statusChanges } from './effect';
 
-/** Move 事件的 `text` token（展示層對照 EnumLogCopy 的位移成員）/ Move event `text` tokens (display maps them to EnumLogCopy's movement members) */
-type IMoveText = EnumMoveText;
-
-/** Info 事件的 `text` token（展示層依 token 選 EnumLogCopy 成員或 buildXxx 建構器）/ Info event `text` tokens (the display picks an EnumLogCopy member or a buildXxx builder per token) */
-type IInfoText = EnumInfoText;
+/** Move 事件的 `text` 使用 EnumMoveText（展示層依 token 對照 EnumLogCopy 的位移成員）/
+ * Move event `text` uses EnumMoveText (the display maps the token to EnumLogCopy's movement members) */
+/** Info 事件的 `text` 使用 EnumInfoText（展示層依 token 選 EnumLogCopy 成員或 buildXxx 建構器）/
+ * Info event `text` uses EnumInfoText (the display picks an EnumLogCopy member or a buildXxx builder per token) */
 
 /**
  * 技能效果執行器：移植 HOF/Class/Skill/Effect.php 的 `SkillEffect()`
@@ -1191,7 +1190,7 @@ export class SkillEffect
 		actor: Character,
 		moved: Character,
 		to: EnumPosition,
-		text: IMoveText,
+		text: EnumMoveText,
 	): boolean
 	{
 		if (moved.POSITION === to) return false;
@@ -1218,7 +1217,7 @@ export class SkillEffect
 	 * @param text - token / the token
 	 * @param value - 乘算次數等數值（multiply／heal-multiply 用）/ the count for multiply-style tokens
 	 */
-	private info(events: IBattleEvent[], text: IInfoText, value?: number): void
+	private info(events: IBattleEvent[], text: EnumInfoText, value?: number): void
 	{
 		const event: IBattleEvent = { type: EnumBattleEventType.Info, text };
 		if (value !== undefined) event.value = value;

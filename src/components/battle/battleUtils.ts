@@ -10,6 +10,7 @@
 import {
 	EnumUnitStatus,
 	EnumAttributeType,
+	EnumStatDirection,
 	EnumTeamSideUI,
 	EnumTeamSideClass,
 	EnumActionType,
@@ -19,6 +20,7 @@ import {
 import { TEAM_SIDE_CLASS } from './types';
 import { computeSpriteFlipped } from './spriteFlip';
 import { corpseSpecOf } from '#/lib/game/battle/corpse-policy';
+import type { EnumStatusAttr } from '#/lib/game/character/status-attrs';
 import type {
 	IBattleAction,
 	IBattleSegment,
@@ -482,8 +484,8 @@ export function buildSacrificeText(value: number): string
  * Stat-change fragment (`STR rise 10%` / `STR down 10%` / `ATK rise to the maximum(100%)`)
  */
 export function buildStatChangeText(
-	stat: string,
-	direction: 'rise' | 'down',
+	stat: EnumStatusAttr,
+	direction: EnumStatDirection,
 	value: number,
 	unit = '%',
 	atMaximum = false,
@@ -495,8 +497,8 @@ export function buildStatChangeText(
 
 /** 上限升降文案片段（`MAXHP(舊值) extended to 999` / `MAXSP(舊值) down to 500`）/ Cap-change fragment */
 export function buildStatToText(
-	stat: string,
-	direction: 'extended' | 'down to',
+	stat: EnumStatusAttr,
+	direction: EnumStatDirection,
 	value: number,
 	from?: number,
 ): string
@@ -504,7 +506,7 @@ export function buildStatToText(
 	// `extended` 補回介係詞 `to`；有舊值時帶出 `(舊值)`，與原始日誌逐字一致
 	// `extended` regains the preposition `to`; when an old value exists it is shown as `(old)`,
 	// matching the original log verbatim
-	const phrase = direction === 'extended' ? 'extended to' : direction;
+	const phrase = direction === EnumStatDirection.Extended ? 'extended to' : direction;
 	// 有舊值時帶出 `(舊值) `，否則補一個空格，使 `MAXHP extended to` 與
 	// `MAXHP(500) extended to` 都與原始日誌逐字一致。
 	// With an old value it shows `(old) `, otherwise a single space, so both

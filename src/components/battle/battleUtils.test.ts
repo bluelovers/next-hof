@@ -38,6 +38,7 @@ import {
 	EnumTeamSideUI,
 	EnumUnitStatus,
 	EnumChargeKind,
+	EnumStatDirection,
 } from './enums';
 import type {
 	IBattleAction,
@@ -45,6 +46,7 @@ import type {
 	IBattleSnapshotDisplayUnit,
 	IBattleSprite,
 } from './types';
+import { EnumStatusAttr } from '#/lib/game/character/status-attrs';
 
 /** 建立最小可用行動 / Build a minimal action */
 function action(message: string, side?: EnumTeamSideUI): IBattleAction
@@ -450,16 +452,16 @@ describe('原始日誌文案與配色 / original log copy and colours', () =>
 
 	it('buildStatChangeText covers rise, down and the maximum wording', () =>
 	{
-		expect(buildStatChangeText('STR', 'rise', 10)).toBe('STR rise 10%');
-		expect(buildStatChangeText('ATK', 'down', 15)).toBe('ATK down 15%');
-		expect(buildStatChangeText('ATK', 'rise', 100, '%', true)).toBe(
+		expect(buildStatChangeText(EnumStatusAttr.STR, EnumStatDirection.Rise, 10)).toBe('STR rise 10%');
+		expect(buildStatChangeText(EnumStatusAttr.ATK, EnumStatDirection.Down, 15)).toBe('ATK down 15%');
+		expect(buildStatChangeText(EnumStatusAttr.ATK, EnumStatDirection.Rise, 100, '%', true)).toBe(
 			'ATK rise to the maximum(100%)',
 		);
-		expect(buildStatToText('MAXHP', 'extended', 999)).toBe('MAXHP extended to 999');
-		expect(buildStatToText('MAXHP', 'extended', 999, 500)).toBe('MAXHP(500) extended to 999');
+		expect(buildStatToText(EnumStatusAttr.MAXHP, EnumStatDirection.Extended, 999)).toBe('MAXHP extended to 999');
+		expect(buildStatToText(EnumStatusAttr.MAXHP, EnumStatDirection.Extended, 999, 500)).toBe('MAXHP(500) extended to 999');
 		// 片段不含名稱：整行一律交給唯一合併點
 		// The fragments carry no name: whole lines always come from the single join point
-		expect(buildActionMessage({ source: 'Hero1', text: buildStatChangeText('STR', 'rise', 10) })).toBe(
+		expect(buildActionMessage({ source: 'Hero1', text: buildStatChangeText(EnumStatusAttr.STR, EnumStatDirection.Rise, 10) })).toBe(
 			'Hero1 STR rise 10%',
 		);
 	});

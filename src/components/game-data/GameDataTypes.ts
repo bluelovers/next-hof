@@ -8,7 +8,7 @@
 
 import { EnumSkillType } from '../battle/enums';
 import type {
-	IStatusAttr,
+	EnumStatusAttr,
 	IPrimaryStat,
 } from '#/lib/game/character/status-attrs';
 import {
@@ -51,9 +51,9 @@ export interface ISkillCost
 export interface ISkillStatChanges
 {
 	/** 臨時增益 % / Temporary buff percentages */
-	upStats?: Partial<Record<IStatusAttr, number>>;
+	upStats?: Partial<Record<EnumStatusAttr, number>>;
 	/** 臨時減益 % / Temporary debuff percentages */
-	downStats?: Partial<Record<IStatusAttr, number>>;
+	downStats?: Partial<Record<EnumStatusAttr, number>>;
 	/** 永久加算（無%）/ Permanent flat bonuses (no %) */
 	plusStats?: Partial<Record<IAbilityStatName, number>>;
 }

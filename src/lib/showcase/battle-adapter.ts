@@ -14,8 +14,9 @@ import type { Character } from '#/lib/game/character/Character';
 import { RNG } from '#/lib/game/core/rng';
 import { createSeedRepository } from '#/lib/game/data/seed-data';
 import type { IDataRepository } from '#/lib/game/data/repository';
-import { EnumBattleEventType, EnumInfoText, EnumSkillDamageType } from '#/lib/game/types';
+import { EnumBattleEventType, EnumInfoText, EnumResource, EnumSkillDamageType, EnumValueWho } from '#/lib/game/types';
 import type { IBattleEvent, IBattleSnapshot, ISkillDef } from '#/lib/game/types';
+import { EnumStatusAttr } from '#/lib/game/character/status-attrs';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
 import {
 	EnumTeamSideUI,
@@ -24,6 +25,7 @@ import {
 	EnumActionType,
 	EnumAttributeType,
 	EnumMagicCircleKind,
+	EnumStatDirection,
 } from '#/components/battle/enums';
 import type {
 	IBattleAction,
@@ -889,7 +891,7 @@ const mapSpHeal: IEventMapper = (ev, ctx) =>
 const mapDrain: IEventMapper = (ev, ctx) =>
 {
 	const value = ev.value ?? 0;
-	const unit = ev.unit === 'sp' ? 'SP' : 'HP';
+	const unit = ev.unit === EnumResource.Sp ? 'SP' : 'HP';
 	return composeAction(ctx, {
 		type: EnumActionType.Drain,
 		source: undefined,
@@ -897,7 +899,7 @@ const mapDrain: IEventMapper = (ev, ctx) =>
 		valueUnit: unit,
 		message: buildDrainMessage(value, unit, ctx.target.name),
 		valueChanges: (ev.valueChanges ?? []).map((vc) => ({
-			who: vc.who === 'actor' ? ctx.actor.name : undefined,
+			who: vc.who === EnumValueWho.Actor ? ctx.actor.name : undefined,
 			from: vc.from,
 			to: vc.to,
 		})),
@@ -1013,7 +1015,7 @@ const mapPoisonResist: IEventMapper = (ev, ctx) =>
  */
 const mapRegen: IEventMapper = (ev, ctx) =>
 {
-	const unit = ev.unit === 'sp' ? 'SP' : 'HP';
+	const unit = ev.unit === EnumResource.Sp ? 'SP' : 'HP';
 	return composeAction(ctx, {
 		type: EnumActionType.Regen,
 		source: ctx.target.name,
@@ -1033,7 +1035,7 @@ const mapRegen: IEventMapper = (ev, ctx) =>
 const mapStatChange: IEventMapper = (ev, ctx) =>
 {
 	const text = ev.text === 'maxsp-extend'
-		? buildStatToText('MAXSP', 'extended', ev.value ?? 0)
+		? buildStatToText(EnumStatusAttr.MAXSP, EnumStatDirection.Extended, ev.value ?? 0)
 		: ev.text ?? '';
 	return composeAction(ctx, {
 		type: EnumActionType.StatChange,
@@ -1056,8 +1058,8 @@ const mapStatChange: IEventMapper = (ev, ctx) =>
  */
 const mapEnergyExchange: IEventMapper = (ev, ctx) =>
 {
-	const hp = ev.valueChanges?.find((c) => c.unit !== 'sp');
-	const sp = ev.valueChanges?.find((c) => c.unit === 'sp');
+	const hp = ev.valueChanges?.find((c) => c.unit !== EnumResource.Sp);
+	const sp = ev.valueChanges?.find((c) => c.unit === EnumResource.Sp);
 	const rateOf = (value: number | undefined, max: number | undefined): number =>
 		max !== undefined && max > 0 && value !== undefined
 			? Math.floor((value / max) * 100)

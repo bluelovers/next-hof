@@ -41,6 +41,7 @@ import {
 	EnumAttributeType,
 	EnumChargeKind,
 	EnumMagicCircleKind,
+	EnumStatDirection,
 	EnumTeamSideUI,
 	EnumUnitStatus,
 } from '#/components/battle/enums';
@@ -76,6 +77,7 @@ import {
 } from '#/components/battle/battleUtils';
 import { EnumPosition } from '#/lib/game/constants';
 import { EnumValueWho } from '#/lib/game/types';
+import { EnumStatusAttr } from '#/lib/game/character/status-attrs';
 import { computeTeamHpStats, type ITeamHpUnit } from '#/lib/showcase/battle-adapter';
 
 // ==================== 常數 / Constants ====================
@@ -819,7 +821,7 @@ const logMessagesActions: IBattleAction[] = [
 	namedLogAction(
 		EnumActionType.Debuff,
 		goblinAxe,
-		buildStatChangeText('STR', 'down', 10),
+		buildStatChangeText(EnumStatusAttr.STR, EnumStatDirection.Down, 10),
 		EnumTeamSideUI.Left,
 	),
 
@@ -876,25 +878,25 @@ const logMessagesActions: IBattleAction[] = [
 	namedLogAction(
 		EnumActionType.StatChange,
 		hero1,
-		buildStatChangeText('STR', 'rise', 10),
+		buildStatChangeText(EnumStatusAttr.STR, EnumStatDirection.Rise, 10),
 		EnumTeamSideUI.Right,
 	),
 	namedLogAction(
 		EnumActionType.StatChange,
 		hero1,
-		buildStatChangeText('ATK', 'rise', 100, '%', true),
+		buildStatChangeText(EnumStatusAttr.ATK, EnumStatDirection.Rise, 100, '%', true),
 		EnumTeamSideUI.Right,
 	),
 	namedLogAction(
 		EnumActionType.StatChange,
 		mage1,
-		buildStatToText('MAXSP', 'extended', 400),
+		buildStatToText(EnumStatusAttr.MAXSP, EnumStatDirection.Extended, 400),
 		EnumTeamSideUI.Right,
 	),
 	namedLogAction(
 		EnumActionType.StatChange,
 		goblinAxe,
-		buildStatToText('MAXHP', 'down to', 150),
+		buildStatToText(EnumStatusAttr.MAXHP, EnumStatDirection.DownTo, 150),
 		EnumTeamSideUI.Left,
 	),
 
