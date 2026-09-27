@@ -27,8 +27,8 @@ importers:
         specifier: ^1.0.11
         version: 1.0.11
       '@ts-type/is-array':
-        specifier: ^1.0.17
-        version: 1.0.17(ts-toolbelt@9.6.0)
+        specifier: ^1.0.19
+        version: 1.0.19(ts-toolbelt@9.6.0)
       array-chunk-split:
         specifier: ^2.0.17
         version: 2.0.17(ts-toolbelt@9.6.0)
@@ -57,8 +57,8 @@ importers:
         specifier: ^1.0.13
         version: 1.0.13
       fake-timer:
-        specifier: ^3.0.3
-        version: 3.0.3
+        specifier: ^3.0.4
+        version: 3.0.4
       loop-colors:
         specifier: ^1.0.12
         version: 1.0.12(ts-toolbelt@9.6.0)
@@ -93,8 +93,8 @@ importers:
         specifier: ^3.7.0
         version: 3.7.0
       ts-type:
-        specifier: ^3.0.15
-        version: 3.0.15(ts-toolbelt@9.6.0)
+        specifier: ^3.0.18
+        version: 3.0.18(ts-toolbelt@9.6.0)
       ts-type-object-entries:
         specifier: ^1.0.11
         version: 1.0.11
@@ -1329,8 +1329,8 @@ packages:
       '@tmcp/auth':
         optional: true
 
-  '@ts-type/is-array@1.0.17':
-    resolution: {integrity: sha512-zZl0MFuPegn3uKUirhOR/OF1F5OeHPMm0G8LSpi0kX2SC5VAwwRoPMlWciWCBH4JDELP7ivlyHDi3DqmLqoCwQ==}
+  '@ts-type/is-array@1.0.19':
+    resolution: {integrity: sha512-6t9H7jtamPXQHv5kLMLWbzenPALb1Hb7R7eOFkC2v++BXxNC+QnaMKV4syjEJYhQIUUxs9098fl8mLW9Lsi2qA==}
 
   '@tybys/wasm-util@0.10.4':
     resolution: {integrity: sha512-W3c4gRigFS0T/Ma4qIYF3GDAc5AQdHb1yL5znJT1Zv1YaD9Kitx656wBjvr19qbiosmZT8lWDM5BEMynUqX65A==}
@@ -1826,8 +1826,8 @@ packages:
     resolution: {integrity: sha512-KfYbmpRm0VbLjEvVa9yGwCi9GI34xvi7A/HXYWQO65CSD2u3MczUJSuwXKFIxlGsgBQizV9q5J9NHj4VG0n+pA==}
     engines: {node: '>=12.0.0'}
 
-  fake-timer@3.0.3:
-    resolution: {integrity: sha512-LcF6XZmD902AgK/z18i9ChmbaP5N/AOiPUWp2V5Kxp+j2TAhUT6qgsbSXQLed9uyxNOUyqGDcq1o8K54TFjPPw==}
+  fake-timer@3.0.4:
+    resolution: {integrity: sha512-6ow4DOCL9w7Og3n00QNL6Qe1PQNQv3ziK8ouowZottoextJ1bXx32tWCGqVHPTD0g6tGmqQTuMZCPwH5lGyXEg==}
 
   fdir@6.5.0:
     resolution: {integrity: sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==}
@@ -2424,6 +2424,11 @@ packages:
 
   ts-type@3.0.15:
     resolution: {integrity: sha512-7ynVd/GOxUTMWnZc15MqjNfDHmnT2ABDgPnP307HdYnCVOgyMYY8XniAX2ziK1sBGlugeHnuhSVZx8ycu7wknA==}
+    peerDependencies:
+      ts-toolbelt: ^9.6.0
+
+  ts-type@3.0.18:
+    resolution: {integrity: sha512-v0p6SI1Mvo4i1ROuTV3eXBDdKN6upvvOHYiQQ6rwkBcvrrHC5whtrlPHZCbJVYngHA5YailfYtDmJkQA8mvNQg==}
     peerDependencies:
       ts-toolbelt: ^9.6.0
 
@@ -3507,9 +3512,9 @@ snapshots:
       esm-env: 1.2.2
       tmcp: 1.20.0(typescript@7.0.2)
 
-  '@ts-type/is-array@1.0.17(ts-toolbelt@9.6.0)':
+  '@ts-type/is-array@1.0.19(ts-toolbelt@9.6.0)':
     dependencies:
-      ts-type: 3.0.15(ts-toolbelt@9.6.0)
+      ts-type: 3.0.18(ts-toolbelt@9.6.0)
     transitivePeerDependencies:
       - ts-toolbelt
 
@@ -3752,7 +3757,7 @@ snapshots:
 
   array-chunk-split@2.0.17(ts-toolbelt@9.6.0):
     dependencies:
-      ts-type: 3.0.15(ts-toolbelt@9.6.0)
+      ts-type: 3.0.18(ts-toolbelt@9.6.0)
     transitivePeerDependencies:
       - ts-toolbelt
 
@@ -3952,7 +3957,7 @@ snapshots:
 
   expect-type@1.4.0: {}
 
-  fake-timer@3.0.3:
+  fake-timer@3.0.4:
     dependencies:
       dayjs: 1.11.23
       nanoid: 5.1.16
@@ -4382,7 +4387,7 @@ snapshots:
   router-uri-convert@2.0.3(ts-toolbelt@9.6.0):
     dependencies:
       execall2: 2.0.29
-      ts-type: 3.0.15(ts-toolbelt@9.6.0)
+      ts-type: 3.0.18(ts-toolbelt@9.6.0)
       tslib: 2.8.1
       uri-template-lite: 23.4.0
     transitivePeerDependencies:
@@ -4567,6 +4572,13 @@ snapshots:
   ts-type-predicates@1.0.14: {}
 
   ts-type@3.0.15(ts-toolbelt@9.6.0):
+    dependencies:
+      '@types/node': 26.6.2
+      ts-toolbelt: 9.6.0
+      tslib: 2.8.1
+      typedarray-dts: 1.0.0
+
+  ts-type@3.0.18(ts-toolbelt@9.6.0):
     dependencies:
       '@types/node': 26.6.2
       ts-toolbelt: 9.6.0

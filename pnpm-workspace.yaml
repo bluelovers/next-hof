@@ -18,3 +18,5 @@ minimumReleaseAgeExclude:
   - '@vitest/utils@5.0.2'
   - vitest@5.0.2
   - fake-timer
+  - ts-type
+
