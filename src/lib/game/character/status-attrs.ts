@@ -6,6 +6,9 @@
 import { MAX_STATUS_MAXIMUM } from '../constants';
 import type { Character } from './Character';
 import { STATUS_UP_KEY_NAME, STATUS_DOWN_KEY_NAME, STATUS_PLUS_KEY_NAME, BASE_STAT_COMP_NAMES } from './status-key';
+import { EnumStatusAttr } from './status-enum';
+
+export { EnumStatusAttr };
 
 /**
  * atk 陣列索引（物理/魔法）/ atk array indices (physical/magic)
@@ -88,41 +91,6 @@ const downAttr = (get: (c: Character) => number, set: (c: Character, v: number) 
  */
 const plusAttr = (get: (c: Character) => number, set: (c: Character, v: number) => void): IAttrFn =>
 	(c, n) => set(c, get(c) + n);
-
-/**
- * 狀態屬性鍵（單一事實來源）/ Status attribute keys (single source of truth)
- *
- * 以 enum 取代舊有的 const 陣列＋union 衍生：STATUS_ATTR_KEYS 仍保留為 enum 值的陣列，
- * 供需要執行期迭代的場景（status-key 衍生、建表迴圈）向後相容；型別位置全面改用 EnumStatusAttr。
- * Replaces the old const-array + union derivation: STATUS_ATTR_KEYS stays as the array of enum
- * values for runtime iteration (status-key derivation, table build loop) backward-compat; all
- * type positions now use EnumStatusAttr.
- */
-export enum EnumStatusAttr
-{
-	/** 力量 / Strength */
-	STR = 'STR',
-	/** 智力 / Intelligence */
-	INT = 'INT',
-	/** 靈巧 / Dexterity */
-	DEX = 'DEX',
-	/** 速度 / Speed */
-	SPD = 'SPD',
-	/** 運氣 / Luck */
-	LUK = 'LUK',
-	/** 物理攻擊 / Physical attack */
-	ATK = 'ATK',
-	/** 魔法攻擊 / Magic attack */
-	MATK = 'MATK',
-	/** 物理防禦 / Physical defense */
-	DEF = 'DEF',
-	/** 魔法防禦 / Magic defense */
-	MDEF = 'MDEF',
-	/** 最大 HP / Max HP */
-	MAXHP = 'MAXHP',
-	/** 最大 SP / Max SP */
-	MAXSP = 'MAXSP',
-}
 
 /** 狀態屬性鍵陣列（由 EnumStatusAttr 衍生，供執行期迭代向後相容）/ Key array derived from EnumStatusAttr for runtime iteration, backward-compatible */
 export const STATUS_ATTR_KEYS: readonly EnumStatusAttr[] = Object.values(EnumStatusAttr);
