@@ -283,6 +283,8 @@ export enum EnumLogCopy
 	PoisonApplied = 'get poisoned\u00a0!',
 	/** 抗毒（`name blocked poison.`）/ poison resisted (`name blocked poison.`) */
 	PoisonBlocked = 'blocked poison.',
+	/** 解毒（所有格片段 `name's poison has cured.`）/ cure (`name's poison has cured.`) */
+	PoisonCured = 'poison has cured.',
 	/** 自我中毒（`Got poisoned`，無名稱）/ self-poison (`Got poisoned`, unnamed) */
 	PoisonSelf = 'Got poisoned',
 
@@ -708,6 +710,22 @@ export function buildPoisonResistText(rate: number): string
 export function buildDamageCountMessage(count: number): string
 {
 	return `Damage x${count}!`;
+}
+
+/**
+ * 回復次數資訊整行（`heal x2!`；無名稱）
+ * Heal-count info line (`heal x2!`, unnamed)
+ *
+ * 對照原始 Skill/Effect.php 的 ProgressiveHeal（3005）：HP≤30% 時印 `heal x2!` 獨立一行。
+ * Mirrors the original Skill/Effect.php's ProgressiveHeal (3005): `heal x2!` on its own line
+ * when HP is at or below 30%.
+ *
+ * @param count - 回復倍數 / heal multiplier
+ * @returns 整行純文字 / the whole plain line
+ */
+export function buildHealCountMessage(count: number): string
+{
+	return `heal x${count}!`;
 }
 
 /**

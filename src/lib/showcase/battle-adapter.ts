@@ -43,13 +43,24 @@ import {
 	buildActMessage,
 	buildActionMessage,
 	buildChargeText,
+	buildDamageCountMessage,
 	buildDamageMessage,
 	buildDownMessage,
+	buildDrainMessage,
+	buildHealCountMessage,
 	buildHealMessage,
 	buildMagicCircleMessage,
 	buildPoisonDamageText,
+	buildPoisonResistText,
+	buildPossessiveText,
 	buildProtectMessage,
+	buildRecoveredText,
+	buildRegenText,
+	buildSpDamageMessage,
+	buildStatToText,
 	buildSummonMessage,
+	buildValueChangeFromDelay,
+	EnumLogCopy,
 } from '#/components/battle/battleUtils';
 import {
 	computeBattleSpritePositions,
@@ -75,8 +86,12 @@ export const DEFAULT_SHOWCASE_TITLE = '組隊戰鬥 / Team Battle';
 const SHOWCASE_BATTLEFIELD_BG = '/image/land/bg_grass.png';
 
 /**
- * 單位名稱／側別查詢條目（事件 actor/target 為 `String(no)`，需 no → 名稱/side）
- * Unit name/side lookup entry (event actor/target are `String(no)`; needs no → name/side)
+ * 單位名稱／側別／上限查詢條目（事件 actor/target 為 `String(no)`，需 no → 名稱/side）
+ * Unit name/side/cap lookup entry (event actor/target are `String(no)`; needs no → name/side)
+ *
+ * `maxHp`／`maxSp` 供 EnergyExchange（3013）把交換前後值換算成比率，只有建表處會填。
+ * `maxHp` / `maxSp` let EnergyExchange (3013) turn the before/after values into rates; only the
+ * lookup builder fills them.
  */
 export interface IUnitRef
 {
@@ -84,6 +99,10 @@ export interface IUnitRef
 	name: string;
 	/** 隊伍側 / Team side */
 	side: ITeamSide;
+	/** HP 上限 / maximum HP */
+	maxHp: number;
+	/** SP 上限 / maximum SP */
+	maxSp: number;
 }
 
 /** no → 單位查詢表 / no → unit lookup */
@@ -212,8 +231,8 @@ export function buildTeam(
 }
 
 /**
- * 建立 no → { name, side } 查詢表（我方先建、敵方後建；seed 編號互斥）
- * Build the no → { name, side } lookup (allies first, enemies after; seed nos are disjoint)
+ * 建立 no → { name, side, maxHp, maxSp } 查詢表（我方先建、敵方後建；seed 編號互斥）
+ * Build the no → { name, side, maxHp, maxSp } lookup (allies first, enemies after; seed nos are disjoint)
  *
  * 側別已翻轉：我方＝'right'、敵方＝'left'（與原版頁面一致）
  * Side flipped: allies = 'right', enemies = 'left' (matches original page)
@@ -224,8 +243,14 @@ export function buildUnitLookup(
 ): IUnitLookup
 {
 	const lookup = new Map<number, IUnitRef>();
-	for (const c of allies) lookup.set(c.no, { name: c.name, side: EnumTeamSideUI.Right });
-	for (const c of enemies) lookup.set(c.no, { name: c.name, side: EnumTeamSideUI.Left });
+	for (const c of allies)
+	{
+		lookup.set(c.no, { name: c.name, side: EnumTeamSideUI.Right, maxHp: c.MAXHP, maxSp: c.MAXSP });
+	}
+	for (const c of enemies)
+	{
+		lookup.set(c.no, { name: c.name, side: EnumTeamSideUI.Left, maxHp: c.MAXHP, maxSp: c.MAXSP });
+	}
 	return lookup;
 }
 
@@ -236,6 +261,10 @@ export interface IResolvedRef
 	name?: string;
 	/** 隊伍側（查無時 undefined）/ team side (undefined when unknown) */
 	side?: ITeamSide;
+	/** HP 上限（查無時 undefined；供 EnergyExchange 換算比率）/ maximum HP (undefined when unknown; lets EnergyExchange derive rates) */
+	maxHp?: number;
+	/** SP 上限（查無時 undefined；供 EnergyExchange 換算比率）/ maximum SP (undefined when unknown; lets EnergyExchange derive rates) */
+	maxSp?: number;
 }
 
 /**
@@ -246,7 +275,12 @@ export function resolveRef(key: string | undefined, lookup: IUnitLookup): IResol
 {
 	if (key === undefined) return {};
 	const info = lookup.get(Number(key));
-	return { name: info?.name ?? key, side: info?.side };
+	return {
+		name: info?.name ?? key,
+		side: info?.side,
+		maxHp: info?.maxHp,
+		maxSp: info?.maxSp,
+	};
 }
 
 /**
@@ -568,11 +602,11 @@ const mapDeath: IEventMapper = (_ev, ctx) =>
 /** Summon → 召喚（target＝被召喚 def no、value＝等級、圖依 def no 查怪物表）/ Summon (target = summoned def no, value = level, image from the mon table) */
 const mapSummon: IEventMapper = (ev, ctx) =>
 {
-	// 召喚事件契約（生產點：Battle.UseSkill 的 applySummon，見 #/lib/game/types 的 EnumBattleEventType.Summon）：
+	// 召喚事件契約（生產點：SkillEffect.default 的召喚分支，見 #/lib/game/types 的 EnumBattleEventType.Summon）：
 	// target＝被召喚單位的 def no、value＝其等級；圖片依 def no 查 sprite-map 怪物表。
-	// Summon event contract (producer: Battle.UseSkill's applySummon; see EnumBattleEventType.Summon in
-	// #/lib/game/types): target = the summoned unit's def no, value = its level; the image comes
-	// from sprite-map's monster table by that def no.
+	// Summon event contract (producer: SkillEffect.default's summon branch; see
+	// EnumBattleEventType.Summon in #/lib/game/types): target = the summoned unit's def no,
+	// value = its level; the image comes from sprite-map's monster table by that def no.
 	const summonedNo = parseDefNo(ev.target);
 	const summoned: ISummonedUnit[] = ctx.target.name
 		? [
@@ -620,18 +654,38 @@ const mapMagicCircle: IEventMapper = (ev, ctx) =>
 	});
 };
 
-/** Buff → 增益（text＝原始日誌文案，缺省時退回通用文案；message 由 composeAction 合併）/ Buff (text = the original phrase, generic copy when absent; composeAction joins the message) */
+/**
+ * Buff → 增益（text＝原始日誌文案，缺省時退回通用文案；message 由 composeAction 合併）
+ * Buff (text = the original phrase, generic copy when absent; composeAction joins the message)
+ *
+ * 原始 StatusChanges 的 Up*／Plus* 都作用在 `$target` 上、`Name('bold')` 印的也是目標本人，
+ * 故主詞與側別優先取 target；事件只帶 actor 時（例如尚未移植的生產點）退回 actor。
+ * The original StatusChanges applies every Up* / Plus* to `$target` and `Name('bold')` prints that
+ * same target, so the subject and the side prefer target; an event carrying only an actor (a
+ * producer not yet ported) falls back to the actor.
+ */
 const mapBuff: IEventMapper = (ev, ctx) =>
 	composeAction(ctx, {
 		type: EnumActionType.Buff,
+		source: ctx.target.name ?? ctx.actor.name,
+		side: ctx.target.side ?? ctx.side,
 		text: ev.text ?? DEFAULT_EVENT_TEXT.buff,
 		attribute: EnumAttributeType.Support,
 	});
 
-/** Debuff → 減益（原始日誌無 span，沿用預設色）/ Debuff (no span in the original log, default colour) */
+/**
+ * Debuff → 減益（原始日誌無 span，沿用預設色）
+ * Debuff (no span in the original log, default colour)
+ *
+ * 主詞／側別優先取 target，理由同 mapBuff（PHP 的 Down* 印的是目標本人）。
+ * Subject and side prefer the target for the same reason as mapBuff (PHP's Down* prints the
+ * target itself).
+ */
 const mapDebuff: IEventMapper = (ev, ctx) =>
 	composeAction(ctx, {
 		type: EnumActionType.Debuff,
+		source: ctx.target.name ?? ctx.actor.name,
+		side: ctx.target.side ?? ctx.side,
 		text: ev.text ?? DEFAULT_EVENT_TEXT.debuff,
 	});
 
@@ -650,8 +704,42 @@ const mapDebuff: IEventMapper = (ev, ctx) =>
  * - without `value` = poison applied (produced by statusChanges): the default copy, or the event's
  *   own `text`, is used.
  */
+/**
+ * Poison → 中毒（施加／每回合傷害／解除／自我中毒）
+ * Poison (applied / per-turn damage / cure / self-inflicted)
+ *
+ * `text` 是結構化 token：'cured'＝解毒（所有格片段、無 span）、'self'＝自我中毒（無主詞）；
+ * 兩者與既有分支一樣，粗體主詞取自 PHP `Name('bold')` 印的那個人。
+ * `text` is a structured token: 'cured' = cure (possessive fragment, no span), 'self' =
+ * self-inflicted (no subject); like the existing branches the bold subject is whoever the
+ * original `Name('bold')` printed.
+ */
 const mapPoison: IEventMapper = (ev, ctx) =>
 {
+	// 解毒：`name's poison has cured.`（所有格片段直接接續名稱，attribute Normal＝無 span）
+	// Cure: `name's poison has cured.` (the possessive fragment attaches to the name; Normal = no span)
+	if (ev.text === 'cured')
+	{
+		return composeAction(ctx, {
+			type: EnumActionType.Poison,
+			source: ctx.target.name ?? ctx.actor.name,
+			side: ctx.target.side ?? ctx.side,
+			text: buildPossessiveText(EnumLogCopy.PoisonCured),
+			attribute: EnumAttributeType.Normal,
+		});
+	}
+	// 自我中毒（3900）：事件無 actor，走 composeAction 預設 → source undefined → 裸 `Got poisoned`
+	// Self-inflicted poison (3900): the event carries no actor, so composeAction's default leaves
+	// source undefined and the bare `Got poisoned` prints
+	if (ev.text === 'self')
+	{
+		return composeAction(ctx, {
+			type: EnumActionType.Poison,
+			side: ctx.target.side ?? ctx.side,
+			text: EnumLogCopy.PoisonSelf,
+			attribute: EnumAttributeType.Normal,
+		});
+	}
 	const name = ctx.target.name ?? ctx.actor.name;
 	const side = ctx.target.side ?? ctx.side;
 	const hasHp = ev.hpBefore !== undefined && ev.hpAfter !== undefined;
@@ -685,18 +773,323 @@ const mapMiss: IEventMapper = (ev, ctx) =>
 		text: ev.text ?? DEFAULT_EVENT_TEXT.miss,
 	});
 
-/** Info → 純文字資訊（text 即完整訊息，無名稱無 span）/ Info (text is the whole message: no name, no span) */
+/**
+ * Info → 純文字資訊（整行無名稱無 span）
+ * Info → plain info (a whole line with no name and no span)
+ *
+ * 引擎刻意只送結構化 token，文案在此解析後交給唯一合併點 buildActionMessage 產出整行；
+ * token 對照 Skill/Effect.php 原始輸出與 Battle.UseSkill 的 no-target 失敗。
+ * The engine deliberately sends only a structured token; the copy is resolved here and handed to
+ * the single join point buildActionMessage to produce the whole line. The tokens mirror the
+ * original Skill/Effect.php output and Battle.UseSkill's no-target failure.
+ *
+ * | token           | 原始輸出 / original line      |
+ * |-----------------|-------------------------------|
+ * | multiply        | `Damage x6!`                  |
+ * | heal-multiply   | `heal x2!`                    |
+ * | over-cap        | `※値が大きすぎて補正されました。` |
+ * | no-target       | `No target.Failed!`           |
+ *
+ * @param ev - 引擎事件（text＝token、value＝倍數）/ engine event (`text` = token, `value` = multiplier)
+ * @param ctx - 轉接上下文 / adapter context
+ * @returns 日誌條目 / log entry
+ */
 const mapInfo: IEventMapper = (ev, ctx) =>
-	composeAction(ctx, { type: EnumActionType.Info, message: ev.text ?? '' });
+{
+	const message =
+		ev.text === 'multiply' ? buildDamageCountMessage(ev.value ?? 0)
+			: ev.text === 'heal-multiply' ? buildHealCountMessage(ev.value ?? 0)
+				: ev.text === 'over-cap' ? EnumLogCopy.InfoOverCap
+					: ev.text === 'no-target' ? EnumLogCopy.InfoNoTarget
+						: ev.text ?? '';
+	// Info 一律是整行文案，刻意不帶 source（原版此類行無粗體主詞）
+	// Info is always a whole-line copy and deliberately carries no source (those original lines
+	// have no bold subject)
+	return composeAction(ctx, { type: EnumActionType.Info, source: undefined, message });
+};
+
+// ==================== SkillEffect 事件轉接器 / SkillEffect event mappers ====================
+// 以下型別全部由 SkillEffect.ts（移植 HOF/Class/Skill/Effect.php）生產。
+// All of the following types are produced by SkillEffect.ts (the port of HOF/Class/Skill/Effect.php).
+//
+// 「粗體主詞」一律是 PHP `Name('bold')` 印的那一個人：增益／位移／延遲／回復等行印的都是
+// 目標本人，故 source 取 ctx.target.name；SP 傷害與吸取則是原版就沒有名稱的整行，故
+// source 刻意留空、message 由 …Message 建構器直接產出。
+// The bold subject is always whoever the original `Name('bold')` printed: buff / move / delay /
+// recovery lines name the target itself, so source comes from ctx.target.name, while SP damage
+// and drain are whole lines that never had a name, so source stays empty and the copy comes from
+// the …Message builders.
+
+/** Delay 顯示用固定基準（分母；原始 DelayByRate 括號的 `/100`）/ Fixed display base for Delay (the denominator of the original DelayByRate `(.../100)`) */
+const DELAY_RATE_BASE = 100;
+
+/** Move 的 token → 原始位移文案（單一事實來源）/ Move token → the original movement copy (single source of truth) */
+const MOVE_TEXT: Readonly<Record<string, string>> = {
+	front: EnumLogCopy.MoveToFront,
+	back: EnumLogCopy.MoveToBack,
+	knockback: EnumLogCopy.KnockBacked,
+	forward: EnumLogCopy.GoesForward,
+};
+
+/**
+ * SpDamage → SP 傷害（`NSP Damage to target`，整行無名稱）
+ * SpDamage → SP damage (`NSP Damage to target`, a whole line with no name)
+ *
+ * 版面由 ValueToTargetMessage 從結構化的 value／target 組出，`message` 只是純文字鏡像。
+ * The layout is assembled by ValueToTargetMessage from the structured value / target, so
+ * `message` is only the plain-text mirror.
+ */
+const mapSpDamage: IEventMapper = (ev, ctx) =>
+{
+	const value = ev.value ?? 0;
+	return composeAction(ctx, {
+		type: EnumActionType.SpDamage,
+		source: undefined,
+		value,
+		valueUnit: 'SP',
+		message: buildSpDamageMessage(value, ctx.target.name),
+		attribute: EnumAttributeType.Spdmg,
+	});
+};
+
+/**
+ * SpHeal → SP 回復（`name Recovered N SP`，主詞為受療者）
+ * SpHeal → SP heal (`name Recovered N SP`, the subject is the healed unit)
+ *
+ * 與 HP 回復共用 Recover 版面；配色由 getMessageClass 依 valueUnit='SP' 決定為 support。
+ * Shares the Recover layout with HP recovery; getMessageClass picks `support` from
+ * valueUnit = 'SP'.
+ */
+const mapSpHeal: IEventMapper = (ev, ctx) =>
+{
+	const value = ev.value ?? 0;
+	return composeAction(ctx, {
+		type: EnumActionType.Recover,
+		source: ctx.target.name,
+		value,
+		valueUnit: 'SP',
+		valueChange: { from: ev.hpBefore, to: ev.hpAfter },
+		text: buildRecoveredText(value, 'SP'),
+		attribute: EnumAttributeType.Support,
+		hpBefore: ev.hpBefore,
+		hpAfter: ev.hpAfter,
+	});
+};
+
+/**
+ * Drain → 吸取（`Drained N HP from target(tFrom ⇒ tTo)actor(aFrom ⇒ aTo)`，行首無名稱）
+ * Drain → absorb (`Drained N HP from target(tFrom ⇒ tTo)actor(aFrom ⇒ aTo)`, unnamed)
+ *
+ * `valueChanges` 的順序即原版輸出順序：目標先、行動者後；`who='actor'` 以粗體名牌呈現，
+ * `who='target'` 的名字已在 `from target` 帶出，故省略 who（對照 fixture 的形狀）。
+ * The order of `valueChanges` is the original output order: target first, actor second; a
+ * `who='actor'` entry prints as a bold label while the `who='target'` name already appears after
+ * `from target`, so its who is dropped (mirrors the fixture's shape).
+ */
+const mapDrain: IEventMapper = (ev, ctx) =>
+{
+	const value = ev.value ?? 0;
+	const unit = ev.unit === 'sp' ? 'SP' : 'HP';
+	return composeAction(ctx, {
+		type: EnumActionType.Drain,
+		source: undefined,
+		value,
+		valueUnit: unit,
+		message: buildDrainMessage(value, unit, ctx.target.name),
+		valueChanges: (ev.valueChanges ?? []).map((vc) => ({
+			who: vc.who === 'actor' ? ctx.actor.name : undefined,
+			from: vc.from,
+			to: vc.to,
+		})),
+		attribute: unit === 'SP' ? EnumAttributeType.Support : EnumAttributeType.Recover,
+	});
+};
+
+/**
+ * Revive → 復活（`name revived!`，只有 revived 上 recover 色）
+ * Revive → revive (`name revived!`, only `revived` takes the recover colour)
+ *
+ * actor 與 target 都是復活者本人（原版 `Name('bold')` 印的就是他），強調片段固定 'revived'。
+ * Both actor and target are the revived unit (that is who the original `Name('bold')` prints) and
+ * the emphasised segment is fixed to 'revived'.
+ */
+const mapRevive: IEventMapper = (_ev, ctx) =>
+	composeAction(ctx, {
+		type: EnumActionType.Revive,
+		source: ctx.target.name,
+		text: EnumLogCopy.Revived,
+		emphasis: 'revived',
+		attribute: EnumAttributeType.Recover,
+	});
+
+/**
+ * Move → 位移（`moved to front.`／`moved to back.`／`knock backed!`／`goes forward.`）
+ * Move → row movement (`moved to front.` / `moved to back.` / `knock backed!` / `goes forward.`)
+ *
+ * 引擎只在站位真的改變時記一筆，`text` 是 token；原版各句皆無 span，故維持預設色。
+ * The engine records one entry only for a real row change and `text` carries a token; the original
+ * lines have no span, so the default colour is kept.
+ */
+const mapMove: IEventMapper = (ev, ctx) =>
+	composeAction(ctx, {
+		type: EnumActionType.Move,
+		source: ctx.target.name,
+		text: ev.text !== undefined ? MOVE_TEXT[ev.text] ?? ev.text : '',
+	});
+
+/**
+ * Delay → 行動延遲（`name Delayed（前值 ⏳↘ 後值/基準）`）
+ * Delay → action lag (`name Delayed(before ⏳↘ after/base)`)
+ *
+ * 引擎送的是分數制前後值；固定基準 100 給 buildValueChangeFromDelay，符號 `⏳↘` 由版面決定。
+ * The engine sends the score before/after; the fixed base of 100 goes to buildValueChangeFromDelay
+ * and the layout decides the `⏳↘` symbol.
+ */
+const mapDelay: IEventMapper = (ev, ctx) =>
+{
+	const change = ev.valueChanges?.[0];
+	return composeAction(ctx, {
+		type: EnumActionType.Delay,
+		source: ctx.target.name,
+		text: EnumLogCopy.Delay,
+		valueChange: change
+			? buildValueChangeFromDelay(change.from, change.to, DELAY_RATE_BASE)
+			: undefined,
+	});
+};
+
+/**
+ * 加速族（Quick／CastShort／BarrierGain）共用「name ＋ 支援色片段」版面
+ * The quick family (Quick / CastShort / BarrierGain) shares the "name + support-coloured fragment"
+ *
+ * 原始 Skill/Effect.php 把三句都包在 `<span class="support">` 內，故 attribute 一律 Support。
+ * The original Skill/Effect.php wraps all three lines in `<span class="support">`, so the attribute
+ * is Support in every case.
+ */
+function namedBuffMapper(copy: string): IEventMapper
+{
+	return (ev, ctx) =>
+		composeAction(ctx, {
+			type: EnumActionType.Buff,
+			source: ctx.target.name,
+			text: copy,
+			attribute: EnumAttributeType.Support,
+		});
+}
+
+/** Quick → 立即行動（`got quicked!`）/ Quick → act now (`got quicked!`) */
+const mapQuick: IEventMapper = namedBuffMapper(EnumLogCopy.Quicked);
+
+/** CastShort → 施法縮短（`casting shorted!`）/ CastShort → cast shortened (`casting shorted!`) */
+const mapCastShort: IEventMapper = namedBuffMapper(EnumLogCopy.CastingShorted);
+
+/** BarrierGain → 取得障壁（`got barriered!`）/ BarrierGain → barrier gained (`got barriered!`) */
+const mapBarrierGain: IEventMapper = namedBuffMapper(EnumLogCopy.Barriered);
+
+/**
+ * PoisonResist → 抗毒（`got PoisonResist!(N%)`，support 色）
+ * PoisonResist → poison resistance (`got PoisonResist!(N%)`, support colour)
+ *
+ * `value` 是取得後的總 PoisonResist%（原版 `GetPoisonResist` 回傳的新總值）。
+ * `value` is the total PoisonResist % after the gain (the new total the original
+ * `GetPoisonResist` returns).
+ */
+const mapPoisonResist: IEventMapper = (ev, ctx) =>
+	composeAction(ctx, {
+		type: EnumActionType.Poison,
+		source: ctx.target.name,
+		text: buildPoisonResistText(ev.value ?? 0),
+		attribute: EnumAttributeType.Support,
+	});
+
+/**
+ * Regen → 持續回復（`gained HP/SP regeneration +N%`）
+ * Regen → regeneration (`gained HP/SP regeneration +N%`)
+ *
+ * 配色由 getMessageClass 依 valueUnit 決定（HP → recover、SP → support）；事件不帶 value，
+ * 數值只存在 text 裡，原版此句也沒有括號前後值。
+ * getMessageClass picks the colour from valueUnit (HP → recover, SP → support); the event carries
+ * no `value`, the number lives in `text` only, and the original line has no before/after pair.
+ */
+const mapRegen: IEventMapper = (ev, ctx) =>
+{
+	const unit = ev.unit === 'sp' ? 'SP' : 'HP';
+	return composeAction(ctx, {
+		type: EnumActionType.Regen,
+		source: ctx.target.name,
+		valueUnit: unit,
+		text: buildRegenText(unit, ev.value ?? 0),
+		attribute: EnumAttributeType.Support,
+	});
+};
+
+/**
+ * StatChange → 上限能力變化（`MAXSP extended to N`）
+ * StatChange → cap stat changed (`MAXSP extended to N`)
+ *
+ * 目前唯一的 token 是 3020 ManaExtend 的 'maxsp-extend'（value＝新的 MAXSP）。
+ * The only token today is 3020 ManaExtend's 'maxsp-extend' (`value` = the new MAXSP).
+ */
+const mapStatChange: IEventMapper = (ev, ctx) =>
+{
+	const text = ev.text === 'maxsp-extend'
+		? buildStatToText('MAXSP', 'extended', ev.value ?? 0)
+		: ev.text ?? '';
+	return composeAction(ctx, {
+		type: EnumActionType.StatChange,
+		source: ctx.target.name,
+		text,
+	});
+};
+
+/**
+ * EnergyExchange → HP/SP 比率交換（首行 `name exchanged rate of HP and SP.`＋HP/SP 兩行）
+ * EnergyExchange → HP/SP rate exchange (first line `name exchanged rate of HP and SP.` + HP/SP)
+ *
+ * 事件只帶 hp／sp 的前後值；比率對照原版 Char/Battle/Effect.php：交換前比率＝`floor(前值/上限)`，
+ * 交換後那一端的比率是**對側**的交換前比率（原版 `$HpRate`／`$SpRate` 對調後印出）。
+ * 上限取自查詢表，查無時以 0 顯示（不臆測數字）。
+ * The event only carries the hp / sp before-after pair; the rates mirror the original
+ * Char/Battle/Effect.php: the pre-exchange rate is `floor(before / cap)` while the post-exchange
+ * side prints the *opposite* resource's pre-exchange rate (the original swaps `$HpRate` /
+ * `$SpRate`). Caps come from the lookup and an unknown cap shows 0 rather than a guess.
+ */
+const mapEnergyExchange: IEventMapper = (ev, ctx) =>
+{
+	const hp = ev.valueChanges?.find((c) => c.unit !== 'sp');
+	const sp = ev.valueChanges?.find((c) => c.unit === 'sp');
+	const rateOf = (value: number | undefined, max: number | undefined): number =>
+		max !== undefined && max > 0 && value !== undefined
+			? Math.floor((value / max) * 100)
+			: 0;
+	const hpRate = rateOf(hp?.from, ctx.target.maxHp);
+	const spRate = rateOf(sp?.from, ctx.target.maxSp);
+	return composeAction(ctx, {
+		type: EnumActionType.EnergyExchange,
+		source: ctx.target.name,
+		text: EnumLogCopy.EnergyExchange,
+		energyExchange: {
+			hpFrom: hp?.from ?? 0,
+			hpFromRate: hpRate,
+			hpTo: hp?.to ?? 0,
+			hpToRate: spRate,
+			spFrom: sp?.from ?? 0,
+			spFromRate: spRate,
+			spTo: sp?.to ?? 0,
+			spToRate: hpRate,
+		},
+	});
+};
 
 /**
  * 事件型別 → 轉接器對照表（單一事實來源；可組裝、可列舉、可逐型別測試）
  * Event type → mapper table (single source of truth; composable, enumerable, testable per type)
  *
- * EnumBattleEventType 的 14 種型別皆已註冊；未註冊（或型別遭竄改）時 mapBattleEvent 走
- * mapUnknownEvent，保證 N 個事件 → N 條日誌。
- * All 14 EnumBattleEventType members are registered; anything unregistered (or a tampered type)
- * goes through mapUnknownEvent in mapBattleEvent, guaranteeing N events → N entries.
+ * EnumBattleEventType 的 27 種型別皆已註冊（14 種既有 ＋ SkillEffect 移植帶來的 13 種）；
+ * 未註冊（或型別遭竄改）時 mapBattleEvent 走 mapUnknownEvent，保證 N 個事件 → N 條日誌。
+ * All 27 EnumBattleEventType members are registered (14 pre-existing plus the 13 that arrived
+ * with the SkillEffect port); anything unregistered (or a tampered type) goes through
+ * mapUnknownEvent in mapBattleEvent, guaranteeing N events → N entries.
  */
 export const EVENT_MAPPERS: Readonly<Partial<Record<EnumBattleEventType, IEventMapper>>> = {
 	[EnumBattleEventType.Act]: mapAct,
@@ -713,6 +1106,19 @@ export const EVENT_MAPPERS: Readonly<Partial<Record<EnumBattleEventType, IEventM
 	[EnumBattleEventType.Poison]: mapPoison,
 	[EnumBattleEventType.Miss]: mapMiss,
 	[EnumBattleEventType.Info]: mapInfo,
+	[EnumBattleEventType.SpDamage]: mapSpDamage,
+	[EnumBattleEventType.SpHeal]: mapSpHeal,
+	[EnumBattleEventType.Drain]: mapDrain,
+	[EnumBattleEventType.Revive]: mapRevive,
+	[EnumBattleEventType.Move]: mapMove,
+	[EnumBattleEventType.Delay]: mapDelay,
+	[EnumBattleEventType.Quick]: mapQuick,
+	[EnumBattleEventType.CastShort]: mapCastShort,
+	[EnumBattleEventType.BarrierGain]: mapBarrierGain,
+	[EnumBattleEventType.PoisonResist]: mapPoisonResist,
+	[EnumBattleEventType.Regen]: mapRegen,
+	[EnumBattleEventType.StatChange]: mapStatChange,
+	[EnumBattleEventType.EnergyExchange]: mapEnergyExchange,
 };
 
 /**

@@ -488,7 +488,7 @@ export interface ISkillDef extends ICompBonuses, ISkillUpFields, ISkillDownField
 	 * When truthy, routes through calcRecoveryValue instead of damage and never triggers guard.
 	 */
 	support?: number;
-	/** AI 目標優先條件（目前僅資料層保留）/ AI target priority hint (data-layer only) */
+	/** 目標優先條件（Dead 由 Battle.selectTargets 讀取：復活技從死亡成員中選目標；其餘仍為資料層保留）/ target priority (Battle.selectTargets reads Dead: revive skills pick from fallen members; the rest stay data-layer only) */
 	priority?: EnumSkillPriority;
 	/**
 	 * 詠唱/蓄力 [詠唱時間, 硬直]
@@ -530,7 +530,11 @@ export interface ISkillDef extends ICompBonuses, ISkillUpFields, ISkillDownField
 	PlusMAXSP?: number;
 	/** 為真時無視 target.def 百分比／定值減傷，並加算 SPECIAL.Pierce（且穿透 Barrier）/ when truthy, ignores target.def percent/flat reduction, adds SPECIAL.Pierce, and bypasses Barrier */
 	pierce?: number;
-	/** 行動延遲 %（目前僅資料層保留）/ action delay % (data-layer only) */
+	/**
+	 * 行動延遲速率 %（SkillEffect 的 DelayChar 讀取：施放後 `delay += DelayValue(target) × rate/100`）
+	 * action delay rate % (read by SkillEffect's DelayChar: after casting,
+	 * `delay += DelayValue(target) × rate / 100`)
+	 */
 	delay?: number;
 	/** 擊退率 %（引擎已讀取：statusChanges 將目標逼退至後排）/ knockback % (engine reads: statusChanges forces the target to the back row) */
 	knockback?: number;
@@ -548,15 +552,20 @@ export interface ISkillDef extends ICompBonuses, ISkillUpFields, ISkillDownField
 	umove?: EnumPosition;
 	/** 為真時視為被動技能，由 passive.ts 在戰鬥初始化時累加補正 / truthy = passive skill; passive.ts accumulates its bonuses at battle setup */
 	passive?: number;
-	/** 快速行動標記（目前僅資料層保留）/ quick-action flag (data-layer only) */
+	/**
+	 * 快速行動標記（SkillEffect 讀取：召喚技能帶 quick 時，召喚物立即行動）
+	 * quick-action flag (read by SkillEffect: with `quick`, a summoned unit acts immediately)
+	 */
 	quick?: number;
 	/** 犧牲比例 %（消耗自身 HP；引擎已讀取：Battle.UseSkill 施法前犧牲使用者 HP）/ sacrifice % (costs own HP; engine reads: Battle.UseSkill sacrifices user HP before casting) */
 	sacrifice?: number;
 	/**
 	 * 解毒標記 / cure-poison flag
 	 *
-	 * 現行條件：CurePoison 為真且目標「非」中毒時才呼叫 getNormal（與解毒語意相反，屬既有實作）。
-	 * Current condition: getNormal is called only when CurePoison is set and the target is NOT poisoned (opposite of cure semantics; as implemented).
+	 * SkillEffect.default 讀取（對齊原始 Skill/Effect.php）：CurePoison 為真且目標「中毒」時
+	 * 才解毒，解毒時產出 Poison(text='cured') 事件。
+	 * Read by SkillEffect.default (mirrors the original Skill/Effect.php): with CurePoison set the
+	 * target is cured only while poisoned, and the cure emits a Poison (text = 'cured') event.
 	 */
 	CurePoison?: number;
 	/** 疊加至目標 SPECIAL.HpRegen 的回復 % / regen % accumulated into the target's SPECIAL.HpRegen */
@@ -794,14 +803,15 @@ export interface IMonDef extends ICharCore
  * 列舉 / enumeration
  *
  * 生產點（單一事實來源，見各成員註解）/ Producers (single source of truth; see each member):
- * - Battle.UseSkill → Act、Cast、Death、MagicCircle、Summon
- * - skill/effect（applySkill／statusChanges）→ Damage、Heal、Guard、Buff、Debuff、Poison（施毒成功）
+ * - Battle.UseSkill → Act、Cast、Death、MagicCircle、Summon、Info（無目標失敗）
+ * - skill/effect（applySkill／statusChanges）→ Damage、Heal、Guard、Buff、Debuff、Poison（施毒成功）、
+ *   Move（statusChanges 帶 move／knockback 且站位真的改變時）
+ * - skill/SkillEffect（特例分支與 default 的延遲／回復欄位）→ SpDamage、SpHeal、Drain、Revive、
+ *   Move、Delay、Quick、CastShort、BarrierGain、EnergyExchange、PoisonResist、Regen、StatChange、
+ *   Info（over-cap／multiply／heal-multiply 標記）、Miss（2032 失敗）、Poison（解毒 cured）
  * - Battle.Action → Poison（每回合毒傷，不帶 skill，故屬一般事件）
- * - 無生產點：Charge（蓄力開始以 Cast 記錄）、Miss（引擎未讀取 hit，無判定可記）、
- *   Info（文案種類屬展示層 EnumLogCopy，引擎層無法結構化）
- * - No producer: Charge (a charge start is recorded as Cast), Miss (the engine never reads `hit`,
- *   so there is no decision to record), Info (its copy variants live in the display layer's
- *   EnumLogCopy and cannot be structured at the engine layer).
+ * - 無生產點：Charge（蓄力開始以 Cast 記錄）
+ * - No producer: Charge (a charge start is recorded as Cast).
  */
 export enum EnumBattleEventType
 {
@@ -825,10 +835,11 @@ export enum EnumBattleEventType
 	Debuff = 'debuff',
 	/**
 	 * 中毒狀態 / poison state
-	 * 兩個生產點：statusChanges（施毒成功，帶 skill）與 Battle.Action（每回合毒傷，帶 value
-	 * 與前後 HP、不帶 skill）
-	 * two producers: statusChanges (poison applied; carries the skill) and Battle.Action (per-turn
-	 * poison damage; carries the value plus before/after HP and no skill)
+	 * 三個生產點：statusChanges（施毒成功，帶 skill）、SkillEffect（解毒成功，text='cured' token、
+	 * 帶 skill）與 Battle.Action（每回合毒傷，帶 value 與前後 HP、不帶 skill）
+	 * three producers: statusChanges (poison applied; carries the skill), SkillEffect (poison cured;
+	 * text = the 'cured' token and the skill) and Battle.Action (per-turn poison damage; carries
+	 * the value plus before/after HP and no skill)
 	 */
 	Poison = 'poison',
 	/** 死亡 / death */
@@ -860,16 +871,142 @@ export enum EnumBattleEventType
 	Summon = 'summon',
 	/**
 	 * 未命中 / miss
-	 * 目前無生產點（hit 未進引擎，無 Miss 判定）/ no producer (hit is not in the engine, so no Miss branch)
+	 * SkillEffect 生產（2032 判定失敗時；無 actor 的裸失敗經展示層印成 `Failed!`）
+	 * produced by SkillEffect (when the 2032 judgement fails; a bare failure without an actor is
+	 * printed by the display as `Failed!`)
 	 */
 	Miss = 'miss',
 	/**
 	 * 一般資訊訊息 / informational message
-	 * 目前無生產點：文案種類（回合延長等）屬展示層 EnumLogCopy，引擎層無法結構化選擇
-	 * no producer yet: its copy variants (turn extension etc.) belong to the display layer's
-	 * EnumLogCopy, which the engine layer cannot choose between structurally
+	 * 兩個生產點：Battle.UseSkill（選不到目標時的 no-target 失敗）與 SkillEffect（over-cap 補正、
+	 * Damage xN!、heal xN!），`text` 為結構化 token，文案由展示層 EnumLogCopy 解析
+	 * two producers: Battle.UseSkill (the no-target failure when no unit can be selected) and
+	 * SkillEffect (over-cap correction, Damage xN!, heal xN!); `text` is a structured token and
+	 * the display layer resolves it through EnumLogCopy
 	 */
 	Info = 'info',
+	/**
+	 * SP 傷害 / SP damage
+	 * SkillEffect 生產（2030／2031 踏破、3012 LifeConvert 等扣 SP 特例；value＝傷害量、
+	 * hpBefore/hpAfter 帶 SP 前後值、unit='sp'）
+	 * produced by SkillEffect (the SP-deducting specials 2030 / 2031 / 3012 etc.; `value` is the
+	 * damage, hpBefore/hpAfter carry the SP before/after and unit = 'sp')
+	 */
+	SpDamage = 'spdamage',
+	/**
+	 * SP 回復 / SP heal
+	 * SkillEffect 生產（2090／2091、3010／3011 等回復 SP 特例；unit='sp'）
+	 * produced by SkillEffect (the SP-healing specials 2090 / 2091 / 3010 / 3011; unit = 'sp')
+	 */
+	SpHeal = 'spheal',
+	/**
+	 * 吸取（HP 吸收）/ drain (HP absorb)
+	 * SkillEffect 生產（1200／3901／5002 等 AbsorbHP；valueChanges 依序帶 target 與 actor 的
+	 * HP 前後值，展示層印成 `from 目標(targetFrom => targetTo)行動者(actorFrom => actorTo)`）
+	 * produced by SkillEffect (AbsorbHP in 1200 / 3901 / 5002; `valueChanges` carries the target's
+	 * then the actor's HP before/after, which the display prints as
+	 * `from target(tFrom => tTo)actor(aFrom => aTo)`)
+	 */
+	Drain = 'drain',
+	/**
+	 * 復活 / revive
+	 * SkillEffect 生產（3040／5030／5063 蘇生特例、2056 對死亡目標的 GetNormal，以及 heal 前
+	 * 偵測到目標為 Dead 的一般回復；actor＝target＝復活者）
+	 * produced by SkillEffect (the revive specials 3040 / 5030 / 5063, 2056's GetNormal on a dead
+	 * target, and a plain heal that found its target Dead; actor = target = the revived unit)
+	 */
+	Revive = 'revive',
+	/**
+	 * 位移（前後衛）/ row movement (front/back)
+	 * SkillEffect 生產：statusChanges 帶 move／knockback 欄位且站位真的改變時，
+	 * `text` 為 token（front/back/knockback/forward），僅在改變當下記一筆
+	 * produced by SkillEffect: when statusChanges carries a move / knockback field and the row
+	 * actually changes; `text` is a token (front/back/knockback/forward) and one record is kept
+	 * only for a real change
+	 */
+	Move = 'move',
+	/**
+	 * 行動延遲 / action delayed
+	 * SkillEffect 生產（skill.delay 的 DelayChar、2110／2111 延遲技、3050／3055 的 DelayCut）；
+	 * value＝速率（rate%），valueChanges 帶 delay 前後值（引擎累積制分數）
+	 * produced by SkillEffect (DelayChar for skill.delay, the delay skills 2110 / 2111, and
+	 * 3050 / 3055's DelayCut); `value` is the rate (%) and valueChanges carries the delay
+	 * before/after (the engine's accumulated score)
+	 */
+	Delay = 'delay',
+	/**
+	 * 加速（立即行動）/ quick (act now)
+	 * SkillEffect 生產（3050 Quick、召喚技能帶 quick 時讓召喚物立即行動）
+	 * produced by SkillEffect (3050 Quick, and a summon skill's `quick` flag letting the summoned
+	 * unit act immediately)
+	 */
+	Quick = 'quick',
+	/**
+	 * 施法縮短 / cast time shortened
+	 * SkillEffect 生產（3055 CastAsist：目標在詠唱中才生效）
+	 * produced by SkillEffect (3055 CastAsist: only fires while the target is casting)
+	 */
+	CastShort = 'castshort',
+	/**
+	 * 取得障壁 / barrier gained
+	 * SkillEffect 生產（3060 HolyShield／5067 BananaProtection：無障壁時取得）
+	 * produced by SkillEffect (3060 HolyShield / 5067 BananaProtection: gained only when the
+	 * target has no barrier yet)
+	 */
+	BarrierGain = 'barriergain',
+	/**
+	 * HP/SP 比率交換 / HP and SP rate exchange
+	 * SkillEffect 生產（3013 EnergyExchange；valueChanges 帶 hp 與 sp 兩組前後值，
+	 * 展示層以交換前比率計算 8 欄紀錄）
+	 * produced by SkillEffect (3013 EnergyExchange; valueChanges carries the hp and sp before/after
+	 * pairs and the display builds its 8-field record from the pre-exchange rates)
+	 */
+	EnergyExchange = 'energyexchange',
+	/**
+	 * 取得中毒抗性 / poison resistance gained
+	 * SkillEffect 生產（1220 AntiPoisoning；value＝取得後的總 PoisonResist%）
+	 * produced by SkillEffect (1220 AntiPoisoning; `value` is the total PoisonResist % after gain)
+	 */
+	PoisonResist = 'poisonresist',
+	/**
+	 * 設定持續回復 / regeneration configured
+	 * SkillEffect 生產（技能帶 HpRegen／SpRegen 欄位；unit＝資源、value＝%）
+	 * produced by SkillEffect (the skill carries HpRegen / SpRegen; unit is the resource and value
+	 * is the %)
+	 */
+	Regen = 'regen',
+	/**
+	 * 上限能力變化 / cap stat changed
+	 * SkillEffect 生產（3020 ManaExtend 等 MAX* 上限的特例變動）
+	 * produced by SkillEffect (the MAX-cap specials such as 3020 ManaExtend)
+	 */
+	StatChange = 'statchange',
+}
+
+/**
+ * 結構化數值變化 / Structured value change
+ * 介面 / interface
+ *
+ * 單一單位／單一資源的前後值；`who` 決定「這段變化是誰的」（Drain 的雙方、Delay 的自身），
+ * `unit` 決定資源維度（hp／sp／delay）。展示層將其組成 valueChange（單筆）或 valueChanges（多筆）。
+ * The before/after pair of one unit (or one resource); `who` says whose change it is (both sides
+ * of a Drain, the caster's own delay) and `unit` names the resource (hp / sp / delay). The display
+ * layer turns these into valueChange (single) or valueChanges (multiple).
+ */
+export interface IBattleValueChange
+{
+	/**
+	 * 變化歸屬（缺省＝事件的 target 自身）/ whose change this is (absent = the event's target itself)
+	 * actor＝行動者自身的變化、target＝目標的變化；展示層以名字替換 who。
+	 * actor = a change on the actor, target = a change on the target; the display swaps in the name.
+	 */
+	who?: 'actor' | 'target';
+	/** 資源維度（缺省＝hp）/ resource dimension (defaults to hp) */
+	unit?: 'hp' | 'sp' | 'delay';
+	/** 變化前 / value before */
+	from: number;
+	/** 變化後 / value after */
+	to: number;
 }
 
 /**
@@ -891,6 +1028,17 @@ export interface IBattleEvent
 	/** 數值變化的前後 HP（Damage/Heal 時帶出 a > b 用）/ HP before/after for value-change display */
 	hpBefore?: number;
 	hpAfter?: number;
+	/**
+	 * 單資源事件的資源維度（SpDamage／SpHeal／Regen／Drain 用；缺省＝hp）
+	 * resource dimension of a single-resource event (SpDamage / SpHeal / Regen / Drain; defaults to hp)
+	 */
+	unit?: 'hp' | 'sp';
+	/**
+	 * 結構化數值變化（Drain 雙方、EnergyExchange 的 hp／sp 對、Delay 的前後分數）
+	 * structured value changes (both sides of a Drain, EnergyExchange's hp / sp pair, a Delay's
+	 * before/after score)
+	 */
+	valueChanges?: IBattleValueChange[];
 	/** 顯示文字（Info 等文字類事件）/ display text (for Info and other text events) */
 	text?: string;
 }

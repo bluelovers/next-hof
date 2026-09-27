@@ -83,6 +83,19 @@ const EVENT_TYPE_LABEL: Record<EnumBattleEventType, string> = {
 	[EnumBattleEventType.Summon]: '召喚 Summon',
 	[EnumBattleEventType.Miss]: '未命中 Miss',
 	[EnumBattleEventType.Info]: '資訊 Info',
+	[EnumBattleEventType.SpDamage]: 'SP 傷害 SpDamage',
+	[EnumBattleEventType.SpHeal]: 'SP 回復 SpHeal',
+	[EnumBattleEventType.Drain]: '吸取 Drain',
+	[EnumBattleEventType.Revive]: '復活 Revive',
+	[EnumBattleEventType.Move]: '位移 Move',
+	[EnumBattleEventType.Delay]: '延遲 Delay',
+	[EnumBattleEventType.Quick]: '加速 Quick',
+	[EnumBattleEventType.CastShort]: '施法縮短 CastShort',
+	[EnumBattleEventType.BarrierGain]: '障壁 BarrierGain',
+	[EnumBattleEventType.PoisonResist]: '抗毒 PoisonResist',
+	[EnumBattleEventType.Regen]: '持續回復 Regen',
+	[EnumBattleEventType.StatChange]: '上限變化 StatChange',
+	[EnumBattleEventType.EnergyExchange]: 'HP/SP 交換 EnergyExchange',
 };
 
 /** 後續事件標籤 / Follow-up labels */

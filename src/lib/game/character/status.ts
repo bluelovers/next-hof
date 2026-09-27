@@ -36,6 +36,40 @@ export function hpDamage(char: Character, dmg: number): number
 	return before - char.HP;
 }
 
+/**
+ * 無保護扣血（對齊原始 HpDamage：純減血、可致死、無玩家保護、不下鉗 0）
+ * Unprotected HP loss (mirrors the original HpDamage: a plain subtraction that can be fatal,
+ * with no player protection and no floor at 0)
+ *
+ * 原始 HpDamage 只做 `HP -= damage` 並印出前後值；玩家保護在 CalcBasicDamage 內完成。
+ * calcBasicDamage 的路徑因此由 hpDamage（含保護）套一次即為原版等價，而特例分支的原始值
+ * （1024／1025／1116／3901 等直接 DamageHP 的路徑）必須走本函式，避免重複套保護。
+ * The original HpDamage only does `HP -= damage` and shows the change; player protection lives in
+ * CalcBasicDamage. A calcBasicDamage path therefore needs exactly one protection pass via hpDamage
+ * to equal the original, while raw special-case values (1024 / 1025 / 1116 / 3901 and friends,
+ * which call DamageHP directly) must go through this function so protection is not applied twice.
+ *
+ * @returns 實際扣血量（可能為負的 HP 變化量）/ HP actually lost (HP may go negative)
+ */
+export function hpDamageRaw(char: Character, dmg: number): number
+{
+	const before = char.HP;
+	char.HP -= dmg;
+	return before - char.HP;
+}
+
+/**
+ * 扣血但不致死（對齊原始 HpDamage2：低於 1 時補回 1），回傳實際扣血量
+ * Deal damage that cannot kill (mirrors the original HpDamage2: floors at 1), returning HP lost
+ */
+export function hpDamage2(char: Character, dmg: number): number
+{
+	const before = char.HP;
+	char.HP -= dmg;
+	if (char.HP < 1) char.HP = 1;
+	return before - char.HP;
+}
+
 /** 回復 HP，回傳實際回復量（不超過 MAXHP）/ recover HP, returning the amount actually healed (capped at MAXHP) */
 export function hpRecover(char: Character, amount: number): number
 {
@@ -60,10 +94,11 @@ export function spRecover(char: Character, amount: number): number
 	return char.SP - before;
 }
 
-/** 中毒傷害公式：MAXHP*10% + ceil(level/2) / poison damage formula: MAXHP*10% + ceil(level/2) */
-export function poisonDamageFormula(char: Character): number
+/** 中毒傷害公式：(MAXHP*10% + ceil(level/2)) × multiply（對齊原始 PoisonDamageFormula）/ poison damage formula: (MAXHP*10% + ceil(level/2)) × multiply (mirrors PoisonDamageFormula) */
+export function poisonDamageFormula(char: Character, multiply = 1): number
 {
-	return Math.round(char.MAXHP * 0.1) + Math.ceil(char.level / 2);
+	const base = Math.round(char.MAXHP * 0.1) + Math.ceil(char.level / 2);
+	return Math.round(base * multiply);
 }
 
 /**
@@ -99,15 +134,18 @@ export function getPoison(char: Character, bePoison: number, rng?: RNG): boolean
 	return true;
 }
 
-/** 中毒持續傷害（不致死，最低 HP=1），回傳實際扣血量 / per-turn poison damage (never fatal; floors at HP=1), returns HP lost */
-export function poisonDamage(char: Character): number
+/**
+ * 中毒持續傷害（不致死、地板 1；對齊原始 PoisonDamage→HpDamage2），回傳實際扣血量
+ * per-turn poison damage (never fatal; floors at 1; mirrors PoisonDamage → HpDamage2),
+ * returns HP lost
+ *
+ * @param multiply - 倍率（對齊原始 PoisonDamageFormula($multiply)，1208 倍增毒傷用）/
+ * multiplier (mirrors PoisonDamageFormula($multiply); used by the 1208 multiplied poison damage)
+ */
+export function poisonDamage(char: Character, multiply = 1): number
 {
 	if (char.STATE !== EnumState.Poison) return 0;
-	const dmg = poisonDamageFormula(char);
-	const before = char.HP;
-	const after = char.HP - dmg;
-	char.HP = after < 1 ? 1 : after; // 不會致死
-	return before - char.HP;
+	return hpDamage2(char, poisonDamageFormula(char, multiply));
 }
 
 /**

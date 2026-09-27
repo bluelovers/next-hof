@@ -96,6 +96,22 @@ export const EVENT_EFFECT: Readonly<Partial<Record<EnumBattleEventType, EnumSkil
 	[EnumBattleEventType.Summon]: EnumSkillEffect.Summon,
 	[EnumBattleEventType.MagicCircle]: EnumSkillEffect.MagicCircle,
 	[EnumBattleEventType.Miss]: EnumSkillEffect.Miss,
+	// ---- SkillEffect 移植新增（不新增 EnumSkillEffect 成員）----
+	// Added by the SkillEffect port (no new EnumSkillEffect member)
+	[EnumBattleEventType.SpDamage]: EnumSkillEffect.Damage,
+	[EnumBattleEventType.Drain]: EnumSkillEffect.Damage,
+	[EnumBattleEventType.SpHeal]: EnumSkillEffect.Heal,
+	[EnumBattleEventType.Regen]: EnumSkillEffect.Heal,
+	[EnumBattleEventType.Revive]: EnumSkillEffect.Heal,
+	[EnumBattleEventType.Quick]: EnumSkillEffect.Buff,
+	[EnumBattleEventType.CastShort]: EnumSkillEffect.Buff,
+	[EnumBattleEventType.BarrierGain]: EnumSkillEffect.Buff,
+	[EnumBattleEventType.StatChange]: EnumSkillEffect.Buff,
+	[EnumBattleEventType.EnergyExchange]: EnumSkillEffect.Buff,
+	[EnumBattleEventType.PoisonResist]: EnumSkillEffect.Poison,
+	// Move／Delay／Info 不進表：位移與延遲無法歸因到單一效果系統，Info 本身是純文字。
+	// Move / Delay / Info stay out: a row change and an action lag cannot be attributed to one
+	// effect system, and Info is plain copy by nature.
 };
 
 /**

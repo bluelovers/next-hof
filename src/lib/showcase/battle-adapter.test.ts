@@ -39,6 +39,7 @@ import {
 	runShowcaseBattle,
 	validateShowcaseInput,
 	type IUnitLookup,
+	type IUnitRef,
 } from './battle-adapter';
 
 // ==================== 3.1 固定種子跑完整場 ====================
@@ -143,9 +144,9 @@ describe('3.2 buildTeam / toBattleUnit', () =>
 // 側別翻轉後：100(我方)=EnumTeamSideUI.Right, 1000(敵方)=EnumTeamSideUI.Left
 describe('3.3 mapBattleEvent', () =>
 {
-	const lookup: IUnitLookup = new Map<number, { name: string; side: EnumTeamSideUI }>([
-		[100, { name: 'Warrior', side: EnumTeamSideUI.Right }],
-		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left }],
+	const lookup: IUnitLookup = new Map<number, IUnitRef>([
+		[100, { name: 'Warrior', side: EnumTeamSideUI.Right, maxHp: 1000, maxSp: 100 }],
+		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left, maxHp: 600, maxSp: 50 }],
 	]);
 	const repo = createSeedRepository();
 
@@ -626,9 +627,9 @@ describe('3.5 buildSprites / buildPositionRoster', () =>
 // Task 3.3b: composable pieces of the event adapter
 describe('3.3b 事件轉接的組裝元件 / event adapter composition', () =>
 {
-	const lookup: IUnitLookup = new Map<number, { name: string; side: EnumTeamSideUI }>([
-		[100, { name: 'Warrior', side: EnumTeamSideUI.Right }],
-		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left }],
+	const lookup: IUnitLookup = new Map<number, IUnitRef>([
+		[100, { name: 'Warrior', side: EnumTeamSideUI.Right, maxHp: 1000, maxSp: 100 }],
+		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left, maxHp: 600, maxSp: 50 }],
 	]);
 	const repo = createSeedRepository();
 
@@ -639,8 +640,10 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () =>
 			lookup,
 			repo,
 		);
-		expect(ctx.actor).toEqual({ name: 'Warrior', side: EnumTeamSideUI.Right });
-		expect(ctx.target).toEqual({ name: 'GoblinAxe', side: EnumTeamSideUI.Left });
+		// maxHp／maxSp 一併解析，供 EnergyExchange 換算比率 / maxHp / maxSp resolve too, for
+		// EnergyExchange's rate computation
+		expect(ctx.actor).toEqual({ name: 'Warrior', side: EnumTeamSideUI.Right, maxHp: 1000, maxSp: 100 });
+		expect(ctx.target).toEqual({ name: 'GoblinAxe', side: EnumTeamSideUI.Left, maxHp: 600, maxSp: 50 });
 		// 歸屬側別優先取 actor（Damage 的施作者側）/ the owning side prefers the actor (the damage dealer)
 		expect(ctx.side).toBe(EnumTeamSideUI.Right);
 		expect(ctx.skillDef).toEqual(repo.getSkill(1000));
@@ -658,7 +661,12 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () =>
 
 	it('resolveRef keeps the raw no string for unknown refs and {} for absent ones', () =>
 	{
-		expect(resolveRef('100', lookup)).toEqual({ name: 'Warrior', side: EnumTeamSideUI.Right });
+		expect(resolveRef('100', lookup)).toEqual({
+			name: 'Warrior',
+			side: EnumTeamSideUI.Right,
+			maxHp: 1000,
+			maxSp: 100,
+		});
 		expect(resolveRef('9999', lookup)).toEqual({ name: '9999' });
 		expect(resolveRef(undefined, lookup)).toEqual({});
 	});
@@ -810,9 +818,9 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () =>
 // Task 3.4b: display-data assembly
 describe('3.4b 展示資料組裝 / display data assembly', () =>
 {
-	const lookup: IUnitLookup = new Map<number, { name: string; side: EnumTeamSideUI }>([
-		[100, { name: 'Warrior', side: EnumTeamSideUI.Right }],
-		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left }],
+	const lookup: IUnitLookup = new Map<number, IUnitRef>([
+		[100, { name: 'Warrior', side: EnumTeamSideUI.Right, maxHp: 1000, maxSp: 100 }],
+		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left, maxHp: 600, maxSp: 50 }],
 	]);
 
 	it('computeSideDamage sums only the events whose actor belongs to that side', () =>

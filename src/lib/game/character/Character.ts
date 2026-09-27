@@ -266,4 +266,23 @@ export class Character implements ICharCore
 	{
 		return this.MAXSP > 0 ? (this.SP / this.MAXSP) * 100 : 0;
 	}
+
+	/**
+	 * 召喚力（召喚單位的強度係數；對齊原始 Char/Battle.php 的 SummonPower）
+	 * Summon strength (the strength coefficient of summoned units; mirrors SummonPower in Char/Battle.php)
+	 *
+	 * 原始公式 / original formula:
+	 *   Strength = 1 + (sqrt(DEX)×5 + LUK) / 250
+	 *   SPECIAL.Summon 為真時再 ×(100 + Summon) / 100
+	 *   when SPECIAL.Summon is truthy, multiply by (100 + Summon) / 100
+	 *
+	 * @returns 召喚強度（>1 表示強化）/ summon strength (> 1 means a stronger summon)
+	 */
+	summonPower(): number
+	{
+		const dexPart = Math.sqrt(this.DEX) * 5;
+		let strength = 1 + (dexPart + this.LUK) / 250;
+		if (this.SPECIAL.Summon) strength *= (100 + this.SPECIAL.Summon) / 100;
+		return strength;
+	}
 }
