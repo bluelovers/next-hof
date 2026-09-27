@@ -5,122 +5,111 @@
 // eliminating string concatenation ('Up'+key, 'P_'+name) for key generation.
 
 import { EnumStatusAttr } from './status-enum';
+import { ITSTemplateLiteralAllowedType, ITSStringLiteralPrefixed, ITSStringLiteralPrefixedRecord } from 'ts-type';
 
-/** 增益前綴 / Up prefix */
-export const STATUS_UP_PREFIX = 'Up' as const;
-/** 減益前綴 / Down prefix */
-export const STATUS_DOWN_PREFIX = 'Down' as const;
-/** 永久加成前綴 / Plus prefix */
-export const STATUS_PLUS_PREFIX = 'Plus' as const;
-/** 補正欄位前綴 / Compensation field prefix */
-export const COMP_PREFIX = 'P_' as const;
+export enum EnumStatusPrefix
+{
+	/** 增益前綴 / Up prefix */
+	Up = 'Up',
+	/** 減益前綴 / Down prefix */
+	Down = 'Down',
+	/** 永久加成前綴 / Plus prefix */
+	Plus = 'Plus',
+	/** 補正欄位前綴 / Compensation field prefix */
+	Comp = 'P_',
+}
 
-/**
- * 狀態屬性的 Up 鍵名對照 / Status attribute Up key name mapping
- * 鍵為 EnumStatusAttr；由 STATUS_UP_PREFIX 靜態對照產生，非動態字串聯合。
- * Keyed by EnumStatusAttr; derived statically from STATUS_UP_PREFIX, not via string concatenation.
- */
-export const STATUS_UP_KEY_NAME: Record<EnumStatusAttr, string> = {
-	[EnumStatusAttr.STR]: 'UpSTR',
-	[EnumStatusAttr.INT]: 'UpINT',
-	[EnumStatusAttr.DEX]: 'UpDEX',
-	[EnumStatusAttr.SPD]: 'UpSPD',
-	[EnumStatusAttr.LUK]: 'UpLUK',
-	[EnumStatusAttr.ATK]: 'UpATK',
-	[EnumStatusAttr.MATK]: 'UpMATK',
-	[EnumStatusAttr.DEF]: 'UpDEF',
-	[EnumStatusAttr.MDEF]: 'UpMDEF',
-	[EnumStatusAttr.MAXHP]: 'UpMAXHP',
-	[EnumStatusAttr.MAXSP]: 'UpMAXSP',
-};
+function _buildStatRecord<Name extends string, Prefix extends ITSTemplateLiteralAllowedType>(prefix: Prefix, names: Name[])
+{
+	const attrs: ITSStringLiteralPrefixed<K, Prefix>[] = [];
+	const record: ITSStringLiteralPrefixedRecord<Name, Prefix> = {} as any;
+	for (const name of names) {
+		const attr = `${prefix}${name}` as const;
+		attrs.push(attr);
+		record[name] = attr;
+	}
+	return {
+		record,
+		attrs,
+	};
+}
 
-/**
- * 狀態屬性的 Down 鍵名對照 / Status attribute Down key name mapping
- * 鍵為 EnumStatusAttr。/ Keyed by EnumStatusAttr.
- */
-export const STATUS_DOWN_KEY_NAME: Record<EnumStatusAttr, string> = {
-	[EnumStatusAttr.STR]: 'DownSTR',
-	[EnumStatusAttr.INT]: 'DownINT',
-	[EnumStatusAttr.DEX]: 'DownDEX',
-	[EnumStatusAttr.SPD]: 'DownSPD',
-	[EnumStatusAttr.LUK]: 'DownLUK',
-	[EnumStatusAttr.ATK]: 'DownATK',
-	[EnumStatusAttr.MATK]: 'DownMATK',
-	[EnumStatusAttr.DEF]: 'DownDEF',
-	[EnumStatusAttr.MDEF]: 'DownMDEF',
-	[EnumStatusAttr.MAXHP]: 'DownMAXHP',
-	[EnumStatusAttr.MAXSP]: 'DownMAXSP',
-};
+const STATUS_LIST = Object.values(EnumStatusAttr);
 
-/**
- * 狀態屬性的 Plus 鍵名對照 / Status attribute Plus key name mapping
- * 鍵為 EnumStatusAttr。/ Keyed by EnumStatusAttr.
- */
-export const STATUS_PLUS_KEY_NAME: Record<EnumStatusAttr, string> = {
-	[EnumStatusAttr.STR]: 'PlusSTR',
-	[EnumStatusAttr.INT]: 'PlusINT',
-	[EnumStatusAttr.DEX]: 'PlusDEX',
-	[EnumStatusAttr.SPD]: 'PlusSPD',
-	[EnumStatusAttr.LUK]: 'PlusLUK',
-	[EnumStatusAttr.ATK]: 'PlusATK',
-	[EnumStatusAttr.MATK]: 'PlusMATK',
-	[EnumStatusAttr.DEF]: 'PlusDEF',
-	[EnumStatusAttr.MDEF]: 'PlusMDEF',
-	[EnumStatusAttr.MAXHP]: 'PlusMAXHP',
-	[EnumStatusAttr.MAXSP]: 'PlusMAXSP',
-};
+export const {
+	/**
+	 * 狀態屬性的 Up 鍵名對照 / Status attribute Up key name mapping
+	 * 鍵為 EnumStatusAttr；由 STATUS_UP_PREFIX 靜態對照產生，非動態字串聯合。
+	 * Keyed by EnumStatusAttr; derived statically from STATUS_UP_PREFIX, not via string concatenation.
+	 */
+	record: STATUS_UP_KEY_NAME,
+	/**
+	* 從 STATUS_ATTR_KEYS 衍生 Up 鍵名陣列 / Up key names array derived from STATUS_ATTR_KEYS
+	 */
+	attrs: STATUS_UP_KEYS,
+} = _buildStatRecord(EnumStatusPrefix.Up, STATUS_LIST);
+
+
+export const {
+	/**
+	 * 狀態屬性的 Down 鍵名對照 / Status attribute Down key name mapping
+	 * 鍵為 EnumStatusAttr。/ Keyed by EnumStatusAttr.
+	 */
+	record: STATUS_DOWN_KEY_NAME,
+	/**
+	 * 從 STATUS_ATTR_KEYS 衍生 Down 鍵名陣列 / Down key names array derived from STATUS_ATTR_KEYS
+	 */
+	attrs: STATUS_DOWN_KEYS,
+} = _buildStatRecord(EnumStatusPrefix.Down, STATUS_LIST);
+
+export const {
+	/**
+	 * 狀態屬性的 Plus 鍵名對照 / Status attribute Plus key name mapping
+	 * 鍵為 EnumStatusAttr。/ Keyed by EnumStatusAttr.
+	 */
+	record: STATUS_PLUS_KEY_NAME,
+	/**
+	 * 從 STATUS_ATTR_KEYS 衍生 Plus 鍵名陣列 / Plus key names array derived from STATUS_ATTR_KEYS
+	 */
+	attrs: STATUS_PLUS_KEYS,
+} = _buildStatRecord(EnumStatusPrefix.Plus, STATUS_LIST);
 
 /**
  * 基礎屬性 → 補正欄位名稱對照 / Base stat to compensation field name mapping
  * 由 PRIMARY_STATS 靜態對照產生，非動態 'P_' + name 字串聯合。
  */
-export const BASE_STAT_COMP_NAMES: Record<string, { battle: string; comp: string }> = {
-	str: { battle: 'STR', comp: 'P_STR' },
-	int: { battle: 'INT', comp: 'P_INT' },
-	dex: { battle: 'DEX', comp: 'P_DEX' },
-	spd: { battle: 'SPD', comp: 'P_SPD' },
-	luk: { battle: 'LUK', comp: 'P_LUK' },
+export const BASE_STAT_COMP_NAMES = {
+	str: { battle: EnumStatusAttr.STR, comp: `${EnumStatusPrefix.Comp}${EnumStatusAttr.STR}` },
+	int: { battle: EnumStatusAttr.INT, comp: `${EnumStatusPrefix.Comp}${EnumStatusAttr.INT}` },
+	dex: { battle: EnumStatusAttr.DEX, comp: `${EnumStatusPrefix.Comp}${EnumStatusAttr.DEX}` },
+	spd: { battle: EnumStatusAttr.SPD, comp: `${EnumStatusPrefix.Comp}${EnumStatusAttr.SPD}` },
+	luk: { battle: EnumStatusAttr.LUK, comp: `${EnumStatusPrefix.Comp}${EnumStatusAttr.LUK}` },
 } as const;
-
-/**
- * 從 STATUS_ATTR_KEYS 衍生 Up 鍵名陣列 / Up key names array derived from STATUS_ATTR_KEYS
- */
-export const STATUS_UP_KEYS = Object.values(STATUS_UP_KEY_NAME) as string[];
-
-/**
- * 從 STATUS_ATTR_KEYS 衍生 Down 鍵名陣列 / Down key names array derived from STATUS_ATTR_KEYS
- */
-export const STATUS_DOWN_KEYS = Object.values(STATUS_DOWN_KEY_NAME) as string[];
-
-/**
- * 從 STATUS_ATTR_KEYS 衍生 Plus 鍵名陣列 / Plus key names array derived from STATUS_ATTR_KEYS
- */
-export const STATUS_PLUS_KEYS = Object.values(STATUS_PLUS_KEY_NAME) as string[];
 
 /**
  * 取得 Up 鍵名 / Get Up key name
  * @param key 狀態屬性鍵 / status attribute key
  * @returns 對應的 Up 鍵名 / corresponding Up key name
  */
-export function getUpKey(key: EnumStatusAttr): string
+export function getUpKey(key: EnumStatusAttr)
 {
-	return STATUS_UP_KEY_NAME[key as keyof typeof STATUS_UP_KEY_NAME] ?? `${STATUS_UP_PREFIX}${key}`;
+	return STATUS_UP_KEY_NAME[key] ?? `${EnumStatusPrefix.Up}${key}`;
 }
 
 /**
  * 取得 Down 鍵名 / Get Down key name
  */
-export function getDownKey(key: EnumStatusAttr): string
+export function getDownKey(key: EnumStatusAttr)
 {
-	return STATUS_DOWN_KEY_NAME[key as keyof typeof STATUS_DOWN_KEY_NAME] ?? `${STATUS_DOWN_PREFIX}${key}`;
+	return STATUS_DOWN_KEY_NAME[key] ?? `${EnumStatusPrefix.Down}${key}`;
 }
 
 /**
  * 取得 Plus 鍵名 / Get Plus key name
  */
-export function getPlusKey(key: EnumStatusAttr): string
+export function getPlusKey(key: EnumStatusAttr)
 {
-	return STATUS_PLUS_KEY_NAME[key as keyof typeof STATUS_PLUS_KEY_NAME] ?? `${STATUS_PLUS_PREFIX}${key}`;
+	return STATUS_PLUS_KEY_NAME[key] ?? `${EnumStatusPrefix.Plus}${key}`;
 }
 
 /**
@@ -128,7 +117,7 @@ export function getPlusKey(key: EnumStatusAttr): string
  * @param key 基礎屬性鍵 / base stat key
  * @returns 補正欄位名稱（如 'P_STR'）/ compensation field name (e.g., 'P_STR')
  */
-export function getCompFieldName(key: string): string
+export function getCompFieldName(key: keyof typeof BASE_STAT_COMP_NAMES)
 {
-	return BASE_STAT_COMP_NAMES[key as keyof typeof BASE_STAT_COMP_NAMES]?.comp ?? `${COMP_PREFIX}${key.toUpperCase()}`;
+	return BASE_STAT_COMP_NAMES[key]?.comp ?? `${EnumStatusPrefix.Comp}${key.toUpperCase()}`;
 }
