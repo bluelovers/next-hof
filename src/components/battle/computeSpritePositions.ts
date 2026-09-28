@@ -184,6 +184,7 @@ function computeRowPositions(
 			y,
 			flipped,
 			imageSize: char.imageSize,
+			side: char.side,
 		};
 	});
 }

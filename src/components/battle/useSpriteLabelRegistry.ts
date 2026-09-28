@@ -18,7 +18,7 @@ import {
 	type ISpriteLabelPositionResult,
 	type IRect,
 } from './labelPosition';
-import { EnumSpriteLabelPlacement } from './enums';
+import { EnumSpriteLabelPlacement, EnumTeamSideUI } from './enums';
 
 /** 單一精靈的標籤運算輸入 / Per-sprite label compute input */
 export interface ISpriteLabelComputeInput
@@ -33,6 +33,12 @@ export interface ISpriteLabelComputeInput
 	placement?: EnumSpriteLabelPlacement;
 	/** 戰鬥單位實例 uid（用於對應 entries）/ Battle-unit instance uid (for matching entries) */
 	unitUuid?: string;
+	/**
+	 * 隊伍側（選填；防重疊只避開同側標籤，讓敵方標籤不會把自己推離角色）
+	 * Team side (optional; anti-overlap only avoids same-side labels, so an opposing
+	 * label never pushes this one away from its character)
+	 */
+	side?: EnumTeamSideUI;
 }
 
 /** 暫存結果項目 / Cached result entry */
@@ -77,22 +83,28 @@ export function useSpriteLabelRegistry(
 	const entries = useMemo(() =>
 	{
 		/**
-		 * 依序計算；每個標籤都把「前面已放置的矩形」納入 occupied，從而避免與既有標籤重疊
-		 * Compute in order; each label feeds the previously placed rects as `occupied`, avoiding overlap.
+		 * 依序計算；每個標籤只把「同側已放置的矩形」納入 occupied，避免與既有標籤重疊，
+		 * 且敵方標籤不會把自己推離角色（各自貼齊自己的角色底部）
+		 * Compute in order; each label only feeds the previously placed rects of the SAME
+		 * side as `occupied`, avoiding overlap without letting an opposing label shove it
+		 * away from its own character.
 		 */
-		const occupied: IRect[] = [];
+		const placed: { rect: IRect; side?: EnumTeamSideUI }[] = [];
 		return sprites.map((s, i) =>
 		{
 			const imageSize = s.imageSize ?? DEFAULT_IMAGE_SIZE;
+			const sameSideOccupied = placed
+				.filter((p) => p.side === s.side)
+				.map((p) => p.rect);
 			const pos = computeSpriteLabelPosition({
 				x: s.x,
 				y: s.y,
 				imageSize,
 				placement: s.placement ?? EnumSpriteLabelPlacement.Below,
 				frameSize,
-				occupied,
+				occupied: sameSideOccupied,
 			});
-			occupied.push(pos.rect);
+			placed.push({ rect: pos.rect, side: s.side });
 			return { unitUuid: s.unitUuid ?? String(i), rect: pos.rect, pos };
 		});
 	}, [sprites, frameSize.width, frameSize.height]);

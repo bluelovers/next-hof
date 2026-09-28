@@ -119,6 +119,12 @@ export interface IBattleSprite extends IStyleProps
 	imageSize?: ISpriteImageSize;
 	/** 角色名稱 / Character name */
 	name?: string;
+	/**
+	 * 隊伍側（選填；標籤防重疊只避開同側標籤，避免被敵方標籤推離角色）
+	 * Team side (optional; label anti-overlap only avoids same-side labels, so an
+	 * opposing team's label never pushes this one away from its character)
+	 */
+	side?: EnumTeamSideUI;
 	/** 名稱標籤自訂樣式（可複寫或追加） / Custom name label style */
 	labelStyle?: CSSProperties;
 	/** 名稱標籤演算法（角色上方 / 下方；預設 below） / Name-label placement */

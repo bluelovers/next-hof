@@ -161,6 +161,7 @@ export const BattleFieldSpriteLayers: React.FC<IBattleFieldSpriteLayersProps> = 
 				imageSize: s.imageSize,
 				placement: s.placement,
 				unitUuid: s.unitUuid ?? String(i),
+				side: s.side,
 			})),
 		[sprites],
 	);
