@@ -45,7 +45,7 @@
 	   Two layers: dark offset shadow + a bright glow (improves contrast on the dark background). */
 	--sprite-drop-shadow:
 		drop-shadow(2px 5px 1px rgba(0, 0, 0, 0.3))
-		drop-shadow(0 0 1px rgba(189, 200, 215, 0.25));
+		drop-shadow(0 0 1px rgba(189, 200, 215, 0.15));
 
 	/* ---- 屬性色 / Attribute colors ---- */
 	--color-dmg: #cc3300;
