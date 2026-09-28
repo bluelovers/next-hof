@@ -8,7 +8,16 @@ import { EnumPosition } from '../constants';
 import type { Character } from '../character/Character';
 import { charIdToString } from '../character/Character';
 import { hpDamage, hpRecover, getPoison, getPoisonResist } from '../character/status';
-import { UPMAP, DOWNMAP, PLUSMAP, STATUS_UP_KEYS, STATUS_DOWN_KEYS, STATUS_PLUS_KEYS, EnumAtkSlot, EnumDefSlot } from '../character/status-attrs';
+import {
+	UPMAP,
+	DOWNMAP,
+	PLUSMAP,
+	STATUS_UP_KEYS,
+	STATUS_DOWN_KEYS,
+	STATUS_PLUS_KEYS,
+	EnumAtkSlot,
+	EnumDefSlot,
+} from '../character/status-attrs';
 import type { IStatusUpKey, IStatusDownKey, IStatusPlusKey } from '../character/status-attrs';
 import type { ISkillDef, IBattleEvent } from '../types';
 import { EnumInfluence, EnumBattleEventType, EnumMoveText, EnumSkillDamageType } from '../types';
@@ -393,15 +402,17 @@ export function applyDamage(skill: ISkillDef, user: Character, target: Character
 	const applied = hpDamage(target, dmg);
 	return {
 		damage: applied,
-		events: [{
-			type: EnumBattleEventType.Damage,
-			actor: charIdToString(user.no),
-			target: charIdToString(target.no),
-			skill: skill.no,
-			value: applied,
-			hpBefore,
-			hpAfter: target.HP,
-		}],
+		events: [
+			{
+				type: EnumBattleEventType.Damage,
+				actor: charIdToString(user.no),
+				target: charIdToString(target.no),
+				skill: skill.no,
+				value: applied,
+				hpBefore,
+				hpAfter: target.HP,
+			},
+		],
 	};
 }
 

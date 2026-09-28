@@ -30,6 +30,7 @@ import {
  * Static lookups from EnumStatusPrefix + EnumStatusAttr produce Up* /Down* /Plus* keys,
  * eliminating string concatenation ('Up'+key, 'P_'+name) at call sites.
  */
+
 // ============================================================================
 
 /**
@@ -136,6 +137,7 @@ export const {
  * 鍵為 EnumStatusAttr；每個屬性描述其角色欄位讀寫與 up/down/plus 語意。
  * DEF/MDEF 的 up/down 採百分比累計，與其他屬性不同，故自定。
  */
+
 // ============================================================================
 
 /**
@@ -296,32 +298,32 @@ const _scaleUp = (orig: number, n: number) => Math.round(orig * (1 + n / 100));
  * Field resolved from STATUS_FIELD by EnumStatusAttr (SSoT; replaces the (get,set) parameters).
  */
 const upAttr = (attr: EnumStatusAttr): IAttrFn => (c, n) =>
-	{
-		const f = STATUS_FIELD[attr];
-		const orig = f.get(c);
-		const cap = orig * (MAX_STATUS_MAXIMUM / 100);
-		f.set(c, Math.min(_scaleUp(orig, n), cap));
-	};
+{
+	const f = STATUS_FIELD[attr];
+	const orig = f.get(c);
+	const cap = orig * (MAX_STATUS_MAXIMUM / 100);
+	f.set(c, Math.min(_scaleUp(orig, n), cap));
+};
 
 /**
  * 通用減益：round(orig*(1-n/100))
  * Generic debuff: round(orig*(1-n/100))
  */
 const downAttr = (attr: EnumStatusAttr): IAttrFn => (c, n) =>
-	{
-		const f = STATUS_FIELD[attr];
-		f.set(c, Math.round(f.get(c) * (1 - n / 100)));
-	};
+{
+	const f = STATUS_FIELD[attr];
+	f.set(c, Math.round(f.get(c) * (1 - n / 100)));
+};
 
 /**
  * 通用加成：orig + n
  * Generic flat bonus: orig + n
  */
 const plusAttr = (attr: EnumStatusAttr): IAttrFn => (c, n) =>
-	{
-		const f = STATUS_FIELD[attr];
-		f.set(c, f.get(c) + n);
-	};
+{
+	const f = STATUS_FIELD[attr];
+	f.set(c, f.get(c) + n);
+};
 
 /**
  * 以下為「自定演算法」：僅 ATK/MATK、DEF/MDEF、MAXHP/MAXSP 需要的特殊 up/down 公式。
@@ -339,21 +341,21 @@ const plusAttr = (attr: EnumStatusAttr): IAttrFn => (c, n) =>
  * Differs from upAttr only by omitting the MAX_STATUS_MAXIMUM cap, hence reuses the same _scaleUp.
  */
 const upNoCap = (attr: EnumStatusAttr): IAttrFn => (c, n) =>
-	{
-		const f = STATUS_FIELD[attr];
-		f.set(c, _scaleUp(f.get(c), n));
-	};
+{
+	const f = STATUS_FIELD[attr];
+	f.set(c, _scaleUp(f.get(c), n));
+};
 
 /**
  * 減傷率增益：填補剩餘空間的 n%（(100 - 現值) * n/100，不超過 100）。DEF/MDEF 共用。
  * Reduction-% up: fills n% of the remaining room toward 100% (never exceeds 100%). Shared by DEF/MDEF.
  */
 const upDefPct = (attr: EnumStatusAttr): IAttrFn => (c, n) =>
-	{
-		const f = STATUS_FIELD[attr];
-		const cur = f.get(c);
-		f.set(c, cur + Math.floor((100 - cur) * (n / 100)));
-	};
+{
+	const f = STATUS_FIELD[attr];
+	const cur = f.get(c);
+	f.set(c, cur + Math.floor((100 - cur) * (n / 100)));
+};
 
 /**
  * 上限減益 + 夾制當前值：round(cap*(1-n/100))，並將當前 HP/SP 壓低至新上限（MAXHP/MAXSP 共用）。
@@ -362,14 +364,14 @@ const upDefPct = (attr: EnumStatusAttr): IAttrFn => (c, n) =>
  * The debuff body reuses the generic downAttr (SSoT; no longer a separate duplicate of downAttr).
  */
 const downCapClamp = (attr: EnumStatusAttr): IAttrFn => (c, n) =>
-	{
-		downAttr(attr)(c, n);
-		const vital = CAP_VITAL[attr];
-		if (vital === undefined) return;
-		const cap = STATUS_FIELD[attr].get(c);
-		const cur = VITAL_FIELD[vital].get(c);
-		if (cur > cap) VITAL_FIELD[vital].set(c, cap);
-	};
+{
+	downAttr(attr)(c, n);
+	const vital = CAP_VITAL[attr];
+	if (vital === undefined) return;
+	const cap = STATUS_FIELD[attr].get(c);
+	const cur = VITAL_FIELD[vital].get(c);
+	if (cur > cap) VITAL_FIELD[vital].set(c, cap);
+};
 
 /**
  * 狀態屬性項目工廠（單一事實來源）/ Status attribute entry factory (single source of truth)
@@ -423,13 +425,27 @@ export const STATUS_ATTR_TABLE: Record<EnumStatusAttr, IStatusAttrEntry> = {
 	/**
 	 * DEF/MDEF 採百分比累計 up/down（對齊原始 UpDEF/DownDEF）/ %-based up/down (mirrors UpDEF/DownDEF)
 	 */
-	[EnumStatusAttr.DEF]: _makeAttr(EnumStatusAttr.DEF, { up: upDefPct(EnumStatusAttr.DEF), down: downAttr(EnumStatusAttr.DEF) }),
-	[EnumStatusAttr.MDEF]: _makeAttr(EnumStatusAttr.MDEF, { up: upDefPct(EnumStatusAttr.MDEF), down: downAttr(EnumStatusAttr.MDEF) }),
+	[EnumStatusAttr.DEF]: _makeAttr(EnumStatusAttr.DEF, {
+		up: upDefPct(EnumStatusAttr.DEF),
+		down: downAttr(EnumStatusAttr.DEF),
+	}),
+	[EnumStatusAttr.MDEF]: _makeAttr(EnumStatusAttr.MDEF, {
+		up: upDefPct(EnumStatusAttr.MDEF),
+		down: downAttr(EnumStatusAttr.MDEF),
+	}),
 	/**
 	 * MAXHP/MAXSP：無上限增益；減益夾制當前 HP/SP（對齊原始 UpMAXHP/DownMAXHP）/ uncapped buff; debuff clamps current HP/SP
 	 */
-	[EnumStatusAttr.MAXHP]: _makeAttr(EnumStatusAttr.MAXHP, { up: upNoCap(EnumStatusAttr.MAXHP), down: downCapClamp(EnumStatusAttr.MAXHP), plus: true }),
-	[EnumStatusAttr.MAXSP]: _makeAttr(EnumStatusAttr.MAXSP, { up: upNoCap(EnumStatusAttr.MAXSP), down: downCapClamp(EnumStatusAttr.MAXSP), plus: true }),
+	[EnumStatusAttr.MAXHP]: _makeAttr(EnumStatusAttr.MAXHP, {
+		up: upNoCap(EnumStatusAttr.MAXHP),
+		down: downCapClamp(EnumStatusAttr.MAXHP),
+		plus: true,
+	}),
+	[EnumStatusAttr.MAXSP]: _makeAttr(EnumStatusAttr.MAXSP, {
+		up: upNoCap(EnumStatusAttr.MAXSP),
+		down: downCapClamp(EnumStatusAttr.MAXSP),
+		plus: true,
+	}),
 };
 
 /**

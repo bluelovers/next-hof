@@ -79,7 +79,12 @@ export const poorTeamStatus = { teamName: 'Beggars', funds: 50, timeCurrent: 100
 export const timeDepletedStatus = { teamName: 'LateComers', funds: 5000, timeCurrent: 0, timeMax: 1000 };
 
 /** 長隊名 / Long team name */
-export const longNameStatus = { teamName: 'VeryLongTeamNameForTesting', funds: 1234567, timeCurrent: 500, timeMax: 1000 };
+export const longNameStatus = {
+	teamName: 'VeryLongTeamNameForTesting',
+	funds: 1234567,
+	timeCurrent: 500,
+	timeMax: 1000,
+};
 
 /** 初始隊伍 / Starting team */
 export const startingTeamStatus = { teamName: 'NewTeam', funds: 10000, timeCurrent: 1000, timeMax: 1000 };

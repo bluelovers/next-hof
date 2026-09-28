@@ -65,12 +65,20 @@ import {
 } from '../character/status';
 import { DOWNMAP, UPMAP } from '../character/status-attrs';
 import type { IBattleEvent, ISkillDef } from '../types';
-import { EnumBattleEventType, EnumInfoText, EnumMoveText, EnumResource, EnumSkillPriority, EnumValueWho } from '../types';
+import {
+	EnumBattleEventType,
+	EnumInfoText,
+	EnumMoveText,
+	EnumResource,
+	EnumSkillPriority,
+	EnumValueWho,
+} from '../types';
 import type { IDamageOption, ISkillResult } from './effect';
 import { applyDamage, applySkill, barrierGuard, calcBasicDamage, calcRecoveryValue, statusChanges } from './effect';
 
 /** Move 事件的 `text` 使用 EnumMoveText（展示層依 token 對照 EnumLogCopy 的位移成員）/
  * Move event `text` uses EnumMoveText (the display maps the token to EnumLogCopy's movement members) */
+
 /** Info 事件的 `text` 使用 EnumInfoText（展示層依 token 選 EnumLogCopy 成員或 buildXxx 建構器）/
  * Info event `text` uses EnumInfoText (the display picks an EnumLogCopy member or a buildXxx builder per token) */
 
@@ -683,7 +691,9 @@ export class SkillEffect
 				const want = target.behavior?.position;
 				if (want !== undefined && target.POSITION !== want)
 				{
-					this.moveUnit(events, skill, char, target, want, want === EnumPosition.Front ? EnumMoveText.Front : EnumMoveText.Back);
+					this.moveUnit(events, skill, char, target, want, want === EnumPosition.Front
+						? EnumMoveText.Front
+						: EnumMoveText.Back);
 				}
 				return { events };
 			}
@@ -969,24 +979,28 @@ export class SkillEffect
 		const no = charIdToString(target.no);
 		if (target.STATE === EnumState.Dead)
 		{
-			const events: IBattleEvent[] = [{
-				type: EnumBattleEventType.Revive,
-				actor: no,
-				target: no,
-				skill: skill.no,
-			}];
+			const events: IBattleEvent[] = [
+				{
+					type: EnumBattleEventType.Revive,
+					actor: no,
+					target: no,
+					skill: skill.no,
+				},
+			];
 			getNormal(target);
 			return events;
 		}
 		if (target.STATE === EnumState.Poison)
 		{
-			const events: IBattleEvent[] = [{
-				type: EnumBattleEventType.Poison,
-				actor: no,
-				target: no,
-				skill: skill.no,
-				text: 'cured',
-			}];
+			const events: IBattleEvent[] = [
+				{
+					type: EnumBattleEventType.Poison,
+					actor: no,
+					target: no,
+					skill: skill.no,
+					text: 'cured',
+				},
+			];
 			getNormal(target);
 			return events;
 		}

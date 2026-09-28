@@ -215,7 +215,10 @@ export const statChangeAction: IBattleAction = {
 	type: EnumActionType.StatChange,
 	source: Mage1,
 	text: buildStatToText(EnumStatusAttr.MAXSP, EnumStatDirection.Extended, 400),
-	message: buildActionMessage({ source: Mage1, text: buildStatToText(EnumStatusAttr.MAXSP, EnumStatDirection.Extended, 400) }),
+	message: buildActionMessage({
+		source: Mage1,
+		text: buildStatToText(EnumStatusAttr.MAXSP, EnumStatDirection.Extended, 400),
+	}),
 	attribute: EnumAttributeType.Normal,
 };
 

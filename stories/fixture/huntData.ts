@@ -17,25 +17,50 @@ export const grassArea: IHuntAreaData = { name: 'GoblinField', land: 'gb0', leve
 export const caveArea: IHuntAreaData = { name: 'DarkCave', land: 'cave01', levelRange: 'Lv10-20', landType: 'cave' };
 
 /** 雪地獵區 / Snow terrain area */
-export const snowArea: IHuntAreaData = { name: 'FrozenTundra', land: 'snow01', levelRange: 'Lv30-40', landType: 'snow' };
+export const snowArea: IHuntAreaData = {
+	name: 'FrozenTundra',
+	land: 'snow01',
+	levelRange: 'Lv30-40',
+	landType: 'snow',
+};
 
 /** 沙漠獵區 / Desert terrain area */
-export const desertArea: IHuntAreaData = { name: 'ScorchedDesert', land: 'des01', levelRange: 'Lv5-10', landType: 'sand' };
+export const desertArea: IHuntAreaData = {
+	name: 'ScorchedDesert',
+	land: 'des01',
+	levelRange: 'Lv5-10',
+	landType: 'sand',
+};
 
 /** 熔岩獵區 / Lava terrain area */
 export const lavaArea: IHuntAreaData = { name: 'VolcanoCore', land: 'volc01', levelRange: 'Lv50-70', landType: 'lava' };
 
 /** 沼地獵區 / Swamp terrain area */
-export const swampArea: IHuntAreaData = { name: 'PoisonMarsh', land: 'swamp01', levelRange: 'Lv15-25', landType: 'swamp' };
+export const swampArea: IHuntAreaData = {
+	name: 'PoisonMarsh',
+	land: 'swamp01',
+	levelRange: 'Lv15-25',
+	landType: 'swamp',
+};
 
 /** 海洋獵區 / Ocean terrain area */
 export const oceanArea: IHuntAreaData = { name: 'DeepSea', land: 'ocean01', levelRange: 'Lv35-55', landType: 'ocean0' };
 
 /** 廢墟獵區 / Abandoned terrain area */
-export const abandonedArea: IHuntAreaData = { name: 'RuinedCity', land: 'blow01', levelRange: 'Lv20-30', landType: 'aband' };
+export const abandonedArea: IHuntAreaData = {
+	name: 'RuinedCity',
+	land: 'blow01',
+	levelRange: 'Lv20-30',
+	landType: 'aband',
+};
 
 /** 高山獵區 / Mountain terrain area */
-export const mountainArea: IHuntAreaData = { name: 'RockyPeak', land: 'mt01', levelRange: 'Lv25-35', landType: 'mount' };
+export const mountainArea: IHuntAreaData = {
+	name: 'RockyPeak',
+	land: 'mt01',
+	levelRange: 'Lv25-35',
+	landType: 'mount',
+};
 
 /** 無背景獵區（fallback） / No-background area (fallback) */
 export const unknownArea: IHuntAreaData = { name: 'UnknownArea', land: 'unknown01', levelRange: 'Lv??' };

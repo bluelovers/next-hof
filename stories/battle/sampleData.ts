@@ -107,6 +107,7 @@ export function createSampleConfig(
 /**
  * 自動產生位置（展示版本）/ Auto-positioned (demo version)
  */
+
 // ============================================================================
 
 /** 名冊角色（不含尺寸，位置由 computeBattleSpritePositions 計算） / Roster char (no size; position computed) */

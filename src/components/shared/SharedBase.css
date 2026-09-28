@@ -38,7 +38,7 @@
 	--color-accent-gold-bright: #ffcc33;
 
 	/* ---- 特效 / Visual effects ---- */
-	
+
 	/* 精靈通用投影（BattleFieldSpriteLayers / MagicCircle / CharacterSprite 共用）
 	   Shared sprite drop-shadow used by BattleFieldSpriteLayers / MagicCircle / CharacterSprite */
 	--sprite-drop-shadow: drop-shadow(2px 5px 1px rgba(0, 0, 0, 0.3));

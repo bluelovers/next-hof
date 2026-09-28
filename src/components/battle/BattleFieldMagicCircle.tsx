@@ -57,5 +57,5 @@ export const BattleFieldMagicCircle: React.FC<IBattleMagicCircleProps> = ({
 	};
 
 	return <div id={id} className={className ? `battle-magic-circle ${className}` : 'battle-magic-circle'}
-	            style={mergedStyle} />;
+							style={mergedStyle} />;
 };

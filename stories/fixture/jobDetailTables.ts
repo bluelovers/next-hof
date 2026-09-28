@@ -22,9 +22,9 @@ export const mixedJobs: IJobData[] = [
 		spriteUrls: [spriteUrlByFile('mon_216.png'), spriteUrlByFile('mon_216y.png')],
 		equipment: ['Dagger', 'Bow', 'Armor', 'Cloth', 'Item'],
 		skills: [
-		skills.arrowRain,
-		skills.eagleEye,
-	],
+			skills.arrowRain,
+			skills.eagleEye,
+		],
 	},
 ];
 
@@ -38,14 +38,14 @@ export const highSkillJob: IJobData[] = [
 		spriteUrls: [spriteUrlByFile('mon_999.png'), spriteUrlByFile('mon_999r.png')],
 		equipment: ['All'],
 		skills: [
-		skills.fire,
-		skills.ice,
-		skills.lightning,
-		skills.heal,
-		skills.cure,
-		skills.revive,
-		skills.buff,
-		skills.debuff,
-	],
+			skills.fire,
+			skills.ice,
+			skills.lightning,
+			skills.heal,
+			skills.cure,
+			skills.revive,
+			skills.buff,
+			skills.debuff,
+		],
 	},
 ];

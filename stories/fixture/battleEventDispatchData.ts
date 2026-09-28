@@ -271,7 +271,13 @@ const skillEffectEvents: IBattleEvent[] = [
 	/**
 	 * 位移不入 EVENT_EFFECT → 一般事件 / a row move stays out of EVENT_EFFECT → a general event
 	 */
-	{ type: EnumBattleEventType.Move, actor: 'Warrior', target: monsterSprites.goblinAxe.name, skill: soulLeech.no, text: EnumMoveText.Front },
+	{
+		type: EnumBattleEventType.Move,
+		actor: 'Warrior',
+		target: monsterSprites.goblinAxe.name,
+		skill: soulLeech.no,
+		text: EnumMoveText.Front,
+	},
 
 	{ type: EnumBattleEventType.Act, actor: 'Priest', skill: soulBless.no },
 	/**
@@ -287,7 +293,14 @@ const skillEffectEvents: IBattleEvent[] = [
 		hpBefore: 60,
 		hpAfter: 90,
 	},
-	{ type: EnumBattleEventType.Regen, actor: 'Priest', target: 'Priest', skill: soulBless.no, value: 15, unit: EnumResource.Sp },
+	{
+		type: EnumBattleEventType.Regen,
+		actor: 'Priest',
+		target: 'Priest',
+		skill: soulBless.no,
+		value: 15,
+		unit: EnumResource.Sp,
+	},
 	{ type: EnumBattleEventType.Revive, actor: 'Priest', target: characterSprites.hero.name, skill: soulBless.no },
 	// ---- 增益系統：加速／施法縮短／障壁／上限變化／HP-SP 交換 ----
 	/**

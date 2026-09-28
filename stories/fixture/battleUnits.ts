@@ -46,7 +46,14 @@ export const downedUnit: IBattleUnit = {
 
 /** 詠唱中 / Casting */
 export const castingUnit: IBattleUnit = {
-	name: Mage1, level: 3, hp: 159, maxHp: 159, sp: 80, maxSp: 112, side: EnumTeamSideUI.Left, status: EnumUnitStatus.Casting,
+	name: Mage1,
+	level: 3,
+	hp: 159,
+	maxHp: 159,
+	sp: 80,
+	maxSp: 112,
+	side: EnumTeamSideUI.Left,
+	status: EnumUnitStatus.Casting,
 };
 
 /** SP 不足 / Low SP */
