@@ -2,14 +2,20 @@
  * BattleTeamInfo 個別展示
  * BattleTeamInfo individual showcase
  *
- * 隊伍標頭資訊：隊伍名稱、等級總和、平均等級、總 HP
- * Team header info: name, total level, average level, total HP
+ * 隊伍標頭資訊：隊伍名稱、等級總和、平均等級、總 HP（展示資料集中於 fixture）
+ * Team header info: name, total level, average level, total HP (showcase data lives in
+ * the fixture)
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { BattleTeamInfoDarkDecorator } from '../decorators';
 import { BattleTeamInfo } from '../../src/components/battle/BattleTeamInfo';
-import { EnumTeamSideUI, EnumTeamSideClass } from '../../src/components/battle/enums';
+import { EnumTeamSideClass } from '../../src/components/battle/enums';
+import {
+	goblinTeamInfo,
+	testTeamInfo,
+	championTeamInfo,
+} from '../fixture/battleUnits';
 
 const meta: Meta<typeof BattleTeamInfo> = {
 	title: 'Battle/Atoms/BattleTeamInfo',
@@ -28,13 +34,7 @@ type Story = StoryObj<typeof BattleTeamInfo>;
 /** ゴブリン隊伍 / Goblin team */
 export const GoblinTeam: Story = {
 	args: {
-		name: 'ゴブリンと遊ぶ(最弱)',
-		units: [
-			{ name: 'GoblinWarrior(A)', level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: EnumTeamSideUI.Left },
-			{ name: 'GoblinWarrior(B)', level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: EnumTeamSideUI.Left },
-			{ name: 'GoblinWarrior(C)', level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: EnumTeamSideUI.Left },
-			{ name: 'GoblinAxe', level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: EnumTeamSideUI.Left },
-		],
+		...goblinTeamInfo,
 		sideClass: EnumTeamSideClass.Ttd2,
 	},
 };
@@ -42,13 +42,7 @@ export const GoblinTeam: Story = {
 /** TestTeam / Test team */
 export const TestTeam: Story = {
 	args: {
-		name: 'TestTeam',
-		units: [
-			{ name: 'Hero1', level: 3, hp: 349, maxHp: 349, sp: 349, maxSp: 53, side: EnumTeamSideUI.Right },
-			{ name: 'Mage1', level: 3, hp: 159, maxHp: 159, sp: 159, maxSp: 112, side: EnumTeamSideUI.Right },
-			{ name: 'Healer1', level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: EnumTeamSideUI.Right },
-			{ name: 'Priest1', level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: EnumTeamSideUI.Right },
-		],
+		...testTeamInfo,
 		sideClass: EnumTeamSideClass.Ttd1,
 	},
 };
@@ -56,13 +50,7 @@ export const TestTeam: Story = {
 /** 高階玩家隊伍 / High level player team */
 export const HighLevelTeam: Story = {
 	args: {
-		name: 'ChampionGuild',
-		units: [
-			{ name: 'Paladin', level: 99, hp: 9999, maxHp: 9999, sp: 5000, maxSp: 5000, side: EnumTeamSideUI.Right },
-			{ name: 'ArchMage', level: 95, hp: 3200, maxHp: 3200, sp: 8000, maxSp: 8000, side: EnumTeamSideUI.Right },
-			{ name: 'HighPriest', level: 90, hp: 4500, maxHp: 4500, sp: 6000, maxSp: 6000, side: EnumTeamSideUI.Right },
-			{ name: 'Ranger', level: 88, hp: 3800, maxHp: 3800, sp: 4000, maxSp: 4000, side: EnumTeamSideUI.Right },
-		],
+		...championTeamInfo,
 		sideClass: EnumTeamSideClass.Ttd1,
 	},
 };

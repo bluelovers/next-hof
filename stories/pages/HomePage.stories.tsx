@@ -9,6 +9,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { GameLayout } from '../../src/components/pages/GameLayout';
 import { HomePage } from '../../src/components/pages/HomePage';
+import { homeRanking, manyUsersRanking } from '../fixture/homePageData';
 
 /** 使用 GameLayout 包裝的 HomePage / HomePage wrapped in GameLayout */
 const HomePageWithLayout: React.FC<{
@@ -62,11 +63,7 @@ export const Default: Story = {
 /** 有 Ranking 資料 / With ranking data */
 export const WithRanking: Story = {
 	args: {
-		ranking: [
-			{ rank: 1, teamName: 'TestTeam' },
-			{ rank: 2, teamName: 'ゴブリンと遊ぶ' },
-			{ rank: 3, teamName: '勇者パーティー' },
-		],
+		ranking: homeRanking,
 		onlineUsers: 3,
 	},
 	parameters: {
@@ -82,13 +79,7 @@ export const WithRanking: Story = {
 /** 多人上線 / Many users online */
 export const ManyUsers: Story = {
 	args: {
-		ranking: [
-			{ rank: 1, teamName: 'ChampionTeam' },
-			{ rank: 2, teamName: 'DarkKnights' },
-			{ rank: 3, teamName: 'MageGuild' },
-			{ rank: 4, teamName: 'BeastTamer' },
-			{ rank: 5, teamName: 'HolyCrusade' },
-		],
+		ranking: manyUsersRanking,
 		onlineUsers: 128,
 	},
 	parameters: {

@@ -2,13 +2,22 @@
  * NavigationBar Storybook 故事
  * NavigationBar Storybook stories
  *
- * 展示登入後的導航列各種狀態
- * Showcases post-login navigation bar states
+ * 展示登入後的導航列各種狀態（展示資料集中於 fixture）
+ * Showcases post-login navigation bar states (showcase data lives in the fixture)
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { FlushDarkDecorator } from '../decorators';
 import { NavigationBar } from '../../src/components/navigation/NavigationBar';
+import {
+	defaultNavItems,
+	huntActiveNavItems,
+	itemActiveNavItems,
+	townActiveNavItems,
+	settingActiveNavItems,
+	logActiveNavItems,
+	customNavItems,
+} from '../fixture/navData';
 
 /** 背景裝飾器 — 模擬遊戲導航背景 / Navigation background decorator */
 const meta: Meta<typeof NavigationBar> = {
@@ -34,14 +43,7 @@ type Story = StoryObj<typeof meta>;
 /** 預設導航 — Top 為當前頁 / Default nav - Top active */
 export const Default: Story = {
 	args: {
-		items: [
-			{ label: 'Top', href: '#', active: true },
-			{ label: 'Hunt', href: '#' },
-			{ label: 'Item', href: '#' },
-			{ label: 'Town', href: '#' },
-			{ label: 'Setting', href: '#' },
-			{ label: 'Log', href: '#' },
-		],
+		items: defaultNavItems,
 	},
 	parameters: {
 		docs: {
@@ -56,14 +58,7 @@ export const Default: Story = {
 /** 在 Hunt 頁面 / On Hunt page */
 export const HuntActive: Story = {
 	args: {
-		items: [
-			{ label: 'Top', href: '#' },
-			{ label: 'Hunt', href: '#', active: true },
-			{ label: 'Item', href: '#' },
-			{ label: 'Town', href: '#' },
-			{ label: 'Setting', href: '#' },
-			{ label: 'Log', href: '#' },
-		],
+		items: huntActiveNavItems,
 	},
 	parameters: {
 		docs: {
@@ -78,67 +73,35 @@ export const HuntActive: Story = {
 /** 在 Item 頁面 / On Item page */
 export const ItemActive: Story = {
 	args: {
-		items: [
-			{ label: 'Top', href: '#' },
-			{ label: 'Hunt', href: '#' },
-			{ label: 'Item', href: '#', active: true },
-			{ label: 'Town', href: '#' },
-			{ label: 'Setting', href: '#' },
-			{ label: 'Log', href: '#' },
-		],
+		items: itemActiveNavItems,
 	},
 };
 
 /** 在 Town 頁面 / On Town page */
 export const TownActive: Story = {
 	args: {
-		items: [
-			{ label: 'Top', href: '#' },
-			{ label: 'Hunt', href: '#' },
-			{ label: 'Item', href: '#' },
-			{ label: 'Town', href: '#', active: true },
-			{ label: 'Setting', href: '#' },
-			{ label: 'Log', href: '#' },
-		],
+		items: townActiveNavItems,
 	},
 };
 
 /** 在 Setting 頁面 / On Setting page */
 export const SettingActive: Story = {
 	args: {
-		items: [
-			{ label: 'Top', href: '#' },
-			{ label: 'Hunt', href: '#' },
-			{ label: 'Item', href: '#' },
-			{ label: 'Town', href: '#' },
-			{ label: 'Setting', href: '#', active: true },
-			{ label: 'Log', href: '#' },
-		],
+		items: settingActiveNavItems,
 	},
 };
 
 /** 在 Log 頁面 / On Log page */
 export const LogActive: Story = {
 	args: {
-		items: [
-			{ label: 'Top', href: '#' },
-			{ label: 'Hunt', href: '#' },
-			{ label: 'Item', href: '#' },
-			{ label: 'Town', href: '#' },
-			{ label: 'Setting', href: '#' },
-			{ label: 'Log', href: '#', active: true },
-		],
+		items: logActiveNavItems,
 	},
 };
 
 /** 自訂導航項目 / Custom nav items */
 export const CustomItems: Story = {
 	args: {
-		items: [
-			{ label: '🏠 Home', href: '#', active: true },
-			{ label: '⚔️ Battle', href: '#' },
-			{ label: '🎒 Inventory', href: '#' },
-		],
+		items: customNavItems,
 	},
 	parameters: {
 		docs: {

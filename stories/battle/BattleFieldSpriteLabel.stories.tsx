@@ -23,15 +23,17 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { makeStageDecorator, STAGE_BG_COLOR } from '../decorators';
 import {
 	sampleFieldSize,
+	sampleLabelHeroLeft,
+	sampleLabelMageRight,
+	sampleLabelGoblinRight,
 } from './sampleData';
-import { EnumBattleFieldVAlign } from '../../src/components/battle/enums';
+import { EnumBattleFieldVAlign, EnumTeamSideUI, EnumSpriteLabelPlacement } from '../../src/components/battle/enums';
 import {
 	BattleFieldSpriteLabel,
 	type IBattleFieldSpriteLabelProps,
 } from '../../src/components/battle/BattleFieldSpriteLabel';
 import { BattleFieldSpriteFrame } from '../../src/components/battle/BattleFieldSpriteFrame';
 import type { IBattleSprite } from '../../src/components/battle/types';
-import { EnumTeamSideUI, EnumSpriteLabelPlacement } from '../../src/components/battle/enums';
 import { EnumPosition } from '../../src/lib/game/constants';
 import { getSpriteImageSize } from '../../src/components/battle/spriteImageSizes';
 import {
@@ -101,31 +103,6 @@ const makeRender = (char: IStoryRosterChar) => (args: IBattleFieldSpriteLabelPro
 	);
 };
 
-/** 左隊（前/後衛由 position 決定） / Left team (front/back by position) */
-const heroLeft = {
-	unitUuid: 'mon_018',
-	name: 'Hero1',
-	imageUrl: '/image/char/mon_018.png',
-	position: EnumPosition.Back,
-	side: EnumTeamSideUI.Left,
-};
-/** 右隊 char_rev（直接定位於右側，flipped:false） / Right team char_rev (directly on the right, not flipped) */
-const mageRight = {
-	unitUuid: 'mon_018b',
-	name: 'Mage1',
-	imageUrl: '/image/char_rev/mon_018.png',
-	position: EnumPosition.Front,
-	side: EnumTeamSideUI.Right,
-};
-/** 右隊 char（由邏輯推導為 flipped:true，標籤會反向抵消鏡像） / Right team char (logic derives flipped:true; label cancels the mirror) */
-const goblinRight = {
-	unitUuid: 'mon_052',
-	name: 'Goblin',
-	imageUrl: '/image/char/mon_052.png',
-	position: EnumPosition.Front,
-	side: EnumTeamSideUI.Right,
-};
-
 const meta: Meta<typeof BattleFieldSpriteLabel> = {
 	title: 'BattleField/BattleFieldSpriteLabel',
 	component: BattleFieldSpriteLabel,
@@ -165,25 +142,25 @@ type Story = StoryObj<typeof BattleFieldSpriteLabel>;
 /** 預設標籤（左隊角色，角色下方） / Default label (left-team character, below) */
 export const Default: Story = {
 	args: { name: 'Hero1', placement: EnumSpriteLabelPlacement.Below },
-	render: makeRender(heroLeft),
+	render: makeRender(sampleLabelHeroLeft),
 };
 
 /** 左側角色（x 由左隊定位邏輯得出） / Left-side character (x from left-team positioning) */
 export const LeftSideCharacter: Story = {
 	args: { name: 'Hero1', placement: EnumSpriteLabelPlacement.Below },
-	render: makeRender(heroLeft),
+	render: makeRender(sampleLabelHeroLeft),
 };
 
 /** 右側角色（右隊 char_rev 直接定位於右側） / Right-side character (right-team char_rev placed directly on the right) */
 export const RightSideCharacter: Story = {
 	args: { name: 'Mage1', placement: EnumSpriteLabelPlacement.Below },
-	render: makeRender(mageRight),
+	render: makeRender(sampleLabelMageRight),
 };
 
 /** 翻轉角色（右隊 char，flipped 由邏輯推導為 true；標籤反向抵消鏡像保持正向） / Flipped character (right-team char; flipped auto-derived true, label cancels mirror) */
 export const FlippedCharacter: Story = {
 	args: { name: 'Goblin', placement: EnumSpriteLabelPlacement.Below },
-	render: makeRender(goblinRight),
+	render: makeRender(sampleLabelGoblinRight),
 };
 
 /** 複寫樣式（紅色、加大字體） / Overridden style (red, larger font) */
@@ -193,17 +170,17 @@ export const OverrideStyle: Story = {
 		placement: EnumSpriteLabelPlacement.Below,
 		style: { color: '#ff6b6b', fontSize: 16, textShadow: '0 0 6px #000' },
 	},
-	render: makeRender(heroLeft),
+	render: makeRender(sampleLabelHeroLeft),
 };
 
 /** 演算法 1：標籤置於角色上方 / Algorithm 1: label above the character */
 export const AboveCharacter: Story = {
 	args: { name: 'Hero1', placement: EnumSpriteLabelPlacement.Above },
-	render: makeRender(heroLeft),
+	render: makeRender(sampleLabelHeroLeft),
 };
 
 /** 演算法 2：標籤置於角色下方 / Algorithm 2: label below the character */
 export const BelowCharacter: Story = {
 	args: { name: 'Hero1', placement: EnumSpriteLabelPlacement.Below },
-	render: makeRender(heroLeft),
+	render: makeRender(sampleLabelHeroLeft),
 };

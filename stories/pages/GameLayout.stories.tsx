@@ -9,6 +9,7 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { GameLayout } from '../../src/components/pages/GameLayout';
+import { layoutCustomNavLinks } from '../fixture/navData';
 
 /** GameLayout 元件設定 / GameLayout component settings */
 const meta: Meta<typeof GameLayout> = {
@@ -62,12 +63,7 @@ export const CustomNav: Story = {
 				<p>Page with custom navigation links.</p>
 			</div>
 		),
-		navLinks: [
-			{ href: '/home', label: '首頁 / Home' },
-			{ href: '/game', label: '戰鬥 / Battle' },
-			{ href: '/data', label: '數據 / Data' },
-			{ href: '/help', label: '幫助 / Help' },
-		],
+		navLinks: layoutCustomNavLinks,
 	},
 	parameters: {
 		docs: {

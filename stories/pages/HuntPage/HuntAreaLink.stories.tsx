@@ -2,11 +2,25 @@
  * HuntAreaLink Storybook stories
  *
  * Showcases hunting area cards with various terrain backgrounds
+ * （展示資料集中於 fixture / showcase data lives in the fixture）
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { makeFlexDecorator, HuntAreaDarkDecorator } from '../../decorators';
 import { HuntAreaLink } from '../../../src/components/areas/HuntAreaLink';
+import {
+	grassArea,
+	caveArea,
+	snowArea,
+	desertArea,
+	lavaArea,
+	swampArea,
+	oceanArea,
+	abandonedArea,
+	mountainArea,
+	unknownArea,
+	rowMiniAreas,
+} from '../../fixture/huntData';
 
 /** Dark game background decorator */
 const meta: Meta<typeof HuntAreaLink> = {
@@ -22,70 +36,70 @@ type Story = StoryObj<typeof meta>;
 /** Grass terrain */
 export const Grass: Story = {
 	args: {
-		area: { name: 'GoblinField', land: 'gb0', levelRange: 'Lv1-5', landType: 'grass' },
+		area: grassArea,
 	},
 };
 
 /** Cave terrain */
 export const Cave: Story = {
 	args: {
-		area: { name: 'DarkCave', land: 'cave01', levelRange: 'Lv10-20', landType: 'cave' },
+		area: caveArea,
 	},
 };
 
 /** Snow terrain */
 export const Snow: Story = {
 	args: {
-		area: { name: 'FrozenTundra', land: 'snow01', levelRange: 'Lv30-40', landType: 'snow' },
+		area: snowArea,
 	},
 };
 
 /** Desert terrain */
 export const Desert: Story = {
 	args: {
-		area: { name: 'ScorchedDesert', land: 'des01', levelRange: 'Lv5-10', landType: 'sand' },
+		area: desertArea,
 	},
 };
 
 /** Lava terrain */
 export const Lava: Story = {
 	args: {
-		area: { name: 'VolcanoCore', land: 'volc01', levelRange: 'Lv50-70', landType: 'lava' },
+		area: lavaArea,
 	},
 };
 
 /** Swamp terrain */
 export const Swamp: Story = {
 	args: {
-		area: { name: 'PoisonMarsh', land: 'swamp01', levelRange: 'Lv15-25', landType: 'swamp' },
+		area: swampArea,
 	},
 };
 
 /** Ocean terrain */
 export const Ocean: Story = {
 	args: {
-		area: { name: 'DeepSea', land: 'ocean01', levelRange: 'Lv35-55', landType: 'ocean0' },
+		area: oceanArea,
 	},
 };
 
 /** Abandoned terrain */
 export const Abandoned: Story = {
 	args: {
-		area: { name: 'RuinedCity', land: 'blow01', levelRange: 'Lv20-30', landType: 'aband' },
+		area: abandonedArea,
 	},
 };
 
 /** Mountain terrain */
 export const Mountain: Story = {
 	args: {
-		area: { name: 'RockyPeak', land: 'mt01', levelRange: 'Lv25-35', landType: 'mount' },
+		area: mountainArea,
 	},
 };
 
 /** No background (fallback) */
 export const NoBackground: Story = {
 	args: {
-		area: { name: 'UnknownArea', land: 'unknown01', levelRange: 'Lv??' },
+		area: unknownArea,
 	},
 };
 
@@ -94,10 +108,9 @@ export const RowShowcase: Story = {
 	decorators: [makeFlexDecorator({ gap: '10px', flexWrap: 'wrap' })],
 	render: () => (
 		<>
-			<HuntAreaLink area={{ name: 'Grass', land: 'g', levelRange: 'Lv1', landType: 'grass' }} />
-			<HuntAreaLink area={{ name: 'Cave', land: 'c', levelRange: 'Lv5', landType: 'cave' }} />
-			<HuntAreaLink area={{ name: 'Lava', land: 'l', levelRange: 'Lv50', landType: 'lava' }} />
-			<HuntAreaLink area={{ name: 'Sea', land: 's', levelRange: 'Lv10', landType: 'sea' }} />
+			{rowMiniAreas.map((area) => (
+				<HuntAreaLink key={area.land} area={area} />
+			))}
 		</>
 	),
 };

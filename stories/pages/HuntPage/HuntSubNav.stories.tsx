@@ -7,6 +7,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { HuntSubNavDarkDecorator } from '../../decorators';
 import { HuntSubNav } from '../../../src/components/navigation/HuntSubNav';
+import { singleNavItems, threeNavItems, manyNavItems } from '../../fixture/huntData';
 
 /** Dark game background decorator */
 const meta: Meta<typeof HuntSubNav> = {
@@ -27,33 +28,21 @@ export const Default: Story = {
 /** Single item */
 export const SingleItem: Story = {
 	args: {
-		items: [
-			{ label: 'AllMonsters', href: '/battle/list_all', active: true },
-		],
+		items: singleNavItems,
 	},
 };
 
 /** Three items with second active */
 export const ThreeItems: Story = {
 	args: {
-		items: [
-			{ label: 'Easy', href: '/battle/easy' },
-			{ label: 'Normal', href: '/battle/normal', active: true },
-			{ label: 'Hard', href: '/battle/hard' },
-		],
+		items: threeNavItems,
 	},
 };
 
 /** Many items */
 export const ManyItems: Story = {
 	args: {
-		items: [
-			{ label: 'Common', href: '/battle/common', active: true },
-			{ label: 'Rare', href: '/battle/rare' },
-			{ label: 'Elite', href: '/battle/elite' },
-			{ label: 'Boss', href: '/battle/boss' },
-			{ label: 'Event', href: '/battle/event' },
-		],
+		items: manyNavItems,
 	},
 };
 

@@ -15,6 +15,19 @@ import { FacilityGroup } from '../../src/components/facilities/FacilityGroup';
 import { MessageBoard } from '../../src/components/facilities/MessageBoard';
 import type { IFacilityData } from '../../src/components/facilities/TownFacility';
 import type { IMessageBoardProps } from '../../src/components/facilities/MessageBoard';
+import {
+	townMessagesFew,
+	townMessagesMany,
+	shopFacility,
+	buyFacility,
+	japaneseOnlyFacility,
+	iconFacility,
+	shopFacilities,
+	smithyFacilities,
+	recruitFacilities,
+	boardMessagesThree,
+	boardMessagesFive,
+} from '../fixture/townData';
 
 /** ==================== TownPage Stories ==================== */
 
@@ -62,12 +75,7 @@ export const Default: Story = {
 export const WithMessages: Story = {
 	args: {
 		messageBoard: {
-			messages: [
-				'こんにちは！',
-				'今日はいい天気ですね。',
-				'誰かパーティー募集してる？',
-				'ダンジョン攻略情報求む！',
-			],
+			messages: townMessagesFew,
 		},
 	},
 	parameters: {
@@ -84,18 +92,7 @@ export const WithMessages: Story = {
 export const ManyMessages: Story = {
 	args: {
 		messageBoard: {
-			messages: [
-				'こんにちは！',
-				'今日はいい天気ですね。',
-				'誰かパーティー募集してる？',
-				'ダンジョン攻略情報求む！',
-				'鍛冶屋で武器強化したよ！',
-				'オークションでレアアイテム出品中',
-				'コロシアムで対戦相手募集！',
-				'アルバイトの報酬が上がったって',
-				'新キャラ追加されたらしい',
-				'精錬に成功した！やったー！',
-			],
+			messages: townMessagesMany,
 		},
 	},
 };
@@ -113,7 +110,7 @@ const facilityMeta: Meta<typeof TownFacility> = {
 export const ShopLink: StoryObj<typeof TownFacility> = {
 	render: () => (
 		<TownFacility
-			facility={{ name: '店', nameEn: 'Shop', href: '#' }}
+			facility={shopFacility}
 		/>
 	),
 };
@@ -121,7 +118,7 @@ export const ShopLink: StoryObj<typeof TownFacility> = {
 export const Bilingual: StoryObj<typeof TownFacility> = {
 	render: () => (
 		<TownFacility
-			facility={{ name: '買う', nameEn: 'Buy', href: '#' }}
+			facility={buyFacility}
 		/>
 	),
 };
@@ -129,7 +126,7 @@ export const Bilingual: StoryObj<typeof TownFacility> = {
 export const JapaneseOnly: StoryObj<typeof TownFacility> = {
 	render: () => (
 		<TownFacility
-			facility={{ name: 'アルバイト', href: '#' }}
+			facility={japaneseOnlyFacility}
 		/>
 	),
 };
@@ -137,7 +134,7 @@ export const JapaneseOnly: StoryObj<typeof TownFacility> = {
 export const WithIcon: StoryObj<typeof TownFacility> = {
 	render: () => (
 		<TownFacility
-			facility={{ name: 'Shop', icon: '🛒', href: '#' }}
+			facility={iconFacility}
 		/>
 	),
 };
@@ -155,12 +152,7 @@ export const ShopGroup: StoryObj<typeof FacilityGroup> = {
 	render: () => (
 		<FacilityGroup
 			title="店"
-			facilities={[
-				{ name: '店', nameEn: 'Shop', href: '#' },
-				{ name: '買う', nameEn: 'Buy', href: '#' },
-				{ name: '売る', nameEn: 'Sell', href: '#' },
-				{ name: 'アルバイト', href: '#' },
-			]}
+			facilities={shopFacilities}
 		/>
 	),
 };
@@ -169,11 +161,7 @@ export const SmithyGroup: StoryObj<typeof FacilityGroup> = {
 	render: () => (
 		<FacilityGroup
 			title="鍛冶"
-			facilities={[
-				{ name: '鍛冶屋', nameEn: 'Smithy', href: '#' },
-				{ name: '精錬工房', nameEn: 'Refine', href: '#' },
-				{ name: '製作工房', nameEn: 'Create', href: '#' },
-			]}
+			facilities={smithyFacilities}
 		/>
 	),
 };
@@ -182,9 +170,7 @@ export const SingleFacility: StoryObj<typeof FacilityGroup> = {
 	render: () => (
 		<FacilityGroup
 			title="人材"
-			facilities={[
-				{ name: '人材斡旋所', nameEn: 'Recruit', href: '#' },
-			]}
+			facilities={recruitFacilities}
 		/>
 	),
 };
@@ -205,11 +191,7 @@ export const EmptyBoard: StoryObj<typeof MessageBoard> = {
 export const BoardWithMessages: StoryObj<typeof MessageBoard> = {
 	render: () => (
 		<MessageBoard
-			messages={[
-				'こんにちは！',
-				'今日はいい天気ですね。',
-				'コロシアムで対戦相手募集！',
-			]}
+			messages={boardMessagesThree}
 		/>
 	),
 };
@@ -217,13 +199,7 @@ export const BoardWithMessages: StoryObj<typeof MessageBoard> = {
 export const BoardManyMessages: StoryObj<typeof MessageBoard> = {
 	render: () => (
 		<MessageBoard
-			messages={[
-				'メッセージ1: こんにちは！',
-				'メッセージ2: パーティー募集！',
-				'メッセージ3: アイテム交換したい',
-				'メッセージ4: ダンジョン攻略情報',
-				'メッセージ5: 鍛冶屋おすすめ',
-			]}
+			messages={boardMessagesFive}
 		/>
 	),
 };

@@ -9,6 +9,14 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { FlushDarkDecorator } from '../decorators';
 import { TeamStatus } from '../../src/components/info/TeamStatus';
+import {
+	defaultTeamStatus,
+	richTeamStatus,
+	poorTeamStatus,
+	timeDepletedStatus,
+	longNameStatus,
+	startingTeamStatus,
+} from '../fixture/homePageData';
 
 /** 背景裝飾器 / Background decorator */
 const meta: Meta<typeof TeamStatus> = {
@@ -33,12 +41,7 @@ type Story = StoryObj<typeof meta>;
 
 /** 預設狀態 / Default state */
 export const Default: Story = {
-	args: {
-		teamName: 'TestTeam',
-		funds: 43080,
-		timeCurrent: 1000,
-		timeMax: 1000,
-	},
+	args: defaultTeamStatus,
 	parameters: {
 		docs: {
 			description: {
@@ -51,12 +54,7 @@ export const Default: Story = {
 
 /** 資金充足 / Rich team */
 export const RichTeam: Story = {
-	args: {
-		teamName: 'GoldMasters',
-		funds: 99999999,
-		timeCurrent: 980,
-		timeMax: 1000,
-	},
+	args: richTeamStatus,
 	parameters: {
 		docs: {
 			description: {
@@ -69,12 +67,7 @@ export const RichTeam: Story = {
 
 /** 資金不足 / Poor team */
 export const PoorTeam: Story = {
-	args: {
-		teamName: 'Beggars',
-		funds: 50,
-		timeCurrent: 100,
-		timeMax: 1000,
-	},
+	args: poorTeamStatus,
 	parameters: {
 		docs: {
 			description: {
@@ -87,12 +80,7 @@ export const PoorTeam: Story = {
 
 /** 時間耗盡 / Time depleted */
 export const TimeDepleted: Story = {
-	args: {
-		teamName: 'LateComers',
-		funds: 5000,
-		timeCurrent: 0,
-		timeMax: 1000,
-	},
+	args: timeDepletedStatus,
 	parameters: {
 		docs: {
 			description: {
@@ -105,12 +93,7 @@ export const TimeDepleted: Story = {
 
 /** 長隊名 / Long team name */
 export const LongTeamName: Story = {
-	args: {
-		teamName: 'VeryLongTeamNameForTesting',
-		funds: 1234567,
-		timeCurrent: 500,
-		timeMax: 1000,
-	},
+	args: longNameStatus,
 	parameters: {
 		docs: {
 			description: {
@@ -123,12 +106,7 @@ export const LongTeamName: Story = {
 
 /** 初始隊伍 / Starting team */
 export const StartingTeam: Story = {
-	args: {
-		teamName: 'NewTeam',
-		funds: 10000,
-		timeCurrent: 1000,
-		timeMax: 1000,
-	},
+	args: startingTeamStatus,
 	parameters: {
 		docs: {
 			description: {

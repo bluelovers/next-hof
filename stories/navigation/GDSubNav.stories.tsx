@@ -2,13 +2,15 @@
  * GDSubNav Storybook 故事
  * GDSubNav Storybook stories
  *
- * 展示 GameDataPage 子導航組件的各種配置
+ * 展示 GameDataPage 子導航組件的各種配置（展示資料集中於 fixture）
  * Showcases GameDataPage sub-navigation component in various configurations
+ * (showcase data lives in the fixture)
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { makeCenteredDecorator, CENTERED_MAX_WIDTH, GDSubNavDarkDecorator } from '../decorators';
 import { GDSubNav } from '../../src/components/navigation/GDSubNav';
+import { customSubLinks, minimalSubLinks, longSubLinks } from '../fixture/navData';
 
 /** 背景裝飾器 — 模擬遊戲深色背景 / Dark game background decorator */
 const meta: Meta<typeof GDSubNav> = {
@@ -48,12 +50,7 @@ export const Default: Story = {
 /** 自訂導航連結 / Custom navigation links */
 export const CustomLinks: Story = {
 	args: {
-		subLinks: [
-			{ label: '職業(Job)', href: 'http://127.0.0.1:8085/gamedata/job' },
-			{ label: '技能(Skill)', href: 'http://127.0.0.1:8085/gamedata/skill' },
-			{ label: '裝備(Equipment)', href: 'http://127.0.0.1:8085/gamedata/equipment' },
-			{ label: '場景(Scene)', href: 'http://127.0.0.1:8085/gamedata/scene' },
-		],
+		subLinks: customSubLinks,
 	},
 	parameters: {
 		docs: {
@@ -69,10 +66,7 @@ export const CustomLinks: Story = {
 /** 最少連結 / Minimal links */
 export const MinimalLinks: Story = {
 	args: {
-		subLinks: [
-			{ label: '職', href: 'http://127.0.0.1:8085/gamedata/job' },
-			{ label: '物', href: 'http://127.0.0.1:8085/gamedata/item' },
-		],
+		subLinks: minimalSubLinks,
 	},
 	parameters: {
 		docs: {
@@ -88,12 +82,7 @@ export const MinimalLinks: Story = {
 /** 長標籤連結 / Long label links */
 export const LongLabels: Story = {
 	args: {
-		subLinks: [
-			{ label: '職業情報(Job Info)', href: 'http://127.0.0.1:8085/gamedata/job' },
-			{ label: 'アイテム詳細(Item Details)', href: 'http://127.0.0.1:8085/gamedata/item' },
-			{ label: '判定基準(Judgment Criteria)', href: 'http://127.0.0.1:8085/gamedata/judge' },
-			{ label: 'モンスター図鑑(Monster Encyclopedia)', href: 'http://127.0.0.1:8085/gamedata/monster' },
-		],
+		subLinks: longSubLinks,
 	},
 	parameters: {
 		docs: {

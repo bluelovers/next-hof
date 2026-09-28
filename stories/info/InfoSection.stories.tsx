@@ -9,6 +9,13 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { InfoSectionDarkDecorator } from '../decorators';
 import { InfoSection } from '../../src/components/info/InfoSection';
+import {
+	basicInfo,
+	highUsageInfo,
+	lowUsageInfo,
+	longRetentionInfo,
+	shortRetentionInfo,
+} from '../fixture/homePageData';
 
 /** InfoSection 元件設定 / InfoSection component settings */
 const meta: Meta<typeof InfoSection> = {
@@ -27,45 +34,25 @@ type Story = StoryObj<typeof meta>;
 
 /** 基本資訊區域 / Basic info section */
 export const Basic: Story = {
-	args: {
-		onlineUsers: 25,
-		maxUsers: 500,
-		retentionDays: 14,
-	},
+	args: basicInfo,
 };
 
 /** 高使用率狀態 / High usage state */
 export const HighUsage: Story = {
-	args: {
-		onlineUsers: 450,
-		maxUsers: 500,
-		retentionDays: 7,
-	},
+	args: highUsageInfo,
 };
 
 /** 低使用率狀態 / Low usage state */
 export const LowUsage: Story = {
-	args: {
-		onlineUsers: 5,
-		maxUsers: 500,
-		retentionDays: 30,
-	},
+	args: lowUsageInfo,
 };
 
 /** 資料保留時間長期 / Long retention period */
 export const LongRetention: Story = {
-	args: {
-		onlineUsers: 100,
-		maxUsers: 500,
-		retentionDays: 90,
-	},
+	args: longRetentionInfo,
 };
 
 /** 資料保留時間短期 / Short retention period */
 export const ShortRetention: Story = {
-	args: {
-		onlineUsers: 200,
-		maxUsers: 500,
-		retentionDays: 3,
-	},
+	args: shortRetentionInfo,
 };

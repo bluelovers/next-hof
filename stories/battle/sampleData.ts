@@ -412,3 +412,61 @@ export const sampleSpritesMixed: IBattleSprite[] = createMixedSampleSprites();
 
 /** 共用自動定位精靈樣本（展示用） / Shared auto-positioned sprite sample (demo) */
 export const sampleSpritesAuto: IBattleSprite[] = createAutoSampleSprites();
+
+// ============================================================================
+/**
+ * 名稱標籤展示用名冊角色（單一角色，位置交由計算邏輯得出）
+ * Name-label showcase roster characters (single char; position from the compute logic)
+ */
+// ============================================================================
+
+/** 左隊角色（後衛，char 圖） / Left-team back-row char (char image) */
+export const sampleLabelHeroLeft: IRosterChar = {
+	unitUuid: 'mon_018',
+	name: 'Hero1',
+	imageUrl: '/image/char/mon_018.png',
+	position: EnumPosition.Back,
+	side: EnumTeamSideUI.Left,
+};
+
+/** 右隊角色（前衛，char_rev 直接定位） / Right-team front-row char (char_rev, direct) */
+export const sampleLabelMageRight: IRosterChar = {
+	unitUuid: 'mon_018b',
+	name: 'Mage1',
+	imageUrl: '/image/char_rev/mon_018.png',
+	position: EnumPosition.Front,
+	side: EnumTeamSideUI.Right,
+};
+
+/** 右隊角色（前衛，char 由邏輯推導翻轉） / Right-team front-row char (char, flip derived) */
+export const sampleLabelGoblinRight: IRosterChar = {
+	unitUuid: 'mon_052',
+	name: 'Goblin',
+	imageUrl: '/image/char/mon_052.png',
+	position: EnumPosition.Front,
+	side: EnumTeamSideUI.Right,
+};
+
+/** 樣式覆寫展示用精靈（含單體 style／labelStyle 覆寫） / Style-override showcase sprites (with per-sprite style / labelStyle) */
+export const sampleStyleOverrideSprites: IBattleSprite[] = [
+	{
+		unitUuid: 'mon_052',
+		imageUrl: '/image/char/mon_052.png',
+		x: 164,
+		y: 16,
+		flipped: false,
+		name: 'GoblinWarrior(A)',
+		/** 單體精靈樣式覆寫（最優先） / Per-sprite style override (highest priority) */
+		style: { opacity: 0.7 },
+		/** 單體標籤樣式覆寫 / Per-sprite label style override */
+		labelStyle: { color: '#ffd166', fontSize: 13 },
+	},
+	{
+		unitUuid: 'mon_018',
+		imageUrl: '/image/char_rev/mon_018.png',
+		x: 352,
+		y: 14,
+		flipped: true,
+		name: 'Hero1',
+	},
+];

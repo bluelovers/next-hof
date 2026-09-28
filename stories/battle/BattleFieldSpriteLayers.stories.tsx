@@ -9,7 +9,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { makeStageDecorator } from '../decorators';
 import { BattleFieldSpriteLayers } from '../../src/components/battle/BattleFieldSpriteLayers';
-import { sampleSprites, sampleFieldSize } from './sampleData';
+import { sampleSprites, sampleFieldSize, sampleStyleOverrideSprites } from './sampleData';
 
 const meta: Meta<typeof BattleFieldSpriteLayers> = {
 	title: 'BattleField/BattleFieldSpriteLayers',
@@ -64,31 +64,6 @@ export const StyleOverride: Story = {
 		 * 元件層級 style：所有精靈圖層套用藍色邊框 / Component-level style: blue outline on every layer
 		 */
 		style: { outline: '1px solid rgba(90,160,255,0.6)' },
-		sprites: [
-			{
-				unitUuid: 'mon_052',
-				imageUrl: '/image/char/mon_052.png',
-				x: 164,
-				y: 16,
-				flipped: false,
-				name: 'GoblinWarrior(A)',
-				/**
-				 * 單體精靈樣式覆寫（最優先） / Per-sprite style override (highest priority)
-				 */
-				style: { opacity: 0.7 },
-				/**
-				 * 單體標籤樣式覆寫 / Per-sprite label style override
-				 */
-				labelStyle: { color: '#ffd166', fontSize: 13 },
-			},
-			{
-				unitUuid: 'mon_018',
-				imageUrl: '/image/char_rev/mon_018.png',
-				x: 352,
-				y: 14,
-				flipped: true,
-				name: 'Hero1',
-			},
-		],
+		sprites: sampleStyleOverrideSprites,
 	},
 };

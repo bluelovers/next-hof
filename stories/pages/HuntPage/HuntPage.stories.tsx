@@ -9,6 +9,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { HuntAreaDarkDecorator } from '../../decorators';
 import { HuntPage } from '../../../src/components/pages/HuntPage';
+import { dragonNestAreas, goblinFewAreas } from '../../fixture/huntData';
 
 /** 背景裝飾器 / Dark game background decorator */
 const meta: Meta<typeof HuntPage> = {
@@ -47,10 +48,7 @@ export const CustomTitle: Story = {
 	args: {
 		title: 'My Hunt',
 		sectionTitle: 'Elite Areas',
-		areas: [
-			{ name: '龍の巣', land: 'dragon01', levelRange: 'Lv50-70' },
-			{ name: '深淵の迷宮', land: 'abyss01', levelRange: 'Lv80-99' },
-		],
+		areas: dragonNestAreas,
 	},
 	parameters: {
 		docs: {
@@ -72,10 +70,7 @@ export const Empty: Story = {
 /** 少數區域 / Few areas */
 export const FewAreas: Story = {
 	args: {
-		areas: [
-			{ name: 'ゴブリンと遊ぶ(最弱)', land: 'gb0', levelRange: 'Lv1' },
-			{ name: 'ちょっと強いゴブリン', land: 'gb1', levelRange: 'Lv1-5' },
-		],
+		areas: goblinFewAreas,
 	},
 	parameters: {
 		docs: {
