@@ -76,6 +76,11 @@ export function newMon(def: IMonDef, repo: IDataRepository, rng: RNG, strength =
 		reward: def.reward,
 		corpse: def.corpse,
 	});
+	/**
+	 * 天生特殊能力（YAML `SPECIAL`；如 Undead／PoisonResist）併入實例。
+	 * Merge innate special abilities (YAML `SPECIAL`; e.g. Undead/PoisonResist) into the instance.
+	 */
+	if (def.special) Object.assign(c.SPECIAL, def.special);
 	c.rng = rng;
 	if (strength && strength !== 1)
 	{

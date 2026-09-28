@@ -1,0 +1,32 @@
+no: 1055
+name: EvilPlant
+img: mon_127
+level: '29'
+maxhp: '450'
+hp: '450'
+maxsp: '120'
+sp: '120'
+str: '60'
+int: '60'
+dex: '40'
+spd: '10'
+luk: '10'
+atk:
+    - 20
+    - 20
+def:
+    - 20
+    - 20
+    - 30
+    - 20
+reward:
+    moneyhold: '90'
+    itemtable: {  }
+    exphold: '390'
+behavior:
+    guard: pro50
+    pattern:
+        -
+            judge: 1000
+            quantity: null
+            action: 1000

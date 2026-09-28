@@ -1,0 +1,35 @@
+no: 100
+name: Warrior
+level: '1'
+exp: '0'
+maxhp: '300'
+hp: '300'
+maxsp: '50'
+sp: '50'
+str: '10'
+int: '2'
+dex: '4'
+spd: '4'
+luk: '1'
+job: '100'
+skill:
+    - 1000
+    - 1001
+data_ex:
+    recruit_money: 2000
+equip:
+    main_hand: '1000'
+    off_hand: '3000'
+    armor: '5000'
+behavior:
+    position: front
+    guard: always
+    pattern:
+        -
+            judge: '1205'
+            quantity: '8'
+            action: '1001'
+        -
+            judge: '1000'
+            quantity: '0'
+            action: '1000'

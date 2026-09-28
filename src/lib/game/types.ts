@@ -797,6 +797,62 @@ export interface IMonDef extends ICharCore
 	 * Data-layer only: the engine stacks EnumCharType.Union via factory.newUnion() and does not read this field yet.
 	 */
 	isUnion?: boolean;
+	/**
+	 * 怪物圖示資源路徑（YAML mon.*.yml 的 img；例如 mon_053）。
+	 * Monster icon asset path (YAML mon.*.yml `img`; e.g. mon_053).
+	 *
+	 * 角色（char.*.yml）不含 img——圖示由職業定義（IJobDef.img）提供。
+	 * Char YAMLs carry no img — their icon comes from the job definition (IJobDef.img).
+	 */
+	img?: string;
+	/**
+	 * 怪物基礎攻擊力（索引同 EnumAtkSlot：0=物理、1=魔法）/ monster base attack (indices follow EnumAtkSlot: 0 = physical, 1 = magic)
+	 *
+	 * YAML 直接給定（mon.*.yml `atk`）；目前僅資料層保留——
+	 * 開戰時 CalcEquips 以裝備累加 atk/def，怪物無裝備因此 atk/def 歸零；接入引擎為後續變更。
+	 * Given directly in the YAML (`atk`); data-layer only for now — at battle setup
+	 * CalcEquips rebuilds atk/def from equipment and monsters equip nothing, so this is
+	 * not yet consumed by the engine (wiring is a follow-up).
+	 */
+	atk?: [phys: number, mag: number];
+	/**
+	 * 怪物基礎減傷四槽（索引同 EnumDefSlot：物理%減、物理定值減、魔法%減、魔法定值減）
+	 * monster base reduction slots (indices follow EnumDefSlot: physical %, physical flat, magic %, magic flat)
+	 *
+	 * 與 atk 相同：目前僅資料層保留（CalcEquips 由裝備重建，怪物未接入）。
+	 * Same as `atk`: data-layer only for now (CalcEquips rebuilds from equipment; not wired for monsters).
+	 */
+	def?: [physPct: number, physFlat: number, magPct: number, magFlat: number];
+	/**
+	 * 怪物天生特殊能力（YAML `SPECIAL`；例如 Undead / PoisonResist）
+	 * innate special abilities from the YAML `SPECIAL` block (e.g. Undead / PoisonResist)
+	 *
+	 * 轉換時已由 factory.newMon 併入 Character.SPECIAL（引擎可讀）；
+	 * 保留於 def 上供 UI／資料層查詢。
+	 * Merged into Character.SPECIAL by factory.newMon (engine-readable); kept on the def for UI/data queries.
+	 */
+	special?: Partial<ISpecial>;
+	/** 怪物說明資訊（YAML `info`；例如技能說明） / monster description info (YAML `info`; e.g. skill description) */
+	info?: { desc?: string };
+	/**
+	 * 工會怪出現週期（秒；YAML `cycle`） / union monster spawn cycle (seconds; YAML `cycle`)
+	 * 目前僅資料層保留 / data-layer only
+	 */
+	cycle?: number;
+	/** 工會怪所在土地（背景；YAML `land`）/ union monster land/background (YAML `land`) */
+	land?: string;
+	/** 工會怪等級限制（YAML `lv_limit`）/ union monster level limit (YAML `lv_limit`) */
+	lv_limit?: number;
+	/**
+	 * 工會怪隨行雜魚表 { 怪物編號: [出現權重, 0] }（YAML `servant`）
+	 * union escort table { monster no: [spawn weight, 0] } (YAML `servant`)
+	 * 目前僅資料層保留 / data-layer only
+	 */
+	servant?: Record<number, [weight: number, ignored: number]>;
+	/** 隨行雜魚數量（YAML `servantAmount`）/ escorted minion count (YAML `servantAmount`); data-layer only */
+	servantAmount?: number;
+	/** 必出隨行雜魚編號（YAML `servantSpecify`）/ guaranteed escort minion nos (YAML `servantSpecify`); data-layer only */
+	servantSpecify?: number[];
 }
 
 /**
