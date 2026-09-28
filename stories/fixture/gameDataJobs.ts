@@ -9,7 +9,7 @@
  * Source: Actual output from PHP page http://localhost:8085/gamedata
  */
 import type { IJobData, IGameDataPageData } from '../../src/components/game-data/GameDataTypes';
-import { spriteUrlByFile } from './spriteCast';
+import { spriteUrlByFile, characterSprites } from './spriteCast';
 import { EnumTargetType } from '../../src/lib/game/types';
 import { EnumPosition } from '../../src/lib/game/constants';
 import { EnumTargetMethod } from '../../src/lib/game/types';
@@ -26,7 +26,7 @@ export const allJobs: IJobData[] = [
 		name: 'Warrior',
 		parentId: 0,
 		description: '戦士系基本職。<br />そこそこ耐えて、攻撃もそこそこ。',
-		spriteUrls: [spriteUrlByFile('mon_079.png'), spriteUrlByFile('mon_080r.png')],
+		spriteUrls: [spriteUrlByFile(characterSprites.jobWarrior.file), spriteUrlByFile(characterSprites.jobWarrior.femaleFile)],
 		equipment: ['Sword', 'TwoHandSword', 'Shield', 'Armor', 'Cloth', 'Robe', 'Item'],
 		skills: [
 			{
@@ -68,7 +68,7 @@ export const allJobs: IJobData[] = [
 		name: 'RoyalGuard',
 		parentId: 100,
 		description: '戦士系上級職。<br />防御も攻撃も一回り強くなる。',
-		spriteUrls: [spriteUrlByFile('mon_199r.png'), spriteUrlByFile('mon_234r.png')],
+		spriteUrls: [spriteUrlByFile(characterSprites.jobRoyalGuard.file), spriteUrlByFile(characterSprites.jobRoyalGuard.femaleFile)],
 		equipment: ['Sword', 'TwoHandSword', 'Shield', 'Armor', 'Cloth', 'Robe', 'Item'],
 		skills: [
 			{
@@ -112,7 +112,7 @@ export const allJobs: IJobData[] = [
 		name: 'Sacrier',
 		parentId: 100,
 		description: '戦士系上級職。<br />攻撃に特化した戦士。<br />自分の体力を犠牲に強力な技が使える。',
-		spriteUrls: [spriteUrlByFile('mon_100r.png'), spriteUrlByFile('mon_012.png')],
+		spriteUrls: [spriteUrlByFile(characterSprites.jobSacrier.file), spriteUrlByFile(characterSprites.jobSacrier.femaleFile)],
 		equipment: ['Sword', 'TwoHandSword', 'Shield', 'Cloth', 'Robe', 'Item'],
 		skills: [
 			{
@@ -153,7 +153,7 @@ export const allJobs: IJobData[] = [
 		name: 'WitchHunt',
 		parentId: 100,
 		description: '戦士系上級職。<br />相手の魔力を奪ったりする、やや変則的な戦士。',
-		spriteUrls: [spriteUrlByFile('mon_150.png'), spriteUrlByFile('mon_234.png')],
+		spriteUrls: [spriteUrlByFile(characterSprites.jobWitchHunt.file), spriteUrlByFile(characterSprites.jobWitchHunt.femaleFile)],
 		equipment: ['Sword', 'Dagger', 'Shield', 'Armor', 'Cloth', 'Robe', 'Item'],
 		skills: [
 			{
@@ -197,7 +197,7 @@ export const allJobs: IJobData[] = [
 		name: 'Sorcerer',
 		parentId: 0,
 		description: '魔法系基本職。<br />撃たれ弱いが強い魔法が使える。',
-		spriteUrls: [spriteUrlByFile('mon_106.png'), spriteUrlByFile('mon_018.png')],
+		spriteUrls: [spriteUrlByFile(characterSprites.jobSorcerer.file), spriteUrlByFile(characterSprites.jobSorcerer.femaleFile)],
 		equipment: ['Wand', 'Staff', 'Book', 'Cloth', 'Robe', 'Item'],
 		skills: [
 			{
@@ -244,7 +244,7 @@ export const allJobs: IJobData[] = [
 		name: 'Warlock',
 		parentId: 200,
 		description: '魔法系上級職。<br />さらに強力な魔法が使えるようになる。',
-		spriteUrls: [spriteUrlByFile('mon_196z.png'), spriteUrlByFile('mon_246r.png')],
+		spriteUrls: [spriteUrlByFile(characterSprites.jobWarlock.file), spriteUrlByFile(characterSprites.jobWarlock.femaleFile)],
 		equipment: ['Wand', 'Staff', 'Book', 'Cloth', 'Robe', 'Item'],
 		skills: [
 			{
@@ -293,7 +293,7 @@ export const allJobs: IJobData[] = [
 		name: 'Summoner',
 		parentId: 200,
 		description: '魔法系上級職。<br />時間はかかるが強力な召喚獣を呼べる。',
-		spriteUrls: [spriteUrlByFile('mon_196y.png'), spriteUrlByFile('mon_246z.png')],
+		spriteUrls: [spriteUrlByFile(characterSprites.jobSummoner.file), spriteUrlByFile(characterSprites.jobSummoner.femaleFile)],
 		equipment: ['Wand', 'Staff', 'Book', 'Robe', 'Item'],
 		skills: [
 			{
@@ -341,7 +341,7 @@ export const allJobs: IJobData[] = [
 		name: 'Necromancer',
 		parentId: 200,
 		description: '魔法系上級職。<br />相手の能力を下げたり、ゾンビを作ったり出来る。<br />毒も扱える。',
-		spriteUrls: [spriteUrlByFile('mon_196x.png'), spriteUrlByFile('mon_246y.png')],
+		spriteUrls: [spriteUrlByFile(characterSprites.jobNecromancer.file), spriteUrlByFile(characterSprites.jobNecromancer.femaleFile)],
 		equipment: ['Wand', 'Staff', 'Book', 'Cloth', 'Robe', 'Item'],
 		skills: [
 			{
@@ -391,7 +391,7 @@ export const allJobs: IJobData[] = [
 		name: 'Priest',
 		parentId: 0,
 		description: '聖職基本職。<br />味方のHP,SPの回復ができる。',
-		spriteUrls: [spriteUrlByFile('mon_213.png'), spriteUrlByFile('mon_214.png')],
+		spriteUrls: [spriteUrlByFile(characterSprites.jobPriest.file), spriteUrlByFile(characterSprites.jobPriest.femaleFile)],
 		equipment: ['Wand', 'Book', 'Cloth', 'Robe', 'Item'],
 		skills: [
 			{
@@ -431,7 +431,7 @@ export const allJobs: IJobData[] = [
 		name: 'Bishop',
 		parentId: 300,
 		description: '聖職上級職。<br />味方の能力値も上げれるようになる。',
-		spriteUrls: [spriteUrlByFile('mon_213r.png'), spriteUrlByFile('mon_214r.png')],
+		spriteUrls: [spriteUrlByFile(characterSprites.jobBishop.file), spriteUrlByFile(characterSprites.jobBishop.femaleFile)],
 		equipment: ['Wand', 'Book', 'Cloth', 'Robe', 'Item'],
 		skills: [
 			{
@@ -478,7 +478,7 @@ export const allJobs: IJobData[] = [
 		name: 'Druid',
 		parentId: 300,
 		description: '聖職上級職。<br />特殊な支援能力を持っている。',
-		spriteUrls: [spriteUrlByFile('mon_213rz.png'), spriteUrlByFile('mon_214rz.png')],
+		spriteUrls: [spriteUrlByFile(characterSprites.jobDruid.file), spriteUrlByFile(characterSprites.jobDruid.femaleFile)],
 		equipment: ['Wand', 'Book', 'Cloth', 'Robe', 'Item'],
 		skills: [
 			{
@@ -521,7 +521,7 @@ export const allJobs: IJobData[] = [
 		name: 'Hunter',
 		parentId: 0,
 		description: '弓系基本職。<br />相手の前衛に影響されずに攻撃できる。',
-		spriteUrls: [spriteUrlByFile('mon_219rr.png'), spriteUrlByFile('mon_219r.png')],
+		spriteUrls: [spriteUrlByFile(characterSprites.jobHunter.file), spriteUrlByFile(characterSprites.jobHunter.femaleFile)],
 		equipment: ['Bow', 'Cloth', 'Robe', 'Item'],
 		skills: [
 			{
@@ -569,7 +569,7 @@ export const allJobs: IJobData[] = [
 		name: 'Sniper',
 		parentId: 400,
 		description: '弓系上級職。<br />さらに強力な攻撃が可能。',
-		spriteUrls: [spriteUrlByFile('mon_076z.png'), spriteUrlByFile('mon_042z.png')],
+		spriteUrls: [spriteUrlByFile(characterSprites.jobSniper.file), spriteUrlByFile(characterSprites.jobSniper.femaleFile)],
 		equipment: ['Bow', 'Cloth', 'Robe', 'Item'],
 		skills: [
 			{
@@ -618,7 +618,7 @@ export const allJobs: IJobData[] = [
 		name: 'BeastTamer',
 		parentId: 400,
 		description: '弓系上級職。<br />素早い召喚と召喚獣の強化が得意。',
-		spriteUrls: [spriteUrlByFile('mon_216z.png'), spriteUrlByFile('mon_217z.png')],
+		spriteUrls: [spriteUrlByFile(characterSprites.jobBeastTamer.file), spriteUrlByFile(characterSprites.jobBeastTamer.femaleFile)],
 		equipment: ['Bow', 'Whip', 'Cloth', 'Robe', 'Item'],
 		skills: [
 			{
@@ -663,7 +663,7 @@ export const allJobs: IJobData[] = [
 		name: 'Murderer',
 		parentId: 400,
 		description: '弓系上級職。<br />毒の扱いに長けた職業。',
-		spriteUrls: [spriteUrlByFile('mon_216y.png'), spriteUrlByFile('mon_217rz.png')],
+		spriteUrls: [spriteUrlByFile(characterSprites.jobMurderer.file), spriteUrlByFile(characterSprites.jobMurderer.femaleFile)],
 		equipment: ['Dagger', 'Bow', 'Armor', 'Cloth', 'Item'],
 		skills: [
 			{
