@@ -8,6 +8,12 @@ const config = {
 			...config.resolve.alias,
 			'next/image': await import('next/image.js').then(m => m.default ?? m),
 		};
+
+		config.watchOptions = {
+			...config.watchOptions,
+			aggregateTimeout: 5000,
+		};
+
 		return config;
 	},
 
