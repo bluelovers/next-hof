@@ -11,9 +11,7 @@ import { makeScaleDecorator, CharacterSpriteDisplayDarkDecorator } from '../deco
 import { CharacterSprite } from '../../src/components/characters/CharacterSprite';
 import { EnumSpriteVariant } from '../../src/components/battle/enums';
 import { EnumSpriteSize } from '../../src/components/battle/enums';
-
-/** 圖像基礎路徑 / Image base path */
-const IMG = '/image/char';
+import { heroSpriteUrl, femaleSpriteUrl } from '../fixture/spriteUrls';
 
 /** 背景裝飾器 — 模擬遊戲深色背景 / Dark background decorator */
 const meta: Meta<typeof CharacterSprite> = {
@@ -39,7 +37,7 @@ type Story = StoryObj<typeof meta>;
 /** 單一精靈（boxed） / Single sprite (boxed) */
 export const SingleSprite: Story = {
 	args: {
-		url: `${IMG}/mon_079.png`,
+		url: heroSpriteUrl,
 		variant: EnumSpriteVariant.Boxed,
 	},
 	parameters: {
@@ -55,7 +53,7 @@ export const SingleSprite: Story = {
 /** 女性精靈（大） / Female sprite (large) */
 export const FemaleLarge: Story = {
 	args: {
-		url: `${IMG}/mon_080r.png`,
+		url: femaleSpriteUrl,
 		variant: EnumSpriteVariant.Boxed,
 		size: EnumSpriteSize.Large,
 	},
@@ -72,7 +70,7 @@ export const FemaleLarge: Story = {
 /** 女性精靈（小） / Female sprite (small) */
 export const FemaleSmall: Story = {
 	args: {
-		url: `${IMG}/mon_080r.png`,
+		url: femaleSpriteUrl,
 		variant: EnumSpriteVariant.Boxed,
 		size: EnumSpriteSize.Small,
 	},
@@ -89,7 +87,7 @@ export const FemaleSmall: Story = {
 /** 無邊框精靈 / Borderless sprite */
 export const BorderlessSprite: Story = {
 	args: {
-		url: `${IMG}/mon_079.png`,
+		url: heroSpriteUrl,
 		variant: EnumSpriteVariant.Boxed,
 		border: false,
 	},
@@ -106,7 +104,7 @@ export const BorderlessSprite: Story = {
 /** 無背景精靈 / No-background sprite */
 export const NoBackgroundSprite: Story = {
 	args: {
-		url: `${IMG}/mon_079.png`,
+		url: heroSpriteUrl,
 		variant: EnumSpriteVariant.Boxed,
 		background: false,
 	},
@@ -123,7 +121,7 @@ export const NoBackgroundSprite: Story = {
 /** 大型精靈顯示 / Large sprite display */
 export const LargeSprites: Story = {
 	args: {
-		url: `${IMG}/mon_079.png`,
+		url: heroSpriteUrl,
 		variant: EnumSpriteVariant.Boxed,
 		size: EnumSpriteSize.Large,
 	},
@@ -141,7 +139,7 @@ export const LargeSprites: Story = {
 /** 小型精靈顯示 / Small sprite display */
 export const SmallSprites: Story = {
 	args: {
-		url: `${IMG}/mon_079.png`,
+		url: heroSpriteUrl,
 		variant: EnumSpriteVariant.Boxed,
 		size: EnumSpriteSize.Small,
 	},

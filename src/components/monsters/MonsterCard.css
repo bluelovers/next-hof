@@ -5,8 +5,16 @@
 
 /* ==================== 地形容器 / Land container ==================== */
 
+/* 使用 flex 讓角色圖片預設向下對齊：無論圖檔高度（48 / 65 / 70+）
+   腳底都貼齊容器底部，不會因為高度不同而在背景上浮動。
+   Use flex bottom-alignment so the character feet always rest on the
+   bottom of the land container regardless of image height (48 / 65 / 70+). */
 .carpet_frame .land
 {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	align-items: center;
 	padding-bottom: 20px;
 	margin: 20px 0 3px;
 	background-position: center bottom;

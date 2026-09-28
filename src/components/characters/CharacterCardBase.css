@@ -19,10 +19,17 @@
 
 /* ==================== carpet0 / carpet1 交替地毯背景 / Alternating backgrounds ==================== */
 
+/* 使用 flex 讓角色腳底預設向下對齊：圖檔高度不同（48 / 64 / 72+）
+   腳底統一貼齊地毯容器底部，不會漂浮在地毯上方或掉進文字區。
+   Use flex bottom-alignment so character feet always rest at the bottom
+   of the carpet container regardless of image height (48 / 64 / 72+). */
 .carpet0,
 .carpet1
 {
-	display: block;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	align-items: center;
 	text-align: center;
 	width: 150px;
 	height: 76px;

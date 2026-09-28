@@ -10,6 +10,12 @@
  */
 import React from 'react';
 
+/**
+ * 載入共享樣式，確保所有 story 的 :root CSS 變數（色票／字型／精靈投影）已定義
+ * Load shared styles so all stories get the :root CSS variables (palette / font / sprite shadow)
+ */
+import '#/components/shared/SharedBase.css';
+
 /** 遊戲深色背景色（原各處硬編碼 #10151b） / Dark game background color */
 export const DARK_BG_COLOR = '#10151b';
 

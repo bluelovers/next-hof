@@ -11,8 +11,16 @@ import { BattlePageCharDarkDecorator } from '../../decorators';
 import { BattlePage } from '../../../src/components/pages/BattlePage';
 import type { IBattleCharacterData } from '../../../src/components/characters/CharacterTypes';
 import type { IMonsterData } from '../../../src/components/monsters/MonsterTypes';
-
-const IMG = '/image/char';
+import { battleCharacters } from '../../fixture/characterCards';
+import {
+	goblinAxeMonster,
+	goblinMageMonster,
+	iceWolfMonster,
+	snowBearMonster,
+	penguinMonster,
+	caveMapBatMonster,
+	darkSlimeMonster,
+} from '../../fixture/monsterCards';
 
 /** 背景裝飾器 / Dark game background decorator */
 const meta: Meta<typeof BattlePage> = {
@@ -34,19 +42,11 @@ const meta: Meta<typeof BattlePage> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** 預設角色清單 / Default character list */
-const DEFAULT_CHARACTERS: IBattleCharacterData[] = [
-	{ id: '1', name: '名探偵', imageUrl: `${IMG}/m_chr30101.png`, level: 1, className: '探偵' },
-	{ id: '2', name: '新米錬金術師', imageUrl: `${IMG}/f_chr03901.png`, level: 1, className: '錬金術師' },
-	{ id: '3', name: '魔導剣士', imageUrl: `${IMG}/m_chr02901.png`, level: 1, className: '魔導剣士' },
-	{ id: '4', name: '弓聖', imageUrl: `${IMG}/f_chr04201.png`, level: 137, className: '弓聖' },
-];
+/** 預設角色清單（fixture） / Default character list (fixture) */
+const DEFAULT_CHARACTERS = battleCharacters;
 
-/** 預設怪物清單 / Default monster list */
-const DEFAULT_MONSTERS: IMonsterData[] = [
-	{ name: 'GoblinAxe', imageUrl: `${IMG}/mon_053.png`, level: 1, landType: 'grass' },
-	{ name: 'GoblinMage', imageUrl: `${IMG}/mon_052.png`, level: 1, landType: 'grass' },
-];
+/** 預設怪物清單（fixture） / Default monster list (fixture) */
+const DEFAULT_MONSTERS: IMonsterData[] = [goblinAxeMonster, goblinMageMonster];
 
 /** ==================== 故事 ==================== */
 
@@ -138,11 +138,7 @@ export const PartiallySelected: Story = {
 export const SnowMountain: Story = {
 	render: () =>
 	{
-		const monsters: IMonsterData[] = [
-			{ name: 'IceWolf', imageUrl: `${IMG}/mon_053.png`, level: 10, landType: 'snow' },
-			{ name: 'SnowBear', imageUrl: `${IMG}/mon_052.png`, level: 12, landType: 'snow' },
-			{ name: 'Penguin', imageUrl: `${IMG}/mon_079.png`, level: 8, landType: 'snow' },
-		];
+		const monsters: IMonsterData[] = [iceWolfMonster, snowBearMonster, penguinMonster];
 
 		return (
 			<BattlePage
@@ -165,10 +161,7 @@ export const SnowMountain: Story = {
 export const CaveMap: Story = {
 	render: () =>
 	{
-		const monsters: IMonsterData[] = [
-			{ name: 'CaveBat', imageUrl: `${IMG}/mon_053.png`, level: 5, landType: 'cave' },
-			{ name: 'DarkSlime', imageUrl: `${IMG}/mon_052.png`, level: 7, landType: 'cave' },
-		];
+		const monsters: IMonsterData[] = [caveMapBatMonster, darkSlimeMonster];
 
 		return (
 			<BattlePage

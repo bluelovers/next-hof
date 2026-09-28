@@ -10,8 +10,13 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { MUTED_TEXT_COLOR, CardDarkDecorator } from '../../decorators';
 import { CharacterCard } from '../../../src/components/characters/CharacterCard';
 import { buildCharacterUrl } from '../../../src/components/characters/characterUtils';
-
-const IMG = '/image/char';
+import {
+	checkboxUnchecked,
+	checkboxChecked,
+	compareUnchecked,
+	compareChecked,
+	checkboxLinked,
+} from '../../fixture/characterCards';
 
 const meta: Meta<typeof CharacterCard> = {
 	title: 'Characters/CharacterCard (Checkbox)',
@@ -37,15 +42,7 @@ export const Unchecked: Story = {
 	args: {
 		index: 0,
 		selection: 'checkbox',
-		character: {
-			id: 'char-uncheck',
-			name: 'Mage1',
-			imageUrl: `${IMG}/mon_018.png`,
-			level: 3,
-			className: 'Sorceress',
-			hasStar: true,
-			active: false,
-		},
+		character: checkboxUnchecked,
 		onActiveChange: (id, active) => console.log(`${id} → ${active}`),
 	},
 };
@@ -55,15 +52,7 @@ export const Checked: Story = {
 	args: {
 		index: 1,
 		selection: 'checkbox',
-		character: {
-			id: 'char-check',
-			name: 'Healer1',
-			imageUrl: `${IMG}/mon_214.png`,
-			level: 5,
-			className: 'Priestess',
-			hasStar: true,
-			active: true,
-		},
+		character: checkboxChecked,
 		onActiveChange: (id, active) => console.log(`${id} → ${active}`),
 	},
 };
@@ -76,14 +65,7 @@ export const CheckCompare: Story = {
 				<CharacterCard
 					index={0}
 					selection="checkbox"
-					character={{
-						id: 'uncheck',
-						name: 'Unchecked',
-						imageUrl: `${IMG}/mon_018.png`,
-						level: 1,
-						className: 'Novice',
-						active: false,
-					}}
+					character={compareUnchecked}
 				/>
 				<p style={{ textAlign: 'center', color: MUTED_TEXT_COLOR, marginTop: 4 }}>
 					未勾選
@@ -93,15 +75,7 @@ export const CheckCompare: Story = {
 				<CharacterCard
 					index={1}
 					selection="checkbox"
-					character={{
-						id: 'checked',
-						name: 'Checked',
-						imageUrl: `${IMG}/mon_079.png`,
-						level: 5,
-						className: 'Warrior',
-						hasStar: true,
-						active: true,
-					}}
+					character={compareChecked}
 				/>
 				<p style={{ textAlign: 'center', color: MUTED_TEXT_COLOR, marginTop: 4 }}>
 					已勾選
@@ -116,15 +90,7 @@ export const WithLink: Story = {
 	args: {
 		index: 0,
 		selection: 'checkbox',
-		character: {
-			id: 'char-link',
-			name: 'LinkedChar',
-			imageUrl: `${IMG}/mon_079.png`,
-			level: 10,
-			className: 'Warrior',
-			hasStar: true,
-			active: false,
-		},
+		character: checkboxLinked,
 		avatarHref: buildCharacterUrl('char-link'),
 		onActiveChange: (id, active) => console.log(`${id} → ${active}`),
 	},

@@ -13,8 +13,17 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { MUTED_TEXT_COLOR, CardDarkDecorator } from '../decorators';
 import { CharacterCard } from '../../src/components/characters/CharacterCard';
 import type { ICharacterInfoProps } from '../../src/components/characters/CharacterCard';
-
-const IMG = '/image/char';
+import {
+	radioMage,
+	checkboxHealer,
+	activeWarrior,
+	linkedWarrior,
+	nameOnlyChar,
+	displayOnlyChar,
+	noCarpetChar,
+	badgeChar,
+	legacySelectedChar,
+} from '../fixture/characterCards';
 
 const meta: Meta<typeof CharacterCard> = {
 	title: 'Characters/CharacterCard',
@@ -42,15 +51,7 @@ export const RadioMode: Story = {
 	args: {
 		index: 0,
 		selection: 'radio',
-		character: {
-			id: 'char-mage',
-			name: 'Mage1',
-			imageUrl: `${IMG}/mon_018.png`,
-			level: 3,
-			className: 'Sorceress',
-			hasStar: true,
-			active: false,
-		},
+		character: radioMage,
 		onActiveChange: (id, active) => console.log(`radio: ${id} → ${active}`),
 	},
 };
@@ -60,15 +61,7 @@ export const CheckboxMode: Story = {
 	args: {
 		index: 1,
 		selection: 'checkbox',
-		character: {
-			id: 'char-healer',
-			name: 'Healer1',
-			imageUrl: `${IMG}/mon_214.png`,
-			level: 5,
-			className: 'Priestess',
-			hasStar: true,
-			active: true,
-		},
+		character: checkboxHealer,
 		onActiveChange: (id, active) => console.log(`checkbox: ${id} → ${active}`),
 	},
 };
@@ -77,15 +70,7 @@ export const CheckboxMode: Story = {
 export const Active: Story = {
 	args: {
 		index: 2,
-		character: {
-			id: 'char-warrior',
-			name: 'Hero1',
-			imageUrl: `${IMG}/mon_079.png`,
-			level: 10,
-			className: 'Warrior',
-			hasStar: true,
-			active: true,
-		},
+		character: activeWarrior,
 	},
 };
 
@@ -95,13 +80,7 @@ export const Active: Story = {
 export const WithLink: Story = {
 	args: {
 		index: 0,
-		character: {
-			id: 'char-link',
-			name: 'Linked',
-			imageUrl: `${IMG}/mon_079.png`,
-			level: 1,
-			className: 'Warrior',
-		},
+		character: linkedWarrior,
 		avatarHref: '/char/char?char=char-link',
 	},
 	parameters: {
@@ -117,15 +96,8 @@ export const WithLink: Story = {
 export const CustomInfo: Story = {
 	args: {
 		index: 0,
-		character: {
-			id: 'char-nameonly',
-			name: 'SimpleChar',
-			imageUrl: `${IMG}/mon_018.png`,
-			level: 1,
-			className: 'Novice',
-			active: false,
-		},
-		renderInfo: ({ character, textId, highlighted, onClick }) => (
+		character: nameOnlyChar,
+		renderInfo: ({ character, textId, highlighted, onClick }: ICharacterInfoProps) => (
 			<div id={textId} className={highlighted ? '' : 'unselect'} onClick={onClick}>
 				<strong>{character.name}</strong>
 			</div>
@@ -144,14 +116,7 @@ export const CustomInfo: Story = {
 export const NoSelection: Story = {
 	args: {
 		index: 0,
-		character: {
-			id: 'char-noselect',
-			name: 'DisplayOnly',
-			imageUrl: `${IMG}/mon_018.png`,
-			level: 7,
-			className: 'Mage',
-			hasStar: true,
-		},
+		character: displayOnlyChar,
 		renderSelection: false,
 	},
 	parameters: {
@@ -167,13 +132,7 @@ export const NoSelection: Story = {
 export const NoPedestal: Story = {
 	args: {
 		index: 0,
-		character: {
-			id: 'char-nopedestal',
-			name: 'NoCarpet',
-			imageUrl: `${IMG}/mon_018.png`,
-			level: 1,
-			className: 'Novice',
-		},
+		character: noCarpetChar,
 		renderPedestal: false,
 	},
 	parameters: {
@@ -189,14 +148,7 @@ export const NoPedestal: Story = {
 export const WithChildren: Story = {
 	args: {
 		index: 0,
-		character: {
-			id: 'char-child',
-			name: 'WithBadge',
-			imageUrl: `${IMG}/mon_079.png`,
-			level: 5,
-			className: 'Warrior',
-			hasStar: true,
-		},
+		character: badgeChar,
 		children: (
 			<div style={{ textAlign: 'center', fontSize: 10, color: '#ffcc33' }}>
 				★ VIP ★
@@ -218,14 +170,7 @@ export const WithChildren: Story = {
 export const BackwardSelected: Story = {
 	args: {
 		index: 0,
-		character: {
-			id: 'char-backward',
-			name: 'OldAPI',
-			imageUrl: `${IMG}/mon_018.png`,
-			level: 1,
-			className: 'Novice',
-			selected: true,
-		} as any,
+		character: legacySelectedChar,
 	},
 	parameters: {
 		docs: {

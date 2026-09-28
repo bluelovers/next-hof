@@ -9,8 +9,15 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { CardDarkDecorator } from '../decorators';
 import { MonsterCard } from '../../src/components/monsters/MonsterCard';
-
-const IMG = '/image/char';
+import {
+	goblinAxeMonster,
+	caveBatMonster,
+	hellHoundMonster,
+	dragonLordMonster,
+	goblinMageMonster,
+	wolfMonster,
+	slimeMonster,
+} from '../fixture/monsterCards';
 
 /** 背景裝飾器 — 模擬遊戲深色背景 / Dark game background decorator */
 const meta: Meta<typeof MonsterCard> = {
@@ -37,12 +44,7 @@ type Story = StoryObj<typeof meta>;
 /** 草地哥布林斧兵 / Grassland GoblinAxe */
 export const GoblinAxe: Story = {
 	args: {
-		monster: {
-			name: 'GoblinAxe',
-			imageUrl: `${IMG}/mon_053.png`,
-			level: 1,
-			landType: 'grass',
-		},
+		monster: goblinAxeMonster,
 	},
 	parameters: {
 		docs: {
@@ -56,12 +58,7 @@ export const GoblinAxe: Story = {
 /** 洞穴蝙蝠 / Cave Bat */
 export const CaveBat: Story = {
 	args: {
-		monster: {
-			name: 'Cave Bat',
-			imageUrl: `${IMG}/mon_052.png`,
-			level: 3,
-			landType: 'cave',
-		},
+		monster: caveBatMonster,
 	},
 	parameters: {
 		docs: {
@@ -75,12 +72,7 @@ export const CaveBat: Story = {
 /** 地獄犬 / Hell Hound on Lava */
 export const HellHound: Story = {
 	args: {
-		monster: {
-			name: 'Hell Hound',
-			imageUrl: `${IMG}/mon_079.png`,
-			level: 15,
-			landType: 'lava',
-		},
+		monster: hellHoundMonster,
 	},
 	parameters: {
 		docs: {
@@ -94,12 +86,7 @@ export const HellHound: Story = {
 /** 高等級 / High level monster */
 export const HighLevel: Story = {
 	args: {
-		monster: {
-			name: 'DragonLord',
-			imageUrl: `${IMG}/mon_214.png`,
-			level: 99,
-			landType: 'mount',
-		},
+		monster: dragonLordMonster,
 	},
 	parameters: {
 		docs: {
@@ -114,10 +101,10 @@ export const HighLevel: Story = {
 export const MonsterRow: Story = {
 	render: () => (
 		<div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-			<MonsterCard monster={{ name: 'GoblinAxe', imageUrl: `${IMG}/mon_053.png`, level: 1, landType: 'grass' }} />
-			<MonsterCard monster={{ name: 'GoblinMage', imageUrl: `${IMG}/mon_052.png`, level: 1, landType: 'grass' }} />
-			<MonsterCard monster={{ name: 'Wolf', imageUrl: `${IMG}/mon_079.png`, level: 5, landType: 'snow' }} />
-			<MonsterCard monster={{ name: 'Slime', imageUrl: `${IMG}/mon_018.png`, level: 2, landType: 'swamp' }} />
+			<MonsterCard monster={goblinAxeMonster} />
+			<MonsterCard monster={goblinMageMonster} />
+			<MonsterCard monster={wolfMonster} />
+			<MonsterCard monster={slimeMonster} />
 		</div>
 	),
 	parameters: {

@@ -9,9 +9,18 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { CharacterListDarkDecorator } from '../decorators';
 import { CharacterList } from '../../src/components/characters/CharacterList';
-import type { ICharacterData } from '../../src/components/characters/CharacterTypes';
-
-const IMAGE_BASE = '/image/char';
+import {
+	mageChar,
+	healerChar,
+	heroChar,
+	priestChar,
+	berserkerChar,
+	archerChar,
+	novice1Char,
+	novice2Char,
+	shortChar,
+	tallChar,
+} from '../fixture/characterCards';
 
 /** 背景裝飾器 / Background decorator */
 const meta: Meta<typeof CharacterList> = {
@@ -35,74 +44,12 @@ const meta: Meta<typeof CharacterList> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** ==================== 角色資料定義 / Character data definitions ==================== */
-
-const MAGE: ICharacterData = {
-	id: 'char-1',
-	name: 'Mage1',
-	imageUrl: `${IMAGE_BASE}/mon_018.png`,
-	level: 3,
-	className: 'Sorceress',
-	hasStar: true,
-	selected: false,
-};
-
-const HEALER: ICharacterData = {
-	id: 'char-2',
-	name: 'Healer1',
-	imageUrl: `${IMAGE_BASE}/mon_214.png`,
-	level: 3,
-	className: 'Priestess',
-	hasStar: true,
-	selected: false,
-};
-
-const HERO: ICharacterData = {
-	id: 'char-3',
-	name: 'Hero1',
-	imageUrl: `${IMAGE_BASE}/mon_079.png`,
-	level: 3,
-	className: 'Warrior',
-	hasStar: true,
-	selected: false,
-};
-
-const PRIEST: ICharacterData = {
-	id: 'char-4',
-	name: 'Priest1',
-	imageUrl: `${IMAGE_BASE}/mon_214.png`,
-	level: 3,
-	className: 'Priestess',
-	hasStar: true,
-	selected: false,
-};
-
-const BERSERKER: ICharacterData = {
-	id: 'char-5',
-	name: 'Berserker1',
-	imageUrl: `${IMAGE_BASE}/mon_079.png`,
-	level: 5,
-	className: 'Berserker',
-	hasStar: true,
-	selected: false,
-};
-
-const ARCHER: ICharacterData = {
-	id: 'char-6',
-	name: 'Archer1',
-	imageUrl: `${IMAGE_BASE}/mon_018.png`,
-	level: 2,
-	className: 'Archer',
-	hasStar: false,
-	selected: false,
-};
-
-/** ==================== 故事 ==================== */
+// ==================== 故事 ====================
 
 /** 四人隊伍（carpet0,1,0,1 交替）/ Four members */
 export const FourMemberTeam: Story = {
 	args: {
-		characters: [MAGE, HEALER, HERO, PRIEST],
+		characters: [mageChar, healerChar, heroChar, priestChar],
 	},
 	parameters: {
 		docs: {
@@ -117,7 +64,7 @@ export const FourMemberTeam: Story = {
 /** 五人滿編 / Five members full team */
 export const FiveMemberTeam: Story = {
 	args: {
-		characters: [MAGE, HEALER, HERO, PRIEST, BERSERKER],
+		characters: [mageChar, healerChar, heroChar, priestChar, berserkerChar],
 	},
 	parameters: {
 		docs: {
@@ -132,7 +79,7 @@ export const FiveMemberTeam: Story = {
 /** 已選取第三位 / Third character selected */
 export const ThirdSelected: Story = {
 	args: {
-		characters: [MAGE, HEALER, HERO, PRIEST].map((c, i) => ({
+		characters: [mageChar, healerChar, heroChar, priestChar].map((c, i) => ({
 			...c,
 			selected: i === 2,
 		})),
@@ -150,7 +97,7 @@ export const ThirdSelected: Story = {
 /** 只有一人 / Solo member */
 export const SoloMember: Story = {
 	args: {
-		characters: [HERO],
+		characters: [heroChar],
 	},
 	parameters: {
 		docs: {
@@ -181,25 +128,9 @@ export const EmptyTeam: Story = {
 export const NoStarTeam: Story = {
 	args: {
 		characters: [
-			{ ...ARCHER },
-			{
-				id: 'char-7',
-				name: 'Novice1',
-				imageUrl: `${IMAGE_BASE}/mon_214.png`,
-				level: 1,
-				className: 'Novice',
-				hasStar: false,
-				selected: false,
-			},
-			{
-				id: 'char-8',
-				name: 'Novice2',
-				imageUrl: `${IMAGE_BASE}/mon_018.png`,
-				level: 1,
-				className: 'Novice',
-				hasStar: false,
-				selected: false,
-			},
+			{ ...archerChar },
+			novice1Char,
+			novice2Char,
 		],
 	},
 	parameters: {
@@ -207,6 +138,24 @@ export const NoStarTeam: Story = {
 			description: {
 				story:
 					'全部無星標的新手角色（carpet0,1,0 交替）。\nNovices without star markers (carpet0,1,0 alternation).',
+			},
+		},
+	},
+};
+
+/** 矮與高角色並排 / Short & tall characters side by side */
+export const ShortAndTall: Story = {
+	args: {
+		characters: [shortChar, mageChar, tallChar],
+	},
+	parameters: {
+		docs: {
+			description: {
+				story:
+					'矮個子（32px）與高個子（128px）角色並排展示，對照一般高度角色，'
+					+ '驗證所有角色的腳底都貼齊地毯底部。\n'
+					+ 'Short (32px) and tall (128px) characters lined up with a normal-height one '
+					+ 'to verify every character feet align to the carpet bottom.',
 			},
 		},
 	},

@@ -12,7 +12,7 @@
 {
 	position: absolute;
 	background-repeat: no-repeat;
-	filter: drop-shadow(2px 5px 1px rgba(0, 0, 0, 0.3));
+	filter: var(--sprite-drop-shadow);
 }
 
 .battle-sprite.flip-h

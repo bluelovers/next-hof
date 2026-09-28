@@ -10,8 +10,13 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { GameLayout } from '../../src/components/pages/GameLayout';
 import { DashboardPage } from '../../src/components/pages/DashboardPage';
 import type { ICharacterData } from '../../src/components/characters/CharacterTypes';
-
-const IMAGE_BASE = '/image/char';
+import {
+	dashboardCharacters,
+	berserkerChar,
+	beginnerWarrior,
+	beginnerMage,
+	loneHeroChar,
+} from '../fixture/characterCards';
 
 /** 使用 GameLayout 包裝的 DashboardPage / DashboardPage wrapped in GameLayout */
 const DashboardWithLayout: React.FC<{
@@ -52,53 +57,12 @@ const meta: Meta<typeof DashboardWithLayout> = {
 export default meta;
 type Story = StoryObj<typeof DashboardWithLayout>;
 
-/** ==================== 預設角色資料 / Default character data ==================== */
-
-const DEFAULT_CHARACTERS: ICharacterData[] = [
-	{
-		id: '2f4954e7348fff17f92b46e8d72005d1',
-		name: 'Mage1',
-		imageUrl: `${IMAGE_BASE}/mon_018.png`,
-		level: 3,
-		className: 'Sorceress',
-		hasStar: true,
-		selected: false,
-	},
-	{
-		id: '6ece402a38eab57ef07afff56535d6e1',
-		name: 'Healer1',
-		imageUrl: `${IMAGE_BASE}/mon_214.png`,
-		level: 3,
-		className: 'Priestess',
-		hasStar: true,
-		selected: true,
-	},
-	{
-		id: 'b3e304903f09e14b8386a49a1e1e1e01e3',
-		name: 'Hero1',
-		imageUrl: `${IMAGE_BASE}/mon_079.png`,
-		level: 3,
-		className: 'Warrior',
-		hasStar: true,
-		selected: false,
-	},
-	{
-		id: 'de979500692a963857ea9d68868f2958',
-		name: 'Priest1',
-		imageUrl: `${IMAGE_BASE}/mon_214.png`,
-		level: 3,
-		className: 'Priestess',
-		hasStar: true,
-		selected: false,
-	},
-];
-
-/** ==================== 故事 ==================== */
+// ==================== 故事 ====================
 
 /** 預設儀表板 / Default dashboard */
 export const Default: Story = {
 	args: {
-		characters: DEFAULT_CHARACTERS,
+		characters: dashboardCharacters,
 		teamName: 'TestTeam',
 		funds: 43080,
 		timeCurrent: 1000,
@@ -119,16 +83,8 @@ export const Default: Story = {
 export const FullTeam: Story = {
 	args: {
 		characters: [
-			...DEFAULT_CHARACTERS,
-			{
-				id: 'char-5',
-				name: 'Berserker1',
-				imageUrl: `${IMAGE_BASE}/mon_079.png`,
-				level: 5,
-				className: 'Berserker',
-				hasStar: true,
-				selected: false,
-			},
+			...dashboardCharacters,
+			berserkerChar,
 		],
 		teamName: 'ShadowLegion',
 		funds: 999999,
@@ -149,26 +105,7 @@ export const FullTeam: Story = {
 /** 新手隊伍 / Beginner team */
 export const BeginnerTeam: Story = {
 	args: {
-		characters: [
-			{
-				id: 'char-b1',
-				name: 'Warrior1',
-				imageUrl: `${IMAGE_BASE}/mon_079.png`,
-				level: 1,
-				className: 'Warrior',
-				hasStar: false,
-				selected: true,
-			},
-			{
-				id: 'char-b2',
-				name: 'Mage1',
-				imageUrl: `${IMAGE_BASE}/mon_018.png`,
-				level: 1,
-				className: 'Sorceress',
-				hasStar: false,
-				selected: false,
-			},
-		],
+		characters: [beginnerWarrior, beginnerMage],
 		teamName: 'NewBeginners',
 		funds: 10000,
 		timeCurrent: 1000,
@@ -188,17 +125,7 @@ export const BeginnerTeam: Story = {
 /** 瀕危隊伍 / Depleted team */
 export const DepletedTeam: Story = {
 	args: {
-		characters: [
-			{
-				id: 'char-d1',
-				name: 'LoneHero',
-				imageUrl: `${IMAGE_BASE}/mon_079.png`,
-				level: 1,
-				className: 'Warrior',
-				hasStar: true,
-				selected: true,
-			},
-		],
+		characters: [loneHeroChar],
 		teamName: 'AlmostDead',
 		funds: 120,
 		timeCurrent: 3,
