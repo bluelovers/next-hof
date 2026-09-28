@@ -7,9 +7,7 @@
  */
 import type { IJobData } from '../../src/components/game-data/GameDataTypes';
 import { spriteUrlByFile } from './spriteCast';
-import { EnumTargetType } from '../../src/lib/game/types';
-import { EnumTargetMethod } from '../../src/lib/game/types';
-import { EnumSkillType } from '../../src/components/battle/enums';
+import { skills } from './skills';
 
 /** 基本職業卡片 / Basic job card */
 export const basicJob: IJobData = {
@@ -20,18 +18,7 @@ export const basicJob: IJobData = {
 	description: 'HPが高く、攻撃力も高い。重装備で防御力も高い。',
 	equipment: ['剣', '盾', '鎧'],
 	skills: [
-		{
-			name: 'スラッシュ',
-			iconUrl: '/image/icon/skill/skill_073.png',
-			target: EnumTargetType.Enemy,
-			scope: EnumTargetMethod.Individual,
-			sp: 5,
-			powerPct: 80,
-			hits: 1,
-			hitRate: '90',
-			weaponLimit: '剣',
-			effect: '敵単体に物理ダメージ',
-		},
+		skills.slash,
 	],
 };
 
@@ -44,33 +31,8 @@ export const multipleSpritesJob: IJobData = {
 	description: 'MPが高く、魔法攻撃が得意。防御力は低い。',
 	equipment: ['杖', 'ローブ'],
 	skills: [
-		{
-			name: 'ファイア',
-			iconUrl: '/image/icon/skill/skill_018.png',
-			target: EnumTargetType.Enemy,
-			scope: EnumTargetMethod.Individual,
-			sp: 10,
-			powerPct: 80,
-			hits: 1,
-			hitRate: '85',
-			weaponLimit: '杖',
-			effect: '敵単体に炎属性ダメージ',
-			skillType: EnumSkillType.Magic,
-		},
-		{
-			name: 'ヒール',
-			iconUrl: '/image/icon/skill/skill_013c.png',
-			target: EnumTargetType.Friend,
-			scope: EnumTargetMethod.Individual,
-			sp: 15,
-			powerPct: 50,
-			hits: 1,
-			hitRate: '100',
-			weaponLimit: '杖',
-			effect: '味単体に回復',
-			skillType: EnumSkillType.Magic,
-			isSupport: true,
-		},
+		skills.flame,
+		skills.healJp,
 	],
 };
 
@@ -83,44 +45,9 @@ export const multipleSkillsJob: IJobData = {
 	description: '遠距離攻撃が得意。敏捷性が高い。',
 	equipment: ['弓', '皮鎧'],
 	skills: [
-		{
-			name: 'マルチショット',
-			iconUrl: '/image/icon/skill/item_042.png',
-			target: EnumTargetType.Enemy,
-			scope: EnumTargetMethod.Multi,
-			sp: 20,
-			powerPct: 40,
-			hits: 3,
-			hitRate: '75',
-			weaponLimit: '弓',
-			effect: '敵全体に矢属性ダメージ',
-			isInvalid: true,
-		},
-		{
-			name: 'スナイプ',
-			iconUrl: '/image/icon/skill/item_042.png',
-			target: EnumTargetType.Enemy,
-			scope: EnumTargetMethod.Individual,
-			sp: 25,
-			powerPct: 150,
-			hits: 1,
-			hitRate: '60',
-			weaponLimit: '弓',
-			effect: '敵単体に超強力な攻撃',
-			isInvalid: true,
-		},
-		{
-			name: 'バインド',
-			iconUrl: '/image/icon/skill/skill_025.png',
-			target: EnumTargetType.Enemy,
-			scope: EnumTargetMethod.Individual,
-			sp: 30,
-			powerPct: 0,
-			hits: 1,
-			hitRate: '80',
-			weaponLimit: '弓',
-			effect: '敵単体を行動不能にする',
-		},
+		skills.multiShot,
+		skills.snipe,
+		skills.bind,
 	],
 };
 
@@ -133,20 +60,7 @@ export const alternatingBgJob: IJobData = {
 	description: '回復とサポートが得意。HPとMPが高い。',
 	equipment: ['杖', '祭服'],
 	skills: [
-		{
-			name: 'ヒール',
-			iconUrl: '/image/icon/skill/skill_013c.png',
-			target: EnumTargetType.Friend,
-			scope: EnumTargetMethod.Individual,
-			sp: 15,
-			powerPct: 50,
-			hits: 1,
-			hitRate: '100',
-			weaponLimit: '杖',
-			effect: '味単体に回復',
-			skillType: EnumSkillType.Magic,
-			isSupport: true,
-		},
+		skills.healJp,
 	],
 };
 
@@ -159,31 +73,7 @@ export const longDescJob: IJobData = {
 	description: '攻撃と防御の両方に長けている。信仰心が強く、魔法も少しだけ使える。味方を守ることに長けている。',
 	equipment: ['聖剣', '盾', '聖鎧', '聖盾'],
 	skills: [
-		{
-			name: 'ホーリー',
-			iconUrl: '/image/icon/skill/skill_010.png',
-			target: EnumTargetType.Enemy,
-			scope: EnumTargetMethod.Individual,
-			sp: 35,
-			powerPct: 120,
-			hits: 1,
-			hitRate: '70',
-			weaponLimit: '聖剣',
-			effect: '敵単体に聖属性ダメージ',
-		},
-		{
-			name: 'プロテクション',
-			iconUrl: '/image/icon/skill/skill_045z.png',
-			target: EnumTargetType.Friend,
-			scope: EnumTargetMethod.Multi,
-			sp: 25,
-			powerPct: 0,
-			hits: 1,
-			hitRate: '100',
-			weaponLimit: '聖盾',
-			effect: '味全体の防御力をアップ',
-			skillType: EnumSkillType.Magic,
-			isSupport: true,
-		},
+		skills.holy,
+		skills.protection,
 	],
 };

@@ -1,102 +1,38 @@
 /**
- * SkillCard 展示用技能資料
- * SkillCard fixture skill data
+ * SkillCard 展示用技能卡片（技能定義的展示別名層）
+ * SkillCard showcase skill cards (display alias layer over the skill registry)
  *
- * 各故事展示用的獨立技能資料。
- * Individual skill data for each story showcase.
+ * 技能定義已統一收斂至 skills.ts（單一事實來源），此檔僅以故事所需名稱重導出別名，
+ * 或對同一技能提供覆寫變體。
+ * Skill definitions live in skills.ts (single source of truth); this file only
+ * re-exports the aliases the SkillCard stories need, or overridden variants.
  */
 import type { ISkillData } from '../../src/components/game-data/GameDataTypes';
-import { EnumTargetType } from '../../src/lib/game/types';
-import { EnumTargetMethod } from '../../src/lib/game/types';
-import { EnumSkillType } from '../../src/components/battle/enums';
+import { skills } from './skills';
 
-/** 基本技能卡片 / Basic skill card (FireBall) */
-export const basicSkill: ISkillData = {
-	name: 'FireBall',
-	iconUrl: '/image/icon/skill/skill_018.png',
-	target: EnumTargetType.Enemy,
-	scope: EnumTargetMethod.Multi,
-	sp: 20,
-	powerPct: 100,
-	hits: 4,
-	hitRate: '60:0',
-	effect: '施放一個火球對多個敵人造成範圍傷害',
-	skillType: EnumSkillType.Magic,
-	isInvalid: true,
-};
+/** 基本技能卡片（FireBall） / Basic skill card (FireBall) */
+export const basicSkill: ISkillData = skills.fireBall;
 
-/** 多次攻擊技能 / Multi-hit skill (DoubleAttack) */
-export const multiHitSkill: ISkillData = {
-	name: 'DoubleAttack',
-	iconUrl: '/image/icon/skill/skill_073.png',
-	target: EnumTargetType.Enemy,
-	scope: EnumTargetMethod.Individual,
-	sp: 15,
-	powerPct: 90,
-	hits: 2,
-	effect: '连续发动两次攻击',
-};
+/** 多次攻擊技能（DoubleAttack） / Multi-hit skill (DoubleAttack) */
+export const multiHitSkill: ISkillData = skills.doubleAttack;
 
-/** 補助技能 / Support skill (PartyHeal) */
-export const supportSkill: ISkillData = {
-	name: 'PartyHeal',
-	iconUrl: '/image/icon/skill/skill_013c.png',
-	target: EnumTargetType.Friend,
-	scope: EnumTargetMethod.All,
-	sp: 30,
-	powerPct: 150,
-	hits: 1,
-	hitRate: '50:0',
-	effect: 'HP回復',
-	skillType: EnumSkillType.Magic,
-	isSupport: true,
-};
+/** 補助技能（PartyHeal） / Support skill (PartyHeal) */
+export const supportSkill: ISkillData = skills.partyHeal;
 
-/** 自我強化技能 / Self-buff skill (ObtainMind) */
-export const selfBuffSkill: ISkillData = {
-	name: 'ObtainMind',
-	iconUrl: '/image/icon/skill/skill_057.png',
-	target: EnumTargetType.Self,
-	scope: EnumTargetMethod.Individual,
-	sp: 0,
-	sacrificePct: 15,
-	upStats: { INT: 100 },
-	effect: '知力上昇',
-};
+/** 自我強化技能（ObtainMind） / Self-buff skill (ObtainMind) */
+export const selfBuffSkill: ISkillData = skills.obtainMind;
 
-/** 高 SP 消耗技能 / High SP cost skill (SummonLeviathan) */
-export const highSPCostSkill: ISkillData = {
-	name: 'SummonLeviathan',
-	iconUrl: '/image/icon/skill/skill_029.png',
-	target: EnumTargetType.Self,
-	scope: EnumTargetMethod.Individual,
-	sp: 700,
-	hitRate: '100:300',
-	effect: '召唤海兽',
-	magicCircleCost: 4,
-	skillType: EnumSkillType.Magic,
-	isQuick: true,
-};
+/** 高 SP 消耗技能（SummonLeviathan） / High SP cost skill (SummonLeviathan) */
+export const highSPCostSkill: ISkillData = skills.summonLeviathan;
 
-/** 無圖標技能 / Skill without icon (StanceRestore) */
+/**
+ * 無圖標技能（StanceRestore，SkillCard 展示用去圖標變體）
+ * Skill without icon (StanceRestore; icon stripped for the SkillCard showcase)
+ */
 export const withoutIconSkill: ISkillData = {
-	name: 'StanceRestore',
+	...skills.stanceRestore,
 	iconUrl: '',
-	target: EnumTargetType.Friend,
-	scope: EnumTargetMethod.All,
-	sp: 0,
-	effect: '隊列修正',
 };
 
-/** 長名稱技能 / Long name skill (FullSupport) */
-export const longNameSkill: ISkillData = {
-	name: 'FullSupport',
-	iconUrl: '/image/icon/skill/we_other007z.png',
-	target: EnumTargetType.Friend,
-	scope: EnumTargetMethod.Individual,
-	sp: 200,
-	hitRate: '0:150',
-	weaponLimit: 'Whip',
-	effect: '召喚キャラ強化',
-	upStats: { STR: 100, INT: 100, SPD: 100 },
-};
+/** 長名稱技能（FullSupport） / Long name skill (FullSupport) */
+export const longNameSkill: ISkillData = skills.fullSupport;

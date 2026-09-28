@@ -7,10 +7,8 @@
  */
 import type { IJobData } from '../../src/components/game-data/GameDataTypes';
 import { spriteUrlByFile } from './spriteCast';
+import { skills } from './skills';
 import { baseJobs, advancedJobs } from './gameDataJobs';
-import { EnumTargetType } from '../../src/lib/game/types';
-import { EnumTargetMethod } from '../../src/lib/game/types';
-import { EnumSkillType } from '../../src/components/battle/enums';
 
 /** 混合職業資料 / Mixed job data */
 export const mixedJobs: IJobData[] = [
@@ -24,25 +22,9 @@ export const mixedJobs: IJobData[] = [
 		spriteUrls: [spriteUrlByFile('mon_216.png'), spriteUrlByFile('mon_216y.png')],
 		equipment: ['Dagger', 'Bow', 'Armor', 'Cloth', 'Item'],
 		skills: [
-			{
-				name: 'ArrowRain',
-				iconUrl: '',
-				target: EnumTargetType.Enemy,
-				scope: EnumTargetMethod.Multi,
-				sp: 35,
-				powerPct: 120,
-				hits: 3,
-				hitRate: '30:50',
-			},
-			{
-				name: 'EagleEye',
-				iconUrl: '',
-				target: EnumTargetType.Self,
-				scope: EnumTargetMethod.Individual,
-				sp: 20,
-				effect: '命中率大幅上昇',
-			},
-		],
+		skills.arrowRain,
+		skills.eagleEye,
+	],
 	},
 ];
 
@@ -56,85 +38,14 @@ export const highSkillJob: IJobData[] = [
 		spriteUrls: [spriteUrlByFile('mon_999.png'), spriteUrlByFile('mon_999r.png')],
 		equipment: ['All'],
 		skills: [
-			{
-				name: 'Fire',
-				iconUrl: '',
-				target: EnumTargetType.Enemy,
-				scope: EnumTargetMethod.Individual,
-				sp: 8,
-				powerPct: 150,
-				hits: 1,
-				hitRate: '20:20',
-				skillType: EnumSkillType.Magic,
-			},
-			{
-				name: 'Ice',
-				iconUrl: '',
-				target: EnumTargetType.Enemy,
-				scope: EnumTargetMethod.Individual,
-				sp: 8,
-				powerPct: 140,
-				hits: 1,
-				hitRate: '25:25',
-				skillType: EnumSkillType.Magic,
-			},
-			{
-				name: 'Lightning',
-				iconUrl: '',
-				target: EnumTargetType.Enemy,
-				scope: EnumTargetMethod.Individual,
-				sp: 8,
-				powerPct: 160,
-				hits: 1,
-				hitRate: '15:30',
-				skillType: EnumSkillType.Magic,
-			},
-			{
-				name: 'Heal',
-				iconUrl: '',
-				target: EnumTargetType.Friend,
-				scope: EnumTargetMethod.Individual,
-				sp: 10,
-				effect: 'HP回復',
-				skillType: EnumSkillType.Magic,
-				isSupport: true,
-			},
-			{
-				name: 'Cure',
-				iconUrl: '',
-				target: EnumTargetType.Friend,
-				scope: EnumTargetMethod.Individual,
-				sp: 6,
-				effect: '状態異常回復',
-				curePoison: true,
-			},
-			{
-				name: 'Revive',
-				iconUrl: '',
-				target: EnumTargetType.Friend,
-				scope: EnumTargetMethod.Individual,
-				sp: 60,
-				effect: '味方一人を復活',
-				skillType: EnumSkillType.Magic,
-			},
-			{
-				name: 'Buff',
-				iconUrl: '',
-				target: EnumTargetType.Friend,
-				scope: EnumTargetMethod.All,
-				sp: 40,
-				effect: '全能力上昇',
-				skillType: EnumSkillType.Magic,
-			},
-			{
-				name: 'Debuff',
-				iconUrl: '',
-				target: EnumTargetType.Enemy,
-				scope: EnumTargetMethod.All,
-				sp: 40,
-				effect: '全能力低下',
-				skillType: EnumSkillType.Magic,
-			},
-		],
+		skills.fire,
+		skills.ice,
+		skills.lightning,
+		skills.heal,
+		skills.cure,
+		skills.revive,
+		skills.buff,
+		skills.debuff,
+	],
 	},
 ];
