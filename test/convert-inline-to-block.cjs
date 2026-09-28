@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 安全的 `//` → 區塊註解轉換器 (v33)
+ * 安全的 `//` → 區塊註解轉換器 (v37)
  *
  * 功能特性:
  *  - 預設為 dry-run（不編輯），需加上 `--write` 才會實際寫入檔案；`--diff` 顯示變更對照
@@ -19,6 +19,10 @@
  *  - 以 async/await 與 fs.promises 實作
  *  - 未提供路徑時顯示用法與旗標說明；提供路徑但找不到檔案時逐項說明原因
  *  - 檔案過多警告時列出前 5 個檔案；可用 `--max-files <N>` 放寬上限
+ *  - 每個檔案處理完成時立即輸出該檔報告（不等待全部處理完才輸出）
+ *  - 可用 `--no-details` 隱藏單檔明細（適合檔案被修改或檔案數量很多時）
+ *  - 沒有明細的檔案預設隱藏；`--show-all` 可顯示
+ *  - 可用 `--report <file>` 將報告輸出同時寫入指定檔案（tee 模式）
  */
 
 const fs = require('fs');
@@ -690,9 +694,16 @@ function parseArgs(rawArgs)
 	let writeMode = false;
 	let showDiff = false;
 	let recursive = true;
+	let showDetails = true;
+
+	/** 顯示沒有明細的檔案（--show-all） / show files without details (--show-all) */
+	let showAll = false;
 
 	/** 放寬後的上限（未指定時使用 MAX_FILES）/ overridden file limit (null → MAX_FILES) */
 	let maxFiles = null;
+
+	/** 報告輸出檔（--report，tee 模式）/ report output file (--report, tee mode) */
+	let reportFile = null;
 
 	const targets = [];
 	for (let idx = 0; idx < rawArgs.length; idx++)
@@ -709,6 +720,25 @@ function parseArgs(rawArgs)
 		else if (a === '--no-recursive')
 		{
 			recursive = false;
+		}
+		else if (a === '--no-details')
+		{
+			showDetails = false;
+		}
+		else if (a === '--show-all')
+		{
+			showAll = true;
+		}
+		else if (a === '--report')
+		{
+			/** --report 需接檔案路徑 / requires a file path */
+			const next = rawArgs[idx + 1];
+			if (next === undefined)
+			{
+				throw new Error('--report requires a file path');
+			}
+			reportFile = next;
+			idx++; // 消耗該值 / consume the value
 		}
 		else if (a === '--max-files')
 		{
@@ -727,7 +757,7 @@ function parseArgs(rawArgs)
 			targets.push(a);
 		}
 	}
-	return { writeMode, showDiff, recursive, maxFiles, targets };
+	return { writeMode, showDiff, recursive, maxFiles, showDetails, showAll, reportFile, targets };
 }
 
 /**
@@ -925,31 +955,51 @@ function printTargets(targets)
 }
 
 /**
- * 處理所有檔案並累計報告資料
- * Process all files and aggregate report data
+ * 處理所有檔案，並在每個檔案處理完成時立即輸出其報告（不等待全部處理完）
+ * Process all files, streaming each file's report as it completes
  */
-async function processAll(filesToProcess, writeMode, showDiff)
+async function processAll(filesToProcess, writeMode, showDiff, showDetails, showAll)
 {
 	let changed = 0;
 	let retainedCount = 0;
 	let reviewCount = 0;
-	const fileReports = [];
 	const fileSkips = [];
-	const report = [];
 
 	for (const fp of filesToProcess)
 	{
 		const { changed: ch, skipped, fileSkip, diff } = await convertFile(fp, writeMode, showDiff);
 
+		/** 整檔跳過（過大等）：立即輸出 / Whole-file skip: print immediately */
 		if (fileSkip)
 		{
 			fileSkips.push({ file: fp, reason: fileSkip });
+			console.log(`[Skipped]  ${fp}  (${fileSkip})`);
 			continue;
 		}
 
 		if (ch) changed++;
 
-		fileReports.push({ file: fp, changed: ch, skippedCount: skipped.length });
+		/**
+		 * 沒有任何明細的檔案預設隱藏；--show-all 時才顯示該檔的處理標記
+		 * Files without any details are hidden by default; --show-all reveals them
+		 */
+		if (skipped.length > 0 || showAll)
+		{
+			/** 每個檔案處理完立即輸出處理標記 / Print the per-file result right away */
+			const mark = ch ? (writeMode ? '[MODIFIED]' : '[WOULD CHANGE]') : '[UNCHANGED]';
+			console.log(`\n[Processed] ${mark}  ${fp}  (skipped ${skipped.length})`);
+
+			/** 立即輸出該檔的跳過明細（--no-details 時隱藏） / Stream skip details unless --no-details */
+			if (skipped.length > 0 && showDetails)
+			{
+				printFileSkipDetail(fp, skipped);
+			}
+		}
+
+		if (showDiff && diff && diff.length > 0)
+		{
+			printDiff(fp, diff);
+		}
 
 		for (const s of skipped)
 		{
@@ -961,15 +1011,9 @@ async function processAll(filesToProcess, writeMode, showDiff)
 			{
 				reviewCount++;
 			}
-			report.push({ file: fp, lineNo: s.lineNo, text: s.text, reason: s.reason });
-		}
-
-		if (showDiff && diff && diff.length > 0)
-		{
-			printDiff(fp, diff);
 		}
 	}
-	return { changed, retainedCount, reviewCount, fileReports, fileSkips, report };
+	return { changed, retainedCount, reviewCount, fileSkips };
 }
 
 /**
@@ -984,86 +1028,73 @@ function printSummary(count, writeMode, changed, retainedCount, reviewCount, ski
 }
 
 /**
- * 輸出處理檔案清單（是否修改 + 跳過行數）
- * Print the processed-files report (changed flag + skipped line count)
+ * 輸出單一檔案的跳過明細（每個類別最多 MAX_REPORT_PER_FILE 筆，文字已於儲存時裁切）
+ * Print one file's skip details (at most MAX_REPORT_PER_FILE per category; text pre-clipped)
  */
-function printProcessedFiles(fileReports, writeMode)
+function printFileSkipDetail(file, items)
 {
-	console.log('\n[Processed files]');
-	for (const fr of fileReports)
+	console.log(`  ${file}`);
+
+	const byCat = new Map();
+	for (const r of items)
 	{
-		const mark = fr.changed ? (writeMode ? '[MODIFIED]' : '[WOULD CHANGE]') : '[UNCHANGED]';
-		console.log(`  ${mark}  ${fr.file}  (skipped ${fr.skippedCount})`);
+		const cat = reasonCategory(r.reason);
+		if (!byCat.has(cat)) byCat.set(cat, []);
+		byCat.get(cat).push(r);
+	}
+
+	for (const [cat, catItems] of byCat)
+	{
+		const shown = Math.min(catItems.length, MAX_REPORT_PER_FILE);
+		for (let idx = 0; idx < shown; idx++)
+		{
+			const r = catItems[idx];
+			console.log(`    [${cat}] L${r.lineNo}  (${r.reason})`);
+			console.log(`        ${r.text}`);
+		}
+		if (catItems.length > shown)
+		{
+			console.log(`    ... ${catItems.length - shown} more ${cat} issue(s) (capped at ${MAX_REPORT_PER_FILE} per category).`);
+		}
 	}
 }
 
-/**
- * 輸出整檔被跳過的檔案；大檔案（過大）上限 MAX_REPORT_PER_FILE 筆
- * Print files skipped entirely; large files (too large) capped at MAX_REPORT_PER_FILE
- */
-function printFileSkips(fileSkips)
-{
-	if (fileSkips.length === 0) return;
+/** 報告輸出檔路徑（--report）/ report output file path (--report) */
+let reportFile = null;
 
-	console.log('\n[Skipped files (not processed)]');
-	const shown = Math.min(fileSkips.length, MAX_REPORT_PER_FILE);
-	for (let idx = 0; idx < shown; idx++)
-	{
-		const f = fileSkips[idx];
-		console.log(`  [SKIPPED]  ${f.file}  (${f.reason})`);
-	}
-	if (fileSkips.length > shown)
-	{
-		console.log(`  ... and ${fileSkips.length - shown} more file(s) (capped at ${MAX_REPORT_PER_FILE}).`);
-	}
-}
+/** 報告輸出緩衝行（--report）/ buffered report lines (--report) */
+const reportLines = [];
 
 /**
- * 輸出跳過明細（普通檔案：每個類別最多 MAX_REPORT_PER_FILE 筆）
- * 文字已在存入 skip 紀錄時裁切（clipAroundComment + MAX_REPORT_TEXT）
+ * 啟用報告檔輸出：將 console 輸出同時收集（終端仍照常顯示，結束時再寫入檔案）
+ * Enable report output: also collect console output (terminal output unchanged; file written at the end)
  *
- * Print skip details for normal files (at most MAX_REPORT_PER_FILE per category).
- * Text was already clipped when the skip record was stored.
+ * @param {string} filePath - 報告輸出檔路徑 / report output file path
  */
-function printSkipDetails(report)
+function enableReportFile(filePath)
 {
-	if (report.length === 0) return;
+	reportFile = filePath;
 
-	const byFile = new Map();
-	for (const r of report)
+	const tee = (orig) => (...args) =>
 	{
-		if (!byFile.has(r.file)) byFile.set(r.file, []);
-		byFile.get(r.file).push(r);
-	}
+		orig(...args);
+		reportLines.push(args.map(String).join(' '));
+	};
 
-	console.log('\n[Skip details]');
-	for (const [file, items] of byFile)
-	{
-		console.log(`\n  ${file}`);
+	console.log = tee(console.log);
+	console.warn = tee(console.warn);
+	console.error = tee(console.error);
+}
 
-		const byCat = new Map();
-		for (const r of items)
-		{
-			const cat = reasonCategory(r.reason);
-			if (!byCat.has(cat)) byCat.set(cat, []);
-			byCat.get(cat).push(r);
-		}
-
-		for (const [cat, catItems] of byCat)
-		{
-			const shown = Math.min(catItems.length, MAX_REPORT_PER_FILE);
-			for (let idx = 0; idx < shown; idx++)
-			{
-				const r = catItems[idx];
-				console.log(`    [${cat}] L${r.lineNo}  (${r.reason})`);
-				console.log(`        ${r.text}`);
-			}
-			if (catItems.length > shown)
-			{
-				console.log(`    ... ${catItems.length - shown} more ${cat} issue(s) (capped at ${MAX_REPORT_PER_FILE} per category).`);
-			}
-		}
-	}
+/**
+ * 將緩衝的報告寫入指定檔案（在 main 完成後呼叫）
+ * Write the buffered report to the file (call after main completes)
+ */
+async function writeReportFile()
+{
+	if (reportFile === null) return;
+	await fs.promises.writeFile(reportFile, reportLines.join('\n') + '\n', 'utf8');
+	console.log(`\n[Report saved to] ${reportFile}`);
 }
 
 /**
@@ -1072,10 +1103,16 @@ function printSkipDetails(report)
  */
 async function main()
 {
+	const { writeMode, showDiff, recursive, maxFiles, showDetails, showAll, reportFile: reportFilePath, targets } = parseArgs(process.argv.slice(2));
+
+	/** 啟用報告檔輸出（終端照常，結束時寫入）/ Enable report file output (written at the end) */
+	if (reportFilePath)
+	{
+		enableReportFile(reportFilePath);
+	}
+
 	/** 輸出目前工作目錄（除錯／診斷用） / Print the current working directory */
 	console.log(`\n[CWD] ${process.cwd()}`);
-
-	const { writeMode, showDiff, recursive, maxFiles, targets } = parseArgs(process.argv.slice(2));
 
 	/** 輸出目前的目標路徑（診斷用） / Print the current target paths */
 	printTargets(targets);
@@ -1099,6 +1136,9 @@ async function main()
 		console.error('  --write           edit files (default: dry-run, no changes are written)');
 		console.error('  --diff            show a preview of the changes');
 		console.error('  --no-recursive    only scan the given directory itself (no subdirectories)');
+		console.error('  --no-details      hide per-file skip details (useful for many files or modified files)');
+		console.error('  --show-all        show files without any details (hidden by default)');
+		console.error('  --report <file>   also write the report output to <file> (tee mode)');
 		console.error('  --max-files <N>   raise the per-run file count limit (default: 20)');
 		console.error('');
 		console.error('<path> can be a file (any extension) or a directory of .ts/.tsx files.');
@@ -1208,11 +1248,9 @@ async function main()
 	 * 4. 開始轉換處理並收集報告資料
 	 * 4. Process files and collect report data
 	 */
-	const { changed, retainedCount, reviewCount, fileReports, fileSkips, report } = await processAll(filesToProcess, writeMode, showDiff);
+	const { changed, retainedCount, reviewCount, fileSkips } = await processAll(filesToProcess, writeMode, showDiff, showDetails, showAll);
 
 	printSummary(filesToProcess.length, writeMode, changed, retainedCount, reviewCount, fileSkips.length);
-	printProcessedFiles(fileReports, writeMode);
-	printFileSkips(fileSkips);
 
 	/**
 	 * dry-run 提示：檔案未被修改，需 --write 才套用
@@ -1222,12 +1260,14 @@ async function main()
 	{
 		console.log('\n(Dry-run: no files were modified. Run again with --write to apply changes.)');
 	}
-
-	printSkipDetails(report);
 }
 
-main().catch((err) =>
+main().then(async () =>
+{
+	await writeReportFile();
+}).catch(async (err) =>
 {
 	console.error(`\n[ERROR] ${err && err.message ? err.message : err}`);
 	process.exitCode = 1;
+	await writeReportFile();
 });
