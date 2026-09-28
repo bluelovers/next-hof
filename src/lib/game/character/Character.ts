@@ -10,6 +10,7 @@ import type { IBehavior, ISpecial, ICharCore, IMonReward } from '../types';
 import type { ICorpsePolicy } from '../battle/corpse-policy';
 import { EnumCharType, EnumEquipSlot, EnumWeaponType } from '../types';
 import type { RNG } from '../core/rng';
+import { nanoid } from 'nanoid';
 
 /**
  * 角色識別字串工具 / Character ID string utilities
@@ -61,25 +62,17 @@ export function defaultSpecial(): ISpecial
 /**
  * 建立戰鬥單位實例唯一識別碼 / Build a battle-unit instance uid
  *
- * 優先採用呼叫方（資料提供者）提供的 unitUuid；否則以 `crypto.randomUUID()` 產生，
- * 在不支援的環境（非安全上下文）退化為「計數器 + 亂數」後綴，確保同一程序內不重複。
- * Prefers a caller/provider-supplied unitUuid; otherwise generates one via
- * `crypto.randomUUID()`, degrading to a counter + random suffix where unavailable
- * (non-secure contexts) while still guaranteeing uniqueness within the process.
+ * 優先採用呼叫方（資料提供者）提供的 unitUuid；否則以 `nanoid()` 產生唯一識別碼。
+ * Prefers a caller/provider-supplied unitUuid; otherwise generates one via `nanoid()`.
  *
  * `types`/`no` 僅作為可讀前綴（除錯用），不參與唯一性判定。
  * `types`/`no` are only a readable prefix for debugging and do not affect uniqueness.
  */
-let unitUidCounter = 0;
-
 export function buildUnitUid(types: EnumCharType[], no: number, provided?: string): string
 {
 	if (provided) return provided;
 	const prefix = `${types.join('-')}-${no}-`;
-	const cryptoObj = (globalThis as { crypto?: { randomUUID?: () => string } }).crypto;
-	if (cryptoObj?.randomUUID) return prefix + cryptoObj.randomUUID();
-	unitUidCounter += 1;
-	return `${prefix}${unitUidCounter.toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+	return prefix + nanoid();
 }
 
 export class Character implements ICharCore
@@ -231,19 +224,28 @@ export class Character implements ICharCore
 
 	/** 是否為玩家角色 / whether this is a player character */
 	isChar(): boolean
-	{ return this.types.has(EnumCharType.Char); }
+	{
+		return this.types.has(EnumCharType.Char);
+	}
 
 	/** 是否為怪物（含召喚物/工會怪）/ whether this is a monster (summons/unions included) */
 	isMon(): boolean
-	{ return this.types.has(EnumCharType.Mon); }
+	{
+		return this.types.has(EnumCharType.Mon);
+	}
 
 	/** 是否為召喚物 / whether this is a summon */
 	isSummon(): boolean
-	{ return this.types.has(EnumCharType.Summon); }
+	{
+		return this.types.has(EnumCharType.Summon);
+
+	}
 
 	/** 是否為工會怪 / whether this is a union monster */
 	isUnion(): boolean
-	{ return this.types.has(EnumCharType.Union); }
+	{
+		return this.types.has(EnumCharType.Union);
+	}
 
 	/** 以字串鍵讀取 SPECIAL 數值（缺省 0）/ read a SPECIAL value by string key (0 when absent) */
 	getSpecial(key: string): number
