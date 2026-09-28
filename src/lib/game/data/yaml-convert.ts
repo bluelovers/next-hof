@@ -26,6 +26,7 @@ import {
 	type ICompBonuses,
 	type IDefTuple,
 	type IEncounterTable,
+	type IEquipTable,
 	type IGenderOverride,
 	type IItemDef,
 	type IJobDef,
@@ -43,11 +44,9 @@ import { SKILL_EXTRA_NUMERIC_KEYS as SHARED_SKILL_EXTRA_NUMERIC_KEYS } from './y
 import type {
 	IRawCharYaml,
 	IRawCombatCoreYaml,
-	IRawEquipYaml,
 	IRawItemYaml,
 	IRawJobYaml,
 	IRawMonYaml,
-	IRawRewardYaml,
 	IRawSkillYaml,
 } from './yaml-types';
 
@@ -111,8 +110,9 @@ export function convertPosition(value: string | null | undefined): EnumPosition 
 
 /**
  * 行為規則列轉換 / Convert one pattern row
- * quantity 的 null → 0；judge／action 無法解析時略過該列。
- * null quantity → 0; rows with unparseable judge/action are dropped.
+ * quantity 的 null 已於載入收斂為 0、缺省保持 undefined；judge／action 缺省時略過該列。
+ * null quantity is normalized to 0 at load and omission stays undefined;
+ * rows with a missing judge/action are dropped.
  */
 export function convertPatternItem(raw: IPatternItem | null | undefined): IPatternItem | undefined
 {
@@ -151,7 +151,7 @@ export function convertBehaviorYaml(raw: IBehavior | null | undefined): IBehavio
 }
 
 /** 獎勵轉換 / Convert a raw reward block */
-export function convertRewardYaml(raw: IRawRewardYaml | null | undefined): IMonReward | undefined
+export function convertRewardYaml(raw: IMonReward | null | undefined): IMonReward | undefined
 {
 	if (!raw) return undefined;
 	const reward: IMonReward = {};
@@ -170,7 +170,7 @@ export function convertRewardYaml(raw: IRawRewardYaml | null | undefined): IMonR
  * main_hand/off_hand/armor → EnumEquipSlot 鍵；未知欄位忽略。
  * main_hand/off_hand/armor → EnumEquipSlot keys; unknown keys are ignored.
  */
-export function convertEquipYaml(raw: IRawEquipYaml | null | undefined): ICharDef['equip']
+export function convertEquipYaml(raw: IEquipTable | null | undefined): ICharDef['equip']
 {
 	if (!raw) return undefined;
 	const out: NonNullable<ICharDef['equip']> = {};

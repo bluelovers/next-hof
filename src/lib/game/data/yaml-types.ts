@@ -47,26 +47,15 @@ export type IRawSkillExtraNumerics = Partial<
 >;
 
 /**
- * 原始掉落與獎勵 / Raw reward block
- * moneyhold／exphold 引用 IMonReward（單一事實來源）；itemtable 鍵在原始檔為字串。
- * moneyhold/exphold reference IMonReward (SSOT); itemtable keys are strings in the source.
- */
-export type IRawRewardYaml = Omit<IMonReward, 'itemtable'> & {
-	/** 掉落表 { 道具編號: 數量或權重 } / drop table (INumberTable) */
-	itemtable?: INumberTable;
-};
-
-/**
- * 原始裝備欄（char.*.yml `equip`）/ Raw equip block (char.*.yml `equip`)
- * 鍵為 EnumEquipSlot 值（main_hand/off_hand/armor），值為道具編號（IEquipTable）。
- * Keys are EnumEquipSlot values (main_hand/off_hand/armor); values are item numbers.
- */
-export type IRawEquipYaml = IEquipTable;
-
-/**
  * 原始戰鬥核心欄位（角色與怪物共用）/ Raw combat-core fields (shared by char & mon)
  * 六維與 HP/SP 引用 ICombatStats；no/name 引用 INamedIconDef（無 img）。
  * Stats/HP/SP reference ICombatStats; no/name reference INamedIconDef (with img omitted).
+ *
+ * behavior 直接使用 IBehavior（載入後即與引擎目標同形：position 值即 EnumPosition、
+ * guard 值即 EnumGuardKind、pattern 列即 IPatternItem——來源筆誤／空物件已於載入修正）。
+ * behavior uses IBehavior directly (post-load it is identical to the engine target: position
+ * values ARE EnumPosition, guard values ARE EnumGuardKind, pattern rows ARE IPatternItem;
+ * source typos / empty objects are already fixed at load).
  */
 export interface IRawCombatCoreYaml extends ICombatStats, Omit<INamedIconDef, 'img'>
 {
@@ -88,7 +77,7 @@ export interface IRawCharYaml extends IRawCombatCoreYaml
 	/** 擴充資料（共用 IDataEx；char 只用 recruit_money）/ extra data (shared IDataEx; char uses recruit_money only) */
 	data_ex?: IDataEx;
 	/** 各欄位裝備 / equipped items per slot */
-	equip?: IRawEquipYaml;
+	equip?: IEquipTable;
 }
 
 /**
@@ -116,7 +105,7 @@ export interface IRawMonYaml extends IRawCombatCoreYaml, INamedIconDef
 	/** 說明資訊 / description info */
 	info?: IDescInfo;
 	/** 掉落與獎勵 / drop & reward */
-	reward?: IRawRewardYaml;
+	reward?: IMonReward;
 	/** AI 行為 / AI behavior */
 	behavior?: IBehavior;
 	/** 獨特怪物出現週期（秒）/ union spawn cycle (seconds) */
