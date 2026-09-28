@@ -8,42 +8,55 @@
 import type { IBattleUnit, IBattleResult } from '../../src/components/battle/types';
 import { EnumTeamSideUI, EnumUnitStatus } from '#/components/battle/enums';
 import { getCharSpriteUrl, getMonSpriteUrl } from '#/lib/showcase/sprite-map';
+import { characterSprites, monsterSprites } from './spriteCast';
+
+/** 角色名稱別名（由 spriteCast 派生） / Character name aliases (derived from spriteCast) */
+const Hero1 = characterSprites.hero.name;
+const Mage1 = characterSprites.mage.name;
+const Healer1 = characterSprites.healer.name;
+const Priest1 = characterSprites.priest.name;
+/** 怪物名稱別名（由 spriteCast 派生） / Monster name aliases (derived from spriteCast) */
+const GoblinWarriorA = monsterSprites.goblinWarriorA.name;
+const GoblinWarriorB = monsterSprites.goblinWarriorB.name;
+const GoblinWarriorC = monsterSprites.goblinWarriorC.name;
+const GoblinAxe = monsterSprites.goblinAxe.name;
+const Slime = monsterSprites.slime.name;
 
 // ==================== BattleUnit 單位資料 / BattleUnit unit data ====================
 
 /** 滿血滿 SP 的單位 / Full HP and SP */
 export const fullHealthUnit: IBattleUnit = {
-	name: 'Hero1', level: 3, hp: 349, maxHp: 349, sp: 349, maxSp: 53, side: EnumTeamSideUI.Left,
+	name: Hero1, level: 3, hp: 349, maxHp: 349, sp: 349, maxSp: 53, side: EnumTeamSideUI.Left,
 };
 
 /** 低血量單位 / Low HP */
 export const lowHealthUnit: IBattleUnit = {
-	name: 'Hero1', level: 3, hp: 42, maxHp: 349, sp: 180, maxSp: 53, side: EnumTeamSideUI.Left,
+	name: Hero1, level: 3, hp: 42, maxHp: 349, sp: 180, maxSp: 53, side: EnumTeamSideUI.Left,
 };
 
 /** 瀕死單位 / Near death */
 export const nearDeathUnit: IBattleUnit = {
-	name: 'Mage1', level: 3, hp: 1, maxHp: 159, sp: 30, maxSp: 112, side: EnumTeamSideUI.Left, status: EnumUnitStatus.Alive,
+	name: Mage1, level: 3, hp: 1, maxHp: 159, sp: 30, maxSp: 112, side: EnumTeamSideUI.Left, status: EnumUnitStatus.Alive,
 };
 
 /** 陣亡單位 / Downed unit */
 export const downedUnit: IBattleUnit = {
-	name: 'Healer1', level: 3, hp: 0, maxHp: 213, sp: 0, maxSp: 89, side: EnumTeamSideUI.Left, status: EnumUnitStatus.Down,
+	name: Healer1, level: 3, hp: 0, maxHp: 213, sp: 0, maxSp: 89, side: EnumTeamSideUI.Left, status: EnumUnitStatus.Down,
 };
 
 /** 詠唱中 / Casting */
 export const castingUnit: IBattleUnit = {
-	name: 'Mage1', level: 3, hp: 159, maxHp: 159, sp: 80, maxSp: 112, side: EnumTeamSideUI.Left, status: EnumUnitStatus.Casting,
+	name: Mage1, level: 3, hp: 159, maxHp: 159, sp: 80, maxSp: 112, side: EnumTeamSideUI.Left, status: EnumUnitStatus.Casting,
 };
 
 /** SP 不足 / Low SP */
 export const lowSpUnit: IBattleUnit = {
-	name: 'Priest1', level: 3, hp: 213, maxHp: 213, sp: 5, maxSp: 89, side: EnumTeamSideUI.Left,
+	name: Priest1, level: 3, hp: 213, maxHp: 213, sp: 5, maxSp: 89, side: EnumTeamSideUI.Left,
 };
 
 /** 高等級敵人 / High level enemy */
 export const highLevelEnemyUnit: IBattleUnit = {
-	name: 'GoblinWarrior(A)', level: 4, hp: 263, maxHp: 263, sp: 200, maxSp: 174, side: EnumTeamSideUI.Right,
+	name: GoblinWarriorA, level: 4, hp: 263, maxHp: 263, sp: 200, maxSp: 174, side: EnumTeamSideUI.Right,
 };
 
 // ==================== BattleTeamInfo 隊伍資料 / BattleTeamInfo team data ====================
@@ -52,10 +65,10 @@ export const highLevelEnemyUnit: IBattleUnit = {
 export const goblinTeamInfo = {
 	name: 'ゴブリンと遊ぶ(最弱)',
 	units: [
-		{ name: 'GoblinWarrior(A)', level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: EnumTeamSideUI.Left },
-		{ name: 'GoblinWarrior(B)', level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: EnumTeamSideUI.Left },
-		{ name: 'GoblinWarrior(C)', level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: EnumTeamSideUI.Left },
-		{ name: 'GoblinAxe', level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: EnumTeamSideUI.Left },
+		{ name: GoblinWarriorA, level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: EnumTeamSideUI.Left },
+		{ name: GoblinWarriorB, level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: EnumTeamSideUI.Left },
+		{ name: GoblinWarriorC, level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: EnumTeamSideUI.Left },
+		{ name: GoblinAxe, level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: EnumTeamSideUI.Left },
 	] as IBattleUnit[],
 };
 
@@ -63,10 +76,10 @@ export const goblinTeamInfo = {
 export const testTeamInfo = {
 	name: 'TestTeam',
 	units: [
-		{ name: 'Hero1', level: 3, hp: 349, maxHp: 349, sp: 349, maxSp: 53, side: EnumTeamSideUI.Right },
-		{ name: 'Mage1', level: 3, hp: 159, maxHp: 159, sp: 159, maxSp: 112, side: EnumTeamSideUI.Right },
-		{ name: 'Healer1', level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: EnumTeamSideUI.Right },
-		{ name: 'Priest1', level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: EnumTeamSideUI.Right },
+		{ name: Hero1, level: 3, hp: 349, maxHp: 349, sp: 349, maxSp: 53, side: EnumTeamSideUI.Right },
+		{ name: Mage1, level: 3, hp: 159, maxHp: 159, sp: 159, maxSp: 112, side: EnumTeamSideUI.Right },
+		{ name: Healer1, level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: EnumTeamSideUI.Right },
+		{ name: Priest1, level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: EnumTeamSideUI.Right },
 	] as IBattleUnit[],
 };
 
@@ -86,7 +99,7 @@ export const championTeamInfo = {
 /** 左隊（敵方）單位 / Left (enemy) units */
 export const segmentLeftUnits: IBattleUnit[] = [
 	{
-		name: 'GoblinAxe',
+		name: GoblinAxe,
 		level: 1,
 		hp: 180,
 		maxHp: 213,
@@ -96,7 +109,7 @@ export const segmentLeftUnits: IBattleUnit[] = [
 		sprite: { url: getMonSpriteUrl(1000) },
 	},
 	{
-		name: 'Slime',
+		name: Slime,
 		level: 2,
 		hp: 213,
 		maxHp: 213,
@@ -110,7 +123,7 @@ export const segmentLeftUnits: IBattleUnit[] = [
 /** 右隊（我方）單位 / Right (ally) units */
 export const segmentRightUnits: IBattleUnit[] = [
 	{
-		name: 'Hero1',
+		name: Hero1,
 		level: 3,
 		hp: 349,
 		maxHp: 349,
@@ -120,7 +133,7 @@ export const segmentRightUnits: IBattleUnit[] = [
 		sprite: { url: getCharSpriteUrl(100) },
 	},
 	{
-		name: 'Mage1',
+		name: Mage1,
 		level: 3,
 		hp: 120,
 		maxHp: 159,
@@ -169,7 +182,7 @@ export const overwhelmingResult: { leftTeamName: string; rightTeamName: string; 
 /** 慘勝 / Pyrrhic victory */
 export const pyrrhicResult: { leftTeamName: string; rightTeamName: string; result: IBattleResult } = {
 	leftTeamName: 'TestTeam',
-	rightTeamName: 'DragonLord',
+	rightTeamName: monsterSprites.dragonLord.name,
 	result: {
 		winner: 'TestTeam',
 		leftTeam: { hpRemain: 12, alive: 1, totalUnits: 5, totalDamage: 15000, totalExp: 5000, funds: '100000' },

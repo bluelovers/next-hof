@@ -7,6 +7,14 @@
  * independently-maintained sample data across files.
  */
 import type { IBattleSprite, IBattleFieldConfig, IBattleMagicCircle } from '../../src/components/battle/types';
+import {
+	charOf,
+	charRevOf,
+	monsterOf,
+	charRevUrl,
+	monUrl,
+	spriteUrlByFile,
+} from '../fixture/spriteCast';
 import { getSpriteImageSize } from '../../src/components/battle/spriteImageSizes';
 import {
 	computeBattleSpritePositions,
@@ -15,14 +23,14 @@ import {
 	type IBattlePositionChar,
 	type ITeamBattleChars,
 } from '../../src/components/battle/computeSpritePositions';
-import { EnumTeamSideUI } from '../../src/components/battle/enums';
+import { EnumTeamSideUI, EnumSpriteImageDir } from '../../src/components/battle/enums';
 import { EnumPosition } from '../../src/lib/game/constants';
 
 /** 共用敵方精靈樣本 / Shared enemy sprite samples */
 export const sampleEnemySprites: IBattleSprite[] = [
-	{ unitUuid: 'mon_052', imageUrl: '/image/char/mon_052.png', x: 164, y: 16, flipped: false, name: 'GoblinWarrior(A)' },
-	{ unitUuid: 'mon_052', imageUrl: '/image/char/mon_052.png', x: 148, y: 56, flipped: false, name: 'GoblinWarrior(B)' },
-	{ unitUuid: 'mon_053', imageUrl: '/image/char/mon_053.png', x: 124, y: 96, flipped: false, name: 'GoblinAxe' },
+	{ unitUuid: 'mon_052', ...monsterOf('goblinWarriorA'), x: 164, y: 16, flipped: false },
+	{ unitUuid: 'mon_052', ...monsterOf('goblinWarriorB'), x: 148, y: 56, flipped: false },
+	{ unitUuid: 'mon_053', ...monsterOf('goblinAxe'), x: 124, y: 96, flipped: false },
 ];
 
 /**
@@ -41,9 +49,9 @@ export const sampleEnemySprites: IBattleSprite[] = [
  * combined with the old nested layering, split a single team across sides.
  */
 export const sampleAllySprites: IBattleSprite[] = [
-	{ unitUuid: 'mon_018', imageUrl: '/image/char_rev/mon_018.png', x: 352, y: 14, flipped: false, name: 'Hero1' },
-	{ unitUuid: 'mon_214', imageUrl: '/image/char_rev/mon_214.png', x: 388, y: 64, flipped: false, name: 'Mage1' },
-	{ unitUuid: 'mon_079', imageUrl: '/image/char_rev/mon_079.png', x: 300, y: 110, flipped: false, name: 'Priest1' },
+	{ unitUuid: 'mon_079', ...charRevOf('hero'), x: 352, y: 14, flipped: false },
+	{ unitUuid: 'mon_018', ...charRevOf('mage'), x: 388, y: 64, flipped: false },
+	{ unitUuid: 'mon_214', ...charRevOf('priest'), x: 300, y: 110, flipped: false },
 ];
 
 /** 共用完整戰場精靈樣本（敵方 + 友方） / Shared full battlefield sprite samples (enemies + allies) */
@@ -142,25 +150,22 @@ const demoRoster: { left: IRosterTeam; right: IRosterTeam } = {
 	left: {
 		back: [
 			{
-				unitUuid: 'mon_018',
-				name: 'Hero1',
-				imageUrl: '/image/char/mon_018.png',
+				unitUuid: 'mon_079',
+				...charOf('hero'),
 				position: EnumPosition.Back,
 				side: EnumTeamSideUI.Left,
 			},
 		],
 		front: [
 			{
-				unitUuid: 'mon_014',
-				name: 'Mage1',
-				imageUrl: '/image/char/mon_014.png',
+				unitUuid: 'mon_018',
+				...charOf('mage'),
 				position: EnumPosition.Front,
 				side: EnumTeamSideUI.Left,
 			},
 			{
-				unitUuid: 'mon_079',
-				name: 'Priest1',
-				imageUrl: '/image/char/mon_079.png',
+				unitUuid: 'mon_214',
+				...charOf('priest'),
 				position: EnumPosition.Front,
 				side: EnumTeamSideUI.Left,
 			},
@@ -170,8 +175,7 @@ const demoRoster: { left: IRosterTeam; right: IRosterTeam } = {
 		back: [
 			{
 				unitUuid: 'mon_052a',
-				name: 'GoblinWarrior(A)',
-				imageUrl: '/image/char/mon_052.png',
+				...monsterOf('goblinWarriorA'),
 				position: EnumPosition.Back,
 				side: EnumTeamSideUI.Right,
 			},
@@ -179,15 +183,13 @@ const demoRoster: { left: IRosterTeam; right: IRosterTeam } = {
 		front: [
 			{
 				unitUuid: 'mon_052b',
-				name: 'GoblinWarrior(B)',
-				imageUrl: '/image/char/mon_052.png',
+				...monsterOf('goblinWarriorB'),
 				position: EnumPosition.Front,
 				side: EnumTeamSideUI.Right,
 			},
 			{
 				unitUuid: 'mon_053',
-				name: 'GoblinAxe',
-				imageUrl: '/image/char/mon_053.png',
+				...monsterOf('goblinAxe'),
 				position: EnumPosition.Front,
 				side: EnumTeamSideUI.Right,
 			},
@@ -251,14 +253,14 @@ const mixedRoster: { left: IRosterTeam; right: IRosterTeam } = {
 			{
 				unitUuid: 'mon_190',
 				name: 'mon_190(char_rev)',
-				imageUrl: '/image/char_rev/mon_190.png',
+				imageUrl: spriteUrlByFile('mon_190.png', EnumSpriteImageDir.CharRev),
 				position: EnumPosition.Back,
 				side: EnumTeamSideUI.Right,
 			},
 			{
 				unitUuid: 'mon_170',
 				name: 'mon_170(char_rev)',
-				imageUrl: '/image/char/mon_170.png',
+				imageUrl: spriteUrlByFile('mon_170.png'),
 				position: EnumPosition.Back,
 				side: EnumTeamSideUI.Right,
 			},
@@ -267,21 +269,21 @@ const mixedRoster: { left: IRosterTeam; right: IRosterTeam } = {
 			{
 				unitUuid: 'mon_052',
 				name: 'Goblin(char)',
-				imageUrl: '/image/char/mon_052.png',
+				imageUrl: monUrl('goblinWarriorA'),
 				position: EnumPosition.Front,
 				side: EnumTeamSideUI.Right,
 			},
 			{
 				unitUuid: 'mon_018',
 				name: 'Hero(char_rev)',
-				imageUrl: '/image/char_rev/mon_018.png',
+				imageUrl: charRevUrl('hero'),
 				position: EnumPosition.Front,
 				side: EnumTeamSideUI.Right,
 			},
 			{
 				unitUuid: 'mon_079',
 				name: 'Priest(char_rev)',
-				imageUrl: '/image/char_rev/mon_079.png',
+				imageUrl: charRevUrl('priest'),
 				position: EnumPosition.Front,
 				side: EnumTeamSideUI.Right,
 			},
@@ -326,44 +328,38 @@ export function createMixedSampleSprites(
  */
 const flatRosterSample: IRosterChar[] = [
 	{
-		unitUuid: 'mon_018',
-		name: 'Hero1',
-		imageUrl: '/image/char/mon_018.png',
+		unitUuid: 'mon_079',
+		...charOf('hero'),
 		position: EnumPosition.Back,
 		side: EnumTeamSideUI.Left,
 	},
 	{
-		unitUuid: 'mon_014',
-		name: 'Mage1',
-		imageUrl: '/image/char/mon_014.png',
+		unitUuid: 'mon_018',
+		...charOf('mage'),
 		position: EnumPosition.Front,
 		side: EnumTeamSideUI.Left,
 	},
 	{
-		unitUuid: 'mon_079',
-		name: 'Priest1',
-		imageUrl: '/image/char/mon_079.png',
+		unitUuid: 'mon_214',
+		...charOf('priest'),
 		position: EnumPosition.Front,
 		side: EnumTeamSideUI.Left,
 	},
 	{
 		unitUuid: 'mon_052a',
-		name: 'GoblinWarrior(A)',
-		imageUrl: '/image/char/mon_052.png',
+		...monsterOf('goblinWarriorA'),
 		position: EnumPosition.Back,
 		side: EnumTeamSideUI.Right,
 	},
 	{
 		unitUuid: 'mon_052b',
-		name: 'GoblinWarrior(B)',
-		imageUrl: '/image/char/mon_052.png',
+		...monsterOf('goblinWarriorB'),
 		position: EnumPosition.Front,
 		side: EnumTeamSideUI.Right,
 	},
 	{
 		unitUuid: 'mon_053',
-		name: 'GoblinAxe',
-		imageUrl: '/image/char/mon_053.png',
+		...monsterOf('goblinAxe'),
 		position: EnumPosition.Front,
 		side: EnumTeamSideUI.Right,
 	},
@@ -422,18 +418,16 @@ export const sampleSpritesAuto: IBattleSprite[] = createAutoSampleSprites();
 
 /** 左隊角色（後衛，char 圖） / Left-team back-row char (char image) */
 export const sampleLabelHeroLeft: IRosterChar = {
-	unitUuid: 'mon_018',
-	name: 'Hero1',
-	imageUrl: '/image/char/mon_018.png',
+	unitUuid: 'mon_079',
+	...charOf('hero'),
 	position: EnumPosition.Back,
 	side: EnumTeamSideUI.Left,
 };
 
 /** 右隊角色（前衛，char_rev 直接定位） / Right-team front-row char (char_rev, direct) */
 export const sampleLabelMageRight: IRosterChar = {
-	unitUuid: 'mon_018b',
-	name: 'Mage1',
-	imageUrl: '/image/char_rev/mon_018.png',
+	unitUuid: 'mon_018',
+	...charRevOf('mage'),
 	position: EnumPosition.Front,
 	side: EnumTeamSideUI.Right,
 };
@@ -441,8 +435,7 @@ export const sampleLabelMageRight: IRosterChar = {
 /** 右隊角色（前衛，char 由邏輯推導翻轉） / Right-team front-row char (char, flip derived) */
 export const sampleLabelGoblinRight: IRosterChar = {
 	unitUuid: 'mon_052',
-	name: 'Goblin',
-	imageUrl: '/image/char/mon_052.png',
+	...monsterOf('goblinWarriorB'),
 	position: EnumPosition.Front,
 	side: EnumTeamSideUI.Right,
 };
@@ -451,22 +444,20 @@ export const sampleLabelGoblinRight: IRosterChar = {
 export const sampleStyleOverrideSprites: IBattleSprite[] = [
 	{
 		unitUuid: 'mon_052',
-		imageUrl: '/image/char/mon_052.png',
 		x: 164,
 		y: 16,
 		flipped: false,
-		name: 'GoblinWarrior(A)',
+		...monsterOf('goblinWarriorA'),
 		/** 單體精靈樣式覆寫（最優先） / Per-sprite style override (highest priority) */
 		style: { opacity: 0.7 },
 		/** 單體標籤樣式覆寫 / Per-sprite label style override */
 		labelStyle: { color: '#ffd166', fontSize: 13 },
 	},
 	{
-		unitUuid: 'mon_018',
-		imageUrl: '/image/char_rev/mon_018.png',
+		unitUuid: 'mon_079',
 		x: 352,
 		y: 14,
 		flipped: true,
-		name: 'Hero1',
+		...charRevOf('hero'),
 	},
 ];

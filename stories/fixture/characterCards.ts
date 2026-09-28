@@ -2,18 +2,19 @@
  * CharacterCard / CharacterList 展示用角色資料（單一事實來源）
  * CharacterCard / CharacterList fixture character data (single source of truth)
  *
- * 各故事展示用的獨立角色資料，集中管理避免重複定義。
- * Individual character data for each story showcase, centralized to avoid duplication.
+ * 名稱與圖像統一取自 spriteCast（角色基底），此檔僅負責組合 ID／等級／職業等展示欄位。
+ * Names and images come from spriteCast (character base); this file only composes the
+ * showcase fields (id / level / class / flags).
  */
 import type { ICharacterData, IBattleCharacterData } from '../../src/components/characters/CharacterTypes';
+import { charOf } from './spriteCast';
 
 // ==================== CharacterList 隊員資料 / CharacterList roster ====================
 
 /** 法師隊員（mon_018 = 72px 高） / Mage member (mon_018 = 72px tall) */
 export const mageChar: ICharacterData = {
 	id: 'char-1',
-	name: 'Mage1',
-	imageUrl: '/image/char/mon_018.png',
+	...charOf('mage'),
 	level: 3,
 	className: 'Sorceress',
 	hasStar: true,
@@ -23,8 +24,7 @@ export const mageChar: ICharacterData = {
 /** 補師隊員（mon_214 = 72px 高） / Healer member (mon_214 = 72px tall) */
 export const healerChar: ICharacterData = {
 	id: 'char-2',
-	name: 'Healer1',
-	imageUrl: '/image/char/mon_214.png',
+	...charOf('healer'),
 	level: 3,
 	className: 'Priestess',
 	hasStar: true,
@@ -34,8 +34,7 @@ export const healerChar: ICharacterData = {
 /** 戰士隊員（mon_079 = 64px 高） / Hero member (mon_079 = 64px tall) */
 export const heroChar: ICharacterData = {
 	id: 'char-3',
-	name: 'Hero1',
-	imageUrl: '/image/char/mon_079.png',
+	...charOf('hero'),
 	level: 3,
 	className: 'Warrior',
 	hasStar: true,
@@ -45,8 +44,7 @@ export const heroChar: ICharacterData = {
 /** 主教隊員（mon_214 = 72px 高） / Priest member (mon_214 = 72px tall) */
 export const priestChar: ICharacterData = {
 	id: 'char-4',
-	name: 'Priest1',
-	imageUrl: '/image/char/mon_214.png',
+	...charOf('priest'),
 	level: 3,
 	className: 'Priestess',
 	hasStar: true,
@@ -56,8 +54,7 @@ export const priestChar: ICharacterData = {
 /** 狂戰士隊員（mon_079 = 64px 高） / Berserker member (mon_079 = 64px tall) */
 export const berserkerChar: ICharacterData = {
 	id: 'char-5',
-	name: 'Berserker1',
-	imageUrl: '/image/char/mon_079.png',
+	...charOf('berserker'),
 	level: 5,
 	className: 'Berserker',
 	hasStar: true,
@@ -67,8 +64,7 @@ export const berserkerChar: ICharacterData = {
 /** 弓箭手隊員（mon_018 = 72px 高） / Archer member (mon_018 = 72px tall) */
 export const archerChar: ICharacterData = {
 	id: 'char-6',
-	name: 'Archer1',
-	imageUrl: '/image/char/mon_018.png',
+	...charOf('archer'),
 	level: 2,
 	className: 'Archer',
 	hasStar: false,
@@ -78,8 +74,7 @@ export const archerChar: ICharacterData = {
 /** 新手隊員一（mon_214 = 72px 高） / Novice member one (mon_214 = 72px tall) */
 export const novice1Char: ICharacterData = {
 	id: 'char-7',
-	name: 'Novice1',
-	imageUrl: '/image/char/mon_214.png',
+	...charOf('novice1'),
 	level: 1,
 	className: 'Novice',
 	hasStar: false,
@@ -89,8 +84,7 @@ export const novice1Char: ICharacterData = {
 /** 新手隊員二（mon_018 = 72px 高） / Novice member two (mon_018 = 72px tall) */
 export const novice2Char: ICharacterData = {
 	id: 'char-8',
-	name: 'Novice2',
-	imageUrl: '/image/char/mon_018.png',
+	...charOf('novice2'),
 	level: 1,
 	className: 'Novice',
 	hasStar: false,
@@ -102,8 +96,7 @@ export const novice2Char: ICharacterData = {
 /** 矮個子角色（精靈圖 32px 高） / Short character (32px-tall sprite) */
 export const shortChar: ICharacterData = {
 	id: 'char-short',
-	name: 'Shorty',
-	imageUrl: '/image/char/mon_036z.png',
+	...charOf('short'),
 	level: 1,
 	className: 'Chibi',
 	hasStar: false,
@@ -113,8 +106,7 @@ export const shortChar: ICharacterData = {
 /** 高個子角色（精靈圖 128px 高） / Tall character (128px-tall sprite) */
 export const tallChar: ICharacterData = {
 	id: 'char-tall',
-	name: 'Giant',
-	imageUrl: '/image/char/mon_162.png',
+	...charOf('tall'),
 	level: 10,
 	className: 'Titan',
 	hasStar: true,
@@ -126,8 +118,7 @@ export const tallChar: ICharacterData = {
 /** radio 模式法師（未選取） / Radio-mode mage (unselected) */
 export const radioMage: ICharacterData = {
 	id: 'char-mage',
-	name: 'Mage1',
-	imageUrl: '/image/char/mon_018.png',
+	...charOf('mage'),
 	level: 3,
 	className: 'Sorceress',
 	hasStar: true,
@@ -137,8 +128,7 @@ export const radioMage: ICharacterData = {
 /** checkbox 模式補師（已勾選） / Checkbox-mode healer (checked) */
 export const checkboxHealer: ICharacterData = {
 	id: 'char-healer',
-	name: 'Healer1',
-	imageUrl: '/image/char/mon_214.png',
+	...charOf('healer'),
 	level: 5,
 	className: 'Priestess',
 	hasStar: true,
@@ -148,67 +138,66 @@ export const checkboxHealer: ICharacterData = {
 /** 已選取戰士 / Active warrior */
 export const activeWarrior: ICharacterData = {
 	id: 'char-warrior',
-	name: 'Hero1',
-	imageUrl: '/image/char/mon_079.png',
+	...charOf('hero'),
 	level: 10,
 	className: 'Warrior',
 	hasStar: true,
 	active: true,
 };
 
-/** 帶連結的戰士 / Linked warrior */
+/** 帶連結的戰士（沿用英雄圖像） / Linked warrior (hero image) */
 export const linkedWarrior: ICharacterData = {
 	id: 'char-link',
+	...charOf('hero'),
 	name: 'Linked',
-	imageUrl: '/image/char/mon_079.png',
 	level: 1,
 	className: 'Warrior',
 };
 
-/** 僅顯示名稱的角色 / Name-only character */
+/** 僅顯示名稱的角色（沿用法師圖像） / Name-only character (mage image) */
 export const nameOnlyChar: ICharacterData = {
 	id: 'char-nameonly',
+	...charOf('mage'),
 	name: 'SimpleChar',
-	imageUrl: '/image/char/mon_018.png',
 	level: 1,
 	className: 'Novice',
 	active: false,
 };
 
-/** 無選取控件的展示角色 / Display-only character (no selection control) */
+/** 無選取控件的展示角色（沿用法師圖像） / Display-only character (mage image) */
 export const displayOnlyChar: ICharacterData = {
 	id: 'char-noselect',
+	...charOf('mage'),
 	name: 'DisplayOnly',
-	imageUrl: '/image/char/mon_018.png',
 	level: 7,
 	className: 'Mage',
 	hasStar: true,
 };
 
-/** 無底座的角色 / Character without pedestal */
+/** 無底座的角色（沿用法師圖像） / Character without pedestal (mage image) */
 export const noCarpetChar: ICharacterData = {
 	id: 'char-nopedestal',
+	...charOf('mage'),
 	name: 'NoCarpet',
-	imageUrl: '/image/char/mon_018.png',
 	level: 1,
 	className: 'Novice',
 };
 
-/** 自訂 children 的角色 / Character with custom children badge */
+/** 自訂 children 的角色（沿用英雄圖像） / Character with custom children badge (hero image) */
 export const badgeChar: ICharacterData = {
 	id: 'char-child',
+	...charOf('hero'),
 	name: 'WithBadge',
-	imageUrl: '/image/char/mon_079.png',
 	level: 5,
 	className: 'Warrior',
 	hasStar: true,
 };
 
-/** 向後兼容 selected 欄位的角色 / Backward-compatible legacy selected character */
+/** 向後兼容 selected 欄位的角色（沿用法師圖像） / Backward-compatible legacy selected character (mage image) */
 export const legacySelectedChar: ICharacterData = {
 	id: 'char-backward',
+	...charOf('mage'),
 	name: 'OldAPI',
-	imageUrl: '/image/char/mon_018.png',
 	level: 1,
 	className: 'Novice',
 	selected: true,
@@ -219,8 +208,7 @@ export const legacySelectedChar: ICharacterData = {
 /** 未勾選法師 / Unchecked mage */
 export const checkboxUnchecked: ICharacterData = {
 	id: 'char-uncheck',
-	name: 'Mage1',
-	imageUrl: '/image/char/mon_018.png',
+	...charOf('mage'),
 	level: 3,
 	className: 'Sorceress',
 	hasStar: true,
@@ -230,40 +218,39 @@ export const checkboxUnchecked: ICharacterData = {
 /** 已勾選補師 / Checked healer */
 export const checkboxChecked: ICharacterData = {
 	id: 'char-check',
-	name: 'Healer1',
-	imageUrl: '/image/char/mon_214.png',
+	...charOf('healer'),
 	level: 5,
 	className: 'Priestess',
 	hasStar: true,
 	active: true,
 };
 
-/** 對比用未勾選新手 / Compare-unchecked novice */
+/** 對比用未勾選新手（沿用法師圖像） / Compare-unchecked novice (mage image) */
 export const compareUnchecked: ICharacterData = {
 	id: 'uncheck',
+	...charOf('mage'),
 	name: 'Unchecked',
-	imageUrl: '/image/char/mon_018.png',
 	level: 1,
 	className: 'Novice',
 	active: false,
 };
 
-/** 對比用已勾選戰士 / Compare-checked warrior */
+/** 對比用已勾選戰士（沿用英雄圖像） / Compare-checked warrior (hero image) */
 export const compareChecked: ICharacterData = {
 	id: 'checked',
+	...charOf('hero'),
 	name: 'Checked',
-	imageUrl: '/image/char/mon_079.png',
 	level: 5,
 	className: 'Warrior',
 	hasStar: true,
 	active: true,
 };
 
-/** checkbox 模式帶連結的角色 / Checkbox-mode linked character */
+/** checkbox 模式帶連結的角色（沿用英雄圖像） / Checkbox-mode linked character (hero image) */
 export const checkboxLinked: ICharacterData = {
 	id: 'char-link',
+	...charOf('hero'),
 	name: 'LinkedChar',
-	imageUrl: '/image/char/mon_079.png',
 	level: 10,
 	className: 'Warrior',
 	hasStar: true,
@@ -280,33 +267,32 @@ export const dashboardCharacters: ICharacterData[] = [
 	{ ...priestChar, id: 'de979500692a963857ea9d68868f2958' },
 ];
 
-/** 新手隊伍戰士（未滿編） / Beginner-team warrior */
+/** 新手隊伍戰士（沿用英雄圖像） / Beginner-team warrior (hero image) */
 export const beginnerWarrior: ICharacterData = {
 	id: 'char-b1',
+	...charOf('hero'),
 	name: 'Warrior1',
-	imageUrl: '/image/char/mon_079.png',
 	level: 1,
 	className: 'Warrior',
 	hasStar: false,
 	selected: true,
 };
 
-/** 新手隊伍法師（未滿編） / Beginner-team mage */
+/** 新手隊伍法師 / Beginner-team mage */
 export const beginnerMage: ICharacterData = {
 	id: 'char-b2',
-	name: 'Mage1',
-	imageUrl: '/image/char/mon_018.png',
+	...charOf('mage'),
 	level: 1,
 	className: 'Sorceress',
 	hasStar: false,
 	selected: false,
 };
 
-/** 瀕危隊伍唯一角色 / Sole survivor of a depleted team */
+/** 瀕危隊伍唯一角色（沿用英雄圖像） / Sole survivor of a depleted team (hero image) */
 export const loneHeroChar: ICharacterData = {
 	id: 'char-d1',
+	...charOf('hero'),
 	name: 'LoneHero',
-	imageUrl: '/image/char/mon_079.png',
 	level: 1,
 	className: 'Warrior',
 	hasStar: true,
@@ -318,8 +304,7 @@ export const loneHeroChar: ICharacterData = {
 /** 編成角色：名探偵 / Formation character: Detective */
 export const battleDetectiveChar: IBattleCharacterData = {
 	id: '1',
-	name: '名探偵',
-	imageUrl: '/image/char/m_chr30101.png',
+	...charOf('detective'),
 	level: 1,
 	className: '探偵',
 };
@@ -327,8 +312,7 @@ export const battleDetectiveChar: IBattleCharacterData = {
 /** 編成角色：新米錬金術師 / Formation character: Novice alchemist */
 export const battleAlchemistChar: IBattleCharacterData = {
 	id: '2',
-	name: '新米錬金術師',
-	imageUrl: '/image/char/f_chr03901.png',
+	...charOf('alchemist'),
 	level: 1,
 	className: '錬金術師',
 };
@@ -336,8 +320,7 @@ export const battleAlchemistChar: IBattleCharacterData = {
 /** 編成角色：魔導剣士 / Formation character: Sword mage */
 export const battleSwordMageChar: IBattleCharacterData = {
 	id: '3',
-	name: '魔導剣士',
-	imageUrl: '/image/char/m_chr02901.png',
+	...charOf('swordMage'),
 	level: 1,
 	className: '魔導剣士',
 };
@@ -345,8 +328,7 @@ export const battleSwordMageChar: IBattleCharacterData = {
 /** 編成角色：弓聖（高階） / Formation character: Bow saint (high level) */
 export const battleBowSaintChar: IBattleCharacterData = {
 	id: '4',
-	name: '弓聖',
-	imageUrl: '/image/char/f_chr04201.png',
+	...charOf('bowSaint'),
 	level: 137,
 	className: '弓聖',
 };

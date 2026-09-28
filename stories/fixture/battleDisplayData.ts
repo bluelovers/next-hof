@@ -33,6 +33,20 @@ import type {
 	ISkillIcon,
 } from '#/components/battle/types';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
+import { characterSprites, monsterSprites, spriteUrlByFile } from './spriteCast';
+
+/** 角色名稱別名（由 spriteCast 派生） / Character name aliases (derived from spriteCast) */
+const Hero1 = characterSprites.hero.name;
+const Mage1 = characterSprites.mage.name;
+const Healer1 = characterSprites.healer.name;
+const Priest1 = characterSprites.priest.name;
+/** 怪物名稱別名（由 spriteCast 派生） / Monster name aliases (derived from spriteCast) */
+const GoblinWarriorA = monsterSprites.goblinWarriorA.name;
+const GoblinWarriorB = monsterSprites.goblinWarriorB.name;
+const GoblinWarriorC = monsterSprites.goblinWarriorC.name;
+const GoblinAxe = monsterSprites.goblinAxe.name;
+const Mummy = monsterSprites.mummy.name;
+const MummyPrisoner = monsterSprites.mummyPrisoner.name;
 import type { IBattlePositionChar } from '#/components/battle/computeSpritePositions';
 import { computeBattleSpritePositions, groupBattleChars } from '#/components/battle/computeSpritePositions';
 import { getSpriteImageSize } from '#/components/battle/spriteImageSizes';
@@ -42,6 +56,7 @@ import {
 	EnumChargeKind,
 	EnumMagicCircleKind,
 	EnumStatDirection,
+	EnumSpriteImageDir,
 	EnumTeamSideUI,
 	EnumUnitStatus,
 } from '#/components/battle/enums';
@@ -157,7 +172,7 @@ interface IShowcaseUnit
 
 const goblinWarriorA: IShowcaseUnit = {
 	unitUuid: 'goblin-a',
-	name: 'GoblinWarrior(A)',
+	name: GoblinWarriorA,
 	level: 4,
 	hp: 263,
 	maxHp: 263,
@@ -165,11 +180,11 @@ const goblinWarriorA: IShowcaseUnit = {
 	maxSp: 174,
 	side: EnumTeamSideUI.Left,
 	position: EnumPosition.Front,
-	imageUrl: '/image/char/mon_052.png',
+	imageUrl: spriteUrlByFile('mon_052.png'),
 };
 const goblinWarriorB: IShowcaseUnit = {
 	unitUuid: 'goblin-b',
-	name: 'GoblinWarrior(B)',
+	name: GoblinWarriorB,
 	level: 4,
 	hp: 263,
 	maxHp: 263,
@@ -177,11 +192,11 @@ const goblinWarriorB: IShowcaseUnit = {
 	maxSp: 174,
 	side: EnumTeamSideUI.Left,
 	position: EnumPosition.Front,
-	imageUrl: '/image/char/mon_052.png',
+	imageUrl: spriteUrlByFile('mon_052.png'),
 };
 const goblinWarriorC: IShowcaseUnit = {
 	unitUuid: 'goblin-c',
-	name: 'GoblinWarrior(C)',
+	name: GoblinWarriorC,
 	level: 1,
 	hp: 213,
 	maxHp: 213,
@@ -189,11 +204,11 @@ const goblinWarriorC: IShowcaseUnit = {
 	maxSp: 154,
 	side: EnumTeamSideUI.Left,
 	position: EnumPosition.Front,
-	imageUrl: '/image/char/mon_052.png',
+	imageUrl: spriteUrlByFile('mon_052.png'),
 };
 const goblinAxe: IShowcaseUnit = {
 	unitUuid: 'goblin-axe',
-	name: 'GoblinAxe',
+	name: GoblinAxe,
 	level: 1,
 	hp: 213,
 	maxHp: 213,
@@ -201,14 +216,14 @@ const goblinAxe: IShowcaseUnit = {
 	maxSp: 154,
 	side: EnumTeamSideUI.Left,
 	position: EnumPosition.Back,
-	imageUrl: '/image/char/mon_053.png',
+	imageUrl: spriteUrlByFile('mon_053.png'),
 };
 
 // ---- 預設戰鬥：右隊（TestTeam）/ Default battle: right team (TestTeam) ----
 
 const hero1: IShowcaseUnit = {
 	unitUuid: 'hero1',
-	name: 'Hero1',
+	name: Hero1,
 	level: 3,
 	hp: 349,
 	maxHp: 349,
@@ -216,11 +231,11 @@ const hero1: IShowcaseUnit = {
 	maxSp: 53,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Front,
-	imageUrl: '/image/char_rev/mon_018.png',
+	imageUrl: spriteUrlByFile('mon_018.png', EnumSpriteImageDir.CharRev),
 };
 const mage1: IShowcaseUnit = {
 	unitUuid: 'mage1',
-	name: 'Mage1',
+	name: Mage1,
 	level: 3,
 	hp: 159,
 	maxHp: 159,
@@ -228,11 +243,11 @@ const mage1: IShowcaseUnit = {
 	maxSp: 112,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Back,
-	imageUrl: '/image/char_rev/mon_214.png',
+	imageUrl: spriteUrlByFile('mon_214.png', EnumSpriteImageDir.CharRev),
 };
 const healer1: IShowcaseUnit = {
 	unitUuid: 'healer1',
-	name: 'Healer1',
+	name: Healer1,
 	level: 3,
 	hp: 213,
 	maxHp: 213,
@@ -240,11 +255,11 @@ const healer1: IShowcaseUnit = {
 	maxSp: 89,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Back,
-	imageUrl: '/image/char_rev/mon_214.png',
+	imageUrl: spriteUrlByFile('mon_214.png', EnumSpriteImageDir.CharRev),
 };
 const priest1: IShowcaseUnit = {
 	unitUuid: 'priest1',
-	name: 'Priest1',
+	name: Priest1,
 	level: 3,
 	hp: 213,
 	maxHp: 213,
@@ -252,7 +267,7 @@ const priest1: IShowcaseUnit = {
 	maxSp: 89,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Front,
-	imageUrl: '/image/char_rev/mon_079.png',
+	imageUrl: spriteUrlByFile('mon_079.png', EnumSpriteImageDir.CharRev),
 };
 
 /**
@@ -274,7 +289,7 @@ const defaultUnits: IShowcaseUnit[] = [
 
 const summonGoblinAxe: IShowcaseUnit = {
 	unitUuid: 'u-goblin-axe',
-	name: 'GoblinAxe',
+	name: GoblinAxe,
 	level: 1,
 	hp: 213,
 	maxHp: 213,
@@ -282,11 +297,11 @@ const summonGoblinAxe: IShowcaseUnit = {
 	maxSp: 154,
 	side: EnumTeamSideUI.Left,
 	position: EnumPosition.Front,
-	imageUrl: '/image/char/mon_053.png',
+	imageUrl: spriteUrlByFile('mon_053.png'),
 };
 const summonHero1: IShowcaseUnit = {
 	unitUuid: 'u-hero1',
-	name: 'Hero1',
+	name: Hero1,
 	level: 3,
 	hp: 349,
 	maxHp: 349,
@@ -294,11 +309,11 @@ const summonHero1: IShowcaseUnit = {
 	maxSp: 53,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Back,
-	imageUrl: '/image/char_rev/mon_018.png',
+	imageUrl: spriteUrlByFile('mon_018.png', EnumSpriteImageDir.CharRev),
 };
 const summonMage1: IShowcaseUnit = {
 	unitUuid: 'u-mage1',
-	name: 'Mage1',
+	name: Mage1,
 	level: 3,
 	hp: 159,
 	maxHp: 159,
@@ -306,11 +321,11 @@ const summonMage1: IShowcaseUnit = {
 	maxSp: 112,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Back,
-	imageUrl: '/image/char_rev/mon_214.png',
+	imageUrl: spriteUrlByFile('mon_214.png', EnumSpriteImageDir.CharRev),
 };
 const mummy1: IShowcaseUnit = {
 	unitUuid: 'u-mummy-1',
-	name: 'Mummy',
+	name: Mummy,
 	level: 10,
 	hp: 472,
 	maxHp: 472,
@@ -318,11 +333,11 @@ const mummy1: IShowcaseUnit = {
 	maxSp: 179,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Front,
-	imageUrl: '/image/char_rev/mon_146.png',
+	imageUrl: spriteUrlByFile('mon_146.png', EnumSpriteImageDir.CharRev),
 };
 const mummyPrisoner: IShowcaseUnit = {
 	unitUuid: 'u-mummy-prisoner',
-	name: 'MummyPrisoner',
+	name: MummyPrisoner,
 	level: 10,
 	hp: 682,
 	maxHp: 682,
@@ -330,11 +345,11 @@ const mummyPrisoner: IShowcaseUnit = {
 	maxSp: 179,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Front,
-	imageUrl: '/image/char_rev/mon_146r.png',
+	imageUrl: spriteUrlByFile('mon_146r.png', EnumSpriteImageDir.CharRev),
 };
 const mummy2: IShowcaseUnit = {
 	unitUuid: 'u-mummy-2',
-	name: 'Mummy',
+	name: Mummy,
 	level: 10,
 	hp: 472,
 	maxHp: 472,
@@ -342,7 +357,7 @@ const mummy2: IShowcaseUnit = {
 	maxSp: 179,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Front,
-	imageUrl: '/image/char_rev/mon_146.png',
+	imageUrl: spriteUrlByFile('mon_146.png', EnumSpriteImageDir.CharRev),
 };
 
 /** 開場單位（首段快照；召喚者不在其中）/ Opening units (first snapshot; the summoned are not in it) */
@@ -426,7 +441,7 @@ function snapshotUnits(units: IShowcaseUnit[]): IBattleSnapshotDisplayUnit[]
  */
 function logAvatarUrl(imageUrl: string): string
 {
-	return imageUrl.replace('/image/char_rev/', '/image/char/');
+	return imageUrl.replace(`${EnumSpriteImageDir.CharRev}/`, `${EnumSpriteImageDir.Char}/`);
 }
 
 // ==================== 行動建構器（文案只書寫一次）/ Action builders (every copy written once) ====================
@@ -1162,7 +1177,7 @@ const summonSnapshots: IBattleSnapshotDisplay[] = [
 function midBattleLeftUnits(): IBattleUnit[]
 {
 	return statusUnits(
-		withHp(unitsOfSide(defaultUnits, EnumTeamSideUI.Left), { 'GoblinWarrior(A)': 180, 'GoblinWarrior(B)': 200 }),
+		withHp(unitsOfSide(defaultUnits, EnumTeamSideUI.Left), { [GoblinWarriorA]: 180, [GoblinWarriorB]: 200 }),
 	);
 }
 
@@ -1170,7 +1185,7 @@ function midBattleLeftUnits(): IBattleUnit[]
 function battleOverLeftUnits(): IBattleUnit[]
 {
 	return statusUnits(
-		withHp(unitsOfSide(defaultUnits, EnumTeamSideUI.Left), { 'GoblinWarrior(A)': 140, 'GoblinWarrior(B)': 130 }),
+		withHp(unitsOfSide(defaultUnits, EnumTeamSideUI.Left), { [GoblinWarriorA]: 140, [GoblinWarriorB]: 130 }),
 	);
 }
 
@@ -1179,11 +1194,11 @@ function casualtyRightUnits(): IBattleUnit[]
 {
 	return statusUnits(unitsOfSide(defaultUnits, EnumTeamSideUI.Right)).map((unit) =>
 	{
-		if (unit.name === 'Mage1' || unit.name === 'Priest1' || unit.name === 'Healer1')
+		if (unit.name === Mage1 || unit.name === Priest1 || unit.name === Healer1)
 		{
 			return { ...unit, hp: 0, status: EnumUnitStatus.Down };
 		}
-		if (unit.name === 'Hero1')
+		if (unit.name === Hero1)
 		{
 			return { ...unit, hp: 1, status: EnumUnitStatus.Alive };
 		}

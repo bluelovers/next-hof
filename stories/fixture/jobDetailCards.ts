@@ -6,6 +6,7 @@
  * Individual job data for each story showcase.
  */
 import type { IJobData } from '../../src/components/game-data/GameDataTypes';
+import { spriteUrlByFile } from './spriteCast';
 import { EnumTargetType } from '../../src/lib/game/types';
 import { EnumTargetMethod } from '../../src/lib/game/types';
 import { EnumSkillType } from '../../src/components/battle/enums';
@@ -15,7 +16,7 @@ export const basicJob: IJobData = {
 	id: 1,
 	parentId: 0,
 	name: '戦士',
-	spriteUrls: ['/image/char/warrior.png'],
+	spriteUrls: [spriteUrlByFile('warrior.png')],
 	description: 'HPが高く、攻撃力も高い。重装備で防御力も高い。',
 	equipment: ['剣', '盾', '鎧'],
 	skills: [
@@ -39,7 +40,7 @@ export const multipleSpritesJob: IJobData = {
 	id: 2,
 	parentId: 0,
 	name: '魔法使い',
-	spriteUrls: ['/image/char/mon_106.png', '/image/char/mon_018.png'],
+	spriteUrls: [spriteUrlByFile('mon_106.png'), spriteUrlByFile('mon_018.png')],
 	description: 'MPが高く、魔法攻撃が得意。防御力は低い。',
 	equipment: ['杖', 'ローブ'],
 	skills: [
@@ -78,7 +79,7 @@ export const multipleSkillsJob: IJobData = {
 	id: 3,
 	parentId: 0,
 	name: '弓使い',
-	spriteUrls: ['/image/char/mon_216.png'],
+	spriteUrls: [spriteUrlByFile('mon_216.png')],
 	description: '遠距離攻撃が得意。敏捷性が高い。',
 	equipment: ['弓', '皮鎧'],
 	skills: [
@@ -128,7 +129,7 @@ export const alternatingBgJob: IJobData = {
 	id: 4,
 	parentId: 0,
 	name: '僧侶',
-	spriteUrls: ['/image/char/mon_213.png'],
+	spriteUrls: [spriteUrlByFile('mon_213.png')],
 	description: '回復とサポートが得意。HPとMPが高い。',
 	equipment: ['杖', '祭服'],
 	skills: [
@@ -154,7 +155,7 @@ export const longDescJob: IJobData = {
 	id: 5,
 	parentId: 0,
 	name: '聖騎士',
-	spriteUrls: ['/image/char/mon_199r.png'],
+	spriteUrls: [spriteUrlByFile('mon_199r.png')],
 	description: '攻撃と防御の両方に長けている。信仰心が強く、魔法も少しだけ使える。味方を守ることに長けている。',
 	equipment: ['聖剣', '盾', '聖鎧', '聖盾'],
 	skills: [

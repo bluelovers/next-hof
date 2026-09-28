@@ -35,6 +35,7 @@
  * the data source stay independent of each other.
  */
 import { runEventEngine } from '#/lib/game/battle/event-engine';
+import { characterSprites, monsterSprites } from './spriteCast';
 import type { IBattleEventRecord } from '#/lib/game/battle/event-engine';
 import {
 	EnumBattleEventType,
@@ -129,7 +130,7 @@ const getSkill = (no: number): ISkillDef | undefined => skillDefs.get(no);
  * Unit names: display names for events whose actor / target is a def no
  */
 export const dispatchUnitNames: Record<string, string> = {
-	'1002': 'Slime',
+	'1002': monsterSprites.slime.name,
 };
 
 /**
@@ -142,14 +143,14 @@ const skillUseEvents: IBattleEvent[] = [
 	{
 		type: EnumBattleEventType.Damage,
 		actor: 'Mage',
-		target: 'GoblinAxe',
+		target: monsterSprites.goblinAxe.name,
 		skill: plagueHex.no,
 		value: 96,
 		hpBefore: 140,
 		hpAfter: 44,
 	},
-	{ type: EnumBattleEventType.Debuff, actor: 'Mage', target: 'GoblinAxe', skill: plagueHex.no },
-	{ type: EnumBattleEventType.Poison, actor: 'Mage', target: 'GoblinAxe', skill: plagueHex.no },
+	{ type: EnumBattleEventType.Debuff, actor: 'Mage', target: monsterSprites.goblinAxe.name, skill: plagueHex.no },
+	{ type: EnumBattleEventType.Poison, actor: 'Mage', target: monsterSprites.goblinAxe.name, skill: plagueHex.no },
 	/**
 	 * 每回合毒傷：屬一般事件，夾在技能執行中間也不會切開它
 	 * Per-turn poison damage: a general event that must not split the execution even when interleaved
@@ -208,7 +209,7 @@ export const summonEntryRecords: IBattleEventRecord[] = runEventEngine(summonUse
  */
 const mixedEvents: IBattleEvent[] = [
 	...skillUseEvents,
-	{ type: EnumBattleEventType.Death, target: 'GoblinAxe' },
+	{ type: EnumBattleEventType.Death, target: monsterSprites.goblinAxe.name },
 	{ type: EnumBattleEventType.Act, actor: 'Warrior', skill: 1000 },
 	{
 		type: EnumBattleEventType.Damage,
@@ -248,7 +249,7 @@ const skillEffectEvents: IBattleEvent[] = [
 	{
 		type: EnumBattleEventType.SpDamage,
 		actor: 'Warrior',
-		target: 'GoblinAxe',
+		target: monsterSprites.goblinAxe.name,
 		skill: soulLeech.no,
 		value: 40,
 		unit: EnumResource.Sp,
@@ -258,7 +259,7 @@ const skillEffectEvents: IBattleEvent[] = [
 	{
 		type: EnumBattleEventType.Drain,
 		actor: 'Warrior',
-		target: 'GoblinAxe',
+		target: monsterSprites.goblinAxe.name,
 		skill: soulLeech.no,
 		value: 40,
 		unit: EnumResource.Hp,
@@ -270,7 +271,7 @@ const skillEffectEvents: IBattleEvent[] = [
 	/**
 	 * 位移不入 EVENT_EFFECT → 一般事件 / a row move stays out of EVENT_EFFECT → a general event
 	 */
-	{ type: EnumBattleEventType.Move, actor: 'Warrior', target: 'GoblinAxe', skill: soulLeech.no, text: EnumMoveText.Front },
+	{ type: EnumBattleEventType.Move, actor: 'Warrior', target: monsterSprites.goblinAxe.name, skill: soulLeech.no, text: EnumMoveText.Front },
 
 	{ type: EnumBattleEventType.Act, actor: 'Priest', skill: soulBless.no },
 	/**
@@ -287,18 +288,18 @@ const skillEffectEvents: IBattleEvent[] = [
 		hpAfter: 90,
 	},
 	{ type: EnumBattleEventType.Regen, actor: 'Priest', target: 'Priest', skill: soulBless.no, value: 15, unit: EnumResource.Sp },
-	{ type: EnumBattleEventType.Revive, actor: 'Priest', target: 'Hero1', skill: soulBless.no },
+	{ type: EnumBattleEventType.Revive, actor: 'Priest', target: characterSprites.hero.name, skill: soulBless.no },
 	// ---- 增益系統：加速／施法縮短／障壁／上限變化／HP-SP 交換 ----
 	/**
 	 * Buff system: quick / cast shortened / barrier / cap change / HP-SP exchange
 	 */
 	{ type: EnumBattleEventType.Quick, actor: 'Priest', target: 'Warrior', skill: soulBless.no },
-	{ type: EnumBattleEventType.CastShort, actor: 'Priest', target: 'Mage1', skill: soulBless.no },
+	{ type: EnumBattleEventType.CastShort, actor: 'Priest', target: characterSprites.mage.name, skill: soulBless.no },
 	{ type: EnumBattleEventType.BarrierGain, actor: 'Priest', target: 'Warrior', skill: soulBless.no },
 	{
 		type: EnumBattleEventType.StatChange,
 		actor: 'Priest',
-		target: 'Mage1',
+		target: characterSprites.mage.name,
 		skill: soulBless.no,
 		value: 400,
 		text: 'maxsp-extend',
@@ -324,7 +325,7 @@ const skillEffectEvents: IBattleEvent[] = [
 	{
 		type: EnumBattleEventType.Delay,
 		actor: 'Warrior',
-		target: 'Mage1',
+		target: characterSprites.mage.name,
 		skill: soulBless.no,
 		valueChanges: [{ who: EnumValueWho.Target, unit: EnumResource.Delay, from: 15, to: 25 }],
 	},

@@ -11,7 +11,7 @@ import { makeScaleDecorator, CharacterSpriteDisplayDarkDecorator } from '../deco
 import { CharacterSprite } from '../../src/components/characters/CharacterSprite';
 import { EnumSpriteVariant } from '../../src/components/battle/enums';
 import { EnumSpriteSize } from '../../src/components/battle/enums';
-import { heroSpriteUrl, femaleSpriteUrl } from '../fixture/spriteUrls';
+import { heroSpriteUrl, femaleSpriteUrl } from '../fixture/spriteCast';
 
 /** 背景裝飾器 — 模擬遊戲深色背景 / Dark background decorator */
 const meta: Meta<typeof CharacterSprite> = {
