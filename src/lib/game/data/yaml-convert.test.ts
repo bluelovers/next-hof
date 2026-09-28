@@ -77,12 +77,12 @@ describe('yaml-load (fixtures)', () =>
 		expect(loadAllMons(TEST_FIXTURES_ROOT).map((m) => m.no)).toEqual([1000, 1010, 1055, 2000, 5006]);
 	});
 
-	it('parses quoted numbers as strings (raw fidelity)', () =>
+	it('normalizes numeric strings to numbers on load', () =>
 	{
 		expect(mustLoadChar(100)).toMatchObject({
-			level: '1',
-			maxhp: '300',
-			job: '100',
+			level: 1,
+			maxhp: 300,
+			job: 100,
 			skill: [1000, 1001],
 		});
 	});
@@ -158,15 +158,13 @@ describe('convertCharYaml (fixtures)', () =>
 		});
 	});
 
-	it('char.400: 缺戰鬥數值時補 0（hp/sp 保持省略）/ missing battle stats default to 0 (hp/sp stay omitted)', () =>
+	it('char.400: 缺戰鬥數值保持 undefined（不補 0）/ missing battle stats stay undefined', () =>
 	{
 		expect(convertCharYaml(mustLoadChar(400))).toEqual({
 			no: 400,
 			name: 'Hunter',
 			level: 1,
 			exp: 0,
-			maxhp: 0,
-			maxsp: 0,
 			str: 2,
 			int: 2,
 			dex: 10,
@@ -228,20 +226,13 @@ describe('convertMonYaml (fixtures)', () =>
 		});
 	});
 
-	it('mon.1010 (Bat): 缺數值補 0、空 pattern 無行為規則、缺 hp/sp 保持省略 / missing stats → 0, empty pattern → no rules, missing hp/sp stay omitted', () =>
+	it('mon.1010 (Bat): 缺數值保持 undefined（不補 0）、空 pattern 無行為規則 / missing stats stay undefined, empty pattern → no rules', () =>
 	{
 		expect(convertMonYaml(mustLoadMon(1010))).toEqual({
 			no: 1010,
 			name: 'Bat',
 			img: 'mon_121',
 			level: 10,
-			maxhp: 0,
-			maxsp: 0,
-			str: 0,
-			int: 0,
-			dex: 0,
-			spd: 0,
-			luk: 0,
 		});
 	});
 
@@ -348,15 +339,15 @@ describe('convertMonYaml (fixtures)', () =>
 
 describe('convertEquipYaml / convertBehaviorYaml', () =>
 {
-	it('ignores unknown equip slots and non-finite item numbers', () =>
+	it('ignores unknown equip slots (values already normalized by the loader)', () =>
 	{
-		const equip = convertEquipYaml({ main_hand: '1000', not_a_slot: '999', armor: 'nope' });
+		const equip = convertEquipYaml({ main_hand: 1000, not_a_slot: 999 } as Partial<Record<string, number>>);
 		expect(equip).toEqual({ [EnumEquipSlot.MainHand]: 1000 });
 	});
 
-	it('empty object behavior → undefined', () =>
+	it('empty object behavior → undefined（空 pattern 已於載入視為 undefined）', () =>
 	{
-		expect(convertBehaviorYaml({ pattern: {} })).toBeUndefined();
+		expect(convertBehaviorYaml({ pattern: undefined })).toBeUndefined();
 		expect(convertBehaviorYaml({})).toBeUndefined();
 		expect(convertBehaviorYaml(null)).toBeUndefined();
 		expect(convertBehaviorYaml(undefined)).toBeUndefined();
@@ -364,16 +355,16 @@ describe('convertEquipYaml / convertBehaviorYaml', () =>
 
 	it('position-only behavior keeps position without guard/pattern', () =>
 	{
-		const b = convertBehaviorYaml({ position: 'front' });
+		const b = convertBehaviorYaml({ position: EnumPosition.Front });
 		expect(b).toEqual({ position: EnumPosition.Front });
 	});
 
-	it('drops rows with unparseable judge/action', () =>
+	it('drops rows with missing judge/action', () =>
 	{
 		const b = convertBehaviorYaml({
 			pattern: [
 				{ judge: 1000, quantity: 0, action: 1000 },
-				{ judge: 'nope', quantity: 0, action: 'nope' },
+				{ judge: undefined, quantity: 0, action: undefined },
 			],
 		});
 		expect(b?.pattern).toEqual([{ judge: 1000, quantity: 0, action: 1000 }]);

@@ -196,8 +196,13 @@ export interface IPatternItem
 {
 	/** 判定碼（交由 judge.ts DecideJudge 評估）/ judge code (evaluated by judge.ts DecideJudge) */
 	judge: number;
-	/** 回合門檻：0＝恆可觸發，否則需 battle.turn >= quantity / turn gate: 0 = always eligible, else requires battle.turn >= quantity */
-	quantity: number;
+	/**
+	 * 回合門檻：省略或 0＝恆可觸發，否則需 battle.turn >= quantity
+	 * turn gate: omitted or 0 = always eligible, else requires battle.turn >= quantity;
+	 * 省略（undefined）由引擎以 0 視之，與來源 `quantity: null`（載入時已收斂為 0）同義。
+	 * an omitted value counts as 0 in the engine, same as the source `quantity: null` (already normalized to 0 at load).
+	 */
+	quantity?: number;
 	/** 動作碼＝技能編號（1000 為預設攻擊）/ action code = skill number (1000 is the default attack) */
 	action: number;
 }
@@ -445,14 +450,8 @@ export type ISkillDownFields = Partial<Record<IStatusDownKey, number>>;
  *   revive, SpRecoveryRate, MagicCircle*, priority, learn, exp, img）目前僅供資料層保留
  *   remaining fields are currently kept in the data layer only
  */
-export interface ISkillDef extends ICompBonuses, ISkillUpFields, ISkillDownFields
+export interface ISkillDef extends ICompBonuses, ISkillUpFields, ISkillDownFields, INamedIconDef
 {
-	/** 技能編號（repository 的索引鍵）/ skill number (repository index key) */
-	no: number;
-	/** 技能名稱 / skill name */
-	name: string;
-	/** 圖示資源路徑 / icon asset path */
-	img?: string;
 	/** 技能說明文字（PHP exp；UI 顯示為 effect）/ description text (PHP exp; shown as effect in UI) */
 	exp?: string;
 	/** SP 消耗；怪物施放時以 ×0.7 折扣檢查（Battle.UseSkill）/ SP cost; monsters pay ×0.7 when checked (Battle.UseSkill) */
@@ -616,32 +615,26 @@ export enum EnumItemCategory
  * 道具定義 / Item definition
  * 介面 / interface
  */
-export interface IItemDef extends ICompBonuses
+export interface IItemDef extends ICompBonuses, INamedIconDef
 {
-	/** 道具編號（repository 索引鍵）/ item number (repository index key) */
-	no: number;
-	/** 道具名稱 / item name */
-	name: string;
 	/** 武器／裝備型別（同時決定可裝備欄位）/ weapon/equipment type (also decides the equip slot) */
 	type: EnumWeaponType;
 	/** 類別細分（Weapon/Armor/Item/Material/Other，見 EnumItemCategory）/ sub-category (see EnumItemCategory) */
 	type2?: EnumItemCategory;
-	/** 圖示資源路徑 / icon asset path */
-	img?: string;
 	/** 購入價格（金幣）/ buy price (gold) */
 	buy?: number;
 	/** 賣出價格（金幣）/ sell price (gold) */
 	sell?: number;
 	/** 攻擊力（索引同 EnumAtkSlot：0=物理、1=魔法）/ attack power (indices follow EnumAtkSlot: 0 = physical, 1 = magic) */
-	atk?: [phys: number, mag: number];
+	atk?: IAtkTuple;
 	/** 減傷四槽（索引同 EnumDefSlot：物理%減、物理定值減、魔法%減、魔法定值減）/ four reduction slots (indices follow EnumDefSlot: physical %, physical flat, magic %, magic flat) */
-	def?: [physPct: number, physFlat: number, magPct: number, magFlat: number];
+	def?: IDefTuple;
 	/** 雙手武器（佔用手部＋副手）/ two-handed weapon (occupies both hand slots) */
 	dh?: boolean;
 	/** 裝備負荷（參與 Delay 系統運算）/ equipment weight (feeds the delay calculation) */
 	handle?: number;
-	/** 習得條件 { 職業編號: 等級 } / learn requirement { job number: level } */
-	need?: Record<number, number>;
+	/** 習得條件 { 職業編號: 等級 } / learn requirement (INumberTable) */
+	need?: INumberTable;
 	/** 強化／進化後的基礎道具名 / base item name after refinement/evolution */
 	base_name?: string;
 	/** 附加的召喚效果值（SPECIAL.P_SUMMON）/ attached summon bonus (SPECIAL.P_SUMMON) */
@@ -689,16 +682,16 @@ export interface IJobDef
 	job_name?: string;
 	/** 可裝備的武器／裝備型別 / equippable weapon/armor types */
 	equip?: EnumWeaponType[];
-	/** 成長係數（maxhp/maxsp 及其餘六維的成長率）/ growth coefficients (maxhp/maxsp and the six primary stats) */
-	coe?: { maxhp?: number; maxsp?: number; [k: string]: number | undefined };
+	/** 成長係數（maxhp/maxsp 及其餘六維的成長率）/ growth coefficients (IGrowthCoefficients) */
+	coe?: IGrowthCoefficients;
 	/** 戰鬥行為樣式；null＝無 AI 模式 / battle behavior pattern; null = no AI pattern */
 	pattern?: IBehavior | null;
 	/** 職業圖示路徑 / job icon path */
 	img?: string;
 	/** 依性別（EnumGender）區分的名稱與圖示 / per-gender (EnumGender) name and icon overrides */
 	gender?: Partial<Record<EnumGender, IGenderOverride>>;
-	/** 職業說明資訊 / job description info */
-	info?: { desc?: string };
+	/** 職業說明資訊 / job description info（IDescInfo） */
+	info?: IDescInfo;
 	/** 職業階級（數字越小越高階）/ job rank (lower = higher tier) */
 	rank?: number;
 }
@@ -713,18 +706,141 @@ export interface IMonReward
 	moneyhold?: number;
 	/** 經驗獎勵上限（exphold：超過此值不再累積）/ exp reward cap (exp stops accumulating past this) */
 	exphold?: number;
-	/** 掉落表 { 道具編號: 數量或權重 } / drop table { item number: amount or weight } */
-	itemtable?: Record<number, number>;
+	/** 掉落表 { 道具編號: 數量或權重 } / drop table (INumberTable) */
+	itemtable?: INumberTable;
+}
+
+/**
+ * 攻擊力二元組 / attack 2-tuple
+ * 索引同 EnumAtkSlot：0=物理、1=魔法。單一事實來源（raw 與 target 共用）。
+ * Index semantics follow EnumAtkSlot: 0 = physical, 1 = magic. SSOT (shared by raw & target).
+ */
+export type IAtkTuple = [phys: number, mag: number];
+
+/**
+ * 減傷四元組 / reduction 4-tuple
+ * 索引同 EnumDefSlot：物理%減、物理定值減、魔法%減、魔法定值減。SSOT。
+ * Index semantics follow EnumDefSlot: phys %, phys flat, mag %, mag flat. SSOT.
+ */
+export type IDefTuple = [physPct: number, physFlat: number, magPct: number, magFlat: number];
+
+/**
+ * 權重二元組 [權重, 旗標] / weight pair [weight, flag]
+ * 工會隨行雜魚（servant）與土地遭遇表（monster）共用。SSOT。
+ * Shared by union escorts (servant) and land encounter tables (monster). SSOT.
+ */
+export type IWeightPair = [weight: number, flag: number];
+
+/**
+ * 具名目錄項目的身分與展示成員（no + name + img）
+ * Identity & icon members of a named catalog item.
+ * 單一事實來源：IItemDef、ISkillDef、IMonDef 與 raw 對應項皆引用（不再各檔重寫）。
+ * SSOT: referenced by IItemDef, ISkillDef, IMonDef and their raw counterparts.
+ */
+export interface INamedIconDef
+{
+	/** 編號（repository 索引鍵）/ number (repository index key) */
+	no: number;
+	/** 名稱 / name */
+	name: string;
+	/** 圖示資源路徑 / icon asset path */
+	img?: string;
+}
+
+/**
+ * 數值鍵對數值表（itemtable／need 等掉落與需求表）/ number-keyed number table (drop/requirement tables)
+ * 單一事實來源：IMonReward.itemtable、IItemDef.need 與 raw 對應欄位皆引用。
+ * SSOT: referenced by IMonReward.itemtable, IItemDef.need and their raw counterparts.
+ */
+export type INumberTable = Record<string | number, number>;
+
+/**
+ * 怪物遭遇／隨行表：怪物編號 → [權重, 旗標] / monster encounter/escort table
+ * 單一事實來源：IMonDef.servant、land.monster、union 隨行表與 raw 對應欄位皆引用。
+ * SSOT: referenced by IMonDef.servant, land.monster, union escorts and their raw counterparts.
+ */
+export type IEncounterTable = Record<string | number, IWeightPair>;
+
+/**
+ * 說明區塊（`info` 欄位共用）/ description block (shared by `info` fields)
+ * 單一事實來源：job／monster／guard／judge 的 info 皆引用。
+ * SSOT: referenced by job/monster/guard/judge info fields.
+ */
+export interface IDescInfo
+{
+	/** 說明文字 / description text */
+	desc?: string;
+}
+
+/**
+ * 裝備表：欄位 → 道具編號 / equip table: slot → item number
+ * 鍵為 EnumEquipSlot（單一事實來源）；ICharDef.equip 與 raw equip 皆引用。
+ * Keyed by EnumEquipSlot (SSOT); referenced by ICharDef.equip and the raw equip shape.
+ */
+export type IEquipTable = Partial<Record<EnumEquipSlot, number>>;
+
+/**
+ * 成長係數（maxhp/maxsp 及其餘六維）/ growth coefficients
+ * 單一事實來源：IJobDef.coe 與 raw coe 皆引用。
+ * SSOT: referenced by IJobDef.coe and the raw coe shape.
+ */
+export type IGrowthCoefficients = {
+	maxhp?: number;
+	maxsp?: number;
+	[k: string]: number | undefined;
+};
+
+/**
+ * 特殊能力原始值型別 / raw SPECIAL value
+ * 數值字串布林之標量；Pierce（索引同 EnumAtkSlot）為二元組。SSOT。
+ * Scalar string/number/boolean, or the Pierce pair (indices follow EnumAtkSlot). SSOT.
+ */
+export type ISpecialRawValue = string | number | boolean | [string | number, string | number];
+
+/**
+ * 戰鬥數值（角色/怪物共用，單一事實來源）/ Combat stats (shared by char & mon; single source of truth)
+ *
+ * 所有欄位皆**可缺省**：原始資料可能缺漏（如 mon.1010 Bat 完全無六維、char.400 缺 HP/SP），
+ * 缺漏表示「未定」，由實例化（Character 建構）或後續推導（職業係數）解析；
+ * ICharCore／raw 型別皆引用本介面，避免重覆宣告。
+ * Every field is optional: the source data may omit stats (e.g. mon.1010 Bat has none,
+ * char.400 lacks HP/SP). An omitted stat is "unresolved" and is resolved at instantiation
+ * (Character construction) or later derivation (job coefficients). Both ICharCore and the
+ * raw YAML types reference this interface instead of re-declaring the fields.
+ */
+export interface ICombatStats
+{
+	/** 等級 / level */
+	level?: number;
+	/** HP 上限 / max HP */
+	maxhp?: number;
+	/** 目前 HP（省略時視為滿血）/ current HP (full HP when omitted) */
+	hp?: number;
+	/** SP 上限 / max SP */
+	maxsp?: number;
+	/** 目前 SP（省略時視為滿 SP）/ current SP (full SP when omitted) */
+	sp?: number;
+	/** 力量（物理攻擊主因）/ strength (main physical-attack stat) */
+	str?: number;
+	/** 智力（魔法攻擊主因）/ intelligence (main magic-attack stat) */
+	int?: number;
+	/** 敏捷（命中／迴避相關）/ dexterity (hit/evasion related) */
+	dex?: number;
+	/** 速度（行動順序與 Delay 距離）/ speed (action order and delay distance) */
+	spd?: number;
+	/** 幸運 / luck */
+	luk?: number;
 }
 
 /**
  * 戰鬥單位基礎定義（角色/怪物共用）/ Combatant base definition (shared by char & mon)
  * 介面 / interface
+ *
+ * 六維與 HP/SP 由 ICombatStats 提供（可缺省）；本介面只宣告身分與列表欄位。
+ * Stats/HP/SP come from ICombatStats (optional); this interface adds identity and list fields only.
  */
-export interface ICharCore extends ICorpsePolicyField
+export interface ICharCore extends ICorpsePolicyField, ICombatStats, Omit<INamedIconDef, 'img'>
 {
-	/** 單位編號 / unit number */
-	no: number;
 	/**
 	 * 戰鬥單位實例唯一識別碼（資料提供者可指定；未提供時由 Character 自動產生）
 	 * Battle-unit instance uid (a data provider may supply one; otherwise Character generates it).
@@ -738,28 +854,6 @@ export interface ICharCore extends ICorpsePolicyField
 	 * prefix is deliberate so it cannot be mistaken for an item/map id.
 	 */
 	unitUuid?: string;
-	/** 單位名稱 / unit name */
-	name: string;
-	/** 等級 / level */
-	level: number;
-	/** HP 上限 / max HP */
-	maxhp: number;
-	/** 目前 HP（省略時視為滿血）/ current HP (full HP when omitted) */
-	hp?: number;
-	/** SP 上限 / max SP */
-	maxsp: number;
-	/** 目前 SP（省略時視為滿 SP）/ current SP (full SP when omitted) */
-	sp?: number;
-	/** 力量（物理攻擊主因）/ strength (main physical-attack stat) */
-	str: number;
-	/** 智力（魔法攻擊主因）/ intelligence (main magic-attack stat) */
-	int: number;
-	/** 敏捷（命中／迴避相關）/ dexterity (hit/evasion related) */
-	dex: number;
-	/** 速度（行動順序與 Delay 距離）/ speed (action order and delay distance) */
-	spd: number;
-	/** 幸運 / luck */
-	luk: number;
 	/** 已習得技能編號列表 / learned skill numbers */
 	skill?: number[];
 	/** AI 行為樣式（怪物戰鬥決策用）/ AI behavior pattern (monster battle decisions) */
@@ -776,8 +870,8 @@ export interface ICharDef extends ICharCore
 	exp?: number;
 	/** 職業編號 / job number */
 	job?: number;
-	/** 各欄位裝備的道具編號 / equipped item number per slot */
-	equip?: Partial<Record<EnumEquipSlot, number>>;
+	/** 各欄位裝備的道具編號 / equipped item number per slot（IEquipTable） */
+	equip?: IEquipTable;
 	/** 擴充資料（非核心欄位原樣保留）/ extra data (non-core fields kept as-is) */
 	data_ex?: Record<string, unknown>;
 }
@@ -786,7 +880,7 @@ export interface ICharDef extends ICharCore
  * 怪物定義 / Monster definition
  * 介面 / interface
  */
-export interface IMonDef extends ICharCore
+export interface IMonDef extends ICharCore, INamedIconDef
 {
 	/** 掉落與獎勵設定（省略＝無獎勵）/ drop & reward settings (omitted = no reward) */
 	reward?: IMonReward;
@@ -798,14 +892,6 @@ export interface IMonDef extends ICharCore
 	 */
 	isUnion?: boolean;
 	/**
-	 * 怪物圖示資源路徑（YAML mon.*.yml 的 img；例如 mon_053）。
-	 * Monster icon asset path (YAML mon.*.yml `img`; e.g. mon_053).
-	 *
-	 * 角色（char.*.yml）不含 img——圖示由職業定義（IJobDef.img）提供。
-	 * Char YAMLs carry no img — their icon comes from the job definition (IJobDef.img).
-	 */
-	img?: string;
-	/**
 	 * 怪物基礎攻擊力（索引同 EnumAtkSlot：0=物理、1=魔法）/ monster base attack (indices follow EnumAtkSlot: 0 = physical, 1 = magic)
 	 *
 	 * YAML 直接給定（mon.*.yml `atk`）；目前僅資料層保留——
@@ -814,7 +900,7 @@ export interface IMonDef extends ICharCore
 	 * CalcEquips rebuilds atk/def from equipment and monsters equip nothing, so this is
 	 * not yet consumed by the engine (wiring is a follow-up).
 	 */
-	atk?: [phys: number, mag: number];
+	atk?: IAtkTuple;
 	/**
 	 * 怪物基礎減傷四槽（索引同 EnumDefSlot：物理%減、物理定值減、魔法%減、魔法定值減）
 	 * monster base reduction slots (indices follow EnumDefSlot: physical %, physical flat, magic %, magic flat)
@@ -822,7 +908,7 @@ export interface IMonDef extends ICharCore
 	 * 與 atk 相同：目前僅資料層保留（CalcEquips 由裝備重建，怪物未接入）。
 	 * Same as `atk`: data-layer only for now (CalcEquips rebuilds from equipment; not wired for monsters).
 	 */
-	def?: [physPct: number, physFlat: number, magPct: number, magFlat: number];
+	def?: IDefTuple;
 	/**
 	 * 怪物天生特殊能力（YAML `SPECIAL`；例如 Undead / PoisonResist）
 	 * innate special abilities from the YAML `SPECIAL` block (e.g. Undead / PoisonResist)
@@ -832,8 +918,8 @@ export interface IMonDef extends ICharCore
 	 * Merged into Character.SPECIAL by factory.newMon (engine-readable); kept on the def for UI/data queries.
 	 */
 	special?: Partial<ISpecial>;
-	/** 怪物說明資訊（YAML `info`；例如技能說明） / monster description info (YAML `info`; e.g. skill description) */
-	info?: { desc?: string };
+	/** 怪物說明資訊（YAML `info`；例如技能說明）/ monster description info (IDescInfo) */
+	info?: IDescInfo;
 	/**
 	 * 工會怪出現週期（秒；YAML `cycle`） / union monster spawn cycle (seconds; YAML `cycle`)
 	 * 目前僅資料層保留 / data-layer only
@@ -848,7 +934,7 @@ export interface IMonDef extends ICharCore
 	 * union escort table { monster no: [spawn weight, 0] } (YAML `servant`)
 	 * 目前僅資料層保留 / data-layer only
 	 */
-	servant?: Record<number, [weight: number, ignored: number]>;
+	servant?: IEncounterTable;
 	/** 隨行雜魚數量（YAML `servantAmount`）/ escorted minion count (YAML `servantAmount`); data-layer only */
 	servantAmount?: number;
 	/** 必出隨行雜魚編號（YAML `servantSpecify`）/ guaranteed escort minion nos (YAML `servantSpecify`); data-layer only */

@@ -3,18 +3,15 @@
  * 將 Resource/Char、Resource/Mon 的原始 YAML 轉為現有實作使用的 ICharDef / IMonDef。
  * Converts raw Char/Mon YAML into the ICharDef / IMonDef consumed by the existing implementation.
  *
- * 正規化（normalization）處理：
- * - 字串數值 → number（`level: '1'` → 1）
- * - pattern.quantity 的 null → 0（原始檔大量出現）
- * - 缺漏數值 → 0（mon.1010/1011 Bat、char.400 無 maxhp/maxsp）
- * - guard 筆誤（pro50 → prob50）→ EnumGuardKind
+ * 數值字串／null／guard 筆誤／空物件等正規化於 yaml-load 讀取時完成，本層直接承接：
+ * Numeric strings, nulls, guard typos and empty objects are normalized at load (yaml-load);
+ * this layer consumes the clean values directly:
  * - `special`（小寫）／`SPECIAL` 合併，Undead: true → 1
  */
 
 import {
 	EnumEquipSlot,
 	EnumGender,
-	EnumGuardKind,
 	EnumInfluence,
 	EnumItemCategory,
 	EnumSkillDamageType,
@@ -22,10 +19,13 @@ import {
 	EnumTargetMethod,
 	EnumTargetType,
 	EnumWeaponType,
+	type IAtkTuple,
 	type IBehavior,
 	type ICharCore,
 	type ICharDef,
 	type ICompBonuses,
+	type IDefTuple,
+	type IEncounterTable,
 	type IGenderOverride,
 	type IItemDef,
 	type IJobDef,
@@ -34,9 +34,12 @@ import {
 	type IPatternItem,
 	type ISkillDef,
 	type ISpecial,
+	type ISpecialRawValue,
 	type ITargetSpec,
 } from '#/lib/game/types';
 import { EnumPosition } from '#/lib/game/constants';
+import { COMP_FIELDS } from '#/lib/game/character/status-attrs';
+import { SKILL_EXTRA_NUMERIC_KEYS as SHARED_SKILL_EXTRA_NUMERIC_KEYS } from './yaml-skill-keys';
 import type {
 	IRawBehaviorYaml,
 	IRawCharYaml,
@@ -98,20 +101,6 @@ export function toNumberRecord(
 }
 
 /**
- * guard 字串 → EnumGuardKind / guard string → EnumGuardKind
- *
- * 以 EnumGuardKind 的成員值為單一事實來源（新增守護種類自動涵蓋），
- * 僅額外收錄原始檔筆誤的別名（pro50 / prpb50 → prob50）。
- * Built from the EnumGuardKind member values (adding a guard kind auto-covers it);
- * only the source typos are extra aliases (pro50 / prpb50 → prob50).
- */
-export const GUARD_ALIASES: Record<string, EnumGuardKind> = Object.fromEntries(
-	Object.values(EnumGuardKind).map((value) => [value, value]),
-) as Record<string, EnumGuardKind>;
-GUARD_ALIASES.pro50 = EnumGuardKind.Prob50;
-GUARD_ALIASES.prpb50 = EnumGuardKind.Prob50;
-
-/**
  * position 字串 → EnumPosition / position string → EnumPosition
  * 未提供或無法辨識時回 undefined（開戰時 setBattleVariable 隨機決定）。
  * Returns undefined when absent/unknown (setBattleVariable randomizes at battle start anyway).
@@ -130,10 +119,10 @@ export function convertPosition(value: string | null | undefined): EnumPosition 
 export function convertPatternItem(raw: IRawPatternItemYaml | null | undefined): IPatternItem | undefined
 {
 	if (!raw) return undefined;
-	const judge = toNumber(raw.judge, Number.NaN);
-	const action = toNumber(raw.action, Number.NaN);
+	const judge = raw.judge ?? Number.NaN;
+	const action = raw.action ?? Number.NaN;
 	if (!Number.isFinite(judge) || !Number.isFinite(action)) return undefined;
-	return { judge, quantity: toNumber(raw.quantity, 0), action };
+	return { judge, quantity: raw.quantity, action };
 }
 
 /**
@@ -149,10 +138,11 @@ export function convertBehaviorYaml(raw: IRawBehaviorYaml | null | undefined): I
 	const position = convertPosition(raw.position);
 	if (position !== undefined) behavior.position = position;
 
-	if (typeof raw.guard === 'string' && raw.guard in GUARD_ALIASES)
-	{
-		behavior.guard = GUARD_ALIASES[raw.guard];
-	}
+	/**
+	 * 前排守護條件（已由載入正規化為 EnumGuardKind；來源筆誤 pro50/prpb50 已修正）
+	 * guard condition (already normalized to EnumGuardKind at load; typos fixed)
+	 */
+	if (raw.guard !== undefined) behavior.guard = raw.guard;
 
 	const pattern = Array.isArray(raw.pattern)
 		? raw.pattern.map(convertPatternItem).filter((p): p is IPatternItem => p !== undefined)
@@ -168,11 +158,8 @@ export function convertRewardYaml(raw: IRawRewardYaml | null | undefined): IMonR
 	if (!raw) return undefined;
 	const reward: IMonReward = {};
 
-	const money = toNumber(raw.moneyhold, Number.NaN);
-	if (Number.isFinite(money)) reward.moneyhold = money;
-
-	const exp = toNumber(raw.exphold, Number.NaN);
-	if (Number.isFinite(exp)) reward.exphold = exp;
+	if (raw.moneyhold !== undefined) reward.moneyhold = raw.moneyhold;
+	if (raw.exphold !== undefined) reward.exphold = raw.exphold;
 
 	const itemtable = toNumberRecord(raw.itemtable);
 	if (Object.keys(itemtable).length > 0) reward.itemtable = itemtable;
@@ -190,11 +177,10 @@ export function convertEquipYaml(raw: IRawEquipYaml | null | undefined): ICharDe
 	if (!raw) return undefined;
 	const out: NonNullable<ICharDef['equip']> = {};
 	const slotValues = Object.values(EnumEquipSlot) as string[];
-	for (const [slot, value] of Object.entries(raw))
+	for (const [slot, itemNo] of Object.entries(raw))
 	{
 		if (!slotValues.includes(slot)) continue;
-		const itemNo = toNumber(value, Number.NaN);
-		if (Number.isFinite(itemNo)) out[slot as EnumEquipSlot] = itemNo;
+		out[slot as EnumEquipSlot] = itemNo;
 	}
 	return Object.keys(out).length > 0 ? out : undefined;
 }
@@ -209,22 +195,22 @@ export function convertEquipYaml(raw: IRawEquipYaml | null | undefined): ICharDe
  */
 export function convertSpecialYaml(raw: IRawMonYaml): Partial<ISpecial> | undefined
 {
-	const merged: Record<string, string | number | boolean> = {};
+	const merged: Record<string, ISpecialRawValue> = {};
 	if (raw.special) Object.assign(merged, raw.special);
 	if (raw.SPECIAL) Object.assign(merged, raw.SPECIAL);
 	if (Object.keys(merged).length === 0) return undefined;
 
 	const out: Partial<ISpecial> = {};
 	const undead = merged.Undead;
-	if (undead !== undefined)
+	if (undead !== undefined && !Array.isArray(undead))
 	{
-		out.Undead = undead === true ? 1 : undead === false ? 0 : toNumber(undead);
+		out.Undead = typeof undead === 'boolean' ? (undead ? 1 : 0) : toNumber(undead);
 	}
 
 	for (const key of ['PoisonResist', 'HealBonus', 'Barrier', 'Summon', 'HpRegen', 'SpRegen'] as (keyof ISpecial)[])
 	{
 		const v = merged[key];
-		if (v === undefined) continue;
+		if (v === undefined || Array.isArray(v)) continue;
 		(out as Record<string, number>)[key] = typeof v === 'boolean' ? (v ? 1 : 0) : toNumber(v);
 	}
 
@@ -239,28 +225,27 @@ export function convertSpecialYaml(raw: IRawMonYaml): Partial<ISpecial> | undefi
 
 /**
  * 核心欄位轉換 / Shared conversion of the combat-core fields
- * 角色與怪物共用的 no/name/level/六維/HP/SP（單一事實來源）。
- * Single source of truth for the fields shared by chars and mons
- * (no/name/level, six stats, HP/SP).
+ * 角色與怪物共用的 no/name/六維/HP/SP（單一事實來源：ICombatStats）。
+ * Single source of truth for the fields shared by chars and mons (ICombatStats).
  *
- * hp/sp 缺省時回 undefined（ICharCore 語意：省略＝滿血）。
- * Missing hp/sp → undefined (ICharCore semantics: omitted = full HP).
+ * 缺省數值**不補 0**——保持 undefined，由實例化（Character 建構）解析。
+ * Missing stats stay undefined here (no 0 invention); instantiation resolves them.
  */
 function convertCombatCoreYaml(raw: IRawCombatCoreYaml): ICharCore
 {
 	return {
-		no: toNumber(raw.no),
-		name: raw.name ?? '',
-		level: toNumber(raw.level),
-		maxhp: toNumber(raw.maxhp),
-		hp: toOptionalNumber(raw.hp),
-		maxsp: toNumber(raw.maxsp),
-		sp: toOptionalNumber(raw.sp),
-		str: toNumber(raw.str),
-		int: toNumber(raw.int),
-		dex: toNumber(raw.dex),
-		spd: toNumber(raw.spd),
-		luk: toNumber(raw.luk),
+		no: raw.no,
+		name: raw.name,
+		level: raw.level,
+		maxhp: raw.maxhp,
+		hp: raw.hp,
+		maxsp: raw.maxsp,
+		sp: raw.sp,
+		str: raw.str,
+		int: raw.int,
+		dex: raw.dex,
+		spd: raw.spd,
+		luk: raw.luk,
 	};
 }
 
@@ -271,9 +256,9 @@ export function convertCharYaml(raw: IRawCharYaml): ICharDef
 {
 	return {
 		...convertCombatCoreYaml(raw),
-		exp: toOptionalNumber(raw.exp),
-		job: toOptionalNumber(raw.job),
-		skill: raw.skill?.map((s) => toNumber(s)).filter((n) => Number.isFinite(n)),
+		exp: raw.exp,
+		job: raw.job,
+		skill: raw.skill,
 		data_ex: raw.data_ex ? raw.data_ex : undefined,
 		equip: convertEquipYaml(raw.equip),
 		behavior: convertBehaviorYaml(raw.behavior),
@@ -285,39 +270,35 @@ export function convertCharYaml(raw: IRawCharYaml): ICharDef
  */
 export function convertMonYaml(raw: IRawMonYaml): IMonDef
 {
-	const atkRaw = raw.atk ? toNumberArray(raw.atk) : [];
-	const defRaw = raw.def ? toNumberArray(raw.def) : [];
-
 	return {
 		...convertCombatCoreYaml(raw),
 		img: raw.img ?? undefined,
-		atk: atkRaw.length >= 2 ? [atkRaw[0], atkRaw[1]] : undefined,
-		def: defRaw.length >= 4 ? [defRaw[0], defRaw[1], defRaw[2], defRaw[3]] : undefined,
+		atk: raw.atk,
+		def: raw.def,
 		special: convertSpecialYaml(raw),
 		info: raw.info && typeof raw.info.desc === 'string' ? { desc: raw.info.desc } : undefined,
 		reward: convertRewardYaml(raw.reward),
 		behavior: convertBehaviorYaml(raw.behavior),
-		cycle: toOptionalNumber(raw.cycle),
+		cycle: raw.cycle,
 		land: raw.land ?? undefined,
-		lv_limit: toOptionalNumber(raw.lv_limit),
+		lv_limit: raw.lv_limit,
 		servant: convertServantYaml(raw.servant),
-		servantAmount: toOptionalNumber(raw.servantAmount),
-		servantSpecify: raw.servantSpecify ? toNumberArray(raw.servantSpecify) : undefined,
+		servantAmount: raw.servantAmount,
+		servantSpecify: raw.servantSpecify,
 	};
 }
 
-/** 隨行雜魚表轉換 / Convert the raw servant table { no: [weight, 0] } */
+/** 隨行雜魚表轉換 / Convert the raw servant table (IEncounterTable) */
 function convertServantYaml(
 	raw: IRawMonYaml['servant'],
-): Record<number, [weight: number, ignored: number]> | undefined
+): IEncounterTable | undefined
 {
 	if (!raw) return undefined;
-	const out: Record<number, [number, number]> = {};
+	const out: IEncounterTable = {};
 	for (const [k, pair] of Object.entries(raw))
 	{
 		const key = Number(k);
-		if (!Number.isFinite(key) || !Array.isArray(pair)) continue;
-		out[key] = [toNumber(pair[0]), toNumber(pair[1])];
+		if (Number.isFinite(key)) out[key] = pair;
 	}
 	return Object.keys(out).length > 0 ? out : undefined;
 }
@@ -433,10 +414,8 @@ export function convertLimit(
 	return Object.keys(out).length > 0 ? out : undefined;
 }
 
-/** 補正欄位鍵（ICompBonuses 9 鍵，單一事實來源）/ the 9 compensation keys (ICompBonuses) */
-const BONUS_KEYS = [
-	'P_STR', 'P_INT', 'P_DEX', 'P_SPD', 'P_LUK', 'P_MAXHP', 'P_MAXSP', 'M_MAXHP', 'M_MAXSP',
-] as const;
+/** 補正欄位鍵（ICompBonuses 9 鍵，單一事實來源：COMP_FIELDS）/ the 9 compensation keys (SSOT: COMP_FIELDS) */
+const BONUS_KEYS = COMP_FIELDS;
 
 /** 補正欄位複製 / Copy the 9 compensation keys from a raw record */
 export function convertBonuses(raw: Record<string, string | number | undefined>): ICompBonuses
@@ -455,24 +434,23 @@ export function convertBonuses(raw: Record<string, string | number | undefined>)
  */
 export function convertItemYaml(raw: IRawItemYaml): IItemDef
 {
-	const atk = raw.atk ? toNumberArray(raw.atk) : [];
-	const def = raw.def ? toNumberArray(raw.def) : [];
+	const itemType = raw.type ? ITEM_TYPE_ALIASES[raw.type] : undefined;
 	return {
-		no: toNumber(raw.no),
-		name: raw.name ?? '',
-		type: ITEM_TYPE_ALIASES[raw.type ?? ''] ?? EnumWeaponType.Other,
+		no: raw.no,
+		name: raw.name,
+		type: itemType ?? EnumWeaponType.Other,
 		type2: raw.type2 !== undefined ? ITEM_TYPE2_ALIASES[raw.type2] : undefined,
 		img: raw.img ?? undefined,
-		buy: toOptionalNumber(raw.buy),
-		sell: toOptionalNumber(raw.sell),
-		atk: atk.length >= 2 ? [atk[0], atk[1]] : undefined,
-		def: def.length >= 4 ? [def[0], def[1], def[2], def[3]] : undefined,
+		buy: raw.buy,
+		sell: raw.sell,
+		atk: raw.atk,
+		def: raw.def,
 		dh: raw.dh !== undefined ? toBool(raw.dh) : undefined,
-		handle: toOptionalNumber(raw.handle),
+		handle: raw.handle,
 		need: toNumberRecord(raw.need),
 		base_name: raw.base_name,
-		P_SUMMON: toOptionalNumber(raw.P_SUMMON),
-		P_PIERCE: toOptionalNumber(raw.P_PIERCE),
+		P_SUMMON: raw.P_SUMMON,
+		P_PIERCE: raw.P_PIERCE,
 		...convertBonuses(raw as unknown as Record<string, string | number | undefined>),
 	};
 }
@@ -487,7 +465,7 @@ export function convertJobYaml(raw: IRawJobYaml): IJobDef
 	const coe: IJobDef['coe'] = {};
 	for (const [k, v] of Object.entries(raw.coe ?? {}))
 	{
-		coe[k] = toNumber(v);
+		coe[k] = v;
 	}
 
 	const gender: Partial<Record<EnumGender, IGenderOverride>> = {};
@@ -499,7 +477,7 @@ export function convertJobYaml(raw: IRawJobYaml): IJobDef
 	}
 
 	return {
-		no: toNumber(raw.no),
+		no: raw.no ?? 0,
 		job_name: raw.job_name,
 		equip: raw.equip
 			?.map((e) => WEAPON_TYPE_LOOKUP[String(e)])
@@ -512,12 +490,8 @@ export function convertJobYaml(raw: IRawJobYaml): IJobDef
 	};
 }
 
-/** 常數加成鍵（Plus／Up／Down 系列，複製自 raw 的技能擴充欄位） */
-const SKILL_EXTRA_NUMERIC_KEYS = [
-	'PlusSTR', 'PlusINT', 'PlusDEX', 'PlusSPD', 'PlusLUK', 'PlusMAXHP', 'PlusMAXSP',
-	'UpSTR', 'UpINT', 'UpDEX', 'UpSPD', 'UpLUK', 'UpATK', 'UpMATK', 'UpDEF', 'UpMDEF', 'UpMAXHP', 'UpMAXSP',
-	'DownSTR', 'DownINT', 'DownDEX', 'DownSPD', 'DownLUK', 'DownATK', 'DownMATK', 'DownDEF', 'DownMDEF', 'DownMAXHP', 'DownMAXSP',
-] as const;
+/** 常數加成鍵（Plus／Up／Down 系列，單一事實來源：yaml-skill-keys） */
+const SKILL_EXTRA_NUMERIC_KEYS = SHARED_SKILL_EXTRA_NUMERIC_KEYS;
 
 /**
  * 技能轉換 / Convert a raw skill YAML into ISkillDef
@@ -527,44 +501,44 @@ const SKILL_EXTRA_NUMERIC_KEYS = [
 export function convertSkillYaml(raw: IRawSkillYaml): ISkillDef
 {
 	const skill: ISkillDef = {
-		no: toNumber(raw.no),
-		name: raw.name ?? '',
+		no: raw.no,
+		name: raw.name,
 		img: raw.img,
 		exp: raw.exp,
-		sp: toNumber(raw.sp),
-		type: toNumber(raw.type) as EnumSkillDamageType,
-		learn: toOptionalNumber(raw.learn),
+		sp: raw.sp ?? 0,
+		type: (raw.type ?? 0) as EnumSkillDamageType,
+		learn: raw.learn,
 		target: convertTarget(raw.target),
-		pow: toOptionalNumber(raw.pow),
-		hit: toOptionalNumber(raw.hit),
+		pow: raw.pow,
+		hit: raw.hit,
 		invalid: raw.invalid !== undefined ? toFlag(raw.invalid) : undefined,
 		support: raw.support !== undefined ? toFlag(raw.support) : undefined,
 		priority: raw.priority !== undefined ? SKILL_PRIORITY_LOOKUP[raw.priority] : undefined,
 		charge: convertCharge(raw.charge),
-		stiff: toOptionalNumber(raw.stiff),
+		stiff: raw.stiff,
 		inf: raw.inf !== undefined ? INF_LOOKUP[raw.inf] : undefined,
-		HealBonus: toOptionalNumber(raw.HealBonus),
+		HealBonus: raw.HealBonus,
 		pierce: raw.pierce !== undefined ? toFlag(raw.pierce) : undefined,
-		delay: toOptionalNumber(raw.delay),
-		knockback: toOptionalNumber(raw.knockback),
-		poison: toOptionalNumber(raw.poison),
-		poisonResist: toOptionalNumber(raw.poisonResist),
-		summon: convertSummon(raw.summon),
+		delay: raw.delay,
+		knockback: raw.knockback,
+		poison: raw.poison,
+		poisonResist: raw.poisonResist,
+		summon: raw.summon,
 		move: convertPosition(raw.move),
 		umove: convertPosition(raw.umove),
 		limit: convertLimit(raw.limit),
 		passive: raw.passive !== undefined ? toFlag(raw.passive) : undefined,
 		quick: raw.quick !== undefined ? toFlag(raw.quick) : undefined,
-		sacrifice: toOptionalNumber(raw.sacrifice),
+		sacrifice: raw.sacrifice,
 		CurePoison: raw.CurePoison !== undefined ? toFlag(raw.CurePoison) : undefined,
-		HpRegen: toOptionalNumber(raw.HpRegen),
-		SpRegen: toOptionalNumber(raw.SpRegen),
+		HpRegen: raw.HpRegen,
+		SpRegen: raw.SpRegen,
 		revive: raw.revive !== undefined ? toFlag(raw.revive) : undefined,
-		SpRecoveryRate: toOptionalNumber(raw.SpRecoveryRate),
-		MagicCircleAdd: toOptionalNumber(raw.MagicCircleAdd),
-		MagicCircleDelete: toOptionalNumber(raw.MagicCircleDelete),
-		MagicCircleDeleteTeam: toOptionalNumber(raw.MagicCircleDeleteTeam),
-		MagicCircleDeleteEnemy: toOptionalNumber(raw.MagicCircleDeleteEnemy),
+		SpRecoveryRate: raw.SpRecoveryRate,
+		MagicCircleAdd: raw.MagicCircleAdd,
+		MagicCircleDelete: raw.MagicCircleDelete,
+		MagicCircleDeleteTeam: raw.MagicCircleDeleteTeam,
+		MagicCircleDeleteEnemy: raw.MagicCircleDeleteEnemy,
 	};
 
 	const rawLoose = raw as unknown as Record<string, string | number | boolean | undefined>;
@@ -575,7 +549,7 @@ export function convertSkillYaml(raw: IRawSkillYaml): ISkillDef
 	}
 
 	Object.assign(skill, convertBonuses(raw as unknown as Record<string, string | number | undefined>));
-	if (raw.p_maxhp !== undefined) skill.P_MAXHP = toNumber(raw.p_maxhp);
+	if (raw.p_maxhp !== undefined) skill.P_MAXHP = raw.p_maxhp;
 
 	return skill;
 }

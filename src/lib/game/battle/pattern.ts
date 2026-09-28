@@ -45,7 +45,9 @@ export function MultiFactJudge(keys: IPatternItem[], char: Character, battle?: {
 	const turn = battle?.turn ?? 0;
 	for (const item of keys)
 	{
-		if (item.quantity === 0 || turn >= item.quantity)
+		/** quantity 省略視為 0（恆可觸發）/ omitted quantity counts as 0 (always eligible) */
+		const q = item.quantity ?? 0;
+		if (q === 0 || turn >= q)
 		{
 			if (DecideJudge(item.judge, char, battle)) return item.action;
 		}

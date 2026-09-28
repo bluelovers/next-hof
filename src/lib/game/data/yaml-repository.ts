@@ -73,7 +73,7 @@ export function listResourceIds(kind: EnumResourceKind, root: string): (string |
 		case EnumResourceKind.Char: return loadAllChars(root).map((r) => r.no);
 		case EnumResourceKind.Mon: return loadAllMons(root).map((r) => r.no);
 		case EnumResourceKind.Item: return loadAllItems(root).map((r) => r.no);
-		case EnumResourceKind.Job: return loadAllJobs(root).map((r) => r.no).filter((v): v is string | number => v !== undefined);
+		case EnumResourceKind.Job: return loadAllJobs(root).map((r) => r.no).filter((v): v is number => v !== undefined);
 		case EnumResourceKind.Skill: return loadAllSkills(root).map((r) => r.no);
 		default: return loadAllResourceIds(kind, root);
 	}

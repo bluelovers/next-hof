@@ -22,8 +22,8 @@ export interface IRosterEntry
 	no: number;
 	/** 角色名稱 / character name */
 	name: string;
-	/** 等級 / level */
-	level: number;
+	/** 等級（缺省＝未定，UI 不顯示 Lv）/ level (optional; UI hides Lv when absent) */
+	level?: number;
 	/** 職業名稱（查無時為 'Unknown'）/ job name ('Unknown' when missing) */
 	jobName: string;
 	/** 精靈圖路徑（缺圖為 placeholder）/ sprite image path (placeholder when missing) */

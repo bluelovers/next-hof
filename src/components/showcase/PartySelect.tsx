@@ -53,7 +53,8 @@ const RosterCard: React.FC<{
 		<span className="party-card-body">
       <span className="party-card-name">{entry.name}</span>
       <span className="party-card-meta">
-        Lv.{entry.level} {entry.jobName}
+        {entry.level !== undefined && <>Lv.{entry.level} </>}
+        {entry.jobName}
       </span>
     </span>
 	</label>
