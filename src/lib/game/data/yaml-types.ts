@@ -19,6 +19,7 @@
 import type {
 	IAtkTuple,
 	IBehavior,
+	IDataEx,
 	ICombatStats,
 	ICompBonuses,
 	IDefTuple,
@@ -45,8 +46,6 @@ export type IRawSkillExtraNumerics = Partial<
 	Record<(typeof SKILL_EXTRA_NUMERIC_KEYS)[number], number>
 >;
 
-/** 擴充資料袋（data_ex；char/job/union 共用）/ extra-data bag (shared by char/job/union) */
-export type IRawDataBag = Record<string, unknown>;
 
 /**
  * 原始行為規則列（pattern 的一列）/ Raw pattern row inside `behavior.pattern`
@@ -110,8 +109,8 @@ export interface IRawCharYaml extends IRawCombatCoreYaml
 	job?: number;
 	/** 已習得技能編號 / learned skill numbers */
 	skill?: number[];
-	/** 擴充資料（recruit_money 等）/ extra data (recruit_money, ...) */
-	data_ex?: IRawDataBag;
+	/** 擴充資料（共用 IDataEx；char 只用 recruit_money）/ extra data (shared IDataEx; char uses recruit_money only) */
+	data_ex?: IDataEx;
 	/** 各欄位裝備 / equipped items per slot */
 	equip?: IRawEquipYaml;
 }
@@ -214,8 +213,8 @@ export interface IRawJobYaml
 	gender?: Record<string, IGenderOverride>;
 	/** 說明資訊 / description info */
 	info?: IDescInfo;
-	/** 擴充資料 / extra data */
-	data_ex?: IRawDataBag;
+	/** 擴充資料（共用 IDataEx；job 用 job_base＋job_conditions）/ extra data (shared IDataEx; job uses job_base + job_conditions) */
+	data_ex?: IDataEx;
 }
 
 /**
@@ -383,6 +382,6 @@ export interface IRawUnionYaml
 		base?: { type?: string; no?: string | number };
 		conditions?: { lv_limit?: number };
 	};
-	/** 展示資料 / display data */
-	data_ex?: IRawDataBag;
+	/** 展示資料（共用 IDataEx；union 用 name/level/img/land/cycle）/ display data (shared IDataEx; union uses name/level/img/land/cycle) */
+	data_ex?: IDataEx;
 }

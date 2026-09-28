@@ -162,6 +162,7 @@ const COERCE_SPECS: Record<EnumResourceKind, ICoerceSpec> = {
 			skill: NUM_ARRAY,
 			equip: { kind: 'map', value: NUM },
 			behavior: { kind: 'object', fields: { guard: GUARD_SPEC, pattern: PATTERN_SPEC } },
+			data_ex: { kind: 'object', fields: { recruit_money: NUM } },
 		},
 	},
 	[EnumResourceKind.Mon]: {
@@ -187,7 +188,21 @@ const COERCE_SPECS: Record<EnumResourceKind, ICoerceSpec> = {
 	},
 	[EnumResourceKind.Job]: {
 		kind: 'object',
-		fields: { no: NUM, job: NUM, coe: { kind: 'map', value: NUM } },
+		fields: {
+			no: NUM, job: NUM, coe: { kind: 'map', value: NUM },
+			data_ex: {
+				kind: 'object',
+				fields: {
+					job_base: NUM,
+					job_conditions: {
+						kind: 'object',
+						fields: {
+							job_from: { kind: 'map', value: { kind: 'object', fields: { lv: NUM } } },
+						},
+					},
+				},
+			},
+		},
 	},
 	[EnumResourceKind.Skill]: {
 		kind: 'object',
@@ -209,7 +224,18 @@ const COERCE_SPECS: Record<EnumResourceKind, ICoerceSpec> = {
 	[EnumResourceKind.Judge]: { kind: 'object', fields: { no: NUM } },
 	[EnumResourceKind.Land]: { kind: 'object', fields: { monster: { kind: 'map', value: NUM_ARRAY } } },
 	[EnumResourceKind.Skilltree]: { kind: 'object', fields: {} },
-	[EnumResourceKind.Union]: { kind: 'object', fields: {} },
+	[EnumResourceKind.Union]: {
+		kind: 'object',
+		fields: {
+			data: {
+				kind: 'object',
+				fields: {
+					conditions: { kind: 'object', fields: { lv_limit: NUM } },
+				},
+			},
+			data_ex: { kind: 'object', fields: { level: NUM, cycle: NUM } },
+		},
+	},
 };
 
 /** 依規格走訪並收斂數值 / walk the document per spec, coercing numeric fields */
