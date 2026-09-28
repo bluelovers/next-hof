@@ -52,7 +52,7 @@ export enum EnumResourceKind
 	Land = 'Land',
 	/** 技能樹 / skill trees */
 	Skilltree = 'Skilltree',
-	/** 工會 / unions */
+	/** 獨特怪物 / unions */
 	Union = 'Union',
 }
 
@@ -433,7 +433,7 @@ export function loadSkilltreeYaml(no: IResourceId, root: string): IRawSkilltreeY
 	return loadResourceYaml<IRawSkilltreeYaml>(EnumResourceKind.Skilltree, no, root);
 }
 
-/** 依補零 id 讀取工會 / Load a union setting by zero-padded id */
+/** 依補零 id 讀取獨特怪物 / Load a union setting by zero-padded id */
 export function loadUnionYaml(id: IResourceId, root: string): IRawUnionYaml | undefined
 {
 	return loadResourceYaml<IRawUnionYaml>(EnumResourceKind.Union, id, root);
@@ -493,7 +493,7 @@ export function loadAllSkilltrees(root: string): IRawSkilltreeYaml[]
 	return loadAllResourceYaml<IRawSkilltreeYaml>(EnumResourceKind.Skilltree, root);
 }
 
-/** 讀取全部工會資源 / Load all union settings */
+/** 讀取全部獨特怪物資源 / Load all union settings */
 export function loadAllUnions(root: string): IRawUnionYaml[]
 {
 	return loadAllResourceYaml<IRawUnionYaml>(EnumResourceKind.Union, root);

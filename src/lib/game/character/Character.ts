@@ -1,6 +1,6 @@
 /**
  * 角色物件 / Character model
- * 統一玩家角色(char)、怪物(mon)、召喚物(summon)、工會怪(union) 的基礎與戰鬥屬性。
+ * 統一玩家角色(char)、怪物(mon)、召喚物(summon)、獨特怪物(union) 的基礎與戰鬥屬性。
  * 邏輯以自由函式（battle-variable / level-fix / status / equip / passive）操作本物件，
  * 不採用 PHP 的多層繼承，保持可序列化與易測試。
  */
@@ -228,7 +228,7 @@ export class Character implements ICharCore
 		return this.types.has(EnumCharType.Char);
 	}
 
-	/** 是否為怪物（含召喚物/工會怪）/ whether this is a monster (summons/unions included) */
+	/** 是否為怪物（含召喚物/獨特怪物）/ whether this is a monster (summons/unions included) */
 	isMon(): boolean
 	{
 		return this.types.has(EnumCharType.Mon);
@@ -241,7 +241,7 @@ export class Character implements ICharCore
 
 	}
 
-	/** 是否為工會怪 / whether this is a union monster */
+	/** 是否為獨特怪物 / whether this is a union monster */
 	isUnion(): boolean
 	{
 		return this.types.has(EnumCharType.Union);

@@ -14,7 +14,7 @@ import type { ICorpsePolicy, ICorpsePolicyField } from './battle/corpse-policy';
  *
  * 以 Set<EnumCharType> 存於 Character.types，可同時持有複數類型：
  * Stored as Set<EnumCharType> on Character.types; a unit may hold several types at once:
- * 召喚物 = Mon + Summon、工會怪 = Mon + Union（factory 以 add() 疊加）。
+ * 召喚物 = Mon + Summon、獨特怪物 = Mon + Union（factory 以 add() 疊加）。
  * summon = Mon + Summon, union monster = Mon + Union (factory stacks them via add()).
  * 戰鬥統計（CountAlive 等）據此排除召喚物，勝負判定只計算真實角色。
  * Battle counters (CountAlive etc.) exclude summons based on this; only real chars decide victory.
@@ -27,7 +27,7 @@ export enum EnumCharType
 	Mon = 'mon',
 	/** 召喚物（疊加於 Mon 之上）/ Summon (stacked on top of Mon) */
 	Summon = 'summon',
-	/** 工會怪（疊加於 Mon 之上）/ Union monster (stacked on top of Mon) */
+	/** 獨特怪物（疊加於 Mon 之上）/ Union monster (stacked on top of Mon) */
 	Union = 'union',
 }
 
@@ -697,7 +697,7 @@ export interface IJobDef
 }
 
 /**
- * 怪物/召喚/工會獎勵 / Monster / summon / union reward
+ * 怪物/召喚/獨特怪物獎勵 / Monster / summon / union reward
  * 介面 / interface
  */
 export interface IMonReward
@@ -726,7 +726,7 @@ export type IDefTuple = [physPct: number, physFlat: number, magPct: number, magF
 
 /**
  * 權重二元組 [權重, 旗標] / weight pair [weight, flag]
- * 工會隨行雜魚（servant）與土地遭遇表（monster）共用。SSOT。
+ * 獨特怪物隨行雜魚（servant）與土地遭遇表（monster）共用。SSOT。
  * Shared by union escorts (servant) and land encounter tables (monster). SSOT.
  */
 export type IWeightPair = [weight: number, flag: number];
@@ -887,10 +887,10 @@ export interface IJobDataEx
 	};
 }
 
-/** 工會展示資料（union data_ex）/ union display data */
+/** 獨特怪物展示資料（union data_ex）/ union display data */
 export interface IUnionDataEx
 {
-	/** 工會名稱 / union name */
+	/** 獨特怪物名稱 / union name */
 	name?: string;
 	/** 等級 / level */
 	level?: number;
@@ -938,7 +938,7 @@ export interface IMonDef extends ICharCore, INamedIconDef
 	/** 掉落與獎勵設定（省略＝無獎勵）/ drop & reward settings (omitted = no reward) */
 	reward?: IMonReward;
 	/**
-	 * 工會怪標記 / union-monster flag
+	 * 獨特怪物標記 / union-monster flag
 	 *
 	 * 目前僅資料層保留：引擎以 factory.newUnion() 疊加 EnumCharType.Union，尚未讀取本欄。
 	 * Data-layer only: the engine stacks EnumCharType.Union via factory.newUnion() and does not read this field yet.
@@ -974,16 +974,16 @@ export interface IMonDef extends ICharCore, INamedIconDef
 	/** 怪物說明資訊（YAML `info`；例如技能說明）/ monster description info (IDescInfo) */
 	info?: IDescInfo;
 	/**
-	 * 工會怪出現週期（秒；YAML `cycle`） / union monster spawn cycle (seconds; YAML `cycle`)
+	 * 獨特怪物出現週期（秒；YAML `cycle`） / union monster spawn cycle (seconds; YAML `cycle`)
 	 * 目前僅資料層保留 / data-layer only
 	 */
 	cycle?: number;
-	/** 工會怪所在土地（背景；YAML `land`）/ union monster land/background (YAML `land`) */
+	/** 獨特怪物所在土地（背景；YAML `land`）/ union monster land/background (YAML `land`) */
 	land?: string;
-	/** 工會怪等級限制（YAML `lv_limit`）/ union monster level limit (YAML `lv_limit`) */
+	/** 獨特怪物等級限制（YAML `lv_limit`）/ union monster level limit (YAML `lv_limit`) */
 	lv_limit?: number;
 	/**
-	 * 工會怪隨行雜魚表 { 怪物編號: [出現權重, 0] }（YAML `servant`）
+	 * 獨特怪物隨行雜魚表 { 怪物編號: [出現權重, 0] }（YAML `servant`）
 	 * union escort table { monster no: [spawn weight, 0] } (YAML `servant`)
 	 * 目前僅資料層保留 / data-layer only
 	 */

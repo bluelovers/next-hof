@@ -143,17 +143,17 @@ export interface IRawMonYaml extends IRawCombatCoreYaml, INamedIconDef
 	reward?: IRawRewardYaml;
 	/** AI 行為 / AI behavior */
 	behavior?: IRawBehaviorYaml;
-	/** 工會怪出現週期（秒）/ union spawn cycle (seconds) */
+	/** 獨特怪物出現週期（秒）/ union spawn cycle (seconds) */
 	cycle?: number;
-	/** 工會怪土地（背景）/ union land (background) */
+	/** 獨特怪物土地（背景）/ union land (background) */
 	land?: string;
-	/** 工會怪等級限制 / union level limit */
+	/** 獨特怪物等級限制 / union level limit */
 	lv_limit?: number;
-	/** 隨行雜魚表 { 怪物編號: [出現權重, 旗標] } / escort table (IEncounterTable) */
+	/** 隨行僕從表 { 怪物編號: [出現權重, 旗標] } / escort table (IEncounterTable) */
 	servant?: IEncounterTable;
-	/** 隨行雜魚數量 / escort count */
+	/** 隨行僕從數量 / escort count */
 	servantAmount?: number;
-	/** 必出隨行雜魚編號 / guaranteed escort monster numbers */
+	/** 必出隨行僕從編號 / guaranteed escort monster numbers */
 	servantSpecify?: number[];
 }
 
@@ -366,15 +366,15 @@ export interface IRawSkilltreeYaml
 }
 
 /**
- * 原始工會設定（Union/union.*.yml）/ Raw union setting (Union/union.*.yml)
- * no 為補零字串（'0000'）；純資料層（對應 mon.*.yml 的工會細節）。
+ * 原始獨特怪物設定（Union/union.*.yml）/ Raw union setting (Union/union.*.yml)
+ * no 為補零字串（'0000'）；純資料層（對應 mon.*.yml 的獨特怪物細節）。
  * `no` is a zero-padded string ('0000'); data-layer only (the union details for the mon.*.yml bosses).
  */
 export interface IRawUnionYaml
 {
-	/** 工會 id（補零字串）/ union id (zero-padded string) */
+	/** 獨特怪物 id（補零字串）/ union id (zero-padded string) */
 	no: string | number;
-	/** 工會名稱 / union name */
+	/** 獨特怪物名稱 / union name */
 	name?: string;
 	/** 核心資料（隊伍、基底怪物、條件）/ core data (team, base monster, conditions) */
 	data?: {

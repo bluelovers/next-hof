@@ -236,7 +236,7 @@ describe('convertMonYaml (fixtures)', () =>
 		});
 	});
 
-	it('mon.2000 (union): 工會欄位完整轉換 / union fields fully converted', () =>
+	it('mon.2000 (union): 獨特怪物欄位完整轉換 / union fields fully converted', () =>
 	{
 		expect(convertMonYaml(mustLoadMon(2000))).toEqual({
 			no: 2000,

@@ -109,7 +109,7 @@ export function newMonSummon(def: IMonDef, repo: IDataRepository, rng: RNG, stre
 }
 
 /**
- * 建立工會怪（Mon + Union 類型疊加）/ Create a union monster (Mon + Union types stacked)
+ * 建立獨特怪物（Mon + Union 類型疊加）/ Create a union monster (Mon + Union types stacked)
  */
 export function newUnion(def: IMonDef, repo: IDataRepository, rng: RNG): Character
 {
