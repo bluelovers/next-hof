@@ -20,6 +20,7 @@
     "build": "next build",
     "start": "next start",
     "build-storybook": "storybook build",
+    "prestorybook": "node --run test:tsc",
     "storybook": "storybook dev -p 6006",
     "sprite:index": "tsx scripts/sprite-size-index.ts"
   },
