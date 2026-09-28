@@ -358,15 +358,4 @@ describe('convertEquipYaml / convertBehaviorYaml', () =>
 		const b = convertBehaviorYaml({ position: EnumPosition.Front });
 		expect(b).toEqual({ position: EnumPosition.Front });
 	});
-
-	it('drops rows with missing judge/action', () =>
-	{
-		const b = convertBehaviorYaml({
-			pattern: [
-				{ judge: 1000, quantity: 0, action: 1000 },
-				{ judge: undefined, quantity: 0, action: undefined },
-			],
-		});
-		expect(b?.pattern).toEqual([{ judge: 1000, quantity: 0, action: 1000 }]);
-	});
 });

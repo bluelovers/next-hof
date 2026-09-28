@@ -41,14 +41,12 @@ import { EnumPosition } from '#/lib/game/constants';
 import { COMP_FIELDS } from '#/lib/game/character/status-attrs';
 import { SKILL_EXTRA_NUMERIC_KEYS as SHARED_SKILL_EXTRA_NUMERIC_KEYS } from './yaml-skill-keys';
 import type {
-	IRawBehaviorYaml,
 	IRawCharYaml,
 	IRawCombatCoreYaml,
 	IRawEquipYaml,
 	IRawItemYaml,
 	IRawJobYaml,
 	IRawMonYaml,
-	IRawPatternItemYaml,
 	IRawRewardYaml,
 	IRawSkillYaml,
 } from './yaml-types';
@@ -116,7 +114,7 @@ export function convertPosition(value: string | null | undefined): EnumPosition 
  * quantity 的 null → 0；judge／action 無法解析時略過該列。
  * null quantity → 0; rows with unparseable judge/action are dropped.
  */
-export function convertPatternItem(raw: IRawPatternItemYaml | null | undefined): IPatternItem | undefined
+export function convertPatternItem(raw: IPatternItem | null | undefined): IPatternItem | undefined
 {
 	if (!raw) return undefined;
 	const judge = raw.judge ?? Number.NaN;
@@ -130,7 +128,7 @@ export function convertPatternItem(raw: IRawPatternItemYaml | null | undefined):
  * 空物件（pattern: { }）→ undefined（引擎會以預設收尾補普攻）。
  * Empty block (pattern: { }) → undefined (the engine's default tail supplies the basic attack).
  */
-export function convertBehaviorYaml(raw: IRawBehaviorYaml | null | undefined): IBehavior | undefined
+export function convertBehaviorYaml(raw: IBehavior | null | undefined): IBehavior | undefined
 {
 	if (!raw) return undefined;
 	const behavior: IBehavior = {};

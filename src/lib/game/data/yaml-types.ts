@@ -46,30 +46,6 @@ export type IRawSkillExtraNumerics = Partial<
 	Record<(typeof SKILL_EXTRA_NUMERIC_KEYS)[number], number>
 >;
 
-
-/**
- * 原始行為規則列（pattern 的一列）/ Raw pattern row inside `behavior.pattern`
- * 直接 derive 自 IPatternItem（單一事實來源；全欄位可省略）。
- * Derives directly from IPatternItem (SSOT; every field optional).
- * 來源 `quantity: null` 已於載入收斂為 0；省略同 0（恆可觸發）。
- * Source `quantity: null` is normalized to 0 at load; omitted also means 0 (always eligible).
- */
-export type IRawPatternItemYaml = Partial<IPatternItem>;
-
-/**
- * 原始 AI 行為定義 / Raw AI behavior definition
- * 與 IBehavior 同形：position 值即 EnumPosition、guard 值即 EnumGuardKind
- * （來源筆誤 pro50/prpb50 已由載入修正）；pattern 列引用 IPatternItem
- * （來源空物件 `{ }` 已於載入視為 undefined）。
- * Mirrors IBehavior: position values ARE EnumPosition and guard values ARE EnumGuardKind
- * (source typos fixed at load); pattern rows derive from IPatternItem
- * (the empty `{ }` is treated as undefined at load).
- */
-export type IRawBehaviorYaml = Omit<IBehavior, 'pattern'> & {
-	/** AI 行動規則列 / AI action rules */
-	pattern?: IRawPatternItemYaml[];
-};
-
 /**
  * 原始掉落與獎勵 / Raw reward block
  * moneyhold／exphold 引用 IMonReward（單一事實來源）；itemtable 鍵在原始檔為字串。
@@ -95,7 +71,7 @@ export type IRawEquipYaml = IEquipTable;
 export interface IRawCombatCoreYaml extends ICombatStats, Omit<INamedIconDef, 'img'>
 {
 	/** AI 行為 / AI behavior */
-	behavior?: IRawBehaviorYaml;
+	behavior?: IBehavior;
 }
 
 /**
@@ -142,7 +118,7 @@ export interface IRawMonYaml extends IRawCombatCoreYaml, INamedIconDef
 	/** 掉落與獎勵 / drop & reward */
 	reward?: IRawRewardYaml;
 	/** AI 行為 / AI behavior */
-	behavior?: IRawBehaviorYaml;
+	behavior?: IBehavior;
 	/** 獨特怪物出現週期（秒）/ union spawn cycle (seconds) */
 	cycle?: number;
 	/** 獨特怪物土地（背景）/ union land (background) */
