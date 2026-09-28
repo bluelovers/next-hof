@@ -38,8 +38,10 @@ export const BattleLog: React.FC<IBattleLogProps> = ({
 	twoColumn = true,
 }) =>
 {
-	// 單欄模式：每個行動獨立一列（維持時間序）
-	// Single-column mode: one row per action (keeps chronological order)
+	/**
+	 * 單欄模式：每個行動獨立一列（維持時間序）
+	 * Single-column mode: one row per action (keeps chronological order)
+	 */
 	if (!twoColumn)
 	{
 		return (
@@ -59,8 +61,10 @@ export const BattleLog: React.FC<IBattleLogProps> = ({
 		<div className="battle-log battle-log--two-col">
 			{actions.map((action, index) =>
 			{
-				// 未指定側別時歸左欄（沿用既有行為）
-				// Actions without a side fall back to the left column (prior behaviour)
+				/**
+				 * 未指定側別時歸左欄（沿用既有行為）
+				 * Actions without a side fall back to the left column (prior behaviour)
+				 */
 				const isRight = action.side === EnumTeamSideUI.Right;
 				return (
 					<div className="log-row" key={index}>

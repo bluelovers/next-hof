@@ -10,7 +10,9 @@ describe('job system (5.1)', () =>
 
 	it('coeMaxHp matches the documented formula (coe.maxhp=3, str=10, level=1)', () =>
 	{
-		// 100*3*1*(1 + (250-10)^2 / 250^2) = 300 * 1.0784 = 323.52
+		/**
+		 * 100*3*1*(1 + (250-10)^2 / 250^2) = 300 * 1.0784 = 323.52
+		 */
 		expect(coeMaxHp(job, 10, 1)).toBeCloseTo(323.52, 1);
 	});
 

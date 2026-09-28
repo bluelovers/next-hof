@@ -1,10 +1,12 @@
-// 屍體政策逐級解析（單一事實來源）/ Corpse policy level resolution (single source of truth)
-//
-// 繼承順序：角色級 → 隊伍級 → 戰鬥級（越具體越優先）；皆未設定＝false（不留屍體）。
-// 每一級的值可以是布林（簡易開關）或物件（進階規格），較具體的一級整個勝出（不做欄位合併）。
-// Inheritance: character → team → battle (more specific wins); all unset = false (no corpse).
-// Each level may be a boolean (simple switch) or an object (detailed spec); the more
-// specific level wins as a whole (fields are NOT merged across levels).
+/**
+ * 屍體政策逐級解析（單一事實來源）/ Corpse policy level resolution (single source of truth)
+ *
+ * 繼承順序：角色級 → 隊伍級 → 戰鬥級（越具體越優先）；皆未設定＝false（不留屍體）。
+ * 每一級的值可以是布林（簡易開關）或物件（進階規格），較具體的一級整個勝出（不做欄位合併）。
+ * Inheritance: character → team → battle (more specific wins); all unset = false (no corpse).
+ * Each level may be a boolean (simple switch) or an object (detailed spec); the more
+ * specific level wins as a whole (fields are NOT merged across levels).
+ */
 
 import type { IStyleProps } from '#/components/shared/types';
 

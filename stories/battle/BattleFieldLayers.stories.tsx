@@ -43,8 +43,10 @@ const meta: Meta<typeof BattleFieldLayers> = {
 		showSpriteLabels: true,
 		valign: EnumBattleFieldVAlign.Bottom,
 	},
-	// 外層舞台，方便觀察背景尺寸與角色框的相對位置
-	// Outer stage to visualize the relationship between background size and sprite frame
+	/**
+	 * 外層舞台，方便觀察背景尺寸與角色框的相對位置
+	 * Outer stage to visualize the relationship between background size and sprite frame
+	 */
 	decorators: [BattleFieldLayersDarkDecorator],
 };
 
@@ -141,7 +143,9 @@ export const BgScaleRepeat: Story = {
 /** bgSize 小於角色排版尺寸（480×200）時被無視，自動回退為角色排版尺寸 / bgSize smaller than layout (480×200) is ignored, falls back to layout size */
 export const BgSizeIgnoredWhenSmaller: Story = {
 	args: {
-		// 300×140 小於 480×200 → 被防禦無視，背景框維持 480×200 / 300×140 < 480×200 → ignored, box stays 480×200
+		/**
+		 * 300×140 小於 480×200 → 被防禦無視，背景框維持 480×200 / 300×140 < 480×200 → ignored, box stays 480×200
+		 */
 		bgSize: { width: 300, height: 140 },
 		config: createSampleConfig('egypt'),
 	},

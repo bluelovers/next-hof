@@ -84,9 +84,11 @@ export const DamageDealt: Story = {
 			source: 'GoblinWarrior(B)',
 			target: 'Hero1',
 			value: 182,
-			// 前後值只寫數字，兩端之間的符號（↘ 下降）由渲染端唯一組出；message 是同一件事的純文字鏡像
-			// Only the numbers are written: the renderer builds the symbol between them (↘ falling)
-			// once, and `message` is the plain-text mirror of the same fact
+			/**
+			 * 前後值只寫數字，兩端之間的符號（↘ 下降）由渲染端唯一組出；message 是同一件事的純文字鏡像
+			 * Only the numbers are written: the renderer builds the symbol between them (↘ falling)
+			 * once, and `message` is the plain-text mirror of the same fact
+			 */
 			valueChange: { from: 349, to: 167 },
 			message: buildDamageMessage(182, 'Hero1'),
 			attribute: EnumAttributeType.Dmg,
@@ -177,11 +179,13 @@ export const HealAction: Story = {
 };
 
 // ==================== SkillEffect 移植帶來的行動型別 ====================
-// 對應 #/lib/game/skill/SkillEffect.ts 生產、由 battle-adapter 轉接的事件；
-// 文案一律引用 battleUtils 的建構器，不在此重打字串（與 fixture 同源）。
-// Action types brought by the SkillEffect port: events produced by
-// #/lib/game/skill/SkillEffect.ts and adapted by battle-adapter; the copy always comes from
-// battleUtils' builders and is never retyped here (same source as the fixture).
+/**
+ * 對應 #/lib/game/skill/SkillEffect.ts 生產、由 battle-adapter 轉接的事件；
+ * 文案一律引用 battleUtils 的建構器，不在此重打字串（與 fixture 同源）。
+ * Action types brought by the SkillEffect port: events produced by
+ * #/lib/game/skill/SkillEffect.ts and adapted by battle-adapter; the copy always comes from
+ * battleUtils' builders and is never retyped here (same source as the fixture).
+ */
 
 /** SP 傷害（`40SP Damage to GoblinAxe`，行首無施放者名稱）/ SP damage (`40SP Damage to GoblinAxe`, no caster name at the head) */
 export const SpDamageAction: Story = {

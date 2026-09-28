@@ -68,9 +68,11 @@ function buildSpriteLayers(
 	return sprites.map((sprite, index) =>
 	{
 		const flipClass = sprite.flipped ? 'flip-h' : '';
-		// 精靈自身的 className（例如屍體規格附加的 class）與 battle-sprite 併存，不互相覆蓋
-		// The sprite's own className (e.g. from a corpse spec) coexists with battle-sprite
-		// instead of replacing it
+		/**
+		 * 精靈自身的 className（例如屍體規格附加的 class）與 battle-sprite 併存，不互相覆蓋
+		 * The sprite's own className (e.g. from a corpse spec) coexists with battle-sprite
+		 * instead of replacing it
+		 */
 		const layerClass = ['battle-sprite', flipClass, sprite.className?.trim()]
 			.filter(Boolean)
 			.join(' ');
@@ -81,21 +83,29 @@ function buildSpriteLayers(
 			backgroundImage: sprite.imageUrl
 				? `url(${sprite.imageUrl})`
 				: undefined,
-			// backgroundRepeat: 'no-repeat',
+			/**
+			 * backgroundRepeat: 'no-repeat',
+			 */
 			backgroundPosition: `${sprite.x}px ${sprite.y}px`,
-			// position: 'absolute',
+			/**
+			 * position: 'absolute',
+			 */
 		};
 
-		// 合併順序：基礎樣式 < 元件/輔助函式 style < 單體精靈 style（最優先）
-		// Merge order: base < component/helper style < per-sprite style (highest priority)
+		/**
+		 * 合併順序：基礎樣式 < 元件/輔助函式 style < 單體精靈 style（最優先）
+		 * Merge order: base < component/helper style < per-sprite style (highest priority)
+		 */
 		const mergedStyle: CSSProperties = {
 			...layerStyle,
 			...style,
 			...sprite.style,
 		};
 
-		// 由上層 useSpriteLabelRegistry 預先算好的防重疊位置（依順序對應）
-		// Pre-computed anti-overlap position from useSpriteLabelRegistry (matched by order).
+		/**
+		 * 由上層 useSpriteLabelRegistry 預先算好的防重疊位置（依順序對應）
+		 * Pre-computed anti-overlap position from useSpriteLabelRegistry (matched by order).
+		 */
 		const entry = registry.entries[index];
 
 		return (
@@ -137,10 +147,12 @@ function buildSpriteLayers(
 export const BattleFieldSpriteLayers: React.FC<IBattleFieldSpriteLayersProps> = (props) =>
 {
 	const { sprites, width, height } = props;
-	// 依序把精靈轉為標籤運算輸入；memo 化使 inputs 在 sprites 不變時保持穩定，
-	// 進而讓 useSpriteLabelRegistry 的 useMemo / ref 快取能跨渲染生效。
-	// Map sprites to label-compute inputs in order; memoized so inputs stay stable when
-	// sprites is unchanged, letting useSpriteLabelRegistry's useMemo/ref cache persist across renders.
+	/**
+	 * 依序把精靈轉為標籤運算輸入；memo 化使 inputs 在 sprites 不變時保持穩定，
+	 * 進而讓 useSpriteLabelRegistry 的 useMemo / ref 快取能跨渲染生效。
+	 * Map sprites to label-compute inputs in order; memoized so inputs stay stable when
+	 * sprites is unchanged, letting useSpriteLabelRegistry's useMemo/ref cache persist across renders.
+	 */
 	const inputs = useMemo<ISpriteLabelComputeInput[]>(
 		() =>
 			sprites.map((s, i) => ({

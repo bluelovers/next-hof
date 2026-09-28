@@ -37,8 +37,10 @@ const meta: Meta<typeof BattleFieldSpriteFrame> = {
 		showSpriteLabels: true,
 		valign: EnumBattleFieldVAlign.Bottom,
 	},
-	// 模擬放大後的背景舞台（640×360），框（480×200）在其中依 valign 定位
-	// Simulated enlarged background stage (640×360); the frame (480×200) positions within by valign
+	/**
+	 * 模擬放大後的背景舞台（640×360），框（480×200）在其中依 valign 定位
+	 * Simulated enlarged background stage (640×360); the frame (480×200) positions within by valign
+	 */
 	decorators: [
 		makeStageDecorator({
 			width: 768,

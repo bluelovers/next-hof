@@ -1,6 +1,8 @@
-// 可注入的隨機數來源 / Injectable RNG (seedable)
-// 使用 mulberry32 PRNG，對應原始 PHP mt_rand 的可重現語意。
-// 所有需要隨機性的系統（敵方生成、守護機率、中毒、AI 1940 等）皆依賴此類。
+/**
+ * 可注入的隨機數來源 / Injectable RNG (seedable)
+ * 使用 mulberry32 PRNG，對應原始 PHP mt_rand 的可重現語意。
+ * 所有需要隨機性的系統（敵方生成、守護機率、中毒、AI 1940 等）皆依賴此類。
+ */
 
 /**
  * 可注入的隨機數來源 / Injectable RNG (seedable)
@@ -19,7 +21,9 @@ export class RNG
 	 */
 	constructor(seed = 1)
 	{
-		// 確保 32-bit 無號整數種子 / normalize to a 32-bit unsigned seed
+		/**
+		 * 確保 32-bit 無號整數種子 / normalize to a 32-bit unsigned seed
+		 */
 		this.state = seed >>> 0;
 	}
 

@@ -15,7 +15,9 @@ const meta: Meta<typeof LoginForm> = {
 	title: 'Auth/LoginForm',
 	component: LoginForm,
 	parameters: {
-		// Storybook 裝飾器配置 / Storybook decorators configuration
+		/**
+		 * Storybook 裝飾器配置 / Storybook decorators configuration
+		 */
 		decorators: [
 			HomePageDarkDecorator,
 		],

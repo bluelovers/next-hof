@@ -236,27 +236,29 @@ export function buildMagicCircleMessage(source?: string, record?: IMagicCircleRe
 }
 
 // ==================== 原始日誌文案（單一事實來源）/ Original log copy (single source of truth) ====================
-//
-// 命名慣例 / Naming convention:
-//   buildXxxText    → 「粗體名稱之後的片段」（對應 IBattleAction.text），由唯一合併點
-//                     buildActionMessage 接成名行；例：buildRecoveredText、buildStatChangeText。
-//   buildXxxMessage → 「整行純文字」（對應 IBattleAction.message），本身已含名稱或根本沒有名稱；
-//                     例：buildDamageMessage、buildProtectMessage。
-//   EnumLogCopy     → 無參數可變的固定文案，以列舉成員持有；資料端只引用成員，
-//                     不得把原始日誌字串寫成字面值，也不設零參數建構器。
-//   buildXxxText    → the fragment after the bold name (IBattleAction.text), joined into the whole
-//                     line by the single join point buildActionMessage; e.g. buildRecoveredText,
-//                     buildStatChangeText.
-//   buildXxxMessage → the whole plain line (IBattleAction.message), already carrying the name or
-//                     having none at all; e.g. buildDamageMessage, buildProtectMessage.
-//   EnumLogCopy     → fixed copy with nothing to vary, held by enum members; the data only
-//                     references them — original-log strings are never spelled out as literals,
-//                     and no zero-argument builder is created for them.
-//
-// 以下建構器與 EnumLogCopy 逐字對應 HOF/Class 的戰鬥日誌輸出；轉接層與展示資料都必須經由
-// 它們產生文案，因此每個字串只書寫一次。
-// The builders and EnumLogCopy below mirror the battle-log output of HOF/Class word for word;
-// the adapter and the showcase data both go through them, so every string is written exactly once.
+/**
+ *
+ * 命名慣例 / Naming convention:
+ *   buildXxxText    → 「粗體名稱之後的片段」（對應 IBattleAction.text），由唯一合併點
+ *                     buildActionMessage 接成名行；例：buildRecoveredText、buildStatChangeText。
+ *   buildXxxMessage → 「整行純文字」（對應 IBattleAction.message），本身已含名稱或根本沒有名稱；
+ *                     例：buildDamageMessage、buildProtectMessage。
+ *   EnumLogCopy     → 無參數可變的固定文案，以列舉成員持有；資料端只引用成員，
+ *                     不得把原始日誌字串寫成字面值，也不設零參數建構器。
+ *   buildXxxText    → the fragment after the bold name (IBattleAction.text), joined into the whole
+ *                     line by the single join point buildActionMessage; e.g. buildRecoveredText,
+ *                     buildStatChangeText.
+ *   buildXxxMessage → the whole plain line (IBattleAction.message), already carrying the name or
+ *                     having none at all; e.g. buildDamageMessage, buildProtectMessage.
+ *   EnumLogCopy     → fixed copy with nothing to vary, held by enum members; the data only
+ *                     references them — original-log strings are never spelled out as literals,
+ *                     and no zero-argument builder is created for them.
+ *
+ * 以下建構器與 EnumLogCopy 逐字對應 HOF/Class 的戰鬥日誌輸出；轉接層與展示資料都必須經由
+ * 它們產生文案，因此每個字串只書寫一次。
+ * The builders and EnumLogCopy below mirror the battle-log output of HOF/Class word for word;
+ * the adapter and the showcase data both go through them, so every string is written exactly once.
+ */
 
 /**
  * 原始日誌的固定文案（單一事實來源；成員值＝逐字對應 HOF/Class 的輸出）
@@ -503,14 +505,18 @@ export function buildStatToText(
 	from?: number,
 ): string
 {
-	// `extended` 補回介係詞 `to`；有舊值時帶出 `(舊值)`，與原始日誌逐字一致
-	// `extended` regains the preposition `to`; when an old value exists it is shown as `(old)`,
-	// matching the original log verbatim
+	/**
+	 * `extended` 補回介係詞 `to`；有舊值時帶出 `(舊值)`，與原始日誌逐字一致
+	 * `extended` regains the preposition `to`; when an old value exists it is shown as `(old)`,
+	 * matching the original log verbatim
+	 */
 	const phrase = direction === EnumStatDirection.Extended ? 'extended to' : direction;
-	// 有舊值時帶出 `(舊值) `，否則補一個空格，使 `MAXHP extended to` 與
-	// `MAXHP(500) extended to` 都與原始日誌逐字一致。
-	// With an old value it shows `(old) `, otherwise a single space, so both
-	// `MAXHP extended to` and `MAXHP(500) extended to` match the original log verbatim.
+	/**
+	 * 有舊值時帶出 `(舊值) `，否則補一個空格，使 `MAXHP extended to` 與
+	 * `MAXHP(500) extended to` 都與原始日誌逐字一致。
+	 * With an old value it shows `(old) `, otherwise a single space, so both
+	 * `MAXHP extended to` and `MAXHP(500) extended to` match the original log verbatim.
+	 */
 	const lead = from !== undefined ? `(${from}) ` : ' ';
 	return `${stat}${lead}${phrase} ${value}`;
 }
@@ -802,10 +808,12 @@ export function getMessageClass(action: IBattleAction): string
 		case EnumActionType.Drain:
 		case EnumActionType.Regen:
 			return action.valueUnit === 'SP' ? 'support' : 'recover';
-		// Buff／Poison 支援以 attribute 覆寫：未指定才取家族預設色，
-		// 明確指定（含 Normal＝不著色）一律尊重原值。
-		// Buff / Poison accept an attribute override: the family default applies only when no
-		// attribute is given; an explicit one (Normal = uncoloured included) is always honoured.
+		/**
+		 * Buff／Poison 支援以 attribute 覆寫：未指定才取家族預設色，
+		 * 明確指定（含 Normal＝不著色）一律尊重原值。
+		 * Buff / Poison accept an attribute override: the family default applies only when no
+		 * attribute is given; an explicit one (Normal = uncoloured included) is always honoured.
+		 */
 		case EnumActionType.Buff:
 			return action.attribute !== undefined ? getAttrClass(action.attribute) : 'support';
 		case EnumActionType.Poison:
@@ -896,15 +904,19 @@ export function splitActionsBySnapshots(
 		return [{ index: 0, actions }];
 	}
 
-	// 複製 + 依 at 穩定排序 + 夾限到 [0, actions.length]
-	// Copy, stable-sort by `at`, then clamp into [0, actions.length]
+	/**
+	 * 複製 + 依 at 穩定排序 + 夾限到 [0, actions.length]
+	 * Copy, stable-sort by `at`, then clamp into [0, actions.length]
+	 */
 	const bounds = snapshots
 		.map((snapshot, order) => ({ snapshot, order, at: Math.max(0, Math.min(actions.length, snapshot.at)) }))
 		.sort((a, b) => a.at - b.at || a.order - b.order);
 
 	const segments: IBattleSegment[] = [];
-	// 防禦：若首個界線晚於 0，先補一段「無快照」涵蓋開頭行動，避免遺失
-	// Guard: if the first bound is past 0, prepend a snapshot-less segment so no action is lost
+	/**
+	 * 防禦：若首個界線晚於 0，先補一段「無快照」涵蓋開頭行動，避免遺失
+	 * Guard: if the first bound is past 0, prepend a snapshot-less segment so no action is lost
+	 */
 	if (bounds[0].at > 0)
 	{
 		segments.push({ index: 0, actions: actions.slice(0, bounds[0].at) });
@@ -914,9 +926,11 @@ export function splitActionsBySnapshots(
 		const start = bounds[i].at;
 		const end = i + 1 < bounds.length ? bounds[i + 1].at : actions.length;
 		const isLast = i === bounds.length - 1;
-		// 跳過中間的空分段；最後一段保留（末端快照＝最終狀態頁，即使沒有行動）
-		// Skip empty intermediate spans; keep the last one (the trailing snapshot is the
-		// final-state page even when it carries no actions).
+		/**
+		 * 跳過中間的空分段；最後一段保留（末端快照＝最終狀態頁，即使沒有行動）
+		 * Skip empty intermediate spans; keep the last one (the trailing snapshot is the
+		 * final-state page even when it carries no actions).
+		 */
 		if (end <= start && !isLast && segments.length > 0) continue;
 		segments.push({
 			index: segments.length,
@@ -951,8 +965,10 @@ export function snapshotUnitToBattleUnit(unit: IBattleSnapshotDisplayUnit): IBat
 		maxSp: unit.maxSp,
 		status,
 		side: unit.side,
-		// 單位精靈資料：快照帶圖時才有（是否渲染另由 showUnitSprites 決定）
-		// Unit sprite data: only when the snapshot carries an image (rendering itself is gated by showUnitSprites)
+		/**
+		 * 單位精靈資料：快照帶圖時才有（是否渲染另由 showUnitSprites 決定）
+		 * Unit sprite data: only when the snapshot carries an image (rendering itself is gated by showUnitSprites)
+		 */
 		sprite: unit.imageUrl ? { url: unit.imageUrl } : undefined,
 	};
 }
@@ -1066,28 +1082,38 @@ export function resolveSegmentSprites(
 		.map((sprite) =>
 		{
 			const unit = sprite.unitUuid ? unitById.get(sprite.unitUuid) : undefined;
-			// 此快照中不存在（尚未加入／已離場）→ 不顯示
-			// Not present at this moment (not yet joined / already gone) → hidden
+			/**
+			 * 此快照中不存在（尚未加入／已離場）→ 不顯示
+			 * Not present at this moment (not yet joined / already gone) → hidden
+			 */
 			if (!unit) return undefined;
 			if (unit.dead)
 			{
-				// 不留屍體（corpse 為 falsy，含未設定）：死亡即消失
-				// No corpse (corpse falsy, including unset): vanish on death
+				/**
+				 * 不留屍體（corpse 為 falsy，含未設定）：死亡即消失
+				 * No corpse (corpse falsy, including unset): vanish on death
+				 */
 				if (!unit.corpse) return undefined;
 				const baseImage = unit.imageUrl ?? sprite.imageUrl;
-				// 物件規格（可為空物件）→ 可指定屍體圖／class／style；布林 → 走預設屍體圖
-				// Object spec (may be empty) → may choose the corpse image/class/style; boolean → default corpse asset
+				/**
+				 * 物件規格（可為空物件）→ 可指定屍體圖／class／style；布林 → 走預設屍體圖
+				 * Object spec (may be empty) → may choose the corpse image/class/style; boolean → default corpse asset
+				 */
 				const spec = corpseSpecOf(unit.corpse);
-				// 未指定圖路徑（或只有空白）＝沿用自動挑圖與原朝向；指定路徑則原樣採用
-				// No path (or a blank one) = auto-pick the asset and keep the original facing;
-				// a given path is used verbatim
+				/**
+				 * 未指定圖路徑（或只有空白）＝沿用自動挑圖與原朝向；指定路徑則原樣採用
+				 * No path (or a blank one) = auto-pick the asset and keep the original facing;
+				 * a given path is used verbatim
+				 */
 				const customImage = spec?.imageUrl?.trim();
 				const corpseImage = customImage || corpseUrlFor(baseImage);
-				// 自訂屍體圖會換掉圖檔目錄，故以「新圖 + 隊伍側」重新推導朝向，
-				// 維持兩隊皆面向場地中心（未指定圖時沿用原精靈朝向，行為不變）
-				// A custom corpse image changes the image directory, so re-derive facing from
-				// "new image + team side" to keep both teams facing the centre; without one the
-				// sprite keeps its original facing (unchanged behaviour)
+				/**
+				 * 自訂屍體圖會換掉圖檔目錄，故以「新圖 + 隊伍側」重新推導朝向，
+				 * 維持兩隊皆面向場地中心（未指定圖時沿用原精靈朝向，行為不變）
+				 * A custom corpse image changes the image directory, so re-derive facing from
+				 * "new image + team side" to keep both teams facing the centre; without one the
+				 * sprite keeps its original facing (unchanged behaviour)
+				 */
 				const flipped = customImage
 					? computeSpriteFlipped(corpseImage, unit.side, { flipped: sprite.flipped })
 					: sprite.flipped;
@@ -1102,8 +1128,10 @@ export function resolveSegmentSprites(
 					style: spec?.style ? { ...sprite.style, ...spec.style } : sprite.style,
 				};
 			}
-			// 存活（含復活）；型態變化以外觀覆寫呈現
-			// Alive (incl. revived); a form change is expressed via the appearance override
+			/**
+			 * 存活（含復活）；型態變化以外觀覆寫呈現
+			 * Alive (incl. revived); a form change is expressed via the appearance override
+			 */
 			return unit.imageUrl
 				? { ...sprite, imageUrl: unit.imageUrl, name: unit.name }
 				: sprite;

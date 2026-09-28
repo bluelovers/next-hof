@@ -65,7 +65,9 @@ describe('Skill effect (6.2)', () =>
 			target: [EnumTargetType.Enemy, EnumTargetMethod.Individual, 1],
 			pow: 160,
 		};
-		// sqrt(100)*10 = 100; *1.6 = 160; *(1-0.2)=128; -5=123; ceil(max(123,12.3))=123
+		/**
+		 * sqrt(100)*10 = 100; *1.6 = 160; *(1-0.2)=128; -5=123; ceil(max(123,12.3))=123
+		 */
 		expect(calcBasicDamage(atk, user, target)).toBe(123);
 
 		const res = applySkill(atk, user, target);
@@ -98,7 +100,8 @@ describe('Skill effect (6.2)', () =>
 			pow: 200,
 			support: 1,
 		};
-		expect(calcRecoveryValue(heal, user)).toBe(200); // ceil((10*10)*2)=200
+		/** ceil((10*10)*2)=200 */
+		expect(calcRecoveryValue(heal, user)).toBe(200);
 
 		const res = applySkill(heal, user, target);
 		expect(res.heal).toBe(200);
@@ -122,7 +125,9 @@ describe('Skill effect (6.2)', () =>
 		target.HP = 300;
 		target.MAXHP = 300;
 
-		// 一個技能同時具備 傷害＋施毒＋減益 / one skill carrying damage + poison + debuff
+		/**
+		 * 一個技能同時具備 傷害＋施毒＋減益 / one skill carrying damage + poison + debuff
+		 */
 		const curse: ISkillDef = {
 			no: 1210, name: 'PlagueHex', sp: 0, type: EnumSkillDamageType.Physical,
 			target: [EnumTargetType.Enemy, EnumTargetMethod.Individual, 1], pow: 100, poison: 100, DownSTR: 15,
@@ -135,9 +140,11 @@ describe('Skill effect (6.2)', () =>
 			EnumBattleEventType.Debuff,
 			EnumBattleEventType.Poison,
 		]);
-		// 每筆都帶 skill 編號 → 上級事件引擎會分派到同一次技能事件的各效果系統
-		// Every record carries the skill number → the upper event engine dispatches them into the
-		// effect systems of one skill event
+		/**
+		 * 每筆都帶 skill 編號 → 上級事件引擎會分派到同一次技能事件的各效果系統
+		 * Every record carries the skill number → the upper event engine dispatches them into the
+		 * effect systems of one skill event
+		 */
 		expect(res.events.every((e) => e.skill === curse.no)).toBe(true);
 	});
 });

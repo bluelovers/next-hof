@@ -78,14 +78,18 @@ describe('Equip system (7.2)', () =>
 		});
 		char.equip = { off_hand: 3000 };
 
-		// 雙手互斥：裝備 dh 主手 → 卸下副手
+		/**
+		 * 雙手互斥：裝備 dh 主手 → 卸下副手
+		 */
 		const [fail, removed] = setEquip(char, r, EnumEquipSlot.MainHand, 9000);
 		expect(fail).toBe(false);
 		expect(removed).toContain(3000);
 		expect(char.equip.off_hand).toBeUndefined();
 		expect(char.equip.main_hand).toBe(9000);
 
-		// 負荷限制：DEX 4, level 1 → 上限 5；handle 10 超過
+		/**
+		 * 負荷限制：DEX 4, level 1 → 上限 5；handle 10 超過
+		 */
 		const char2 = new Character({
 			no: 2, name: 'c2', types: [EnumCharType.Char], level: 1,
 			str: 10, int: 10, dex: 4, spd: 10, luk: 10, maxhp: 300, maxsp: 50,

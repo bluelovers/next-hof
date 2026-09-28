@@ -1,9 +1,11 @@
-// 展示頁敵方編選 / Showcase enemy encounters
-// 定義至少兩組可選 encounter（純 def no 清單，資料來自 seed 怪物）；開戰時由
-// runShowcaseBattle 依所選項目建立敵方隊伍，切換選項即切換敵方構成。
-// Defines at least two selectable encounters (plain def-no lists built from seed
-// monsters). At battle start runShowcaseBattle builds the enemy side from the
-// chosen option, so switching options switches the enemy composition.
+/**
+ * 展示頁敵方編選 / Showcase enemy encounters
+ * 定義至少兩組可選 encounter（純 def no 清單，資料來自 seed 怪物）；開戰時由
+ * runShowcaseBattle 依所選項目建立敵方隊伍，切換選項即切換敵方構成。
+ * Defines at least two selectable encounters (plain def-no lists built from seed
+ * monsters). At battle start runShowcaseBattle builds the enemy side from the
+ * chosen option, so switching options switches the enemy composition.
+ */
 
 import { SEED } from '#/lib/game/data/seed-data';
 

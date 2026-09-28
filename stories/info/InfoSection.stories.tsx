@@ -15,7 +15,9 @@ const meta: Meta<typeof InfoSection> = {
 	title: 'Info/InfoSection',
 	component: InfoSection,
 	parameters: {
-		// Storybook 裝飾器配置 / Storybook decorators configuration
+		/**
+		 * Storybook 裝飾器配置 / Storybook decorators configuration
+		 */
 		decorators: [InfoSectionDarkDecorator],
 	},
 };

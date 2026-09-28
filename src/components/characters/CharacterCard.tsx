@@ -212,7 +212,9 @@ export const CharacterCard: React.FC<ICharacterCardProps> = ({
 	const controlId = `${selection === 'radio' ? 'radio' : 'box'}${index + 1}`;
 	const textId = `text${index + 1}`;
 
-	// 統一讀取 active（向後相容 selected / checked）
+	/**
+	 * 統一讀取 active（向後相容 selected / checked）
+	 */
 	const highlighted = character.active
 		?? (character as ICharacterData).selected
 		?? (character as IBattleCharacterData).checked

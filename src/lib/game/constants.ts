@@ -1,6 +1,8 @@
-// 遊戲常數集中定義 / Centralized game tuning constants
-// 數值來源：docs/log/battle/05-battle-details.md §1 與 docs/data/README.md
-// 所有數值與原始 PHP setting.dist.php 一致，便於後續 YAML 匯入對照。
+/**
+ * 遊戲常數集中定義 / Centralized game tuning constants
+ * 數值來源：docs/log/battle/05-battle-details.md §1 與 docs/data/README.md
+ * 所有數值與原始 PHP setting.dist.php 一致，便於後續 YAML 匯入對照。
+ */
 
 export const MAX_TIME = 1000;
 export const START_TIME = 900;
@@ -14,7 +16,9 @@ export const START_MONEY = 50000;
 export const EXP_RATE = 1;
 export const MONEY_RATE = 1;
 
-// 戰鬥相關 / Battle
+/**
+ * 戰鬥相關 / Battle
+ */
 export const NORMAL_BATTLE_TIME = 1;
 export const ENEMY_INCREASE = 1;
 export const BATTLE_MAX_TURNS = 100;
@@ -32,18 +36,24 @@ export const DELAY = 2.5;
 /** 新版基底值 */
 export const DELAY_BASE = 5;
 
-// Union / 排名戰 / Union & Ranking
+/**
+ * Union / 排名戰 / Union & Ranking
+ */
 export const UNION_BATTLE_TIME = 10;
 export const UNION_BATTLE_NEXT = 1200;
 export const RANK_TEAM_SET_TIME = 172800;
 export const RANK_BATTLE_NEXT_LOSE = 86400;
 export const RANK_BATTLE_NEXT_WIN = 60;
 
-// 裝備負荷基礎 / Handle base（DELAY 相關運算用）
+/**
+ * 裝備負荷基礎 / Handle base（DELAY 相關運算用）
+ */
 export const REFINE_LIMIT = 10;
 export const SELLING_PRICE = 1 / 5;
 
-// 魔方陣上限 / Magic circle cap
+/**
+ * 魔方陣上限 / Magic circle cap
+ */
 export const MAGIC_CIRCLE_MAX = 5;
 
 /**

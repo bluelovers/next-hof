@@ -1,5 +1,7 @@
-// 戰鬥結果 / Battle result
-// 對應 docs/log/battle/02 §5（BattleResult）：依存活者判定勝/負/平。
+/**
+ * 戰鬥結果 / Battle result
+ * 對應 docs/log/battle/02 §5（BattleResult）：依存活者判定勝/負/平。
+ */
 
 import type { BattleTeam } from '../team/BattleTeam';
 
@@ -58,7 +60,10 @@ export function computeOutcome(team0: BattleTeam, team1: BattleTeam): EnumOutcom
 	const a0 = team0.CountAlive();
 	const a1 = team1.CountAlive();
 	if (a0 === 0 && a1 === 0) return EnumOutcome.Draw;
-	if (a1 === 0) return EnumOutcome.Win; // team0 存活，敵方全滅 / team0 alive, enemy wiped
-	if (a0 === 0) return EnumOutcome.Lose; // team0 全滅 / team0 wiped
-	return EnumOutcome.Draw; // 雙方皆存活（超時）/ both sides alive (timeout)
+	/** team0 存活，敵方全滅 / team0 alive, enemy wiped */
+	if (a1 === 0) return EnumOutcome.Win;
+	/** team0 全滅 / team0 wiped */
+	if (a0 === 0) return EnumOutcome.Lose;
+	/** 雙方皆存活（超時）/ both sides alive (timeout) */
+	return EnumOutcome.Draw;
 }

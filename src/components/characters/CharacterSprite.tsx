@@ -51,7 +51,9 @@ export const CharacterSprite: React.FC<ICharacterSpriteProps> = ({
 	className = '',
 }) =>
 {
-	// avatar / original — 直接用 <img>，無 frame
+	/**
+	 * avatar / original — 直接用 <img>，無 frame
+	 */
 	if (variant === EnumSpriteVariant.Avatar || variant === EnumSpriteVariant.Original)
 	{
 		return (
@@ -64,7 +66,9 @@ export const CharacterSprite: React.FC<ICharacterSpriteProps> = ({
 		);
 	}
 
-	// boxed / raw — 用 background-image
+	/**
+	 * boxed / raw — 用 background-image
+	 */
 	const classes = [
 		'character-sprite',
 		`character-sprite--${variant}`,

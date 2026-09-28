@@ -72,24 +72,34 @@ function resolveBgImageLayout(
 	switch (scale)
 	{
 		case 'cover':
-			// 縮放至覆蓋整個背景框（可能裁切溢出部分）/ Scale to cover the box (may crop overflow)
+			/**
+			 * 縮放至覆蓋整個背景框（可能裁切溢出部分）/ Scale to cover the box (may crop overflow)
+			 */
 			return { backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: position };
 		case 'contain':
-			// 縮放至完整放入背景框（可能留白）/ Scale to fit entirely (may letterbox)
+			/**
+			 * 縮放至完整放入背景框（可能留白）/ Scale to fit entirely (may letterbox)
+			 */
 			return { backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: position };
 		case 'stretch':
-			// 拉伸至背景框的確切尺寸（會變形）/ Stretch to exact box size (may distort)
+			/**
+			 * 拉伸至背景框的確切尺寸（會變形）/ Stretch to exact box size (may distort)
+			 */
 			return {
 				backgroundSize: `${bgSize.width}px ${bgSize.height}px`,
 				backgroundRepeat: 'no-repeat',
 				backgroundPosition: position,
 			};
 		case 'repeat':
-			// 平鋪（依原始尺寸重複）/ Repeat (tile at natural size)
+			/**
+			 * 平鋪（依原始尺寸重複）/ Repeat (tile at natural size)
+			 */
 			return { backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: '0 0' };
 		case 'natural':
 		default:
-			// 原始尺寸，水平置中 + 垂直置底 / Natural size, horizontally centered + bottom-aligned
+			/**
+			 * 原始尺寸，水平置中 + 垂直置底 / Natural size, horizontally centered + bottom-aligned
+			 */
 			return { backgroundSize: 'auto', backgroundRepeat: 'no-repeat', backgroundPosition: position };
 	}
 }
@@ -106,21 +116,27 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
 	className,
 }) =>
 {
-	// 角色排版尺寸：選填，未提供時使用預設值（保持原有設計）
-	// Sprite layout size: optional, fall back to defaults when omitted
+	/**
+	 * 角色排版尺寸：選填，未提供時使用預設值（保持原有設計）
+	 * Sprite layout size: optional, fall back to defaults when omitted
+	 */
 	const width = rawWidth ?? SPRITE_LAYOUT_WIDTH;
 	const height = rawHeight ?? SPRITE_LAYOUT_HEIGHT;
 
-	// 背景尺寸防禦：bgSize 任一維度低於角色排版尺寸時，該維度被無視並回退為角色排版尺寸
-	// Background size guard: when any bgSize dimension is smaller than the sprite layout
-	// size, that dimension is ignored and falls back to the sprite layout size.
+	/**
+	 * 背景尺寸防禦：bgSize 任一維度低於角色排版尺寸時，該維度被無視並回退為角色排版尺寸
+	 * Background size guard: when any bgSize dimension is smaller than the sprite layout
+	 * size, that dimension is ignored and falls back to the sprite layout size.
+	 */
 	const resolvedBgSize: ISpriteImageSize = {
 		width: bgSize?.width! >= width ? bgSize!.width! : width,
 		height: bgSize?.height! >= height ? bgSize!.height! : height,
 	};
 
-	// 背景圖排版：預設自然尺寸 + 水平置中垂直置底，縮放模式由 config.bgScale 控制
-	// Background image layout: default natural size + centered/bottom; scale mode from config.bgScale
+	/**
+	 * 背景圖排版：預設自然尺寸 + 水平置中垂直置底，縮放模式由 config.bgScale 控制
+	 * Background image layout: default natural size + centered/bottom; scale mode from config.bgScale
+	 */
 	const bgScaleMode = config.bgScale ?? EnumBattleFieldBgScale.Natural;
 	const bgImageLayout = resolveBgImageLayout(bgScaleMode, resolvedBgSize);
 

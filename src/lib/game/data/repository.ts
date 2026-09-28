@@ -1,6 +1,8 @@
-// 資料儲存抽象 / Data repository abstraction
-// 本變更僅提供 InMemoryRepository + 少量範例資料；YAML 資源匯入留待後續變更。
-// 所有系統透過 IDataRepository 取得技能/職業/物品/怪物/角色定義。
+/**
+ * 資料儲存抽象 / Data repository abstraction
+ * 本變更僅提供 InMemoryRepository + 少量範例資料；YAML 資源匯入留待後續變更。
+ * 所有系統透過 IDataRepository 取得技能/職業/物品/怪物/角色定義。
+ */
 
 import type { ISkillDef, IItemDef, IJobDef, ICharDef, IMonDef } from '../types';
 

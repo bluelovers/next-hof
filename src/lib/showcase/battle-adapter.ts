@@ -1,10 +1,12 @@
-// 展示頁戰鬥轉接層 / Showcase battle adapter
-// 將引擎的「名冊 → 建隊 → 戰鬥執行」輸出轉為展示頁所需的 IBattleDisplayData
-// 契約（隊伍/單位/日誌/結果/精靈）。以固定種子保證同輸入同結果，所有轉接函式
-// 皆可獨立單元測試（OpenSpec 任務 3.1–3.5）。
-//
-// 側別慣例（與原版頁面一致）：敵方＝左隊 'left'、我方＝右隊 'right'。
-// Side convention (matches the original page): enemies = left team 'left', allies = right team 'right'.
+/**
+ * 展示頁戰鬥轉接層 / Showcase battle adapter
+ * 將引擎的「名冊 → 建隊 → 戰鬥執行」輸出轉為展示頁所需的 IBattleDisplayData
+ * 契約（隊伍/單位/日誌/結果/精靈）。以固定種子保證同輸入同結果，所有轉接函式
+ * 皆可獨立單元測試（OpenSpec 任務 3.1–3.5）。
+ *
+ * 側別慣例（與原版頁面一致）：敵方＝左隊 'left'、我方＝右隊 'right'。
+ * Side convention (matches the original page): enemies = left team 'left', allies = right team 'right'.
+ */
 
 import { EnumState, EnumPosition, EnumTeamSide, MAX_CHAR } from '#/lib/game/constants';
 import { Battle } from '#/lib/game/battle/Battle';
@@ -481,8 +483,10 @@ export type IActionFields = Pick<IBattleAction, 'type'> & Partial<IBattleAction>
 export function composeAction(ctx: IEventContext, fields: IActionFields): IBattleAction
 {
 	const source = fields.source ?? ctx.actor.name;
-	// 給 text 時在此合併一次；渲染端只讀 source／text，不會再切割 message
-	// Joined here once when `text` is given; renderers read source / text and never slice message
+	/**
+	 * 給 text 時在此合併一次；渲染端只讀 source／text，不會再切割 message
+	 * Joined here once when `text` is given; renderers read source / text and never slice message
+	 */
 	const message = buildActionMessage({ source, text: fields.text, message: fields.message });
 	const base: IBattleAction = {
 		type: fields.type,
@@ -497,9 +501,11 @@ export function composeAction(ctx: IEventContext, fields: IActionFields): IBattl
 }
 
 // ==================== 個別事件轉接器 / Per-event mappers ====================
-// 每個轉接器都是純函式（ev + ctx），可經 EVENT_MAPPERS 單獨呼叫與測試。
-// Every mapper is a pure function (ev + ctx) and can be called and tested on its own
-// through EVENT_MAPPERS.
+/**
+ * 每個轉接器都是純函式（ev + ctx），可經 EVENT_MAPPERS 單獨呼叫與測試。
+ * Every mapper is a pure function (ev + ctx) and can be called and tested on its own
+ * through EVENT_MAPPERS.
+ */
 
 /** Act → 技能行動（`name SkillName`；無技能時只印名稱）/ Act → skill action (`name SkillName`; name only without a skill) */
 const mapAct: IEventMapper = (_ev, ctx) =>
@@ -549,9 +555,11 @@ const mapDamage: IEventMapper = (ev, ctx) =>
 	return composeAction(ctx, {
 		type: EnumActionType.Damage,
 		value,
-		// 兩者刻意互斥：結構化資料到位時不寫預組文字，否則符號規則會被繞過
-		// Deliberately mutually exclusive: no pre-assembled copy when the structured data is there,
-		// otherwise the symbol rules would be bypassed
+		/**
+		 * 兩者刻意互斥：結構化資料到位時不寫預組文字，否則符號規則會被繞過
+		 * Deliberately mutually exclusive: no pre-assembled copy when the structured data is there,
+		 * otherwise the symbol rules would be bypassed
+		 */
 		valueChange: hasHp ? { from: ev.hpBefore, to: ev.hpAfter } : undefined,
 		valueChangeText: hasHp ? undefined : ctx.actor.name ? `by ${ctx.actor.name}` : undefined,
 		message: buildDamageMessage(value, ctx.target.name),
@@ -604,11 +612,13 @@ const mapDeath: IEventMapper = (_ev, ctx) =>
 /** Summon → 召喚（target＝被召喚 def no、value＝等級、圖依 def no 查怪物表）/ Summon (target = summoned def no, value = level, image from the mon table) */
 const mapSummon: IEventMapper = (ev, ctx) =>
 {
-	// 召喚事件契約（生產點：SkillEffect.default 的召喚分支，見 #/lib/game/types 的 EnumBattleEventType.Summon）：
-	// target＝被召喚單位的 def no、value＝其等級；圖片依 def no 查 sprite-map 怪物表。
-	// Summon event contract (producer: SkillEffect.default's summon branch; see
-	// EnumBattleEventType.Summon in #/lib/game/types): target = the summoned unit's def no,
-	// value = its level; the image comes from sprite-map's monster table by that def no.
+	/**
+	 * 召喚事件契約（生產點：SkillEffect.default 的召喚分支，見 #/lib/game/types 的 EnumBattleEventType.Summon）：
+	 * target＝被召喚單位的 def no、value＝其等級；圖片依 def no 查 sprite-map 怪物表。
+	 * Summon event contract (producer: SkillEffect.default's summon branch; see
+	 * EnumBattleEventType.Summon in #/lib/game/types): target = the summoned unit's def no,
+	 * value = its level; the image comes from sprite-map's monster table by that def no.
+	 */
 	const summonedNo = parseDefNo(ev.target);
 	const summoned: ISummonedUnit[] = ctx.target.name
 		? [
@@ -718,8 +728,10 @@ const mapDebuff: IEventMapper = (ev, ctx) =>
  */
 const mapPoison: IEventMapper = (ev, ctx) =>
 {
-	// 解毒：`name's poison has cured.`（所有格片段直接接續名稱，attribute Normal＝無 span）
-	// Cure: `name's poison has cured.` (the possessive fragment attaches to the name; Normal = no span)
+	/**
+	 * 解毒：`name's poison has cured.`（所有格片段直接接續名稱，attribute Normal＝無 span）
+	 * Cure: `name's poison has cured.` (the possessive fragment attaches to the name; Normal = no span)
+	 */
 	if (ev.text === 'cured')
 	{
 		return composeAction(ctx, {
@@ -730,9 +742,11 @@ const mapPoison: IEventMapper = (ev, ctx) =>
 			attribute: EnumAttributeType.Normal,
 		});
 	}
-	// 自我中毒（3900）：事件無 actor，走 composeAction 預設 → source undefined → 裸 `Got poisoned`
-	// Self-inflicted poison (3900): the event carries no actor, so composeAction's default leaves
-	// source undefined and the bare `Got poisoned` prints
+	/**
+	 * 自我中毒（3900）：事件無 actor，走 composeAction 預設 → source undefined → 裸 `Got poisoned`
+	 * Self-inflicted poison (3900): the event carries no actor, so composeAction's default leaves
+	 * source undefined and the bare `Got poisoned` prints
+	 */
 	if (ev.text === 'self')
 	{
 		return composeAction(ctx, {
@@ -804,23 +818,27 @@ const mapInfo: IEventMapper = (ev, ctx) =>
 				: ev.text === EnumInfoText.OverCap ? EnumLogCopy.InfoOverCap
 					: ev.text === EnumInfoText.NoTarget ? EnumLogCopy.InfoNoTarget
 						: ev.text ?? '';
-	// Info 一律是整行文案，刻意不帶 source（原版此類行無粗體主詞）
-	// Info is always a whole-line copy and deliberately carries no source (those original lines
-	// have no bold subject)
+	/**
+	 * Info 一律是整行文案，刻意不帶 source（原版此類行無粗體主詞）
+	 * Info is always a whole-line copy and deliberately carries no source (those original lines
+	 * have no bold subject)
+	 */
 	return composeAction(ctx, { type: EnumActionType.Info, source: undefined, message });
 };
 
 // ==================== SkillEffect 事件轉接器 / SkillEffect event mappers ====================
-// 以下型別全部由 SkillEffect.ts（移植 HOF/Class/Skill/Effect.php）生產。
-// All of the following types are produced by SkillEffect.ts (the port of HOF/Class/Skill/Effect.php).
-//
-// 「粗體主詞」一律是 PHP `Name('bold')` 印的那一個人：增益／位移／延遲／回復等行印的都是
-// 目標本人，故 source 取 ctx.target.name；SP 傷害與吸取則是原版就沒有名稱的整行，故
-// source 刻意留空、message 由 …Message 建構器直接產出。
-// The bold subject is always whoever the original `Name('bold')` printed: buff / move / delay /
-// recovery lines name the target itself, so source comes from ctx.target.name, while SP damage
-// and drain are whole lines that never had a name, so source stays empty and the copy comes from
-// the …Message builders.
+/**
+ * 以下型別全部由 SkillEffect.ts（移植 HOF/Class/Skill/Effect.php）生產。
+ * All of the following types are produced by SkillEffect.ts (the port of HOF/Class/Skill/Effect.php).
+ *
+ * 「粗體主詞」一律是 PHP `Name('bold')` 印的那一個人：增益／位移／延遲／回復等行印的都是
+ * 目標本人，故 source 取 ctx.target.name；SP 傷害與吸取則是原版就沒有名稱的整行，故
+ * source 刻意留空、message 由 …Message 建構器直接產出。
+ * The bold subject is always whoever the original `Name('bold')` printed: buff / move / delay /
+ * recovery lines name the target itself, so source comes from ctx.target.name, while SP damage
+ * and drain are whole lines that never had a name, so source stays empty and the copy comes from
+ * the …Message builders.
+ */
 
 /** Delay 顯示用固定基準（分母；原始 DelayByRate 括號的 `/100`）/ Fixed display base for Delay (the denominator of the original DelayByRate `(.../100)`) */
 const DELAY_RATE_BASE = 100;
@@ -1265,8 +1283,10 @@ function buildTeamStats(
 	lookup: IUnitLookup | undefined,
 ): ITeamFinalStats
 {
-	// HP 統計抽離為共用邏輯（展示資料亦使用 computeTeamHpStats）
-	// HP stats extracted into the shared helper (the showcase data also uses computeTeamHpStats)
+	/**
+	 * HP 統計抽離為共用邏輯（展示資料亦使用 computeTeamHpStats）
+	 * HP stats extracted into the shared helper (the showcase data also uses computeTeamHpStats)
+	 */
 	const hp = computeTeamHpStats(
 		members.map((c) => ({ hp: c.HP, maxHp: c.MAXHP, dead: c.STATE === EnumState.Dead })),
 	);
@@ -1387,7 +1407,9 @@ function toSnapshotDisplay(snap: IBattleSnapshot, repo?: IDataRepository): IBatt
 		{
 			const side = u.team === EnumTeamSide.Team1 ? EnumTeamSideUI.Left : EnumTeamSideUI.Right;
 			const dead = u.dead;
-			// def no → 精靈圖（角色表優先，怪物表次之）/ def no → sprite image (char table first, then mon)
+			/**
+			 * def no → 精靈圖（角色表優先，怪物表次之）/ def no → sprite image (char table first, then mon)
+			 */
 			const unitNo = Number(u.no);
 			const imageUrl = repo ? spriteUrlFor(unitNo, !repo.getCharBase(unitNo)) : undefined;
 			return {
@@ -1402,8 +1424,10 @@ function toSnapshotDisplay(snap: IBattleSnapshot, repo?: IDataRepository): IBatt
 				maxSp: u.maxSp,
 				dead,
 				status: dead ? EnumUnitStatus.Down : undefined,
-				// 依 skill.type 決定 (charging)/(casting)
-				// (charging)/(casting) decided by skill.type
+				/**
+				 * 依 skill.type 決定 (charging)/(casting)
+				 * (charging)/(casting) decided by skill.type
+				 */
 				chargeKind: snapshotChargeKind(repo, u.expectSkill),
 			};
 		}),
@@ -1489,8 +1513,10 @@ export function buildDisplayData(args: IDisplayDataInput): IBattleDisplayData
 	return {
 		title: args.input.title ?? DEFAULT_SHOWCASE_TITLE,
 		time: args.input.time,
-		// 側別對齊原版：左=敵方，右=我方
-		// Side matches original: left = enemies, right = allies
+		/**
+		 * 側別對齊原版：左=敵方，右=我方
+		 * Side matches original: left = enemies, right = allies
+		 */
 		leftTeam: buildTeam(enemyTeamName, args.enemies, EnumTeamSideUI.Left),
 		rightTeam: buildTeam(allyTeamName, args.allies, EnumTeamSideUI.Right),
 		battlefield: {
@@ -1539,12 +1565,14 @@ export function runShowcaseBattle(input: IShowcaseBattleInput): IShowcaseBattleO
 	const rng = new RNG(input.seed ?? DEFAULT_SHOWCASE_SEED);
 	const { allies, enemies } = buildShowcaseTeams(input.charNos, input.monNos, repo, rng);
 
-	// 屍體政策三級示範（詳見 seed-data.ts）：
-	// - 戰鬥級：corpse:true → 全場預設留屍體（我方 Team0）
-	// - 隊伍級：teamCorpse Team1:false → 敵方預設不留屍體
-	// - 角色級：seed def 的 corpse（Priest:false、DarkElfHunter:true、Slime:false）覆寫上層
-	// Corpse-policy 3-level demo (see seed-data.ts): battle-level corpse:true,
-	// team-level Team1:false, character-level overrides via def.corpse.
+	/**
+	 * 屍體政策三級示範（詳見 seed-data.ts）：
+	 * - 戰鬥級：corpse:true → 全場預設留屍體（我方 Team0）
+	 * - 隊伍級：teamCorpse Team1:false → 敵方預設不留屍體
+	 * - 角色級：seed def 的 corpse（Priest:false、DarkElfHunter:true、Slime:false）覆寫上層
+	 * Corpse-policy 3-level demo (see seed-data.ts): battle-level corpse:true,
+	 * team-level Team1:false, character-level overrides via def.corpse.
+	 */
 	const battle = new Battle(allies, enemies, {
 		repo,
 		rng,
@@ -1555,9 +1583,11 @@ export function runShowcaseBattle(input: IShowcaseBattleInput): IShowcaseBattleO
 
 	const data = buildDisplayData({
 		input,
-		// 以「戰鬥結束後的隊伍成員」為準（含中途加入的召喚物），而非開戰前的初始陣列
-		// Use the post-battle team members (summons that joined mid-battle included),
-		// not just the initial pre-battle arrays.
+		/**
+		 * 以「戰鬥結束後的隊伍成員」為準（含中途加入的召喚物），而非開戰前的初始陣列
+		 * Use the post-battle team members (summons that joined mid-battle included),
+		 * not just the initial pre-battle arrays.
+		 */
 		allies: battle.teams[EnumTeamSide.Team0].members,
 		enemies: battle.teams[EnumTeamSide.Team1].members,
 		repo,

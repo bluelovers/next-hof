@@ -22,7 +22,9 @@ describe('Enemy generation (8.2)', () =>
 	it('EnemyParty boosts level into [floor(diff/3), round(diff+5)]', () =>
 	{
 		const rng = new RNG(3);
-		// mon1001 基礎 level 39，目標 50（div<=10 → 無隨機削減，精確為 50）
+		/**
+		 * mon1001 基礎 level 39，目標 50（div<=10 → 無隨機削減，精確為 50）
+		 */
 		const enemies = EnemyParty(repo, 1, [[1001, 1]], 50, rng);
 		const e = enemies[0];
 		const diff = 50 - 39;

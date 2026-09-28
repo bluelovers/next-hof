@@ -55,7 +55,9 @@ describe('instance identity (unitUuid)', () =>
 	{
 		expect(new Character({ ...base, no: 1000, corpse: true }).corpse).toBe(true);
 		expect(new Character({ ...base, no: 1000, corpse: false }).corpse).toBe(false);
-		// 未提供時保留 undefined（往上繼承：隊伍級 → 戰鬥級 → 最終未設定＝不留屍體）
+		/**
+		 * 未提供時保留 undefined（往上繼承：隊伍級 → 戰鬥級 → 最終未設定＝不留屍體）
+		 */
 		expect(new Character({ ...base, no: 1000 }).corpse).toBeUndefined();
 	});
 });
@@ -65,14 +67,18 @@ describe('level_fix (4.2)', () =>
 	it('scales monster base attributes by ceil(base * newLevel/oldLevel)', () =>
 	{
 		const rng = new RNG(2);
-		const mon = newMon(repo.getMon(1000)!, repo, rng); // base str 20, maxhp 140, level 1
+		/** base str 20, maxhp 140, level 1 */
+		const mon = newMon(repo.getMon(1000)!, repo, rng);
 		const oldStr = mon.str;
 		const oldMaxhp = mon.maxhp;
-		const changed = levelFix(mon, 9); // newLevel = 10, div = 10
+		/** newLevel = 10, div = 10 */
+		const changed = levelFix(mon, 9);
 		expect(changed).toBe(true);
 		expect(mon.level).toBe(10);
-		expect(mon.str).toBe(Math.ceil(oldStr * 10)); // 200
-		expect(mon.maxhp).toBe(Math.ceil(oldMaxhp * 10)); // 1400
+		/** 200 */
+		expect(mon.str).toBe(Math.ceil(oldStr * 10));
+		/** 1400 */
+		expect(mon.maxhp).toBe(Math.ceil(oldMaxhp * 10));
 		expect(mon.hp).toBe(mon.maxhp);
 	});
 
@@ -97,7 +103,9 @@ describe('battle-variable (4.3)', () =>
 		expect(char.STR).toBe(char.str + char.P_STR);
 		expect(char.MAXHP).toBe(Math.round(char.maxhp * (1 + char.M_MAXHP / 100) + char.P_MAXHP));
 
-		// 補正 P_STR 後重新計算
+		/**
+		 * 補正 P_STR 後重新計算
+		 */
 		char.P_STR = 5;
 		setBattleVariable(char, repo, rng);
 		expect(char.STR).toBe(char.str + 5);
@@ -121,13 +129,17 @@ describe('status effects (4.4)', () =>
 		expect(poison).toBe(true);
 		expect(char.STATE).toBe(EnumState.Poison);
 
-		// 非致死：HP=5 經中毒扣 31 → 最低 1
+		/**
+		 * 非致死：HP=5 經中毒扣 31 → 最低 1
+		 */
 		char.HP = 5;
 		const dmg = poisonDamage(char);
 		expect(char.HP).toBe(1);
 		expect(dmg).toBe(4);
 
-		// Barrier：消耗一次，完全抵擋
+		/**
+		 * Barrier：消耗一次，完全抵擋
+		 */
 		char.STATE = EnumState.Alive;
 		char.SPECIAL.Barrier = 1;
 		expect(consumeBarrier(char)).toBe(true);

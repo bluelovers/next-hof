@@ -30,6 +30,7 @@ describe('RNG', () =>
 		const src = [1, 2, 3, 4, 5];
 		const out = rng.shuffle(src);
 		expect(out.slice().sort((x, y) => x - y)).toEqual(src);
-		expect(src).toEqual([1, 2, 3, 4, 5]); // 原陣列不被改變
+		/** 原陣列不被改變 */
+		expect(src).toEqual([1, 2, 3, 4, 5]);
 	});
 });

@@ -1,7 +1,9 @@
-// 角色戰鬥狀態與效果 / Character battle status & effects
-// 對應 docs/log/battle/02 §3.4, §3.5, §6 與 docs/log/battle/05 §6。
-// 並移植原始 HOF/Class/Char/Battle/Effect.php 的 GetPoisonResist / SacrificeHp。
-// Also ports GetPoisonResist / SacrificeHp from HOF/Class/Char/Battle/Effect.php.
+/**
+ * 角色戰鬥狀態與效果 / Character battle status & effects
+ * 對應 docs/log/battle/02 §3.4, §3.5, §6 與 docs/log/battle/05 §6。
+ * 並移植原始 HOF/Class/Char/Battle/Effect.php 的 GetPoisonResist / SacrificeHp。
+ * Also ports GetPoisonResist / SacrificeHp from HOF/Class/Char/Battle/Effect.php.
+ */
 
 import { EnumState, EnumPosition } from '../constants';
 import type { Character } from './Character';
@@ -23,11 +25,13 @@ export function hpDamage(char: Character, dmg: number): number
 	{
 		if (char.HP > 10 && dmg >= char.HP)
 		{
-			dmg = char.HP - 1; // 留 1 HP（不致死）
+			/** 留 1 HP（不致死） */
+			dmg = char.HP - 1;
 		}
 		else if (char.level < 10 && char.MAXHP < 200)
 		{
-			dmg -= Math.max(10, 25 - char.level); // 低等減傷
+			/** 低等減傷 */
+			dmg -= Math.max(10, 25 - char.level);
 		}
 	}
 	dmg = Math.max(0, dmg);
@@ -188,9 +192,11 @@ export function sacrificeHp(char: Character, rate: number): number
 {
 	if (!rate) return 0;
 	let selfDamage = Math.ceil(char.MAXHP * (rate / 100));
-	if (char.POSITION !== EnumPosition.Front) selfDamage *= 2; // 後衛犧牲翻倍
+	/** 後衛犧牲翻倍 */
+	if (char.POSITION !== EnumPosition.Front) selfDamage *= 2;
 	const before = char.HP;
-	char.HP = Math.max(0, char.HP - selfDamage); // 純扣血、可致死
+	/** 純扣血、可致死 */
+	char.HP = Math.max(0, char.HP - selfDamage);
 	return before - char.HP;
 }
 

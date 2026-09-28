@@ -21,13 +21,17 @@ export function buildJobTree(jobs: IJobData[]): IJobTreeNode[]
 	const tree: IJobTreeNode[] = [];
 	const map = new Map<number, IJobTreeNode>();
 
-	// 建立所有節點 / Create all nodes
+	/**
+	 * 建立所有節點 / Create all nodes
+	 */
 	for (const job of jobs)
 	{
 		map.set(job.id, { job, children: [] });
 	}
 
-	// 建立父子關係 / Build parent-child relationships
+	/**
+	 * 建立父子關係 / Build parent-child relationships
+	 */
 	for (const job of jobs)
 	{
 		const node = map.get(job.id)!;

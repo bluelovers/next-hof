@@ -1,5 +1,7 @@
-// 戰鬥變數初始化 / Battle variable setup
-// 對應 docs/log/battle/02 §1（SetBattleVariable）：初始化狀態、位置、能力補正與戰鬥屬性。
+/**
+ * 戰鬥變數初始化 / Battle variable setup
+ * 對應 docs/log/battle/02 §1（SetBattleVariable）：初始化狀態、位置、能力補正與戰鬥屬性。
+ */
 
 import { EnumState, EnumPosition } from '../constants';
 import type { Character } from './Character';

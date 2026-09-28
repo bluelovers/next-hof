@@ -1,5 +1,7 @@
-// 共用型別定義 / Shared type definitions
-// 欄位對應 docs/data/{char,job,skill,item,mon}.md 分析的 YAML 結構。
+/**
+ * 共用型別定義 / Shared type definitions
+ * 欄位對應 docs/data/{char,job,skill,item,mon}.md 分析的 YAML 結構。
+ */
 
 import { EnumState, EnumPosition, EnumTeamSide } from './constants';
 import type { ICompField, IStatusUpKey, IStatusDownKey } from './character/status-attrs';

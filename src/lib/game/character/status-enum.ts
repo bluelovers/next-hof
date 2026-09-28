@@ -1,13 +1,19 @@
-// 狀態屬性鍵 enum（單一事實來源）/ Status attribute key enum (single source of truth)
-//
-// 獨立於 status-attrs.ts，避免 value 層級的循環依賴：status-attrs 在模組求值時
-// 便需要本 enum 作為對照表鍵型別（STATUS_ATTR_KEYS / STATUS_ATTR_TABLE / 鍵名衍生），
-// 若 enum 定義在 status-attrs 內側會造成自身 value 層級的循環匯入（列舉在模組求值時
-// 處於 TDZ 而崩潰）。
-// Kept separate from status-attrs.ts to avoid a value-level circular import: status-attrs
-// needs this enum at module-eval time as the map-key type (STATUS_ATTR_KEYS / STATUS_ATTR_TABLE
-// / key-name derivation). Defining the enum inside status-attrs would create a self-referential
-// value cycle that crashes at module-eval time (the enum would sit in its TDZ).
+/**
+ * 狀態屬性鍵 enum（單一事實來源）/ Status attribute key enum (single source of truth)
+ *
+ * 獨立於 status-attrs.ts，避免 value 層級的循環依賴：status-attrs 在模組求值時
+ * 便需要本 enum 作為對照表鍵型別（STATUS_ATTR_KEYS / STATUS_ATTR_TABLE / 鍵名衍生），
+ * 若 enum 定義在 status-attrs 內側會造成自身 value 層級的循環匯入（列舉在模組求值時
+ * 處於 TDZ 而崩潰）。
+ * Kept separate from status-attrs.ts to avoid a value-level circular import: status-attrs
+ * needs this enum at module-eval time as the map-key type (STATUS_ATTR_KEYS / STATUS_ATTR_TABLE
+ */
+/**
+ * / key-name derivation). Defining the enum inside status-attrs would create a self-referential
+ */
+/**
+ * value cycle that crashes at module-eval time (the enum would sit in its TDZ).
+ */
 
 /**
  * 狀態屬性鍵（單一事實來源）/ Status attribute keys (single source of truth)

@@ -17,7 +17,8 @@ function mk(no: number): Character
 describe('Guard (9.3)', () =>
 {
 	const repo = createSeedRepository();
-	const normal = repo.getSkill(1000)!; // enemy/individual, 非 invalid
+	/** enemy/individual, 非 invalid */
+	const normal = repo.getSkill(1000)!;
 	const invalid = { ...repo.getSkill(1000)!, invalid: 1 };
 
 	it('back-row target guarded by alive front always-guard; invalid hits directly', () =>
@@ -33,7 +34,9 @@ describe('Guard (9.3)', () =>
 		team.add(back);
 
 		expect(Defending(team, back, normal)).toBe(front);
-		expect(Defending(team, back, invalid)).toBeNull(); // 貫穿命中後排
-		expect(Defending(team, front, normal)).toBeNull(); // 前排本身無守護
+		/** 貫穿命中後排 */
+		expect(Defending(team, back, invalid)).toBeNull();
+		/** 前排本身無守護 */
+		expect(Defending(team, front, normal)).toBeNull();
 	});
 });

@@ -1,41 +1,49 @@
-// 技能效果：特例分支與 default 分支（完整移植 HOF/Class/Skill/Effect.php 的 SkillEffect）
-// Skill effect: the special branches and the default branch (a complete port of SkillEffect in
-// HOF/Class/Skill/Effect.php)
-//
+/**
+ * 技能效果：特例分支與 default 分支（完整移植 HOF/Class/Skill/Effect.php 的 SkillEffect）
+ * Skill effect: the special branches and the default branch (a complete port of SkillEffect in
+ * HOF/Class/Skill/Effect.php)
+ *
+ */
 // ---- 分派語意 / dispatch semantics ----
-// 原始 PHP 以 `switch ($skill_no): ... endswitch` 分派：命中特例 case 後的 break 或 return
-// **一律不落 default**，只有沒有任何 case 匹配的技能編號才執行 default 分支。
-// TS 以「每個 case 皆 `return { events }`、`default:` 另行 return」重現同一規則。
-// The original PHP dispatches through `switch ($skill_no): ... endswitch`: a matched special case
-// that breaks or returns never falls into the default branch; only a skill number no case matches
-// runs the default branch. Every case here therefore ends with `return { events }` and `default:`
-// returns separately, which reproduces the same rule.
-//
+/**
+ * 原始 PHP 以 `switch ($skill_no): ... endswitch` 分派：命中特例 case 後的 break 或 return
+ * **一律不落 default**，只有沒有任何 case 匹配的技能編號才執行 default 分支。
+ * TS 以「每個 case 皆 `return { events }`、`default:` 另行 return」重現同一規則。
+ * The original PHP dispatches through `switch ($skill_no): ... endswitch`: a matched special case
+ * that breaks or returns never falls into the default branch; only a skill number no case matches
+ * runs the default branch. Every case here therefore ends with `return { events }` and `default:`
+ * returns separately, which reproduces the same rule.
+ *
+ */
 // ---- 事件而非字串 / events, not strings ----
-// 本類只產結構化 IBattleEvent，**不產任何日誌字串**；文案一律由展示層解析
-// （EnumLogCopy 成員或 battleUtils 的 buildXxx 建構器）。因此這裡的 `text` 一律是結構化 token
-// （如 'cured'／'multiply'／'front'），不是可顯示文字。
-// This class only produces structured IBattleEvent values and never builds log copy; the display
-// layer resolves every line (an EnumLogCopy member or a battleUtils buildXxx builder). The `text`
-// fields here are therefore structured tokens ('cured' / 'multiply' / 'front'), never display text.
-//
+/**
+ * 本類只產結構化 IBattleEvent，**不產任何日誌字串**；文案一律由展示層解析
+ * （EnumLogCopy 成員或 battleUtils 的 buildXxx 建構器）。因此這裡的 `text` 一律是結構化 token
+ * （如 'cured'／'multiply'／'front'），不是可顯示文字。
+ * This class only produces structured IBattleEvent values and never builds log copy; the display
+ * layer resolves every line (an EnumLogCopy member or a battleUtils buildXxx builder). The `text`
+ * fields here are therefore structured tokens ('cured' / 'multiply' / 'front'), never display text.
+ *
+ */
 // ---- 計算與列印的分工 / calculation vs. printing ----
-// - calc 路徑（calcBasicDamage 後 DamageHP）→ hpDamage：含玩家保護，一次保護即原版等價
-//   （原始保護寫在 CalcBasicDamage 內）。
-//   calc path (CalcBasicDamage then DamageHP) → hpDamage: player protection included, one pass
-//   equals the original (the original protection lives inside CalcBasicDamage).
-// - raw 路徑（1024／1025／1116／3901 與 AbsorbHP 的扣血）→ hpDamageRaw：純扣血、不套保護，
-//   否則保護會被套兩次。
-//   raw path (1024 / 1025 / 1116 / 3901 and AbsorbHP's HP loss) → hpDamageRaw: a plain
-//   subtraction with no protection, otherwise protection would apply twice.
-// - DamageHP2（3012）→ hpDamage2：`value` 為**請求值**，hpBefore／hpAfter 為實際值（下限 1）。
-//   DamageHP2 (3012) → hpDamage2: `value` is the *requested* amount, hpBefore / hpAfter the actual
-//   ones (floored at 1).
-// - SpDamage → spDamage：`value` 為請求值，hpBefore／hpAfter 為 SP 前後、`unit='sp'`。
-//   SpDamage → spDamage: `value` is requested, hpBefore / hpAfter are the SP ends, unit = 'sp'.
-// - RecoverHP／SpHeal：`value` 為**實際**回復量（TS 既有慣例，與 applySkill 一致）。
-//   RecoverHP / SpHeal: `value` is the *actual* amount healed (the existing TypeScript convention,
-//   shared with applySkill).
+/**
+ * - calc 路徑（calcBasicDamage 後 DamageHP）→ hpDamage：含玩家保護，一次保護即原版等價
+ *   （原始保護寫在 CalcBasicDamage 內）。
+ *   calc path (CalcBasicDamage then DamageHP) → hpDamage: player protection included, one pass
+ *   equals the original (the original protection lives inside CalcBasicDamage).
+ * - raw 路徑（1024／1025／1116／3901 與 AbsorbHP 的扣血）→ hpDamageRaw：純扣血、不套保護，
+ *   否則保護會被套兩次。
+ *   raw path (1024 / 1025 / 1116 / 3901 and AbsorbHP's HP loss) → hpDamageRaw: a plain
+ *   subtraction with no protection, otherwise protection would apply twice.
+ * - DamageHP2（3012）→ hpDamage2：`value` 為**請求值**，hpBefore／hpAfter 為實際值（下限 1）。
+ *   DamageHP2 (3012) → hpDamage2: `value` is the *requested* amount, hpBefore / hpAfter the actual
+ *   ones (floored at 1).
+ * - SpDamage → spDamage：`value` 為請求值，hpBefore／hpAfter 為 SP 前後、`unit='sp'`。
+ *   SpDamage → spDamage: `value` is requested, hpBefore / hpAfter are the SP ends, unit = 'sp'.
+ * - RecoverHP／SpHeal：`value` 為**實際**回復量（TS 既有慣例，與 applySkill 一致）。
+ *   RecoverHP / SpHeal: `value` is the *actual* amount healed (the existing TypeScript convention,
+ *   shared with applySkill).
+ */
 
 import type { Battle } from '../battle/Battle';
 import type { Character } from '../character/Character';
@@ -111,14 +119,17 @@ export class SkillEffect
 	{
 		const events: IBattleEvent[] = [];
 
-		// 特例分支：命中即 return，**不落 default**（對齊原始 switch 語意）。
-		// Special branches: hitting one returns immediately and never falls into the default branch
-		// (mirrors the original switch semantics).
+		/**
+		 * 特例分支：命中即 return，**不落 default**（對齊原始 switch 語意）。
+		 * Special branches: hitting one returns immediately and never falls into the default branch
+		 * (mirrors the original switch semantics).
+		 */
 		switch (skillNo)
 		{
 			// ---- 打擊系 / strikes ----
 
-			case 1020: // ManaBreak：以傷害值扣 SP
+			/** ManaBreak：以傷害值扣 SP */
+			case 1020:
 			{
 				if (this.blockedByBarrier(skill, target, events)) return { events, damage: 0 };
 				const dmg = calcBasicDamage(skill, char, target);
@@ -126,7 +137,8 @@ export class SkillEffect
 				return { events, damage: dmg };
 			}
 
-			case 1021: // SoulBreak：同一傷害值先扣 HP 再扣 SP
+			/** SoulBreak：同一傷害值先扣 HP 再扣 SP */
+			case 1021:
 			{
 				if (this.blockedByBarrier(skill, target, events)) return { events, damage: 0 };
 				const dmg = calcBasicDamage(skill, char, target);
@@ -135,12 +147,15 @@ export class SkillEffect
 				return { events, damage: dmg };
 			}
 
-			case 1022: // ChargeAttack：非前衛時威力 ×4，之後自己移至前衛
+			/** ChargeAttack：非前衛時威力 ×4，之後自己移至前衛 */
+			case 1022:
 			{
 				if (this.blockedByBarrier(skill, target, events)) return { events, damage: 0 };
-				// 只有非前衛才加成；其餘路徑不帶 option（原始 `$option["multiply"] = 4` 同理）
-				// The bonus applies only off the front row; the other path carries no option (the
-				// original's `$option["multiply"] = 4` likewise)
+				/**
+				 * 只有非前衛才加成；其餘路徑不帶 option（原始 `$option["multiply"] = 4` 同理）
+				 * The bonus applies only off the front row; the other path carries no option (the
+				 * original's `$option["multiply"] = 4` likewise)
+				 */
 				const option: IDamageOption | undefined = char.POSITION !== EnumPosition.Front ? { multiply: 4 } : undefined;
 				const dmg = calcBasicDamage(skill, char, target, option);
 				this.damageHp(events, skill, char, target, dmg);
@@ -148,7 +163,8 @@ export class SkillEffect
 				return { events, damage: dmg };
 			}
 
-			case 1023: // Hit&Away：前衛時威力 ×3，之後自己移至後衛
+			/** Hit&Away：前衛時威力 ×3，之後自己移至後衛 */
+			case 1023:
 			{
 				if (this.blockedByBarrier(skill, target, events)) return { events, damage: 0 };
 				const option: IDamageOption | undefined = char.POSITION === EnumPosition.Front ? { multiply: 3 } : undefined;
@@ -160,7 +176,8 @@ export class SkillEffect
 
 			// ---- 分割／反傷 / division & retribution ----
 
-			case 1024: // LifeDivision：HP 差的一半轉移（無保護的 raw 值）
+			/** LifeDivision：HP 差的一半轉移（無保護的 raw 值） */
+			case 1024:
 			{
 				let value = Math.round(Math.abs(target.HP - char.HP) * 0.5);
 				if (char.HP <= target.HP)
@@ -181,7 +198,8 @@ export class SkillEffect
 				return { events };
 			}
 
-			case 1025: // ManaDivision：SP 差的一半轉移（raw 值）
+			/** ManaDivision：SP 差的一半轉移（raw 值） */
+			case 1025:
 			{
 				let value = Math.round(Math.abs(target.SP - char.SP) * 0.5);
 				if (char.SP <= target.SP)
@@ -202,14 +220,16 @@ export class SkillEffect
 				return { events };
 			}
 
-			case 1116: // Punish：以「自己欠缺的 HP」為傷害值打目標
+			/** Punish：以「自己欠缺的 HP」為傷害值打目標 */
+			case 1116:
 			{
 				const dmg = char.MAXHP - char.HP;
 				this.damageHpRaw(events, skill, char, target, dmg);
 				return { events, damage: dmg };
 			}
 
-			case 1119: // Possession：對自己無效
+			/** Possession：對自己無效 */
+			case 1119:
 			{
 				if (char === target) return { events };
 				events.push(...statusChanges(skill, char, target, this.battle.rng));
@@ -218,7 +238,8 @@ export class SkillEffect
 
 			// ---- 毒系 / poison ----
 
-			case 1200: // PoisonBlow：目標中毒時威力 ×6
+			/** PoisonBlow：目標中毒時威力 ×6 */
+			case 1200:
 			{
 				const option: IDamageOption = {};
 				if (target.STATE === EnumState.Poison)
@@ -232,16 +253,21 @@ export class SkillEffect
 				return { events, damage: dmg };
 			}
 
-			case 1208: // PoisonInvasion：依 INT 決定的中毒傷害倍率
+			/** PoisonInvasion：依 INT 決定的中毒傷害倍率 */
+			case 1208:
 			{
-				// 原始公式：Rate = (log((INT+22)/10) - 0.8) / 0.85（PHP log 為自然對數）
-				// Original: Rate = (log((INT+22)/10) - 0.8) / 0.85 (PHP's log is the natural log)
+				/**
+				 * 原始公式：Rate = (log((INT+22)/10) - 0.8) / 0.85（PHP log 為自然對數）
+				 * Original: Rate = (log((INT+22)/10) - 0.8) / 0.85 (PHP's log is the natural log)
+				 */
 				const rate = (Math.log((char.INT + 22) / 10) - 0.8) / 0.85;
-				// 未中毒時 poisonDamage 回傳 0 且不扣血（原始 PoisonDamage 同樣直接 return false）。
-				// 負 Rate 忠實不鉗：公式可能為負，原始亦照算（等同回血）。
-				// Without poison poisonDamage returns 0 and deals nothing (the original PoisonDamage
-				// likewise returns false). A negative Rate is deliberately not clamped: the formula can
-				// go negative and the original computes it as-is (which heals).
+				/**
+				 * 未中毒時 poisonDamage 回傳 0 且不扣血（原始 PoisonDamage 同樣直接 return false）。
+				 * 負 Rate 忠實不鉗：公式可能為負，原始亦照算（等同回血）。
+				 * Without poison poisonDamage returns 0 and deals nothing (the original PoisonDamage
+				 * likewise returns false). A negative Rate is deliberately not clamped: the formula can
+				 * go negative and the original computes it as-is (which heals).
+				 */
 				if (target.STATE !== EnumState.Poison) return { events };
 				const hpBefore = target.HP;
 				const lost = poisonDamage(target, rate);
@@ -256,7 +282,8 @@ export class SkillEffect
 				return { events };
 			}
 
-			case 1209: // TransPoison：轉移中毒後解除
+			/** TransPoison：轉移中毒後解除 */
+			case 1209:
 			{
 				if (target.STATE !== EnumState.Poison) return { events };
 				events.push(...statusChanges(skill, char, target, this.battle.rng));
@@ -264,7 +291,8 @@ export class SkillEffect
 				return { events };
 			}
 
-			case 1220: // AntiPoisoning：取得中毒抗性
+			/** AntiPoisoning：取得中毒抗性 */
+			case 1220:
 			{
 				const total = getPoisonResist(target, 50);
 				events.push({
@@ -279,18 +307,23 @@ export class SkillEffect
 
 			// ---- 吸取系 / drains ----
 
-			case 2030: // LifeDrain
-			case 2031: // LifeSqueeze
+			/** LifeDrain */
+			case 2030:
+			/** LifeSqueeze */
+			case 2031:
 			{
-				if (char === target) return { events }; // 自己不吸自己
+				/** 自己不吸自己 */
+				if (char === target) return { events };
 				if (this.blockedByBarrier(skill, target, events)) return { events, damage: 0 };
 				const dmg = calcBasicDamage(skill, char, target);
 				this.drainHp(events, skill, char, target, dmg);
 				return { events, damage: dmg };
 			}
 
-			case 2090: // EneryRob：吸取 SP（無視 def）
-			case 2091: // EneryCollect
+			/** EneryRob：吸取 SP（無視 def） */
+			case 2090:
+			/** EneryCollect */
+			case 2091:
 			{
 				if (char === target) return { events };
 				if (this.blockedByBarrier(skill, target, events)) return { events, damage: 0 };
@@ -299,7 +332,8 @@ export class SkillEffect
 				return { events, damage: dmg };
 			}
 
-			case 5002: // BloodSuck：吸取 HP（無視 def）
+			/** BloodSuck：吸取 HP（無視 def） */
+			case 5002:
 			{
 				if (this.blockedByBarrier(skill, target, events)) return { events, damage: 0 };
 				const dmg = calcBasicDamage(skill, char, target, { pierce: true });
@@ -309,7 +343,8 @@ export class SkillEffect
 
 			// ---- 一擊／死亡 / instant kill ----
 
-			case 2032: // DeathKnell：過半機率直接歸零（無傷害事件，死亡由 UseSkill 迴環尾判定）
+			/** DeathKnell：過半機率直接歸零（無傷害事件，死亡由 UseSkill 迴環尾判定） */
+			case 2032:
 			{
 				const p = this.battle.rng.randInt(1, 100);
 				if (p > 50)
@@ -318,9 +353,11 @@ export class SkillEffect
 				}
 				else
 				{
-					// 原始印裸的 `Failed!`（無名稱）→ 事件不帶 actor，展示層退回裸文案。
-					// The original prints a bare `Failed!` (no name) → the event carries no actor and the
-					// display falls back to the unnamed copy.
+					/**
+					 * 原始印裸的 `Failed!`（無名稱）→ 事件不帶 actor，展示層退回裸文案。
+					 * The original prints a bare `Failed!` (no name) → the event carries no actor and the
+					 * display falls back to the unnamed copy.
+					 */
 					events.push({
 						type: EnumBattleEventType.Miss,
 						target: charIdToString(target.no),
@@ -332,7 +369,8 @@ export class SkillEffect
 
 			// ---- 蘇生／變身 / revival & transformation ----
 
-			case 2055: // SoulRevenge：每有一位死者威力 +1
+			/** SoulRevenge：每有一位死者威力 +1 */
+			case 2055:
 			{
 				const team = char.team as BattleTeam;
 				const count = team.CountDead() + 1;
@@ -343,7 +381,8 @@ export class SkillEffect
 				return { events, damage: dmg };
 			}
 
-			case 2056: // ZombieRevival：只對死者有效
+			/** ZombieRevival：只對死者有效 */
+			case 2056:
 			{
 				if (target.STATE !== EnumState.Dead) return { events };
 				events.push(...this.getNormalEvents(target, skill));
@@ -352,12 +391,15 @@ export class SkillEffect
 				return { events };
 			}
 
-			case 2057: // SelfMetamorphorse：HP>60% 或已變身時失敗
+			/** SelfMetamorphorse：HP>60% 或已變身時失敗 */
+			case 2057:
 			{
 				if (60 < target.hpPercent() || target.getSpecial('Metamo'))
 				{
-					// 原始印裸的 `Failed!` → 與 2032 相同，事件不帶 actor。
-					// The original prints a bare `Failed!` →, as with 2032, the event carries no actor.
+					/**
+					 * 原始印裸的 `Failed!` → 與 2032 相同，事件不帶 actor。
+					 * The original prints a bare `Failed!` →, as with 2032, the event carries no actor.
+					 */
 					events.push({
 						type: EnumBattleEventType.Miss,
 						target: charIdToString(target.no),
@@ -365,13 +407,17 @@ export class SkillEffect
 					});
 					return { events };
 				}
-				// 原始另會換 img／性別對應的立圖；展示層以既有精靈呈現，故不移植。
-				// The original also swaps the portrait by gender; the display keeps the existing sprite,
-				// so that part is not ported.
+				/**
+				 * 原始另會換 img／性別對應的立圖；展示層以既有精靈呈現，故不移植。
+				 * The original also swaps the portrait by gender; the display keeps the existing sprite,
+				 * so that part is not ported.
+				 */
 				target.setSpecial('Metamo', 1);
 				events.push(...statusChanges(skill, char, target, this.battle.rng));
-				// 原始 `RecoverHP($target, round($target->MAXHP / 2))`
-				// The original's `RecoverHP($target, round($target->MAXHP / 2))`
+				/**
+				 * 原始 `RecoverHP($target, round($target->MAXHP / 2))`
+				 * The original's `RecoverHP($target, round($target->MAXHP / 2))`
+				 */
 				this.recoverHp(events, skill, char, target, Math.round(target.MAXHP / 2));
 				return { events };
 			}
@@ -379,22 +425,26 @@ export class SkillEffect
 			// ---- 詠唱／延遲 / casting & delay ----
 
 			case 2110:
-			case 2111: // 蓄力／詠唱中的目標才會被延遲
+			/** 蓄力／詠唱中的目標才會被延遲 */
+			case 2111:
 			{
 				if (target.expect === null) return { events };
 				this.delayChar(char, target, skill, events);
 				return { events };
 			}
 
-			case 3050: // Quick：對象不能是自己、也不能正在詠唱
+			/** Quick：對象不能是自己、也不能正在詠唱 */
+			case 3050:
 			{
 				if (target === char) return { events };
 				if (target.expect !== null) return { events };
-				// 只產 Quick 事件、不另產 Delay：原始 `got quicked!(old >>> new/100)` 是**單行**，
-				// 括號由 DelayCut 的 $Show 輸出、屬於同一行；拆成兩行會與原版不符。
-				// Only the Quick record is produced, no separate Delay one: the original's
-				// `got quicked!(old >>> new/100)` is a *single* line whose parentheses come from
-				// DelayCut's $Show, so splitting it into two lines would diverge.
+				/**
+				 * 只產 Quick 事件、不另產 Delay：原始 `got quicked!(old >>> new/100)` 是**單行**，
+				 * 括號由 DelayCut 的 $Show 輸出、屬於同一行；拆成兩行會與原版不符。
+				 * Only the Quick record is produced, no separate Delay one: the original's
+				 * `got quicked!(old >>> new/100)` is a *single* line whose parentheses come from
+				 * DelayCut's $Show, so splitting it into two lines would diverge.
+				 */
 				this.delayCut(target, 101);
 				events.push({
 					type: EnumBattleEventType.Quick,
@@ -405,12 +455,15 @@ export class SkillEffect
 				return { events };
 			}
 
-			case 3055: // CastAsist：只對詠唱中（expect_type＝Cast）的目標生效
+			/** CastAsist：只對詠唱中（expect_type＝Cast）的目標生效 */
+			case 3055:
 			{
 				if (target.expect === null || target.expect_type !== EnumExpect.Cast) return { events };
-				// 同 3050：原始 `casting shorted!(old >>> new/100)` 為單行，故只產 CastShort。
-				// As with 3050: the original's `casting shorted!(old >>> new/100)` is one line, so only
-				// CastShort is produced.
+				/**
+				 * 同 3050：原始 `casting shorted!(old >>> new/100)` 為單行，故只產 CastShort。
+				 * As with 3050: the original's `casting shorted!(old >>> new/100)` is one line, so only
+				 * CastShort is produced.
+				 */
 				this.delayCut(target, 60);
 				events.push({
 					type: EnumBattleEventType.CastShort,
@@ -423,8 +476,10 @@ export class SkillEffect
 
 			// ---- 防護 / protection ----
 
-			case 3060: // HolyShield
-			case 5067: // BananaProtection：已有 Barrier 時不重複取得
+			/** HolyShield */
+			case 3060:
+			/** BananaProtection：已有 Barrier 時不重複取得 */
+			case 5067:
 			{
 				if (target.SPECIAL.Barrier) return { events };
 				target.setSpecial('Barrier', 1);
@@ -439,11 +494,14 @@ export class SkillEffect
 
 			// ---- 回復系 / heals ----
 
-			case 3005: // ProgressiveHeal：HP≤30% 時回復量 ×2
+			/** ProgressiveHeal：HP≤30% 時回復量 ×2 */
+			case 3005:
 			{
-				// 原始 CalcRecoveryValue($skill, $char, $target) 的第三參未被讀取，TS 簽名已精簡。
-				// The original CalcRecoveryValue's third parameter is never read, so the TypeScript
-				// signature drops it.
+				/**
+				 * 原始 CalcRecoveryValue($skill, $char, $target) 的第三參未被讀取，TS 簽名已精簡。
+				 * The original CalcRecoveryValue's third parameter is never read, so the TypeScript
+				 * signature drops it.
+				 */
 				let heal = calcRecoveryValue(skill, char);
 				const rate = (target.HP / target.MAXHP) * 100;
 				if (rate <= 30)
@@ -455,21 +513,24 @@ export class SkillEffect
 				return { events, heal };
 			}
 
-			case 3010: // ManaRecharge
+			/** ManaRecharge */
+			case 3010:
 			{
 				const spRec = Math.ceil(target.MAXSP * 3 / 10);
 				this.recoverSp(events, skill, char, target, spRec);
 				return { events, heal: spRec };
 			}
 
-			case 3011: // HiManaRecharge
+			/** HiManaRecharge */
+			case 3011:
 			{
 				const spRec = Math.ceil(target.MAXSP * 5 / 10);
 				this.recoverSp(events, skill, char, target, spRec);
 				return { events, heal: spRec };
 			}
 
-			case 3012: // LifeConvert：以 HP 換 SP（扣血走 DamageHP2、下限 1）
+			/** LifeConvert：以 HP 換 SP（扣血走 DamageHP2、下限 1） */
+			case 3012:
 			{
 				const hpDmg = Math.ceil(target.MAXHP * 3 / 10);
 				this.damageHp2(events, skill, char, target, hpDmg);
@@ -478,21 +539,24 @@ export class SkillEffect
 				return { events, damage: hpDmg, heal: spRec };
 			}
 
-			case 3120: // FirstAid
+			/** FirstAid */
+			case 3120:
 			{
 				const heal = Math.ceil(50 + target.MAXHP * 1 / 10);
 				this.recoverHp(events, skill, char, target, heal);
 				return { events, heal };
 			}
 
-			case 3121: // SelfRecovery
+			/** SelfRecovery */
+			case 3121:
 			{
 				const heal = Math.ceil(50 + target.MAXHP * 2 / 10);
 				this.recoverHp(events, skill, char, target, heal);
 				return { events, heal };
 			}
 
-			case 3122: // HyperRecovery：回復量依**施放者**欠缺的 HP 計算
+			/** HyperRecovery：回復量依**施放者**欠缺的 HP 計算 */
+			case 3122:
 			{
 				const dif = char.MAXHP - char.HP;
 				const heal = Math.ceil(dif * 0.6);
@@ -500,7 +564,8 @@ export class SkillEffect
 				return { events, heal };
 			}
 
-			case 5022: // Fortune：對自己無效
+			/** Fortune：對自己無效 */
+			case 5022:
 			{
 				if (char === target) return { events };
 				const heal = calcRecoveryValue(skill, char);
@@ -511,11 +576,14 @@ export class SkillEffect
 
 			// ---- 資源交換／上限 / resource swap & caps ----
 
-			case 3013: // EnergyExchange：把 HP 比率與 SP 比率互換
+			/** EnergyExchange：把 HP 比率與 SP 比率互換 */
+			case 3013:
 			{
-				// 上限為 0 時比率無定義，額外防呆令其為 0（原版會算出 NAN 並寫回角色）。
-				// When a cap is 0 the rate is undefined; a defensive guard pins it to 0 (the original
-				// would compute NAN and store it on the character).
+				/**
+				 * 上限為 0 時比率無定義，額外防呆令其為 0（原版會算出 NAN 並寫回角色）。
+				 * When a cap is 0 the rate is undefined; a defensive guard pins it to 0 (the original
+				 * would compute NAN and store it on the character).
+				 */
 				const hpRate = target.MAXHP > 0 ? Math.floor(target.HP / target.MAXHP * 100) : 0;
 				const spRate = target.MAXSP > 0 ? Math.floor(target.SP / target.MAXSP * 100) : 0;
 				const hpFrom = target.HP;
@@ -535,7 +603,8 @@ export class SkillEffect
 				return { events };
 			}
 
-			case 3020: // ManaExtend：MAXSP ×1.2
+			/** ManaExtend：MAXSP ×1.2 */
+			case 3020:
 			{
 				target.MAXSP = Math.round(target.MAXSP * 1.2);
 				events.push({
@@ -549,9 +618,12 @@ export class SkillEffect
 				return { events };
 			}
 
-			case 3040: // Resurrection
-			case 5030: // SoulRestor
-			case 5063: // WakeUp：只對死者有效（原始 STATE !== 1 即非死亡 → break）
+			/** Resurrection */
+			case 3040:
+			/** SoulRestor */
+			case 5030:
+			/** WakeUp：只對死者有效（原始 STATE !== 1 即非死亡 → break） */
+			case 5063:
 			{
 				if (target.STATE !== EnumState.Dead) return { events };
 				const heal = calcRecoveryValue(skill, char);
@@ -562,16 +634,21 @@ export class SkillEffect
 
 			// ---- 召喚物限定 / summon-only ----
 
-			case 3300: // PowerTrain
-			case 3301: // MindTrain
-			case 3302: // SpeedTrain
-			case 3303: // DefenceTrain
+			/** PowerTrain */
+			case 3300:
+			/** MindTrain */
+			case 3301:
+			/** SpeedTrain */
+			case 3302:
+			/** DefenceTrain */
+			case 3303:
 			case 3304:
 			case 3305:
 			case 3306:
 			case 3307:
 			case 3308:
-			case 3310: // SuppressBeast：非召喚物一律無效
+			/** SuppressBeast：非召喚物一律無效 */
+			case 3310:
 			{
 				if (!target.isSummon()) return { events };
 				events.push(...statusChanges(skill, char, target, this.battle.rng));
@@ -580,7 +657,8 @@ export class SkillEffect
 
 			// ---- 自傷／自身狀態 / self-inflicted ----
 
-			case 3900: // GetPoison：無條件讓自己中毒（原始先印字、後 GetPoison）
+			/** GetPoison：無條件讓自己中毒（原始先印字、後 GetPoison） */
+			case 3900:
 			{
 				events.push({
 					type: EnumBattleEventType.Poison,
@@ -592,13 +670,15 @@ export class SkillEffect
 				return { events };
 			}
 
-			case 3901: // GetDead：自殺
+			/** GetDead：自殺 */
+			case 3901:
 			{
 				const dmg = this.damageHpRaw(events, skill, char, char, 9999);
 				return { events, damage: dmg };
 			}
 
-			case 4000: // StanceRestore：回到 AI 設定的預期站位
+			/** StanceRestore：回到 AI 設定的預期站位 */
+			case 4000:
 			{
 				const want = target.behavior?.position;
 				if (want !== undefined && target.POSITION !== want)
@@ -610,13 +690,16 @@ export class SkillEffect
 
 			// ---- 敵方技能 / monster skills ----
 
-			case 5006: // Charge!!!
+			/** Charge!!! */
+			case 5006:
 			{
 				if (char === target)
 				{
-					// 自己是對象時只有「自己往後排」且**靜默**（原始 return false、無印字）。
-					// When the target is the caster only "the caster steps back" happens, and *silently*
-					// (the original returns false without printing).
+					/**
+					 * 自己是對象時只有「自己往後排」且**靜默**（原始 return false、無印字）。
+					 * When the target is the caster only "the caster steps back" happens, and *silently*
+					 * (the original returns false without printing).
+					 */
 					char.POSITION = EnumPosition.Back;
 					return { events };
 				}
@@ -625,7 +708,8 @@ export class SkillEffect
 				return { events };
 			}
 
-			case 5060: // ArmorSnatch：目標 DEF/MDEF 下降、自己 DEF/MDEF 上升
+			/** ArmorSnatch：目標 DEF/MDEF 下降、自己 DEF/MDEF 上升 */
+			case 5060:
 			{
 				DOWNMAP.DownDEF?.(target, 30);
 				DOWNMAP.DownMDEF?.(target, 30);
@@ -646,16 +730,19 @@ export class SkillEffect
 				return { events };
 			}
 
-			case 5803: // Spawn：隨機召喚一隻（原始 break，不落 default）
+			/** Spawn：隨機召喚一隻（原始 break，不落 default） */
+			case 5803:
 			{
 				const spawn = [1018, 1019, 1020, 1021, 5002];
 				const monNo = spawn[this.battle.rng.randInt(0, spawn.length - 1)];
 				const def = this.battle.repo.getMon(monNo);
 				if (def)
 				{
-					// 原始 newMonSummon($mob) 未帶召喚力，TS 對應 strength 預設 1。
-					// The original calls newMonSummon($mob) with no strength; TypeScript's default of 1
-					// is the equivalent.
+					/**
+					 * 原始 newMonSummon($mob) 未帶召喚力，TS 對應 strength 預設 1。
+					 * The original calls newMonSummon($mob) with no strength; TypeScript's default of 1
+					 * is the equivalent.
+					 */
 					const summoned = newMonSummon(def, this.battle.repo, this.battle.rng);
 					(char.team as BattleTeam).add(summoned);
 					events.push({
@@ -669,12 +756,16 @@ export class SkillEffect
 				return { events };
 			}
 
-			// 3000–3004／3103／5007／5055 等在原始中整段被註解掉，沒有 case → 落 default。
-			// 3000-3004 / 3103 / 5007 / 5055 are commented out in the original, so they have no case
-			// and fall through to the default branch.
+			/**
+			 * 3000–3004／3103／5007／5055 等在原始中整段被註解掉，沒有 case → 落 default。
+			 * 3000-3004 / 3103 / 5007 / 5055 are commented out in the original, so they have no case
+			 * and fall through to the default branch.
+			 */
 
-			// 3113（Berserk）是空 case：只中斷、不做任何事、也不落 default。
-			// 3113 (Berserk) is an empty case: it only breaks — no effect, and no fall into default.
+			/**
+			 * 3113（Berserk）是空 case：只中斷、不做任何事、也不落 default。
+			 * 3113 (Berserk) is an empty case: it only breaks — no effect, and no fall into default.
+			 */
 			case 3113:
 				return { events };
 
@@ -725,42 +816,55 @@ export class SkillEffect
 	 */
 	private defaultEffect(skill: ISkillDef, char: Character, target: Character, events: IBattleEvent[]): ISkillResult
 	{
-		// HP 持続回復：疊加至 SPECIAL.HpRegen（原始 GetSpecial("HpRegen", n) 為疊加）
-		// HP regen: accumulates into SPECIAL.HpRegen (the original's GetSpecial("HpRegen", n) adds)
+		/**
+		 * HP 持続回復：疊加至 SPECIAL.HpRegen（原始 GetSpecial("HpRegen", n) 為疊加）
+		 * HP regen: accumulates into SPECIAL.HpRegen (the original's GetSpecial("HpRegen", n) adds)
+		 */
 		if (skill.HpRegen)
 		{
 			target.addSpecial('HpRegen', skill.HpRegen);
 			this.regen(events, skill, char, target, EnumResource.Hp, skill.HpRegen);
 		}
-		// SP 持続回復
+		/**
+		 * SP 持続回復
+		 */
 		if (skill.SpRegen)
 		{
 			target.addSpecial('SpRegen', skill.SpRegen);
 			this.regen(events, skill, char, target, EnumResource.Sp, skill.SpRegen);
 		}
 
-		// 蓄力技能只對「已在詠唱／蓄力」的目標生效（原始 `break` → 不走 default 餘下流程）
-		// A charge skill only affects a target that is already charging (the original `break`s, so the
-		// rest of default never runs)
+		/**
+		 * 蓄力技能只對「已在詠唱／蓄力」的目標生效（原始 `break` → 不走 default 餘下流程）
+		 * A charge skill only affects a target that is already charging (the original `break`s, so the
+		 * rest of default never runs)
+		 */
 		if (skill.priority === EnumSkillPriority.Charge && target.expect === null) return { events };
 
-		// 召喚系：完成即結束（原始 `return true`）
-		// Summon: done right after the summons are joined (the original's `return true`)
+		/**
+		 * 召喚系：完成即結束（原始 `return true`）
+		 * Summon: done right after the summons are joined (the original's `return true`)
+		 */
 		if (skill.summon)
 		{
 			const defNos = Array.isArray(skill.summon) ? skill.summon : [skill.summon];
-			// 召喚力＝施放者的 summonPower()（SPECIAL.Summon 為真時再加成）
-			// Summon strength = the caster's summonPower() (further scaled by SPECIAL.Summon)
+			/**
+			 * 召喚力＝施放者的 summonPower()（SPECIAL.Summon 為真時再加成）
+			 * Summon strength = the caster's summonPower() (further scaled by SPECIAL.Summon)
+			 */
 			const strength = char.summonPower();
 			const team = char.team as BattleTeam;
 			for (const monNo of defNos)
 			{
 				const def = this.battle.repo.getMon(monNo);
-				if (!def) continue; // 未知編號略過（不產半成品紀錄）/ unknown no skipped (no half-built record)
+				/** 未知編號略過（不產半成品紀錄）/ unknown no skipped (no half-built record) */
+				if (!def) continue;
 				const summoned = newMonSummon(def, this.battle.repo, this.battle.rng, strength);
-				// 速攻：原始 `$add->Quick($this->battle->delay * 2)`；TS 為「排在目前最快者之前」。
-				// quick: the original's `$add->Quick($this->battle->delay * 2)`; in TypeScript it means
-				// "line up ahead of whoever is currently next".
+				/**
+				 * 速攻：原始 `$add->Quick($this->battle->delay * 2)`；TS 為「排在目前最快者之前」。
+				 * quick: the original's `$add->Quick($this->battle->delay * 2)`; in TypeScript it means
+				 * "line up ahead of whoever is currently next".
+				 */
 				if (skill.quick) this.quickNow(summoned);
 				team.add(summoned);
 				events.push({
@@ -774,8 +878,10 @@ export class SkillEffect
 			return { events };
 		}
 
-		// 毒の治療：只在目標真的中毒時解毒
-		// Cure poison: only a genuinely poisoned target is cured
+		/**
+		 * 毒の治療：只在目標真的中毒時解毒
+		 * Cure poison: only a genuinely poisoned target is cured
+		 */
 		if (skill.CurePoison && target.STATE === EnumState.Poison)
 		{
 			events.push(...this.getNormalEvents(target, skill));
@@ -784,31 +890,39 @@ export class SkillEffect
 		let damage: number | undefined;
 		let heal: number | undefined;
 
-		// 基本的なダメージの計算
+		/**
+		 * 基本的なダメージの計算
+		 */
 		if (skill.pow)
 		{
 			if (skill.support)
 			{
-				// applySkill 自帶 heal + statusChanges，與原始「RecoverHP → StatusChanges」同序。
-				// applySkill carries both the heal and the statusChanges, in the original's
-				// RecoverHP → StatusChanges order.
+				/**
+				 * applySkill 自帶 heal + statusChanges，與原始「RecoverHP → StatusChanges」同序。
+				 * applySkill carries both the heal and the statusChanges, in the original's
+				 * RecoverHP → StatusChanges order.
+				 */
 				const res = applySkill(skill, char, target, this.battle.rng);
 				events.push(...res.events);
 				heal = res.heal;
 			}
 			else
 			{
-				// applyDamage 只產 Barrier／Damage，狀態變化交給下方統一的 statusChanges。
-				// applyDamage only produces the barrier / damage records; the statuses are left to the
-				// single statusChanges below.
+				/**
+				 * applyDamage 只產 Barrier／Damage，狀態變化交給下方統一的 statusChanges。
+				 * applyDamage only produces the barrier / damage records; the statuses are left to the
+				 * single statusChanges below.
+				 */
 				const res = applyDamage(skill, char, target);
 				events.push(...res.events);
 				damage = res.damage;
 			}
 		}
 
-		// SP 回復(レート)：ceil(sqrt(MAXSP) × rate)
-		// SP recovery (rate): ceil(sqrt(MAXSP) × rate)
+		/**
+		 * SP 回復(レート)：ceil(sqrt(MAXSP) × rate)
+		 * SP recovery (rate): ceil(sqrt(MAXSP) × rate)
+		 */
 		if (skill.SpRecoveryRate)
 		{
 			const spRec = Math.ceil(Math.sqrt(target.MAXSP) * skill.SpRecoveryRate);
@@ -816,12 +930,16 @@ export class SkillEffect
 			heal = spRec;
 		}
 
-		// 毒化／擊退／ステータス変化／隊列の移動（原版分散於此處與其前後，TS 統一於 statusChanges）
-		// poison / knockback / status changes / row movement (spread across this spot and its
-		// neighbours in the original; consolidated into statusChanges here)
+		/**
+		 * 毒化／擊退／ステータス変化／隊列の移動（原版分散於此處與其前後，TS 統一於 statusChanges）
+		 * poison / knockback / status changes / row movement (spread across this spot and its
+		 * neighbours in the original; consolidated into statusChanges here)
+		 */
 		events.push(...statusChanges(skill, char, target, this.battle.rng));
 
-		// 行動を遅らせる(DELAY)
+		/**
+		 * 行動を遅らせる(DELAY)
+		 */
 		this.delayChar(char, target, skill, events);
 
 		const result: ISkillResult = { events };
@@ -1225,31 +1343,33 @@ export class SkillEffect
 	}
 
 	// ==================== 行動順序 / action delay ====================
-	//
-	// 原始 DELAY_TYPE=1 是「進度制」（0→100、越大越快）；TS 是「分數制」（delay 越小越快，
-	// 每回合行動後 `delay += DelayValue(c)`）。三支換算如下：
-	// The original's DELAY_TYPE=1 is a *progress* scale (0 → 100, bigger = sooner) while the
-	// TypeScript model is a *score* (smaller = sooner, with `delay += DelayValue(c)` after each
-	// action). The three conversions are:
-	//
-	// - DelayByRate($No) → delayByRate：原始 `delay -= No`（進度後退）→ `delay += DV×rate/100`
-	//   （分數制的「更晚行動」），DV＝ DelayValue(target)。
-	//   DelayByRate($No) → delayByRate: the original's `delay -= No` (progress retreats) becomes
-	//   `delay += DV × rate / 100` (a later action on the score scale), DV = DelayValue(target).
-	// - DelayCut($No) → delayCut：向「存活者最小 delay」收斂，rate≥100 時直接領先一名
-	//   （`min - 1`）。以 min 為錨可保證「加快」永遠不會反而變慢。
-	//   DelayCut($No) → delayCut: converges toward the smallest delay among living units; at
-	//   rate ≥ 100 it jumps ahead of everyone (`min - 1`). Anchoring on `min` guarantees that
-	//   speeding up can never slow down.
-	// - Quick → quickNow：排在目前最快者之前（原始 `delay = 100.1`＝「進度滿、立刻行動」）。
-	//   Quick → quickNow: lines up ahead of whoever is currently next (the original's
-	//   `delay = 100.1`, i.e. full progress and acting immediately).
-	//
-	// DelayByRate／DelayCut 原本就沒有死亡檢查；`Delay($no)` 有，但 TS 的三個呼叫點皆不會
-	// 對死亡者觸發（2110/2111 檢查 expect、3050 檢查自身與 expect、3055 檢查 expect）。
-	// DelayByRate / DelayCut had no death check in the original; `Delay($no)` did, but none of the
-	// three TypeScript call sites can fire on a dead unit (2110/2111 and 3055 check expect, 3050
-	// checks the caster and expect).
+	/**
+	 *
+	 * 原始 DELAY_TYPE=1 是「進度制」（0→100、越大越快）；TS 是「分數制」（delay 越小越快，
+	 * 每回合行動後 `delay += DelayValue(c)`）。三支換算如下：
+	 * The original's DELAY_TYPE=1 is a *progress* scale (0 → 100, bigger = sooner) while the
+	 * TypeScript model is a *score* (smaller = sooner, with `delay += DelayValue(c)` after each
+	 * action). The three conversions are:
+	 *
+	 * - DelayByRate($No) → delayByRate：原始 `delay -= No`（進度後退）→ `delay += DV×rate/100`
+	 *   （分數制的「更晚行動」），DV＝ DelayValue(target)。
+	 *   DelayByRate($No) → delayByRate: the original's `delay -= No` (progress retreats) becomes
+	 *   `delay += DV × rate / 100` (a later action on the score scale), DV = DelayValue(target).
+	 * - DelayCut($No) → delayCut：向「存活者最小 delay」收斂，rate≥100 時直接領先一名
+	 *   （`min - 1`）。以 min 為錨可保證「加快」永遠不會反而變慢。
+	 *   DelayCut($No) → delayCut: converges toward the smallest delay among living units; at
+	 *   rate ≥ 100 it jumps ahead of everyone (`min - 1`). Anchoring on `min` guarantees that
+	 *   speeding up can never slow down.
+	 * - Quick → quickNow：排在目前最快者之前（原始 `delay = 100.1`＝「進度滿、立刻行動」）。
+	 *   Quick → quickNow: lines up ahead of whoever is currently next (the original's
+	 *   `delay = 100.1`, i.e. full progress and acting immediately).
+	 *
+	 * DelayByRate／DelayCut 原本就沒有死亡檢查；`Delay($no)` 有，但 TS 的三個呼叫點皆不會
+	 * 對死亡者觸發（2110/2111 檢查 expect、3050 檢查自身與 expect、3055 檢查 expect）。
+	 * DelayByRate / DelayCut had no death check in the original; `Delay($no)` did, but none of the
+	 * three TypeScript call sites can fire on a dead unit (2110/2111 and 3055 check expect, 3050
+	 * checks the caster and expect).
+	 */
 
 	/**
 	 * 目前存活單位中的最小 delay（無存活者時回傳 Infinity）
@@ -1323,8 +1443,10 @@ export class SkillEffect
 	 */
 	private delayChar(char: Character, target: Character, skill: ISkillDef, events: IBattleEvent[]): void
 	{
-		// 原始 `if (!$skill["delay"]) return false;`——沒有 delay 欄位就不動順位、也不印字。
-		// The original's `if (!$skill["delay"]) return false;` — no delay field means no change and no line.
+		/**
+		 * 原始 `if (!$skill["delay"]) return false;`——沒有 delay 欄位就不動順位、也不印字。
+		 * The original's `if (!$skill["delay"]) return false;` — no delay field means no change and no line.
+		 */
 		if (!skill.delay) return;
 
 		const from = target.delay;

@@ -1,5 +1,7 @@
-// 敵方隊伍生成 / Enemy party generation
-// 對應 docs/log/battle/04 §6.1（EnemyNumber）與 §6.2（EnemyParty）。
+/**
+ * 敵方隊伍生成 / Enemy party generation
+ * 對應 docs/log/battle/04 §6.1（EnemyNumber）與 §6.2（EnemyParty）。
+ */
 
 import type { Character } from '../character/Character';
 import type { IDataRepository } from '../data/repository';
@@ -8,7 +10,9 @@ import { weightedPick, type IWeightedEntry } from '../core/random';
 import { newMon } from '../character/factory';
 import { levelFix } from '../character/level-fix';
 
-// party size → [min, max] 敵人數（top_level>5 時取區間隨機）
+/**
+ * party size → [min, max] 敵人數（top_level>5 時取區間隨機）
+ */
 const ENEMY_TABLE: Record<number, [number, number]> = {
 	1: [1, 3],
 	2: [2, 4],
@@ -55,7 +59,8 @@ export function EnemyParty(
 		const def = repo.getMon(no);
 		if (!def) continue;
 		const e = newMon(def, repo, rng);
-		levelFix(e, topLevel - e.level, rng); // 調整至 topLevel（大幅提升時隨機削減）
+		/** 調整至 topLevel（大幅提升時隨機削減） */
+		levelFix(e, topLevel - e.level, rng);
 		enemies.push(e);
 	}
 	return enemies;

@@ -1,15 +1,17 @@
-// 原始版 GetPoison（對照 HOF/Class/Char/Battle/Effect.php::GetPoison）
-// 作為與移植版 getPoison 的「比較基準」。
-// Original GetPoison (mirrors HOF/Class/Char/Battle/Effect.php::GetPoison), kept as a
-// comparison baseline against the ported getPoison.
-//
-// 與移植版 getPoison 的差異（divergence from the ported getPoison）：
-// - 無抗毒時，原始設定 STATE_POISON2（二階中毒）；移植版一律設定 STATE_Poison。
-//   Without resistance the original sets STATE_POISON2; the port always sets STATE_Poison.
-// - 原始 PoisonDamage 僅對 STATE_POISON 生效，故非抗毒中毒（POISON2）在原始中不會每回合掉血
-//   （原始既有行為）；移植版統一 STATE_Poison 則會正常掉血。
-//   The original PoisonDamage only triggers on STATE_POISON, so a non-resisted POISON2 wouldn't
-//   tick in the original (as-implemented); the port's unified STATE_Poison ticks normally.
+/**
+ * 原始版 GetPoison（對照 HOF/Class/Char/Battle/Effect.php::GetPoison）
+ * 作為與移植版 getPoison 的「比較基準」。
+ * Original GetPoison (mirrors HOF/Class/Char/Battle/Effect.php::GetPoison), kept as a
+ * comparison baseline against the ported getPoison.
+ *
+ * 與移植版 getPoison 的差異（divergence from the ported getPoison）：
+ * - 無抗毒時，原始設定 STATE_POISON2（二階中毒）；移植版一律設定 STATE_Poison。
+ *   Without resistance the original sets STATE_POISON2; the port always sets STATE_Poison.
+ * - 原始 PoisonDamage 僅對 STATE_POISON 生效，故非抗毒中毒（POISON2）在原始中不會每回合掉血
+ *   （原始既有行為）；移植版統一 STATE_Poison 則會正常掉血。
+ *   The original PoisonDamage only triggers on STATE_POISON, so a non-resisted POISON2 wouldn't
+ *   tick in the original (as-implemented); the port's unified STATE_Poison ticks normally.
+ */
 
 import { EnumState } from '../constants';
 import type { Character } from './Character';
@@ -46,14 +48,17 @@ export function getPoisonOriginal(char: Character, bePoison: number, rng?: RNG):
 		const chance = bePoison * (1 - char.SPECIAL.PoisonResist / 100);
 		if (rng.randInt(0, 99) < chance)
 		{
-			char.STATE = EnumState.Poison; // 抗毒成功仍為 STATE_POISON
+			/** 抗毒成功仍為 STATE_POISON */
+			char.STATE = EnumState.Poison;
 			return true;
 		}
 		return 'BLOCK';
 	}
 
-	// 無抗毒（或無 rng 無法判定抗毒）：原始設定 STATE_POISON2
-	// No resistance (or no rng to resolve it): the original sets STATE_POISON2
+	/**
+	 * 無抗毒（或無 rng 無法判定抗毒）：原始設定 STATE_POISON2
+	 * No resistance (or no rng to resolve it): the original sets STATE_POISON2
+	 */
 	char.STATE = EnumState.Poison2;
 	return true;
 }

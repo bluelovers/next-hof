@@ -1,5 +1,7 @@
-// 守護邏輯 / Guard logic
-// 對應 docs/log/battle/02 §4（Defending）：後排單體/群體攻擊被前排守護者攔截。
+/**
+ * 守護邏輯 / Guard logic
+ * 對應 docs/log/battle/02 §4（Defending）：後排單體/群體攻擊被前排守護者攔截。
+ */
 
 import { EnumState, EnumPosition } from '../constants';
 import type { Character } from '../character/Character';

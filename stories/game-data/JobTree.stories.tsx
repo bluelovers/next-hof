@@ -105,7 +105,9 @@ const sorcererJobs: IJobData[] = [
 
 /** 完整職業樹資料 / Complete job tree data */
 const completeJobs: IJobData[] = [
-	// 戰士系
+	/**
+	 * 戰士系
+	 */
 	...warriorJobs,
 	{
 		id: 103,
@@ -117,10 +119,14 @@ const completeJobs: IJobData[] = [
 		skills: [],
 	},
 
-	// 法師系
+	/**
+	 * 法師系
+	 */
 	...sorcererJobs,
 
-	// 祭司系
+	/**
+	 * 祭司系
+	 */
 	{
 		id: 300,
 		name: 'Priest',
@@ -158,7 +164,9 @@ const completeJobs: IJobData[] = [
 		skills: [],
 	},
 
-	// 弓箭手系
+	/**
+	 * 弓箭手系
+	 */
 	{
 		id: 400,
 		name: 'Archer',

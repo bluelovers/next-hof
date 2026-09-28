@@ -50,13 +50,17 @@ describe('上級事件引擎：兩類涵蓋所有紀錄 / upper event engine: tw
 		expect(
 			classifyBattleEvent({ type: EnumBattleEventType.Damage, actor: 'Mage', target: 'GoblinAxe', skill: 1000 }),
 		).toBe(EnumEventClass.Skill);
-		// 死亡不依附技能 / death attaches to no skill
+		/**
+		 * 死亡不依附技能 / death attaches to no skill
+		 */
 		expect(classifyBattleEvent({ type: EnumBattleEventType.Death, target: 'GoblinAxe' })).toBe(
 			EnumEventClass.General,
 		);
-		// 每回合毒傷同型別但無 skill → 一般事件，不會誤掛到某次技能使用
-		// Per-turn poison damage shares the Poison type but carries no skill → general, so it can
-		// never be attached to a skill use
+		/**
+		 * 每回合毒傷同型別但無 skill → 一般事件，不會誤掛到某次技能使用
+		 * Per-turn poison damage shares the Poison type but carries no skill → general, so it can
+		 * never be attached to a skill use
+		 */
 		expect(classifyBattleEvent({ type: EnumBattleEventType.Poison, target: 'Warrior', value: 31 })).toBe(
 			EnumEventClass.General,
 		);
@@ -78,8 +82,10 @@ describe('技能事件：效果偵測與分派 / skill events: effect detection 
 				hpBefore: 140,
 				hpAfter: 44,
 			},
-			// 每回合毒傷夾在中間：屬一般事件，不切開這次技能執行
-			// Per-turn poison damage in the middle: a general event that must not split the execution
+			/**
+			 * 每回合毒傷夾在中間：屬一般事件，不切開這次技能執行
+			 * Per-turn poison damage in the middle: a general event that must not split the execution
+			 */
 			{ type: EnumBattleEventType.Poison, target: 'Warrior', value: 31, hpBefore: 240, hpAfter: 209 },
 			{ type: EnumBattleEventType.Debuff, actor: 'Mage', target: 'GoblinAxe', skill: curse.no },
 			{ type: EnumBattleEventType.Poison, actor: 'Mage', target: 'GoblinAxe', skill: curse.no },
@@ -93,8 +99,10 @@ describe('技能事件：效果偵測與分派 / skill events: effect detection 
 		expect(general.class).toBe(EnumEventClass.General);
 		if (skill.class !== EnumEventClass.Skill || general.class !== EnumEventClass.General) return;
 
-		// 一個技能不一定只有一種效果：偵測回清單，分派按紀錄歸系統
-		// One skill may carry several effects: detection returns the list, dispatch routes each record
+		/**
+		 * 一個技能不一定只有一種效果：偵測回清單，分派按紀錄歸系統
+		 * One skill may carry several effects: detection returns the list, dispatch routes each record
+		 */
 		expect(skill.skillName).toBe('PlagueHex');
 		expect(skill.effects).toEqual([EnumSkillEffect.Damage, EnumSkillEffect.Poison, EnumSkillEffect.Debuff]);
 		expect(skill.source.type).toBe(EnumBattleEventType.Act);
@@ -104,7 +112,9 @@ describe('技能事件：效果偵測與分派 / skill events: effect detection 
 			EnumSkillEffect.Poison,
 		]);
 		expect(skill.dispatch.map((d) => d.records.length)).toEqual([1, 1, 1]);
-		// 一般事件原樣保留 / the general event stays verbatim
+		/**
+		 * 一般事件原樣保留 / the general event stays verbatim
+		 */
 		expect(general.event).toBe(events[2]);
 	});
 
@@ -117,8 +127,10 @@ describe('技能事件：效果偵測與分派 / skill events: effect detection 
 			{ type: EnumBattleEventType.Damage, actor: 'Mage', target: 'GoblinAxe', skill: curse.no, value: 96 },
 		];
 
-		// 未提供 getSkill：仍照樣分組，只是不偵測效果（effects 為空陣列）
-		// Without getSkill the grouping still works; only detection is skipped (empty `effects`)
+		/**
+		 * 未提供 getSkill：仍照樣分組，只是不偵測效果（effects 為空陣列）
+		 * Without getSkill the grouping still works; only detection is skipped (empty `effects`)
+		 */
 		const records = runEventEngine(events);
 		expect(records).toHaveLength(2);
 		expect(records.every((r) => r.class === EnumEventClass.Skill)).toBe(true);

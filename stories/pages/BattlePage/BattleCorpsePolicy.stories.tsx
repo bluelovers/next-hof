@@ -239,8 +239,10 @@ function buildDemoData(
 	controls: ICorpseSpecControls,
 ): IBattleDisplayData
 {
-	// 以共用的 resolveCorpsePolicy 解析，與引擎同一套規則（單一事實來源）
-	// Resolve with the shared resolveCorpsePolicy so the story and the engine share one rule
+	/**
+	 * 以共用的 resolveCorpsePolicy 解析，與引擎同一套規則（單一事實來源）
+	 * Resolve with the shared resolveCorpsePolicy so the story and the engine share one rule
+	 */
 	const leftCorpse = resolveCorpsePolicy(
 		toPolicy(args.leftUnitCorpse, controls),
 		toPolicy(args.teamCorpseLeft, controls),
@@ -321,8 +323,10 @@ function buildDemoData(
 			width: SPRITE_LAYOUT_WIDTH,
 			height: SPRITE_LAYOUT_HEIGHT,
 		}),
-		// 單一快照、無行動 → 只有一段、無日誌
-		// Single snapshot, no actions → one segment, no log
+		/**
+		 * 單一快照、無行動 → 只有一段、無日誌
+		 * Single snapshot, no actions → one segment, no log
+		 */
 		actions: [],
 		snapshots: [
 			{
@@ -342,8 +346,10 @@ const CorpsePolicyDemo: React.FC<ICorpsePolicyDemoArgs> = (args) =>
 	const controls = buildControls(args);
 	const data = buildDemoData(args, controls);
 	const [leftUnit, rightUnit] = data.snapshots![0].units;
-	// 只要任一層級選 custom，才顯示物件規格控制項的現況（避免多餘雜訊）
-	// Show the object-spec controls only when some level is `custom` (keeps the caption tidy)
+	/**
+	 * 只要任一層級選 custom，才顯示物件規格控制項的現況（避免多餘雜訊）
+	 * Show the object-spec controls only when some level is `custom` (keeps the caption tidy)
+	 */
 	const anyCustom = [
 		args.battleCorpse,
 		args.teamCorpseLeft,
@@ -410,9 +416,11 @@ const meta: Meta<ICorpsePolicyDemoArgs> = {
 		teamCorpseRight: EnumCorpseChoice.Inherit,
 		leftUnitCorpse: EnumCorpseChoice.Inherit,
 		rightUnitCorpse: EnumCorpseChoice.Inherit,
-		// 墓碑圖一眼可辨（不同於預設屍體圖），證明 imageUrl 控制真的生效
-		// The tombstone is instantly distinguishable from the default corpse asset,
-		// proving the imageUrl control actually takes effect
+		/**
+		 * 墓碑圖一眼可辨（不同於預設屍體圖），證明 imageUrl 控制真的生效
+		 * The tombstone is instantly distinguishable from the default corpse asset,
+		 * proving the imageUrl control actually takes effect
+		 */
 		corpseImageUrl: '/image/char/mon_146.png',
 		corpseClassName: 'corpse-ghost',
 		corpseStyle: { filter: 'brightness(0.65) saturate(0.4)' },

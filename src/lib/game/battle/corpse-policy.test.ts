@@ -36,14 +36,20 @@ describe('resolveCorpsePolicy', () =>
 	it('returns an object spec as-is (more specific level wins whole)', () =>
 	{
 		const spec: ICorpseSpec = { imageUrl: '/image/char/mon_146.png', className: 'corpse-frost' };
-		// 角色級物件勝出，戰鬥級布林不被合併進來
-		// The character-level object wins; the battle-level boolean is not merged in
+		/**
+		 * 角色級物件勝出，戰鬥級布林不被合併進來
+		 * The character-level object wins; the battle-level boolean is not merged in
+		 */
 		expect(resolveCorpsePolicy(spec, true, false)).toBe(spec);
-		// 戰鬥級物件在上層皆未設定時被繼承
-		// The battle-level object is inherited when the upper levels are unset
+		/**
+		 * 戰鬥級物件在上層皆未設定時被繼承
+		 * The battle-level object is inherited when the upper levels are unset
+		 */
 		expect(resolveCorpsePolicy(undefined, undefined, spec)).toBe(spec);
-		// 更具體一級的 false 仍可否決下層的物件
-		// A more specific `false` still vetoes a lower-level object
+		/**
+		 * 更具體一級的 false 仍可否決下層的物件
+		 * A more specific `false` still vetoes a lower-level object
+		 */
 		expect(resolveCorpsePolicy(false, undefined, spec)).toBe(false);
 		expect(resolveCorpsePolicy(undefined, false, spec)).toBe(false);
 	});

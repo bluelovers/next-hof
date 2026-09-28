@@ -85,8 +85,10 @@ export const PartySelect: React.FC<IPartySelectProps> = ({
 				{SHOWCASE_ROSTER.map((entry) =>
 				{
 					const checked = selected.includes(entry.no);
-					// 滿上限後，未勾選項禁用（再選需先取消一名）
-					// Once full, unchecked options are disabled (deselect to free a slot)
+					/**
+					 * 滿上限後，未勾選項禁用（再選需先取消一名）
+					 * Once full, unchecked options are disabled (deselect to free a slot)
+					 */
 					const disabled = !checked && full;
 					return (
 						<RosterCard

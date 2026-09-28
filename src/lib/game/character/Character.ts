@@ -1,7 +1,9 @@
-// 角色物件 / Character model
-// 統一玩家角色(char)、怪物(mon)、召喚物(summon)、工會怪(union) 的基礎與戰鬥屬性。
-// 邏輯以自由函式（battle-variable / level-fix / status / equip / passive）操作本物件，
-// 不採用 PHP 的多層繼承，保持可序列化與易測試。
+/**
+ * 角色物件 / Character model
+ * 統一玩家角色(char)、怪物(mon)、召喚物(summon)、工會怪(union) 的基礎與戰鬥屬性。
+ * 邏輯以自由函式（battle-variable / level-fix / status / equip / passive）操作本物件，
+ * 不採用 PHP 的多層繼承，保持可序列化與易測試。
+ */
 
 import { EnumState, EnumPosition, EnumExpect } from '../constants';
 import type { IBehavior, ISpecial, ICharCore, IMonReward } from '../types';
@@ -101,7 +103,9 @@ export class Character implements ICharCore
 	/** 當前累積經驗 / accumulated exp */
 	exp = 0;
 
-	// 基礎屬性 / base
+	/**
+	 * 基礎屬性 / base
+	 */
 	str: number;
 	int: number;
 	dex: number;
@@ -112,7 +116,9 @@ export class Character implements ICharCore
 	maxsp: number;
 	sp: number;
 
-	// 補正 / compensation
+	/**
+	 * 補正 / compensation
+	 */
 	P_STR = 0;
 	P_INT = 0;
 	P_DEX = 0;
@@ -123,7 +129,9 @@ export class Character implements ICharCore
 	M_MAXHP = 0;
 	M_MAXSP = 0;
 
-	// 戰鬥屬性 / battle
+	/**
+	 * 戰鬥屬性 / battle
+	 */
 	/** 戰鬥六維（基礎值 + P_* 補正，setBattleVariable 計算）/ battle stats (base + P_*, computed by setBattleVariable) */
 	STR = 0;
 	INT = 0;
@@ -166,7 +174,9 @@ export class Character implements ICharCore
 	 */
 	corpse?: ICorpsePolicy;
 
-	// 戰鬥執行期狀態 / runtime
+	/**
+	 * 戰鬥執行期狀態 / runtime
+	 */
 	/** 行動延遲值（越小越先行動；死亡設為 Infinity）/ action delay (smaller acts first; Infinity when dead) */
 	delay = 0;
 	/** 詠唱中的技能編號（null＝無）/ skill currently charging (null = none) */

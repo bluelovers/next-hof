@@ -1,23 +1,25 @@
-// 上級戰鬥事件引擎：技能事件 / 一般事件
-// Upper battle event engine: skill events / general events
-//
-// 兩類涵蓋所有戰鬥紀錄（IBattleEvent），讓上層「消費各種戰鬥紀錄」時只面對兩種形狀，
-// 而不是各自拼接底層欄位（actor/target/skill/value…）：
-// - 技能事件（Skill）：依附某次技能執行的紀錄。以 Act／Cast／Charge 起頭，
-//   先依「技能定義」偵測效果（一個技能可同時有多種效果），再把後續紀錄分派給對應效果系統；
-//   效果系統處理完還能衍生後續事件（例：召喚系統 → 入場事件）。
-// - 一般事件（General）：不依附技能的紀錄（死亡、每回合毒傷、Info…），直接轉手。
-// Two classes cover every battle record (IBattleEvent), so consumers only ever face two shapes
-// instead of hand-stitching raw fields (actor / target / skill / value …):
-// - Skill: records attached to one skill execution. Started by Act / Cast / Charge; effects are
-//   first detected from the skill definition (one skill may carry several effects), then the
-//   following records are dispatched to the matching effect systems. A system may derive further
-//   events after processing (e.g. the summon system → the entry event).
-// - General: records not attached to a skill (death, per-turn poison damage, Info …), passed through.
-//
-// 引擎不改寫任何原始紀錄：輸入什麼 IBattleEvent 就原樣保留在結果裡（單一事實來源）。
-// The engine never rewrites an input record: every IBattleEvent stays verbatim in the output
-// (single source of truth).
+/**
+ * 上級戰鬥事件引擎：技能事件 / 一般事件
+ * Upper battle event engine: skill events / general events
+ *
+ * 兩類涵蓋所有戰鬥紀錄（IBattleEvent），讓上層「消費各種戰鬥紀錄」時只面對兩種形狀，
+ * 而不是各自拼接底層欄位（actor/target/skill/value…）：
+ * - 技能事件（Skill）：依附某次技能執行的紀錄。以 Act／Cast／Charge 起頭，
+ *   先依「技能定義」偵測效果（一個技能可同時有多種效果），再把後續紀錄分派給對應效果系統；
+ *   效果系統處理完還能衍生後續事件（例：召喚系統 → 入場事件）。
+ * - 一般事件（General）：不依附技能的紀錄（死亡、每回合毒傷、Info…），直接轉手。
+ * Two classes cover every battle record (IBattleEvent), so consumers only ever face two shapes
+ * instead of hand-stitching raw fields (actor / target / skill / value …):
+ * - Skill: records attached to one skill execution. Started by Act / Cast / Charge; effects are
+ *   first detected from the skill definition (one skill may carry several effects), then the
+ *   following records are dispatched to the matching effect systems. A system may derive further
+ *   events after processing (e.g. the summon system → the entry event).
+ * - General: records not attached to a skill (death, per-turn poison damage, Info …), passed through.
+ *
+ * 引擎不改寫任何原始紀錄：輸入什麼 IBattleEvent 就原樣保留在結果裡（單一事實來源）。
+ * The engine never rewrites an input record: every IBattleEvent stays verbatim in the output
+ * (single source of truth).
+ */
 
 import { STATUS_UP_KEYS, STATUS_DOWN_KEYS, STATUS_PLUS_KEYS } from '../character/status-attrs';
 import type { IStatusUpKey, IStatusDownKey, IStatusPlusKey } from '../character/status-attrs';
@@ -98,7 +100,9 @@ export const EVENT_EFFECT: Readonly<Partial<Record<EnumBattleEventType, EnumSkil
 	[EnumBattleEventType.MagicCircle]: EnumSkillEffect.MagicCircle,
 	[EnumBattleEventType.Miss]: EnumSkillEffect.Miss,
 	// ---- SkillEffect 移植新增（不新增 EnumSkillEffect 成員）----
-	// Added by the SkillEffect port (no new EnumSkillEffect member)
+	/**
+	 * Added by the SkillEffect port (no new EnumSkillEffect member)
+	 */
 	[EnumBattleEventType.SpDamage]: EnumSkillEffect.Damage,
 	[EnumBattleEventType.Drain]: EnumSkillEffect.Damage,
 	[EnumBattleEventType.SpHeal]: EnumSkillEffect.Heal,
@@ -110,9 +114,11 @@ export const EVENT_EFFECT: Readonly<Partial<Record<EnumBattleEventType, EnumSkil
 	[EnumBattleEventType.StatChange]: EnumSkillEffect.Buff,
 	[EnumBattleEventType.EnergyExchange]: EnumSkillEffect.Buff,
 	[EnumBattleEventType.PoisonResist]: EnumSkillEffect.Poison,
-	// Move／Delay／Info 不進表：位移與延遲無法歸因到單一效果系統，Info 本身是純文字。
-	// Move / Delay / Info stay out: a row change and an action lag cannot be attributed to one
-	// effect system, and Info is plain copy by nature.
+	/**
+	 * Move／Delay／Info 不進表：位移與延遲無法歸因到單一效果系統，Info 本身是純文字。
+	 * Move / Delay / Info stay out: a row change and an action lag cannot be attributed to one
+	 * effect system, and Info is plain copy by nature.
+	 */
 };
 
 /**
@@ -196,9 +202,11 @@ export function detectSkillEffects(skill: ISkillDef): EnumSkillEffect[]
 		if (!found.includes(effect)) found.push(effect);
 	};
 
-	// 傷害／恢復路線：本引擎對非支援技能一律走 calcBasicDamage（無 revive 特例）。
-	// Damage / heal path: the engine always routes non-support skills through calcBasicDamage
-	// (there is no revive special case in this port).
+	/**
+	 * 傷害／恢復路線：本引擎對非支援技能一律走 calcBasicDamage（無 revive 特例）。
+	 * Damage / heal path: the engine always routes non-support skills through calcBasicDamage
+	 * (there is no revive special case in this port).
+	 */
 	if (skill.support)
 	{
 		add(EnumSkillEffect.Heal);
@@ -220,8 +228,10 @@ export function detectSkillEffects(skill: ISkillDef): EnumSkillEffect[]
 		add(EnumSkillEffect.MagicCircle);
 	}
 
-	// Up*／Plus* → 增益、Down* → 減益：與 statusChanges 的分派表共用 UPMAP／DOWNMAP／PLUSMAP。
-	// Up* / Plus* → buff, Down* / debuff: shares UPMAP / DOWNMAP / PLUSMAP with statusChanges.
+	/**
+	 * Up*／Plus* → 增益、Down* → 減益：與 statusChanges 的分派表共用 UPMAP／DOWNMAP／PLUSMAP。
+	 * Up* / Plus* → buff, Down* / debuff: shares UPMAP / DOWNMAP / PLUSMAP with statusChanges.
+	 */
 	const upFields = skill as Partial<Record<IStatusUpKey, number>>;
 	const downFields = skill as Partial<Record<IStatusDownKey, number>>;
 	const plusFields = skill as Partial<Record<IStatusPlusKey, number>>;
@@ -411,8 +421,10 @@ export function runEventEngine(
 	{
 		const cls = classifyBattleEvent(ev);
 		const skillNo = ev.skill;
-		// 分類已保證技能事件必帶 skill；此處僅為型別收窄。
-		// The classifier already guarantees a skill event carries a skill; this only narrows the type.
+		/**
+		 * 分類已保證技能事件必帶 skill；此處僅為型別收窄。
+		 * The classifier already guarantees a skill event carries a skill; this only narrows the type.
+		 */
 		if (cls !== EnumEventClass.Skill || skillNo === undefined)
 		{
 			records.push({ class: EnumEventClass.General, event: ev });
@@ -427,8 +439,10 @@ export function runEventEngine(
 		}
 
 		const effect = EVENT_EFFECT[ev.type];
-		// 起點紀錄本身不是效果，只做事件的 source。
-		// The start record is not an effect; it only becomes the event's source.
+		/**
+		 * 起點紀錄本身不是效果，只做事件的 source。
+		 * The start record is not an effect; it only becomes the event's source.
+		 */
 		if (effect !== undefined) dispatchRecord(current, effect, ev);
 	}
 

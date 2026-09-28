@@ -32,9 +32,11 @@ import './BattleFieldSpriteLabel.css';
 import { EnumSpriteLabelPlacement } from '#/components/battle/enums';
 import type { IStyleProps } from '#/components/shared/types';
 
-// 將純邏輯工具重新匯出，使 BattleFieldSpriteLabel 模組同時提供組件與標籤定位邏輯
-// Re-export the pure logic tool so the BattleFieldSpriteLabel module exposes both the
-// component and the label-positioning logic.
+/**
+ * 將純邏輯工具重新匯出，使 BattleFieldSpriteLabel 模組同時提供組件與標籤定位邏輯
+ * Re-export the pure logic tool so the BattleFieldSpriteLabel module exposes both the
+ * component and the label-positioning logic.
+ */
 export {
 	computeSpriteLabelPosition,
 	computeLabelLeft,
@@ -131,8 +133,10 @@ export const BattleFieldSpriteLabel: React.FC<IBattleFieldSpriteLabelProps> = ({
 }) =>
 {
 	const resolvedImageSize = imageSize ?? DEFAULT_IMAGE_SIZE;
-	// 優先採用上層預算好的位置（含防重疊）；否則組件自行計算
-	// Prefer the parent's pre-computed position (incl. anti-overlap); otherwise compute internally.
+	/**
+	 * 優先採用上層預算好的位置（含防重疊）；否則組件自行計算
+	 * Prefer the parent's pre-computed position (incl. anti-overlap); otherwise compute internally.
+	 */
 	const pos =
 		position ??
 		computeSpriteLabelPosition({
@@ -149,23 +153,29 @@ export const BattleFieldSpriteLabel: React.FC<IBattleFieldSpriteLabelProps> = ({
 	const baseStyle: CSSProperties = {
 		top: pos.top,
 		left: pos.left,
-		// 標籤最小寬度＝角色圖像寬度，使標籤盒寬度至少涵蓋角色，便於文字置中對齊角色
-		// Label min-width = character image width, so the box spans at least the character (text centers over it).
+		/**
+		 * 標籤最小寬度＝角色圖像寬度，使標籤盒寬度至少涵蓋角色，便於文字置中對齊角色
+		 * Label min-width = character image width, so the box spans at least the character (text centers over it).
+		 */
 		minWidth: resolvedImageSize.width,
-		// 最終高度由 labelPosition 決定：超出邊界或避免重疊時會被縮減，故以 height 鎖定並裁切，
-		// 文字在盒內垂直水平置中，縮減時自動裁切溢出部分。
-		// Final height from labelPosition: reduced when out of bounds / avoiding overlap, so lock it
-		// and clip; text is centered inside, overflow is clipped when the height shrinks.
+		/**
+		 * 最終高度由 labelPosition 決定：超出邊界或避免重疊時會被縮減，故以 height 鎖定並裁切，
+		 * 文字在盒內垂直水平置中，縮減時自動裁切溢出部分。
+		 * Final height from labelPosition: reduced when out of bounds / avoiding overlap, so lock it
+		 * and clip; text is centered inside, overflow is clipped when the height shrinks.
+		 */
 		height: pos.height,
 		overflow: 'hidden',
 		display: 'flex',
 		alignItems: 'center',
 		justifyContent: 'center',
-		// 父層 flip-h 已鏡像整個精靈 div；若所屬精靈翻轉，此處再加一次 scaleX(-1)
-		// 抵銷鏡像，使文字正向、位置仍貼齊角色
-		// Parent flip-h already mirrors the whole sprite div; when the owning sprite is
-		// flipped, add one more scaleX(-1) here to cancel it, keeping text upright while
-		// the box stays anchored under the character.
+		/**
+		 * 父層 flip-h 已鏡像整個精靈 div；若所屬精靈翻轉，此處再加一次 scaleX(-1)
+		 * 抵銷鏡像，使文字正向、位置仍貼齊角色
+		 * Parent flip-h already mirrors the whole sprite div; when the owning sprite is
+		 * flipped, add one more scaleX(-1) here to cancel it, keeping text upright while
+		 * the box stays anchored under the character.
+		 */
 		transform: flipped ? 'scaleX(-1)' : undefined,
 	};
 

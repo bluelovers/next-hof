@@ -54,15 +54,19 @@ export const BattleDisplay: React.FC<IBattleDisplayProps> = ({
 {
 	const { leftTeam, rightTeam, battlefield, sprites, actions, result, title, time, snapshots } = data;
 
-	// 依快照把行動切成多段；無快照時為單段
-	// Split actions into segments by snapshot; a single segment when absent
+	/**
+	 * 依快照把行動切成多段；無快照時為單段
+	 * Split actions into segments by snapshot; a single segment when absent
+	 */
 	const segments = splitActionsBySnapshots(actions, snapshots);
 
-	// 開場入場列以「首段快照」為準：中途召喚／加入的單位不會出現在開場入場列；
-	// 首段無快照（或完全無快照）時仍沿用隊伍單位，行為不變。
-	// Opening entrance rows follow the first segment's snapshot so mid-battle joins
-	// (summons) never appear in the opening list; when the first segment carries no
-	// snapshot (or there are no snapshots at all) the team units are used as before.
+	/**
+	 * 開場入場列以「首段快照」為準：中途召喚／加入的單位不會出現在開場入場列；
+	 * 首段無快照（或完全無快照）時仍沿用隊伍單位，行為不變。
+	 * Opening entrance rows follow the first segment's snapshot so mid-battle joins
+	 * (summons) never appear in the opening list; when the first segment carries no
+	 * snapshot (or there are no snapshots at all) the team units are used as before.
+	 */
 	const openingSegment = segments[0];
 	const hasOpeningSnapshot = Boolean(openingSegment?.snapshot);
 	const entranceLeft = hasOpeningSnapshot

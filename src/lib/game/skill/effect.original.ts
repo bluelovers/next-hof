@@ -1,19 +1,21 @@
-// 原始版 CalcBasicDamage（對照 HOF/Class/Skill/Effect.php::CalcBasicDamage）
-// 作為與移植版 calcBasicDamage（適應版）的「比較基準」。
-// Original CalcBasicDamage (mirrors HOF/Class/Skill/Effect.php::CalcBasicDamage), kept as a
-// comparison baseline against the ported calcBasicDamage (adapted).
-//
-// 與移植版 calcBasicDamage 的差異（divergence from the ported calcBasicDamage）：
-// - 穿透（SPECIAL.Pierce）：原始「無條件」加算（只要有 SPECIAL.Pierce 即生效，與 option.pierce 無關）；
-//   移植版僅在 skill.pierce 為真時加算。
-//   Pierce (SPECIAL.Pierce): the original adds it UNCONDITIONALLY (whenever SPECIAL.Pierce is set,
-//   independent of option.pierce); the port only adds it when skill.pierce is set.
-// - Barrier：原始在函式內消耗並使傷害歸 0；移植版由 Battle.UseSkill 處理。
-//   Barrier: the original consumes it inside the function and zeroes damage; the port handles it in Battle.UseSkill.
-// - 玩家保護（低等 / 不致死）：原始在函式尾端處理；移植版由 hpDamage 處理。
-//   Player protection (low-level / non-lethal): handled at the end of the original function; the port handles it in hpDamage.
-// - 保底最小傷害的基準：原始取「扣防禦前」的 10%；移植版已對齊（先算 min 再扣防）。
-//   Floor reference: the original uses 10% of the PRE-defence value; the port now matches (computes min before defence).
+/**
+ * 原始版 CalcBasicDamage（對照 HOF/Class/Skill/Effect.php::CalcBasicDamage）
+ * 作為與移植版 calcBasicDamage（適應版）的「比較基準」。
+ * Original CalcBasicDamage (mirrors HOF/Class/Skill/Effect.php::CalcBasicDamage), kept as a
+ * comparison baseline against the ported calcBasicDamage (adapted).
+ *
+ * 與移植版 calcBasicDamage 的差異（divergence from the ported calcBasicDamage）：
+ * - 穿透（SPECIAL.Pierce）：原始「無條件」加算（只要有 SPECIAL.Pierce 即生效，與 option.pierce 無關）；
+ *   移植版僅在 skill.pierce 為真時加算。
+ *   Pierce (SPECIAL.Pierce): the original adds it UNCONDITIONALLY (whenever SPECIAL.Pierce is set,
+ *   independent of option.pierce); the port only adds it when skill.pierce is set.
+ * - Barrier：原始在函式內消耗並使傷害歸 0；移植版由 Battle.UseSkill 處理。
+ *   Barrier: the original consumes it inside the function and zeroes damage; the port handles it in Battle.UseSkill.
+ * - 玩家保護（低等 / 不致死）：原始在函式尾端處理；移植版由 hpDamage 處理。
+ *   Player protection (low-level / non-lethal): handled at the end of the original function; the port handles it in hpDamage.
+ * - 保底最小傷害的基準：原始取「扣防禦前」的 10%；移植版已對齊（先算 min 再扣防）。
+ *   Floor reference: the original uses 10% of the PRE-defence value; the port now matches (computes min before defence).
+ */
 
 import { EnumSkillDamageType, EnumInfluence } from '../types';
 import type { Character } from '../character/Character';
@@ -81,16 +83,20 @@ export function calcBasicDamageOriginal(
 
 	if (option.multiply) dmg *= option.multiply;
 
-	// Barrier：消耗一次並使傷害歸 0（對齊原始）
-	// Barrier: consume one charge and zero the damage (mirrors original)
+	/**
+	 * Barrier：消耗一次並使傷害歸 0（對齊原始）
+	 * Barrier: consume one charge and zero the damage (mirrors original)
+	 */
 	if (target.SPECIAL.Barrier)
 	{
 		target.SPECIAL.Barrier = Math.max(0, target.SPECIAL.Barrier - 1);
 		dmg = 0;
 	}
 
-	// 保底基準：對齊原始 `$min = $dmg * (1/10)`，於「扣防禦前」計算（含 barrier 後的值）。
-	// Floor reference: mirrors original `$min = $dmg * (1/10)`, computed BEFORE defence reduction (after Barrier).
+	/**
+	 * 保底基準：對齊原始 `$min = $dmg * (1/10)`，於「扣防禦前」計算（含 barrier 後的值）。
+	 * Floor reference: mirrors original `$min = $dmg * (1/10)`, computed BEFORE defence reduction (after Barrier).
+	 */
 	const min = dmg * 0.1;
 
 	if (!option.pierce)
@@ -107,8 +113,10 @@ export function calcBasicDamageOriginal(
 		}
 	}
 
-	// 穿透：原始「無條件」加算（只要有 SPECIAL.Pierce[slot] 即生效，與 option.pierce 無關）。
-	// Pierce: the original adds it UNCONDITIONALLY whenever SPECIAL.Pierce[slot] is set, independent of option.pierce.
+	/**
+	 * 穿透：原始「無條件」加算（只要有 SPECIAL.Pierce[slot] 即生效，與 option.pierce 無關）。
+	 * Pierce: the original adds it UNCONDITIONALLY whenever SPECIAL.Pierce[slot] is set, independent of option.pierce.
+	 */
 	if (user.SPECIAL.Pierce[atkIdx])
 	{
 		dmg += (user.SPECIAL.Pierce[atkIdx] ?? 0) * (skill.pow ?? 100) / 100;
@@ -118,17 +126,21 @@ export function calcBasicDamageOriginal(
 
 	dmg = Math.ceil(dmg);
 
-	// 玩家保護（對齊原始尾端處理）
-	// Player protection (mirrors original end-of-function handling)
+	/**
+	 * 玩家保護（對齊原始尾端處理）
+	 * Player protection (mirrors original end-of-function handling)
+	 */
 	if (target.isChar() && dmg > 20)
 	{
 		if (target.HP > 10 && dmg >= target.HP)
 		{
-			dmg = target.HP - 1; // 不致死
+			/** 不致死 */
+			dmg = target.HP - 1;
 		}
 		else if (target.level < 10 && target.MAXHP < 200)
 		{
-			dmg -= Math.max(10, 25 - target.level); // 低等減傷
+			/** 低等減傷 */
+			dmg -= Math.max(10, 25 - target.level);
 		}
 	}
 

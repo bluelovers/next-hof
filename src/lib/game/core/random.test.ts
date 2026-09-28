@@ -21,7 +21,9 @@ describe('weightedPick', () =>
 			if (v !== undefined) counts[v]++;
 		}
 		const ratio1000 = counts[1000] / n;
-		// 1000 權重 4 / 總和 10 = 40%
+		/**
+		 * 1000 權重 4 / 總和 10 = 40%
+		 */
 		expect(ratio1000).toBeGreaterThan(0.35);
 		expect(ratio1000).toBeLessThan(0.45);
 		expect(counts[1000]).toBeGreaterThan(counts[1003]);

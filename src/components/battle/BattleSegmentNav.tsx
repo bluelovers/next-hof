@@ -29,7 +29,9 @@ export interface IBattleSegmentNavProps
  */
 export const BattleSegmentNav: React.FC<IBattleSegmentNavProps> = ({ index, total }) =>
 {
-	// 單一分段不需導覽 / No navigation needed for a single segment
+	/**
+	 * 單一分段不需導覽 / No navigation needed for a single segment
+	 */
 	if (total <= 1) return null;
 
 	const hasPrev = index > 0;

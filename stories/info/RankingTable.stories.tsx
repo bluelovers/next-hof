@@ -15,7 +15,9 @@ const meta: Meta<typeof RankingTable> = {
 	title: 'Info/RankingTable',
 	component: RankingTable,
 	parameters: {
-		// Storybook 裝飾器配置 / Storybook decorators configuration
+		/**
+		 * Storybook 裝飾器配置 / Storybook decorators configuration
+		 */
 		decorators: [
 			HomePageDarkDecorator,
 		],

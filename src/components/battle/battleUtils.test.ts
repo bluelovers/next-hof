@@ -183,8 +183,10 @@ describe('resolveSegmentSprites', () =>
 			sp: 0,
 			maxSp: 0,
 			dead,
-			// 預設留屍體；個別測試可覆寫為 false / 省略來驗證不留屍體
-			// Leaves a corpse by default; individual tests override to false / omit to vanish
+			/**
+			 * 預設留屍體；個別測試可覆寫為 false / 省略來驗證不留屍體
+			 * Leaves a corpse by default; individual tests override to false / omit to vanish
+			 */
 			corpse: true,
 			...extra,
 		};
@@ -221,7 +223,9 @@ describe('resolveSegmentSprites', () =>
 	{
 		const sprites = [sprite('u1'), sprite('u2')];
 		const snap = snapshot(0, [unit('u1', true, { corpse: false }), unit('u2', true)]);
-		// u1 vanishes (no corpse); u2 stays as a corpse
+		/**
+		 * u1 vanishes (no corpse); u2 stays as a corpse
+		 */
 		expect(resolveSegmentSprites(sprites, snap).map((s) => s.unitUuid)).toEqual(['u2']);
 	});
 
@@ -279,8 +283,10 @@ describe('resolveSegmentSprites', () =>
 		const snap = snapshot(0, [unit('u1', true, { corpse: { imageUrl: '   ' } })]);
 		const out = resolveSegmentSprites(sprites, snap)[0];
 		expect(out.imageUrl).toBe(SPRITE_CORPSE_URL_REV);
-		// 空白路徑＝未指定，故沿用原精靈朝向（不重新推導）
-		// A blank path counts as unspecified, so the original facing is kept (no re-derivation)
+		/**
+		 * 空白路徑＝未指定，故沿用原精靈朝向（不重新推導）
+		 * A blank path counts as unspecified, so the original facing is kept (no re-derivation)
+		 */
 		expect(out.flipped).toBe(true);
 	});
 
@@ -304,8 +310,10 @@ describe('resolveSegmentSprites', () =>
 			unit('u1', true, { corpse: { className: 'corpse-frost', style: { opacity: 0.6 } } }),
 		]);
 		const out = resolveSegmentSprites(sprites, snap)[0];
-		// class 併存而非取代；style 同名屬性由 spec 覆寫、其餘保留
-		// Classes coexist (not replaced); same-named style keys come from the spec, the rest stay
+		/**
+		 * class 併存而非取代；style 同名屬性由 spec 覆寫、其餘保留
+		 * Classes coexist (not replaced); same-named style keys come from the spec, the rest stay
+		 */
 		expect(out.className).toBe('on-field corpse-frost');
 		expect(out.style).toEqual({ opacity: 0.6, filter: 'none' });
 	});
@@ -319,16 +327,20 @@ describe('resolveSegmentSprites', () =>
 
 	it('re-derives facing from a custom corpse image plus the team side', () =>
 	{
-		// char 圖 + 左隊 → 不翻轉（原精靈 char_rev + 左隊本來是翻轉的）
-		// char image + left team → no flip (the original char_rev + left sprite was flipped)
+		/**
+		 * char 圖 + 左隊 → 不翻轉（原精靈 char_rev + 左隊本來是翻轉的）
+		 * char image + left team → no flip (the original char_rev + left sprite was flipped)
+		 */
 		const onLeft = [{ ...sprite('u1', '/image/char_rev/mon_018.png'), flipped: true }];
 		const leftSnap = snapshot(0, [
 			unit('u1', true, { corpse: { imageUrl: '/image/char/mon_146.png' } }),
 		]);
 		expect(resolveSegmentSprites(onLeft, leftSnap)[0].flipped).toBe(false);
 
-		// char 圖 + 右隊 → 翻轉（維持面向場地中心）
-		// char image + right team → flipped (keeps facing the centre)
+		/**
+		 * char 圖 + 右隊 → 翻轉（維持面向場地中心）
+		 * char image + right team → flipped (keeps facing the centre)
+		 */
 		const onRight = [{ ...sprite('u2', '/image/char_rev/mon_018.png'), flipped: false }];
 		const rightSnap = snapshot(0, [
 			unit('u2', true, {
@@ -356,21 +368,29 @@ describe('原始日誌文案與配色 / original log copy and colours', () =>
 		expect(buildActionMessage({ source: 'Hero1', text: 'got barriered!' })).toBe(
 			'Hero1 got barriered!',
 		);
-		// 缺名稱時整段即文案（名稱不加粗，也不會印出 undefined）
-		// Without a name the whole string is the copy (no bold name, and no `undefined` printed)
+		/**
+		 * 缺名稱時整段即文案（名稱不加粗，也不會印出 undefined）
+		 * Without a name the whole string is the copy (no bold name, and no `undefined` printed)
+		 */
 		expect(buildActionMessage({ text: 'got barriered!' })).toBe('got barriered!');
 		expect(buildActionMessage({ source: '', text: 'got barriered!' })).toBe('got barriered!');
-		// 沒有任何輸入時給空字串；只給名稱時鏡像即名稱本身
-		// No input at all yields an empty string; with only a subject the mirror is the subject
+		/**
+		 * 沒有任何輸入時給空字串；只給名稱時鏡像即名稱本身
+		 * No input at all yields an empty string; with only a subject the mirror is the subject
+		 */
 		expect(buildActionMessage({})).toBe('');
 		expect(buildActionMessage({ source: 'Hero1' })).toBe('Hero1');
-		// 已是整行的 message 優先，完全跳過合併
-		// A pre-assembled `message` wins and skips the join entirely
+		/**
+		 * 已是整行的 message 優先，完全跳過合併
+		 * A pre-assembled `message` wins and skips the join entirely
+		 */
 		expect(buildActionMessage({ source: 'Hero1', text: 'down.', message: 'Someone down.' })).toBe(
 			'Someone down.',
 		);
-		// 所有格片段（`'s …`）直接接續名稱，不插入空格
-		// A possessive fragment (`'s …`) attaches straight to the subject with no space
+		/**
+		 * 所有格片段（`'s …`）直接接續名稱，不插入空格
+		 * A possessive fragment (`'s …`) attaches straight to the subject with no space
+		 */
 		expect(
 			buildActionMessage({ source: 'GoblinAxe', text: buildPossessiveText('poison has cured.') }),
 		).toBe("GoblinAxe's poison has cured.");
@@ -381,9 +401,11 @@ describe('原始日誌文案與配色 / original log copy and colours', () =>
 
 	it('getNamedCopy reads the structured parts instead of slicing the message', () =>
 	{
-		// 產生端存入 source／text → 渲染端直接取用，完全沒有「組字串再切割」的轉換
-		// The producer stores source / text → the renderer reads them back directly: no
-		// "join a string then slice it" conversion anywhere
+		/**
+		 * 產生端存入 source／text → 渲染端直接取用，完全沒有「組字串再切割」的轉換
+		 * The producer stores source / text → the renderer reads them back directly: no
+		 * "join a string then slice it" conversion anywhere
+		 */
 		expect(
 			getNamedCopy({
 				source: 'Hero1',
@@ -391,8 +413,10 @@ describe('原始日誌文案與配色 / original log copy and colours', () =>
 				message: buildActionMessage({ source: 'Hero1', text: 'got barriered!' }),
 			}),
 		).toEqual({ subject: 'Hero1', text: 'got barriered!' });
-		// 所有格文案同樣以結構化欄位保存（`'s` 屬於名稱之後的文案）
-		// The possessive copy is stored the same way (`'s` belongs to the copy after the name)
+		/**
+		 * 所有格文案同樣以結構化欄位保存（`'s` 屬於名稱之後的文案）
+		 * The possessive copy is stored the same way (`'s` belongs to the copy after the name)
+		 */
 		expect(
 			getNamedCopy({
 				source: 'GoblinAxe',
@@ -407,8 +431,10 @@ describe('原始日誌文案與配色 / original log copy and colours', () =>
 
 	it('getNamedCopy falls back to the whole line when no text is supplied', () =>
 	{
-		// 沒有 text（外部匯入的舊資料）→ 整段視為文字、名稱不加粗
-		// Without `text` (legacy data from elsewhere) the whole line is the text and no name is bolded
+		/**
+		 * 沒有 text（外部匯入的舊資料）→ 整段視為文字、名稱不加粗
+		 * Without `text` (legacy data from elsewhere) the whole line is the text and no name is bolded
+		 */
 		expect(getNamedCopy({ message: 'Failed!' })).toEqual({ text: 'Failed!' });
 		expect(getNamedCopy({ source: 'Hero1', message: 'Someone else down.' })).toEqual({
 			text: 'Someone else down.',
@@ -422,8 +448,10 @@ describe('原始日誌文案與配色 / original log copy and colours', () =>
 		expect(isProtectingGuard('Warrior', undefined)).toBe(false);
 		expect(isProtectingGuard(undefined, 'Mage')).toBe(false);
 		expect(isProtectingGuard(undefined, undefined)).toBe(false);
-		// 同一判定同時驅動文案與版面 → 兩者不會漂移
-		// One rule drives both the copy and the layout → the two cannot drift apart
+		/**
+		 * 同一判定同時驅動文案與版面 → 兩者不會漂移
+		 * One rule drives both the copy and the layout → the two cannot drift apart
+		 */
 		expect(isProtectingGuard('Warrior', 'Mage')).toBe(
 			buildProtectMessage('Warrior', 'Mage').includes('protected'),
 		);
@@ -437,8 +465,10 @@ describe('原始日誌文案與配色 / original log copy and colours', () =>
 		expect(buildChargeText(EnumChargeKind.Charging)).toBe('start charging.');
 		expect(buildChargeText(EnumChargeKind.Casting)).toBe('start casting.');
 		expect(buildChargeText()).toBe('start casting.');
-		// 片段本身不含名稱，整行由唯一合併點接出
-		// The fragment carries no name; the whole line comes from the single join point
+		/**
+		 * 片段本身不含名稱，整行由唯一合併點接出
+		 * The fragment carries no name; the whole line comes from the single join point
+		 */
 		expect(buildActionMessage({ source: 'Mage1', text: buildChargeText() })).toBe(
 			'Mage1 start casting.',
 		);
@@ -459,8 +489,10 @@ describe('原始日誌文案與配色 / original log copy and colours', () =>
 		);
 		expect(buildStatToText(EnumStatusAttr.MAXHP, EnumStatDirection.Extended, 999)).toBe('MAXHP extended to 999');
 		expect(buildStatToText(EnumStatusAttr.MAXHP, EnumStatDirection.Extended, 999, 500)).toBe('MAXHP(500) extended to 999');
-		// 片段不含名稱：整行一律交給唯一合併點
-		// The fragments carry no name: whole lines always come from the single join point
+		/**
+		 * 片段不含名稱：整行一律交給唯一合併點
+		 * The fragments carry no name: whole lines always come from the single join point
+		 */
 		expect(buildActionMessage({ source: 'Hero1', text: buildStatChangeText(EnumStatusAttr.STR, EnumStatDirection.Rise, 10) })).toBe(
 			'Hero1 STR rise 10%',
 		);
@@ -468,14 +500,18 @@ describe('原始日誌文案與配色 / original log copy and colours', () =>
 
 	it('delay keeps the copy in the data and the change structured', () =>
 	{
-		// 固定文案只由 EnumLogCopy.Delay 持有：整行由唯一合併點用成員接出，輸入端不重打字串
-		// The fixed copy is owned solely by EnumLogCopy.Delay: the single join point builds the
-		// whole line from the member, so no input retypes the string
+		/**
+		 * 固定文案只由 EnumLogCopy.Delay 持有：整行由唯一合併點用成員接出，輸入端不重打字串
+		 * The fixed copy is owned solely by EnumLogCopy.Delay: the single join point builds the
+		 * whole line from the member, so no input retypes the string
+		 */
 		expect(buildActionMessage({ source: 'GoblinAxe', text: EnumLogCopy.Delay })).toBe(
 			'GoblinAxe Delayed',
 		);
-		// 前後值交給 buildValueChangeFromDelay（含 Delay 型別），符號交給版面
-		// The ends go to buildValueChangeFromDelay (type included) and the symbol to the layout
+		/**
+		 * 前後值交給 buildValueChangeFromDelay（含 Delay 型別），符號交給版面
+		 * The ends go to buildValueChangeFromDelay (type included) and the symbol to the layout
+		 */
 		expect(buildValueChangeFromDelay(15, 25, 100)).toEqual({
 			from: 15,
 			to: '25/100',
@@ -485,35 +521,45 @@ describe('原始日誌文案與配色 / original log copy and colours', () =>
 
 	it('getValueChangeSymbol decides the symbol by type, then direction, then default', () =>
 	{
-		// 型別優先：Delay 固定 ⏳↘（變化後是比率字串，比不出升降）
-		// The action type wins: Delay is always ⏳↘ (its `to` is a rate, so no direction can be told)
+		/**
+		 * 型別優先：Delay 固定 ⏳↘（變化後是比率字串，比不出升降）
+		 * The action type wins: Delay is always ⏳↘ (its `to` is a rate, so no direction can be told)
+		 */
 		expect(getValueChangeSymbol(buildValueChangeFromDelay(15, 25, 100))).toBe(
 			VALUE_CHANGE_SYMBOL.delay,
 		);
 		expect(
 			getValueChangeSymbol({ from: 15, to: 10, type: EnumActionType.Delay }),
 		).toBe(VALUE_CHANGE_SYMBOL.delay);
-		// 升降：↗ 上升、↘ 下降、持平 ⭢
-		// Direction: ↗ rising, ↘ falling, ⭢ when equal
+		/**
+		 * 升降：↗ 上升、↘ 下降、持平 ⭢
+		 * Direction: ↗ rising, ↘ falling, ⭢ when equal
+		 */
 		expect(getValueChangeSymbol({ from: 129, to: 213 })).toBe(VALUE_CHANGE_SYMBOL.rise);
 		expect(
 			getValueChangeSymbol({ from: 349, to: 167, type: EnumActionType.Damage }),
 		).toBe(VALUE_CHANGE_SYMBOL.fall);
 		expect(getValueChangeSymbol({ from: 100, to: 100 })).toBe(VALUE_CHANGE_SYMBOL.default);
-		// 非數字端點無從判定 → 預設 ⭢
-		// Non-numeric ends cannot be compared → the default ⭢
+		/**
+		 * 非數字端點無從判定 → 預設 ⭢
+		 * Non-numeric ends cannot be compared → the default ⭢
+		 */
 		expect(getValueChangeSymbol({ from: 'A', to: 'B' })).toBe(VALUE_CHANGE_SYMBOL.default);
 	});
 
 	it('buildValueChange prefers the pre-assembled copy and yields nothing without data', () =>
 	{
-		// 預組字串優先（符號規則不介入）
-		// The pre-assembled string wins (the symbol rules stay out of it)
+		/**
+		 * 預組字串優先（符號規則不介入）
+		 * The pre-assembled string wins (the symbol rules stay out of it)
+		 */
 		expect(buildValueChange({ valueChangeText: 'by GoblinAxe', from: 1, to: 2 })).toBe(
 			'by GoblinAxe',
 		);
-		// 兩者皆無 → null（渲染端輸出空內容，不出現空括號）
-		// Neither present → null (the renderer emits nothing, never empty parentheses)
+		/**
+		 * 兩者皆無 → null（渲染端輸出空內容，不出現空括號）
+		 * Neither present → null (the renderer emits nothing, never empty parentheses)
+		 */
 		expect(
 			buildValueChange({ valueChangeText: undefined, from: undefined, to: undefined }),
 		).toBeNull();
@@ -534,20 +580,26 @@ describe('原始日誌文案與配色 / original log copy and colours', () =>
 		expect(of(EnumActionType.LevelUp)).toBe('levelup');
 		expect(of(EnumActionType.Enter)).toBe('result');
 		expect(of(EnumActionType.Revive)).toBe('recover');
-		// 原始日誌依單位配色：HP→recover、SP→support
-		// The original log colours by unit: HP → recover, SP → support
+		/**
+		 * 原始日誌依單位配色：HP→recover、SP→support
+		 * The original log colours by unit: HP → recover, SP → support
+		 */
 		expect(of(EnumActionType.Recover, { valueUnit: 'HP' })).toBe('recover');
 		expect(of(EnumActionType.Recover, { valueUnit: 'SP' })).toBe('support');
 		expect(of(EnumActionType.Drain, { valueUnit: 'SP' })).toBe('support');
 		expect(of(EnumActionType.Regen, { valueUnit: 'SP' })).toBe('support');
-		// 屬性升降／位移／延遲／資訊在原始日誌沒有 span
-		// Stat change / movement / delay / info carry no span in the original log
+		/**
+		 * 屬性升降／位移／延遲／資訊在原始日誌沒有 span
+		 * Stat change / movement / delay / info carry no span in the original log
+		 */
 		expect(of(EnumActionType.StatChange)).toBe('');
 		expect(of(EnumActionType.Move)).toBe('');
 		expect(of(EnumActionType.Delay)).toBe('');
 		expect(of(EnumActionType.Info)).toBe('');
-		// Poison 可以 attribute 覆寫（抗毒為 support、解除無 span）
-		// Poison accepts an attribute override (support for resist, none for cure)
+		/**
+		 * Poison 可以 attribute 覆寫（抗毒為 support、解除無 span）
+		 * Poison accepts an attribute override (support for resist, none for cure)
+		 */
 		expect(of(EnumActionType.Poison, { attribute: EnumAttributeType.Support })).toBe('support');
 		expect(of(EnumActionType.Poison, { attribute: EnumAttributeType.Normal })).toBe('');
 	});
@@ -559,8 +611,10 @@ describe('事件家族的原始日誌文案 / original log copy per event family
 	{
 		expect(buildActMessage('Warrior', 'Fireball')).toBe('Warrior Fireball');
 		expect(buildActMessage('Warrior')).toBe('Warrior');
-		// 缺施放者時由唯一合併點接手，不把 undefined 印進日誌
-		// Without a caster the single join point takes over so `undefined` never reaches the log
+		/**
+		 * 缺施放者時由唯一合併點接手，不把 undefined 印進日誌
+		 * Without a caster the single join point takes over so `undefined` never reaches the log
+		 */
 		expect(buildActMessage(undefined, 'Fireball')).toBe('Fireball');
 		expect(buildActMessage(undefined)).toBe('');
 	});
@@ -579,9 +633,11 @@ describe('事件家族的原始日誌文案 / original log copy per event family
 
 	it('buildItemDropMessage and buildFailMessage keep the item and reason out of `message`', () =>
 	{
-		// 道具名與失敗原因各有自己的結構化欄位，message 永遠只是整行鏡像
-		// The item name and the failure reason each have their own structured field, so `message`
-		// stays a whole-line mirror
+		/**
+		 * 道具名與失敗原因各有自己的結構化欄位，message 永遠只是整行鏡像
+		 * The item name and the failure reason each have their own structured field, so `message`
+		 * stays a whole-line mirror
+		 */
 		expect(buildItemDropMessage('Warrior', 'Magic Scroll')).toBe('Warrior dropped Magic Scroll.');
 		expect(buildItemDropMessage(undefined, 'Magic Scroll')).toBe('Magic Scroll.');
 		expect(buildFailMessage('GoblinAxe', 'FatalStab', '(Weapon type doesnt match)')).toBe(
@@ -593,9 +649,11 @@ describe('事件家族的原始日誌文案 / original log copy per event family
 
 	it('buildTeamGoldMessage groups the figure the way the original log prints it', () =>
 	{
-		// 千分位是這批資訊文案唯一的格式邏輯，分錯就與原始日誌的數字不一致
-		// The thousands separator is the only formatting logic in these info lines; the wrong
-		// grouping would stop matching the figures in the original log
+		/**
+		 * 千分位是這批資訊文案唯一的格式邏輯，分錯就與原始日誌的數字不一致
+		 * The thousands separator is the only formatting logic in these info lines; the wrong
+		 * grouping would stop matching the figures in the original log
+		 */
 		expect(buildTeamGoldMessage('TestTeam', 1500)).toBe('TestTeam Get 1,500.');
 		expect(buildTeamGoldMessage('TestTeam', 1234567)).toBe('TestTeam Get 1,234,567.');
 	});
@@ -603,7 +661,9 @@ describe('事件家族的原始日誌文案 / original log copy per event family
 	it('buildProtectMessage separates guarding someone else from blocking alone', () =>
 	{
 		expect(buildProtectMessage('Warrior', 'Mage')).toBe('Warrior protected Mage!');
-		// 同單位或缺目標 → 攔截文案 / same unit or no target → the interception copy
+		/**
+		 * 同單位或缺目標 → 攔截文案 / same unit or no target → the interception copy
+		 */
 		expect(buildProtectMessage('Warrior', 'Warrior')).toBe(
 			'Warrior blocked the attack with barrier!',
 		);

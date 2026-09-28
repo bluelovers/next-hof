@@ -150,8 +150,10 @@ const skillUseEvents: IBattleEvent[] = [
 	},
 	{ type: EnumBattleEventType.Debuff, actor: 'Mage', target: 'GoblinAxe', skill: plagueHex.no },
 	{ type: EnumBattleEventType.Poison, actor: 'Mage', target: 'GoblinAxe', skill: plagueHex.no },
-	// 每回合毒傷：屬一般事件，夾在技能執行中間也不會切開它
-	// Per-turn poison damage: a general event that must not split the execution even when interleaved
+	/**
+	 * 每回合毒傷：屬一般事件，夾在技能執行中間也不會切開它
+	 * Per-turn poison damage: a general event that must not split the execution even when interleaved
+	 */
 	{ type: EnumBattleEventType.Poison, target: 'Warrior', value: 31, hpBefore: 240, hpAfter: 209 },
 	{ type: EnumBattleEventType.Act, actor: 'Priest', skill: purify.no },
 	{
@@ -240,7 +242,9 @@ export const mixedLogRecords: IBattleEventRecord[] = runEventEngine(mixedEvents,
  */
 const skillEffectEvents: IBattleEvent[] = [
 	{ type: EnumBattleEventType.Act, actor: 'Warrior', skill: soulLeech.no },
-	// ---- 傷害系統：SP 傷害／吸取 ---- / Damage system: SP damage / drain
+	/**
+	 * ---- 傷害系統：SP 傷害／吸取 ---- / Damage system: SP damage / drain
+	 */
 	{
 		type: EnumBattleEventType.SpDamage,
 		actor: 'Warrior',
@@ -263,11 +267,15 @@ const skillEffectEvents: IBattleEvent[] = [
 			{ who: EnumValueWho.Actor, unit: EnumResource.Hp, from: 200, to: 240 },
 		],
 	},
-	// 位移不入 EVENT_EFFECT → 一般事件 / a row move stays out of EVENT_EFFECT → a general event
+	/**
+	 * 位移不入 EVENT_EFFECT → 一般事件 / a row move stays out of EVENT_EFFECT → a general event
+	 */
 	{ type: EnumBattleEventType.Move, actor: 'Warrior', target: 'GoblinAxe', skill: soulLeech.no, text: EnumMoveText.Front },
 
 	{ type: EnumBattleEventType.Act, actor: 'Priest', skill: soulBless.no },
-	// ---- 恢復系統：SP 回復／持續回復／復活 ---- / Heal system: SP heal / regen / revive
+	/**
+	 * ---- 恢復系統：SP 回復／持續回復／復活 ---- / Heal system: SP heal / regen / revive
+	 */
 	{
 		type: EnumBattleEventType.SpHeal,
 		actor: 'Priest',
@@ -281,7 +289,9 @@ const skillEffectEvents: IBattleEvent[] = [
 	{ type: EnumBattleEventType.Regen, actor: 'Priest', target: 'Priest', skill: soulBless.no, value: 15, unit: EnumResource.Sp },
 	{ type: EnumBattleEventType.Revive, actor: 'Priest', target: 'Hero1', skill: soulBless.no },
 	// ---- 增益系統：加速／施法縮短／障壁／上限變化／HP-SP 交換 ----
-	// Buff system: quick / cast shortened / barrier / cap change / HP-SP exchange
+	/**
+	 * Buff system: quick / cast shortened / barrier / cap change / HP-SP exchange
+	 */
 	{ type: EnumBattleEventType.Quick, actor: 'Priest', target: 'Warrior', skill: soulBless.no },
 	{ type: EnumBattleEventType.CastShort, actor: 'Priest', target: 'Mage1', skill: soulBless.no },
 	{ type: EnumBattleEventType.BarrierGain, actor: 'Priest', target: 'Warrior', skill: soulBless.no },
@@ -303,10 +313,14 @@ const skillEffectEvents: IBattleEvent[] = [
 			{ who: EnumValueWho.Target, unit: EnumResource.Sp, from: 80, to: 50 },
 		],
 	},
-	// ---- 毒系統：抗毒 ---- / Poison system: resist
+	/**
+	 * ---- 毒系統：抗毒 ---- / Poison system: resist
+	 */
 	{ type: EnumBattleEventType.PoisonResist, actor: 'Priest', target: 'Warrior', skill: soulBless.no, value: 50 },
 	// ---- 不入表者：延遲／資訊，即使帶 skill 也是一般事件 ----
-	// Out of the table: delay / info — general events even though they carry a skill number
+	/**
+	 * Out of the table: delay / info — general events even though they carry a skill number
+	 */
 	{
 		type: EnumBattleEventType.Delay,
 		actor: 'Warrior',

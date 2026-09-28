@@ -69,13 +69,17 @@ export function useSpriteLabelRegistry(
 	frameSize: ISpriteImageSize,
 ): ISpriteLabelRegistry
 {
-	// ref 作為跨組件 / 跨渲染的快取 / ref = cross-component / cross-render cache
+	/**
+	 * ref 作為跨組件 / 跨渲染的快取 / ref = cross-component / cross-render cache
+	 */
 	const cache = useRef<ISpriteLabelRegistry | null>(null);
 
 	const entries = useMemo(() =>
 	{
-		// 依序計算；每個標籤都把「前面已放置的矩形」納入 occupied，從而避免與既有標籤重疊
-		// Compute in order; each label feeds the previously placed rects as `occupied`, avoiding overlap.
+		/**
+		 * 依序計算；每個標籤都把「前面已放置的矩形」納入 occupied，從而避免與既有標籤重疊
+		 * Compute in order; each label feeds the previously placed rects as `occupied`, avoiding overlap.
+		 */
 		const occupied: IRect[] = [];
 		return sprites.map((s, i) =>
 		{

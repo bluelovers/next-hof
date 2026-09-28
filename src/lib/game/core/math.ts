@@ -1,4 +1,6 @@
-// 數學與機率工具 / Math & probability helpers
+/**
+ * 數學與機率工具 / Math & probability helpers
+ */
 
 /** 屬性平方根基底：sqrt(STR)*10 等傷害公式使用 / sqrt base used by damage formulas such as sqrt(STR)*10 */
 export function sqrtStat(stat: number): number

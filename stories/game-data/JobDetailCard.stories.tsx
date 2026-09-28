@@ -22,7 +22,9 @@ const meta: Meta<typeof JobDetailCard> = {
 	title: 'GameData/JobDetailCard',
 	component: JobDetailCard,
 	parameters: {
-		// Storybook 裝飾器配置 / Storybook decorators configuration
+		/**
+		 * Storybook 裝飾器配置 / Storybook decorators configuration
+		 */
 		decorators: [JobDetailCardDarkDecorator],
 	},
 };

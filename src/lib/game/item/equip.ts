@@ -1,6 +1,8 @@
-// 裝備系統 / Equipment system
-// 對應 docs/log/battle/03-char-equipment-system.md §5。
-// CalcEquips 計算 atk/def 與 P_*/M_* 補正；setEquip 處理雙手互斥與負荷限制。
+/**
+ * 裝備系統 / Equipment system
+ * 對應 docs/log/battle/03-char-equipment-system.md §5。
+ * CalcEquips 計算 atk/def 與 P_* /M_* 補正；setEquip 處理雙手互斥與負荷限制。
+ */
 
 import type { Character } from '../character/Character';
 import { COMP_FIELDS, EnumAtkSlot, EnumDefSlot } from '../character/status-attrs';
@@ -93,7 +95,9 @@ export function setEquip(
 
 	const removed: number[] = [];
 
-	// 雙手互斥
+	/**
+	 * 雙手互斥
+	 */
 	if (slot === EnumEquipSlot.MainHand || slot === EnumEquipSlot.OffHand)
 	{
 		const other: EnumEquipSlot = slot === EnumEquipSlot.MainHand ? EnumEquipSlot.OffHand : EnumEquipSlot.MainHand;
@@ -109,7 +113,9 @@ export function setEquip(
 		}
 	}
 
-	// 負荷檢查
+	/**
+	 * 負荷檢查
+	 */
 	const trial: Record<string, number | undefined> = { ...char.equip, [slot]: itemNo };
 	let h = 0;
 	for (const no of Object.values(trial))
@@ -124,5 +130,7 @@ export function setEquip(
 	return [false, removed];
 }
 
-// 讓 parseItem 在測試中可見但不強制使用
+/**
+ * 讓 parseItem 在測試中可見但不強制使用
+ */
 export { parseItem };

@@ -1,5 +1,7 @@
-// 技能定義 / Skill definition helpers
-// 對應 docs/data/skill.md。倉庫回傳的即為 ISkillDef（YAML 結構），此處提供正規化與取值。
+/**
+ * 技能定義 / Skill definition helpers
+ * 對應 docs/data/skill.md。倉庫回傳的即為 ISkillDef（YAML 結構），此處提供正規化與取值。
+ */
 
 import type { ISkillDef } from '../types';
 import type { IDataRepository } from '../data/repository';

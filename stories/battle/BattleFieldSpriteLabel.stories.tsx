@@ -92,8 +92,10 @@ const makeRender = (char: IStoryRosterChar) => (args: IBattleFieldSpriteLabelPro
 			height={fieldSize.height}
 			showSpriteLabels
 			valign={EnumBattleFieldVAlign.Bottom}
-			// 為 frame 加上可視邊框與底色，才能看見「顯示範圍」是否把標籤收納在內
-			// Give the frame a visible border + tint so we can see whether the label stays inside the display range.
+			/**
+			 * 為 frame 加上可視邊框與底色，才能看見「顯示範圍」是否把標籤收納在內
+			 * Give the frame a visible border + tint so we can see whether the label stays inside the display range.
+			 */
 			style={{ border: '1px dashed #5a6b7e', background: 'rgba(255,255,255,0.04)' }}
 		/>
 	);
@@ -143,9 +145,11 @@ const meta: Meta<typeof BattleFieldSpriteLabel> = {
 		},
 	},
 	tags: ['autodocs'],
-	// 舞台尺寸取自真實戰場尺寸（480×200），使絕對定位的 frame 有正確原點與可視範圍
-	// Stage size comes from the real battlefield size (480×200), giving the absolutely-positioned
-	// frame a correct origin and visible range.
+	/**
+	 * 舞台尺寸取自真實戰場尺寸（480×200），使絕對定位的 frame 有正確原點與可視範圍
+	 * Stage size comes from the real battlefield size (480×200), giving the absolutely-positioned
+	 * frame a correct origin and visible range.
+	 */
 	decorators: [
 		makeStageDecorator({ width: fieldSize.width, height: fieldSize.height, background: STAGE_BG_COLOR }),
 	],

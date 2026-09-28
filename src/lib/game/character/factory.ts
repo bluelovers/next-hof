@@ -1,5 +1,7 @@
-// 角色工廠 / Character factories
-// 依據 ICharDef / IMonDef 建立 Character 實例，並完成戰鬥變數初始化。
+/**
+ * 角色工廠 / Character factories
+ * 依據 ICharDef / IMonDef 建立 Character 實例，並完成戰鬥變數初始化。
+ */
 
 import { Character } from './Character';
 import { setBattleVariable } from './battle-variable';

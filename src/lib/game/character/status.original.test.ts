@@ -21,7 +21,9 @@ describe('getPoisonOriginal (對照原始 PHP GetPoison)', () =>
 		expect(r).toBe(true);
 		expect(c.STATE).toBe(EnumState.Poison2);
 
-		// 移植版一律 STATE_Poison
+		/**
+		 * 移植版一律 STATE_Poison
+		 */
 		const c2 = makeChar();
 		getPoison(c2, 100);
 		expect(c2.STATE).toBe(EnumState.Poison);
@@ -38,7 +40,8 @@ describe('getPoisonOriginal (對照原始 PHP GetPoison)', () =>
 	{
 		const c = makeChar();
 		c.SPECIAL.PoisonResist = 50;
-		const rng = { randInt: () => 99 } as unknown as RNG; // 99 >= chance(50) → 抵抗
+		/** 99 >= chance(50) → 抵抗 */
+		const rng = { randInt: () => 99 } as unknown as RNG;
 		expect(getPoisonOriginal(c, 100, rng)).toBe('BLOCK');
 		expect(c.STATE).not.toBe(EnumState.Poison);
 		expect(c.STATE).not.toBe(EnumState.Poison2);
@@ -48,7 +51,8 @@ describe('getPoisonOriginal (對照原始 PHP GetPoison)', () =>
 	{
 		const c = makeChar();
 		c.SPECIAL.PoisonResist = 50;
-		const rng = { randInt: () => 0 } as unknown as RNG; // 0 < chance(50) → 成功
+		/** 0 < chance(50) → 成功 */
+		const rng = { randInt: () => 0 } as unknown as RNG;
 		expect(getPoisonOriginal(c, 100, rng)).toBe(true);
 		expect(c.STATE).toBe(EnumState.Poison);
 	});

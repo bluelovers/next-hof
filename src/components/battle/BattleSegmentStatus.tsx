@@ -64,7 +64,9 @@ const SideUnit: React.FC<{
 } & IBattleBarToggleOptions &
 	IBattleSpriteToggleOptions> = ({ unit, showHpBars, showSpBars, showUnitSprites }) =>
 {
-	// 單位精靈僅在 showUnitSprites 開啟時輸出 / Unit sprites render only when showUnitSprites is on
+	/**
+	 * 單位精靈僅在 showUnitSprites 開啟時輸出 / Unit sprites render only when showUnitSprites is on
+	 */
 	const unitSprite = showUnitSprites ? unit.sprite : undefined;
 
 	return (
@@ -101,13 +103,17 @@ const SideStatus: React.FC<{
 	showSpBars,
 }) =>
 {
-	// 隊伍精靈：showTeamSprite 開啟時才輸出；資料取顯式 prop，否則取該側第一個帶精靈的單位
-	// Team sprite: rendered only when showTeamSprite is on; data comes from the explicit prop, or else the first unit of this side carrying a sprite
+	/**
+	 * 隊伍精靈：showTeamSprite 開啟時才輸出；資料取顯式 prop，否則取該側第一個帶精靈的單位
+	 * Team sprite: rendered only when showTeamSprite is on; data comes from the explicit prop, or else the first unit of this side carrying a sprite
+	 */
 	const sideSprite = showTeamSprite ? (teamSprite ?? units.find((u) => u.sprite)?.sprite) : undefined;
 
 	return (
-		// 刻意不套用共用的 .divider-bottom：HP/SP 狀態欄底部不畫水平框線（見 SharedBase.css）
-		// Deliberately skips the shared .divider-bottom utility: no horizontal rule under the HP/SP status column (see SharedBase.css)
+		/**
+		 * 刻意不套用共用的 .divider-bottom：HP/SP 狀態欄底部不畫水平框線（見 SharedBase.css）
+		 * Deliberately skips the shared .divider-bottom utility: no horizontal rule under the HP/SP status column (see SharedBase.css)
+		 */
 		<div className={`battle-side ${getSideClass(side)}`}>
 			{sideSprite && (
 				<div className="battle-side-sprite">

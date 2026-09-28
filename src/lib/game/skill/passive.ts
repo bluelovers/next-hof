@@ -1,5 +1,7 @@
-// 被動技能加成 / Passive skill bonuses
-// 對應 docs/log/battle/03 §6.2 skill_passive()：將已學被動技能的 P_*/M_* 與 SPECIAL 累加至角色。
+/**
+ * 被動技能加成 / Passive skill bonuses
+ * 對應 docs/log/battle/03 §6.2 skill_passive()：將已學被動技能的 P_* /M_* 與 SPECIAL 累加至角色。
+ */
 
 import type { Character } from '../character/Character';
 import { COMP_FIELDS } from '../character/status-attrs';

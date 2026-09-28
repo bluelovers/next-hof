@@ -96,8 +96,10 @@ function computeRowPositions(
 ): IBattleSprite[]
 {
 	const { width, height, cellCount = 6 } = options;
-	// 手動覆寫：呼叫端明確傳入 flip 時沿用舊定位模式；否則依圖檔目錄自動推導
-	// Manual override: explicit flip keeps the legacy mode; otherwise auto-derive.
+	/**
+	 * 手動覆寫：呼叫端明確傳入 flip 時沿用舊定位模式；否則依圖檔目錄自動推導
+	 * Manual override: explicit flip keeps the legacy mode; otherwise auto-derive.
+	 */
 	const explicitFlip = options.flip;
 	const number = chars.length;
 	if (number === 0)
@@ -114,30 +116,38 @@ function computeRowPositions(
 	return chars.map((char) =>
 	{
 		gap++;
-		// 逐個精靈依「自身圖檔目錄 + 隊伍側」決定翻轉定位模式，
-		// 使同一隊伍混用 char / char_rev 時仍能全部落於同一側
-		// Per-sprite flip positioning from this sprite's own image directory + side, so a
-		// single team mixing char / char_rev still lands entirely on the same side.
+		/**
+		 * 逐個精靈依「自身圖檔目錄 + 隊伍側」決定翻轉定位模式，
+		 * 使同一隊伍混用 char / char_rev 時仍能全部落於同一側
+		 * Per-sprite flip positioning from this sprite's own image directory + side, so a
+		 * single team mixing char / char_rev still lands entirely on the same side.
+		 */
 		const spriteFlipMode = explicitFlip ?? useFlipPositioning(char.imageUrl, side);
 
-		// direction：翻轉定位模式下兩隊皆 0；非翻轉定位模式右隊為 1
-		// direction: flip positioning → 0 for both; non-flip → 1 for right team
+		/**
+		 * direction：翻轉定位模式下兩隊皆 0；非翻轉定位模式右隊為 1
+		 * direction: flip positioning → 0 for both; non-flip → 1 for right team
+		 */
 		const direction = spriteFlipMode ? 0 : side === EnumTeamSideUI.Right ? 1 : 0;
 
-		// 列基準 x（column index）：
-		// 翻轉定位模式：前衛=2、後衛=1（右隊靠 flipped 鏡像到右側）
-		// 非翻轉定位模式：左隊 前衛=2/後衛=1；右隊 前衛=4/後衛=5（直接置於右側）
-		// Column index:
-		// flip positioning: front=2, back=1 (right team mirrored via flipped)
-		// non-flip positioning: left front=2/back=1; right front=4/back=5 (directly on right)
+		/**
+		 * 列基準 x（column index）：
+		 * 翻轉定位模式：前衛=2、後衛=1（右隊靠 flipped 鏡像到右側）
+		 * 非翻轉定位模式：左隊 前衛=2/後衛=1；右隊 前衛=4/後衛=5（直接置於右側）
+		 * Column index:
+		 * flip positioning: front=2, back=1 (right team mirrored via flipped)
+		 * non-flip positioning: left front=2/back=1; right front=4/back=5 (directly on right)
+		 */
 		const columnIndex = spriteFlipMode
 			? position === EnumPosition.Back ? 1 : 2
 			: side === EnumTeamSideUI.Left
 				? position === EnumPosition.Back ? 1 : 2
 				: position === EnumPosition.Back ? 5 : 4;
 
-		// 對應 PHP：axis_x += (direction ? -cell/2 : +cell/2)；axis_y += -cell/2（兩分支皆同）
-		// Mirrors PHP: axis_x += (direction ? -cell/2 : +cell/2); axis_y += -cell/2 (both branches)
+		/**
+		 * 對應 PHP：axis_x += (direction ? -cell/2 : +cell/2)；axis_y += -cell/2（兩分支皆同）
+		 * Mirrors PHP: axis_x += (direction ? -cell/2 : +cell/2); axis_y += -cell/2 (both branches)
+		 */
 		const axisX = columnIndex * cellWidth + (direction ? -cellWidth / 2 : cellWidth / 2);
 		const axisY = yCenter + -cellHeight / 2;
 
@@ -148,14 +158,18 @@ function computeRowPositions(
 		x = Math.floor(x);
 		y = Math.floor(y);
 
-		// 以圖像中心對齊 (x, y) 後，減去半寬高得到 background-position 左上角
-		// Center the image on (x, y), then subtract half size for background-position top-left
+		/**
+		 * 以圖像中心對齊 (x, y) 後，減去半寬高得到 background-position 左上角
+		 * Center the image on (x, y), then subtract half size for background-position top-left
+		 */
 		x -= Math.round(char.imageSize.width / 2);
 		y -= Math.round(char.imageSize.height / 2);
 
-		// 翻轉標記：明確傳入 flip 時沿用舊公式；否則依圖檔目錄 + 隊伍自動計算
-		// Flipped flag: explicit flip keeps the legacy formula; otherwise auto-compute
-		// from the image directory + team side.
+		/**
+		 * 翻轉標記：明確傳入 flip 時沿用舊公式；否則依圖檔目錄 + 隊伍自動計算
+		 * Flipped flag: explicit flip keeps the legacy formula; otherwise auto-compute
+		 * from the image directory + team side.
+		 */
 		const flipped = (
 			explicitFlip !== undefined
 				? side === EnumTeamSideUI.Right ? explicitFlip : false

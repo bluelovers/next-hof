@@ -1,12 +1,14 @@
-// Battle UI enums — UI/rendering-layer enums only.
-// 本檔只包含 battle scene 渲染層專用 enum（sprite / layout / CSS class / 顯示分類），
-// 無對應 domain 概念。Domain enum（EnumPosition / EnumTargetType 等）由各消費者
-// 直接從 #/lib/game 匯入，不在這裡 re-export，以免混淆原始來源。
-//
-// Battle UI enums — UI/rendering-layer enums only. This file holds only scene
-// rendering enums (sprite/layout/CSS class/display categories) with no domain
-// equivalent. Domain enums are imported directly from #/lib/game by their
-// consumers and are NEVER re-exported here, to keep the original source unambiguous.
+/**
+ * Battle UI enums — UI/rendering-layer enums only.
+ * 本檔只包含 battle scene 渲染層專用 enum（sprite / layout / CSS class / 顯示分類），
+ * 無對應 domain 概念。Domain enum（EnumPosition / EnumTargetType 等）由各消費者
+ * 直接從 #/lib/game 匯入，不在這裡 re-export，以免混淆原始來源。
+ *
+ * Battle UI enums — UI/rendering-layer enums only. This file holds only scene
+ * rendering enums (sprite/layout/CSS class/display categories) with no domain
+ * equivalent. Domain enums are imported directly from #/lib/game by their
+ * consumers and are NEVER re-exported here, to keep the original source unambiguous.
+ */
 
 /** 隊伍側別（UI 顯示層：left/right）/ Team side (UI display layer) */
 export enum EnumTeamSideUI

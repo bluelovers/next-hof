@@ -57,9 +57,11 @@ const ValueChange: React.FC<IValueChangeInput & {
 	type?: EnumActionType;
 }> = (props) =>
 {
-	// 符號與變化值委由 battleUtilsElem.buildValueChange（單一事實來源，展示資料共用同一定義）
-	// The symbol and the value are delegated to battleUtilsElem.buildValueChange (single source of
-	// truth, shared definition with the showcase data)
+	/**
+	 * 符號與變化值委由 battleUtilsElem.buildValueChange（單一事實來源，展示資料共用同一定義）
+	 * The symbol and the value are delegated to battleUtilsElem.buildValueChange (single source of
+	 * truth, shared definition with the showcase data)
+	 */
 	const text = buildValueChange(props);
 	if (text == null) return null;
 	return (
@@ -267,11 +269,13 @@ const MagicCircleMessage: React.FC<{ action: IBattleAction }> = ({ action }) =>
 	const kind = action.magicCircle?.kind ?? EnumMagicCircleKind.Draw;
 	const amount = action.magicCircle?.amount;
 	const cls = getMagicCircleClass(kind);
-	// 原始日誌（`draw`/`erased enemy` 於 Skill/Effect.php、`use` 於 Battle/Skill.php）：
-	// 名稱保持預設色，只有動作文案（含 ` xN`）上色；Fail 種類沒有施放者，整段即文案本身。
-	// The original log (draw/erased enemy in Skill/Effect.php, use in Battle/Skill.php) keeps
-	// the name in the default colour and only the action phrase (including ` xN`) is coloured;
-	// the Fail kind has no caster so the whole string is just the phrase itself.
+	/**
+	 * 原始日誌（`draw`/`erased enemy` 於 Skill/Effect.php、`use` 於 Battle/Skill.php）：
+	 * 名稱保持預設色，只有動作文案（含 ` xN`）上色；Fail 種類沒有施放者，整段即文案本身。
+	 * The original log (draw/erased enemy in Skill/Effect.php, use in Battle/Skill.php) keeps
+	 * the name in the default colour and only the action phrase (including ` xN`) is coloured;
+	 * the Fail kind has no caster so the whole string is just the phrase itself.
+	 */
 	if (kind === EnumMagicCircleKind.Fail)
 	{
 		return <ActionLine className={cls} body={MAGIC_CIRCLE_PHRASE[kind]} />;
@@ -480,10 +484,12 @@ const SpDamageMessage: React.FC<{ action: IBattleAction }> = ({ action }) => (
 const DrainMessage: React.FC<{ action: IBattleAction }> = ({ action }) =>
 {
 	const cls = getMessageClass(action);
-	// 原始日誌：`Drained <b>N</b> HP from <b>target</b>(…)`——僅吸取數值與單位上色，
-	// `Drained`／`from target`／`(n1→n2)` 維持預設色。
-	// Original log: `Drained <b>N</b> HP from <b>target</b>(…)` — only the drained value and
-	// unit are coloured; `Drained`, `from target` and `(n1→n2)` stay default.
+	/**
+	 * 原始日誌：`Drained <b>N</b> HP from <b>target</b>(…)`——僅吸取數值與單位上色，
+	 * `Drained`／`from target`／`(n1→n2)` 維持預設色。
+	 * Original log: `Drained <b>N</b> HP from <b>target</b>(…)` — only the drained value and
+	 * unit are coloured; `Drained`, `from target` and `(n1→n2)` stay default.
+	 */
 	return (
 		<>
 			Drained{' '}
@@ -517,15 +523,19 @@ const RegenMessage: React.FC<{ action: IBattleAction }> = ({ action }) =>
 	const cls = getMessageClass(action);
 	if (action.linePrefix !== undefined && action.value !== undefined)
 	{
-		// `* name Auto Regenerate N HP`：行首星號與「Auto Regenerate N HP」上色，名稱預設色。
-		// `* name Auto Regenerate N HP`: the leading asterisk and "Auto Regenerate N HP" are
-		// coloured while the name stays default.
+		/**
+		 * `* name Auto Regenerate N HP`：行首星號與「Auto Regenerate N HP」上色，名稱預設色。
+		 * `* name Auto Regenerate N HP`: the leading asterisk and "Auto Regenerate N HP" are
+		 * coloured while the name stays default.
+		 */
 		return <NamedValueMessage action={action} className={cls} text="Auto Regenerate" />;
 	}
-	// `name gained HP/SP regeneration +N%`：名稱預設色，僅「gained … +N%」上色。
-	// `name gained HP/SP regeneration +N%`: the name stays default and only "gained … +N%" is
-	// coloured. 名稱與文字取自結構化欄位，無需切割 message。
-	// The name and text come from the structured fields, so `message` is never sliced.
+	/**
+	 * `name gained HP/SP regeneration +N%`：名稱預設色，僅「gained … +N%」上色。
+	 * `name gained HP/SP regeneration +N%`: the name stays default and only "gained … +N%" is
+	 * coloured. 名稱與文字取自結構化欄位，無需切割 message。
+	 * The name and text come from the structured fields, so `message` is never sliced.
+	 */
 	const { subject, text } = getNamedCopy(action);
 	return (
 		<ActionLine
@@ -605,9 +615,11 @@ const PoisonMessage: React.FC<{ action: IBattleAction }> = ({ action }) =>
 	{
 		return <EmphasizedMessage action={action} className="spdmg" />;
 	}
-	// 每回合中毒傷害（4.7）：整行 spdmg，數值加粗，並附 `(前 後)`。
-	// Per-turn poison damage (4.7): the whole line is spdmg, the value is bold, and the
-	// `(from symbol to)` is appended.
+	/**
+	 * 每回合中毒傷害（4.7）：整行 spdmg，數值加粗，並附 `(前 後)`。
+	 * Per-turn poison damage (4.7): the whole line is spdmg, the value is bold, and the
+	 * `(from symbol to)` is appended.
+	 */
 	if (action.value !== undefined)
 	{
 		return (
@@ -847,8 +859,10 @@ function renderActionContent(action: IBattleAction): React.ReactNode
 			return <SkillMessage action={action} />;
 		case EnumActionType.Damage:
 			return <DamageMessage action={action} />;
-		// 原始回復文案為 "Recovered N HP/SP"，Heal 與 'recover' 共用 Partial 上色版面。
-		// The original recovery copy is "Recovered N HP/SP", so Heal shares the Recover layout.
+		/**
+		 * 原始回復文案為 "Recovered N HP/SP"，Heal 與 'recover' 共用 Partial 上色版面。
+		 * The original recovery copy is "Recovered N HP/SP", so Heal shares the Recover layout.
+		 */
 		case EnumActionType.Heal:
 		case EnumActionType.Recover:
 			return <RecoverMessage action={action} />;

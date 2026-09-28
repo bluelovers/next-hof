@@ -31,9 +31,11 @@ const meta: Meta<typeof BattleFieldSpriteLayers> = {
 		...sampleFieldSize,
 		showSpriteLabels: true,
 	},
-	// 提供與精靈框同尺寸的相對定位舞台，使絕對定位的精靈圖層有正確的原點
-	// Provide a relatively-positioned stage matching the sprite frame size so the
-	// absolutely-positioned sprite layers have a correct origin
+	/**
+	 * 提供與精靈框同尺寸的相對定位舞台，使絕對定位的精靈圖層有正確的原點
+	 * Provide a relatively-positioned stage matching the sprite frame size so the
+	 * absolutely-positioned sprite layers have a correct origin
+	 */
 	decorators: [
 		makeStageDecorator((args) => ({
 			width: args.width as number,
@@ -58,7 +60,9 @@ export const NoLabels: Story = {
 export const StyleOverride: Story = {
 	args: {
 		showSpriteLabels: true,
-		// 元件層級 style：所有精靈圖層套用藍色邊框 / Component-level style: blue outline on every layer
+		/**
+		 * 元件層級 style：所有精靈圖層套用藍色邊框 / Component-level style: blue outline on every layer
+		 */
 		style: { outline: '1px solid rgba(90,160,255,0.6)' },
 		sprites: [
 			{
@@ -68,9 +72,13 @@ export const StyleOverride: Story = {
 				y: 16,
 				flipped: false,
 				name: 'GoblinWarrior(A)',
-				// 單體精靈樣式覆寫（最優先） / Per-sprite style override (highest priority)
+				/**
+				 * 單體精靈樣式覆寫（最優先） / Per-sprite style override (highest priority)
+				 */
 				style: { opacity: 0.7 },
-				// 單體標籤樣式覆寫 / Per-sprite label style override
+				/**
+				 * 單體標籤樣式覆寫 / Per-sprite label style override
+				 */
 				labelStyle: { color: '#ffd166', fontSize: 13 },
 			},
 			{

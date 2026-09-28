@@ -171,18 +171,24 @@ export function clampLabelToBoundary(
 		const bandBottom = Math.max(0, y - gap);
 		if (top0 < 0)
 		{
-			// 高於邊界 → 貼齊頂緣並縮減高度 / Above boundary → pin to top, shrink height.
+			/**
+			 * 高於邊界 → 貼齊頂緣並縮減高度 / Above boundary → pin to top, shrink height.
+			 */
 			return { top: 0, height: Math.max(0, bandBottom) };
 		}
 		return { top: top0, height: labelSize.height };
 	}
-	// below
-	// 觸底時與 frame 底邊保留 FRAME_BOTTOM_MARGIN，避免完全貼底
-	// Keep FRAME_BOTTOM_MARGIN from the frame bottom so the label never fully sticks to it.
+	/**
+	 * below
+	 * 觸底時與 frame 底邊保留 FRAME_BOTTOM_MARGIN，避免完全貼底
+	 * Keep FRAME_BOTTOM_MARGIN from the frame bottom so the label never fully sticks to it.
+	 */
 	const bandBottom = Math.max(0, frameSize.height - FRAME_BOTTOM_MARGIN);
 	if (top0 + labelSize.height > bandBottom)
 	{
-		// 低於邊界 → 縮減高度並收斂到 frame 內 / Below boundary → shrink height, clamp inside.
+		/**
+		 * 低於邊界 → 縮減高度並收斂到 frame 內 / Below boundary → shrink height, clamp inside.
+		 */
 		const height = Math.max(0, bandBottom - top0);
 		return { top: Math.min(top0, Math.max(0, bandBottom - height)), height };
 	}
@@ -275,29 +281,37 @@ export function largestFreeGap(
 export function computeSpriteLabelPosition(input: ISpriteLabelPositionInput): ISpriteLabelPositionResult
 {
 	const { x, y, imageSize, placement, frameSize, occupied } = input;
-	// 標籤預設寬度＝圖像寬度（對應組件 min-width: imageSize.width），高度用預設值
-	// Default label width = image width (matches the component's min-width: imageSize.width); height uses the default.
+	/**
+	 * 標籤預設寬度＝圖像寬度（對應組件 min-width: imageSize.width），高度用預設值
+	 * Default label width = image width (matches the component's min-width: imageSize.width); height uses the default.
+	 */
 	const labelSize = input.labelSize ?? { width: imageSize.width, height: DEFAULT_LABEL_HEIGHT };
 	const gap = input.gap ?? DEFAULT_GAP;
 
-	// 水平：以角色圖像中心對齊，再收斂在 frame 左右邊界內
-	// Horizontal: center on the character, then clamp within the frame's left/right edges.
+	/**
+	 * 水平：以角色圖像中心對齊，再收斂在 frame 左右邊界內
+	 * Horizontal: center on the character, then clamp within the frame's left/right edges.
+	 */
 	const left = clamp(
 		computeLabelLeft(x, imageSize, labelSize),
 		0,
 		Math.max(0, frameSize.width - labelSize.width),
 	);
 
-	// 垂直：先以邊界收斂（超界則縮減高度，不翻轉）
-	// Vertical: boundary clamp first (shrink height on overflow, no flip).
+	/**
+	 * 垂直：先以邊界收斂（超界則縮減高度，不翻轉）
+	 * Vertical: boundary clamp first (shrink height on overflow, no flip).
+	 */
 	const boundary = clampLabelToBoundary(placement, y, imageSize, labelSize, gap, frameSize);
 	let top = boundary.top;
 	let height = boundary.height;
 	const width = labelSize.width;
 
-	// 防重疊：沿 placement 方向在 frame 內找空位；仍重疊則縮減高度塞進帶內最大空隙
-	// Anti-overlap: scan along the placement direction inside the frame; if still overlapping,
-	// shrink the height into the largest free gap.
+	/**
+	 * 防重疊：沿 placement 方向在 frame 內找空位；仍重疊則縮減高度塞進帶內最大空隙
+	 * Anti-overlap: scan along the placement direction inside the frame; if still overlapping,
+	 * shrink the height into the largest free gap.
+	 */
 	if (occupied && occupied.length > 0)
 	{
 		const rect0: IRect = { left, top, width, height };

@@ -1,5 +1,7 @@
-// 物品定義 / Item definition helpers
-// 對應 docs/data/item.md。倉庫回傳的即為 IItemDef（YAML 結構），此處提供正規化與取值。
+/**
+ * 物品定義 / Item definition helpers
+ * 對應 docs/data/item.md。倉庫回傳的即為 IItemDef（YAML 結構），此處提供正規化與取值。
+ */
 
 import { EnumItemCategory, type IItemDef, type EnumWeaponType } from '../types';
 import type { IDataRepository } from '../data/repository';

@@ -1,5 +1,7 @@
-// 職業系統 / Job system
-// 對應 docs/data/job.md 與 docs/log/battle/03 §2（hpsp 公式）。
+/**
+ * 職業系統 / Job system
+ * 對應 docs/data/job.md 與 docs/log/battle/03 §2（hpsp 公式）。
+ */
 
 import { MAX_STATUS } from '../constants';
 import type { IJobDef, EnumWeaponType } from '../types';

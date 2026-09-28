@@ -8,9 +8,11 @@ import {
 	getMonSpriteUrl,
 } from './sprite-map';
 
-// OpenSpec 任務 2.2：每個 seed 角色/怪物都必須有 imageUrl 或明確 placeholder
-// OpenSpec task 2.2: every seed char/monster must resolve to an image URL or the
-// explicit placeholder.
+/**
+ * OpenSpec 任務 2.2：每個 seed 角色/怪物都必須有 imageUrl 或明確 placeholder
+ * OpenSpec task 2.2: every seed char/monster must resolve to an image URL or the
+ * explicit placeholder.
+ */
 describe('showcase sprite map', () =>
 {
 	it('every seed char has a non-placeholder sprite image', () =>

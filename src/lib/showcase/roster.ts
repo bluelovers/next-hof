@@ -1,11 +1,13 @@
-// 展示頁名冊 / Showcase roster
-// 從引擎 seed 角色定義整理出選角 UI 所需的純展示欄位（no/name/level/jobName/
-// spriteUrl），職業名取自 SEED 職業定義、圖檔取自 sprite-map（缺圖自動回傳
-// placeholder），本身不建 Character、不含戰鬥邏輯。
-// Flattens engine seed char definitions into display-only fields for the party
-// picker (no/name/level/jobName/spriteUrl). Job names come from SEED job defs and
-// images from sprite-map (placeholder on miss); it builds no Character and holds
-// no battle logic.
+/**
+ * 展示頁名冊 / Showcase roster
+ * 從引擎 seed 角色定義整理出選角 UI 所需的純展示欄位（no/name/level/jobName/
+ * spriteUrl），職業名取自 SEED 職業定義、圖檔取自 sprite-map（缺圖自動回傳
+ * placeholder），本身不建 Character、不含戰鬥邏輯。
+ * Flattens engine seed char definitions into display-only fields for the party
+ * picker (no/name/level/jobName/spriteUrl). Job names come from SEED job defs and
+ * images from sprite-map (placeholder on miss); it builds no Character and holds
+ * no battle logic.
+ */
 
 import { SEED } from '#/lib/game/data/seed-data';
 import { getCharSpriteUrl } from './sprite-map';

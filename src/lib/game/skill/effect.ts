@@ -1,6 +1,8 @@
-// 技能效果套用 / Skill effect application
-// 對應 docs/log/battle/02 §3（傷害/回復）, §4（守護由 battle/guard 處理）, §7（Buff/Debuff）,
-// docs/data/skill.md（Up*/Down*/Plus*/Poison/CurePoison/HpRegen/SpRegen ...）。
+/**
+ * 技能效果套用 / Skill effect application
+ * 對應 docs/log/battle/02 §3（傷害/回復）, §4（守護由 battle/guard 處理）, §7（Buff/Debuff）,
+ * docs/data/skill.md（Up* /Down* /Plus* /Poison/CurePoison/HpRegen/SpRegen ...）。
+ */
 
 import { EnumPosition } from '../constants';
 import type { Character } from '../character/Character';
@@ -95,17 +97,23 @@ export function calcBasicDamage(
 	const base = Math.sqrt(stat) * 10 + (user.atk[atkIdx] ?? 0);
 	let raw = base * (skill.pow ?? 100) / 100;
 
-	// 倍率（原始 `$option["multiply"]`）：pow 之後、min／def 之前。
-	// Multiplier (the original `$option["multiply"]`): after pow, before min / def.
+	/**
+	 * 倍率（原始 `$option["multiply"]`）：pow 之後、min／def 之前。
+	 * Multiplier (the original `$option["multiply"]`): after pow, before min / def.
+	 */
 	if (option?.multiply) raw *= option.multiply;
 
-	// 保底基準：對齊原始 `$min = $dmg * (1/10)`，於「扣防禦前」計算。
-	// Floor reference: mirrors original `$min = $dmg * (1/10)`, computed BEFORE defence reduction.
+	/**
+	 * 保底基準：對齊原始 `$min = $dmg * (1/10)`，於「扣防禦前」計算。
+	 * Floor reference: mirrors original `$min = $dmg * (1/10)`, computed BEFORE defence reduction.
+	 */
 	const min = raw * 0.1;
 
-	// 跳過 def：skill.pierce 或 option.pierce 任一為真即無視減傷（原始由 `$option["pierce"]` 決定）。
-	// Skip def: either skill.pierce or option.pierce nullifies reduction (the original decides by
-	// `$option["pierce"]`).
+	/**
+	 * 跳過 def：skill.pierce 或 option.pierce 任一為真即無視減傷（原始由 `$option["pierce"]` 決定）。
+	 * Skip def: either skill.pierce or option.pierce nullifies reduction (the original decides by
+	 * `$option["pierce"]`).
+	 */
 	if (!skill.pierce && !option?.pierce)
 	{
 		if (isMagic)
@@ -122,17 +130,20 @@ export function calcBasicDamage(
 
 	let dmg = raw;
 
-	// 穿透加算：移植版（適應版）僅在 skill.pierce 為真時加算 SPECIAL.Pierce。
-	// 原始 PHP 為「無條件」加算；完整還原請見 effect.original.ts 的 calcBasicDamageOriginal。
-	// Pierce bonus: the port (adapted) adds SPECIAL.Pierce only when skill.pierce is set.
-	// The original PHP adds it unconditionally; see calcBasicDamageOriginal in effect.original.ts.
+	/**
+	 * 穿透加算：移植版（適應版）僅在 skill.pierce 為真時加算 SPECIAL.Pierce。
+	 * 原始 PHP 為「無條件」加算；完整還原請見 effect.original.ts 的 calcBasicDamageOriginal。
+	 * Pierce bonus: the port (adapted) adds SPECIAL.Pierce only when skill.pierce is set.
+	 * The original PHP adds it unconditionally; see calcBasicDamageOriginal in effect.original.ts.
+	 */
 	if (skill.pierce)
 	{
 		const p = user.SPECIAL.Pierce[atkIdx] ?? 0;
 		dmg += (p * (skill.pow ?? 100)) / 100;
 	}
 
-	if (dmg < min) dmg = min; // 保底最小傷害（扣防＋穿透後再與 min 比較）
+	/** 保底最小傷害（扣防＋穿透後再與 min 比較） */
+	if (dmg < min) dmg = min;
 
 	return Math.ceil(dmg);
 }
@@ -198,8 +209,10 @@ export function statusChanges(skill: ISkillDef, actor: Character, target: Charac
 	let buffed = false;
 	let debuffed = false;
 
-	// 對齊原始 StatusChanges：Up/Down/Plus 全部作用在目標（$target）。
-	// Mirrors original StatusChanges: Up/Down/Plus all apply to the target ($target).
+	/**
+	 * 對齊原始 StatusChanges：Up/Down/Plus 全部作用在目標（$target）。
+	 * Mirrors original StatusChanges: Up/Down/Plus all apply to the target ($target).
+	 */
 	const upFields = skill as Partial<Record<IStatusUpKey, number>>;
 	const downFields = skill as Partial<Record<IStatusDownKey, number>>;
 	const plusFields = skill as Partial<Record<IStatusPlusKey, number>>;
@@ -261,18 +274,22 @@ export function statusChanges(skill: ISkillDef, actor: Character, target: Charac
 			});
 		}
 	}
-	// CurePoison 與 HpRegen／SpRegen 由 SkillEffect.default 處理（對齊原始 default 分支：
-	// regen 在最前、CurePoison 在 summon 與 pow 之間；本函式不再觸碰這些欄位）。
-	// CurePoison and HpRegen / SpRegen are handled by SkillEffect.default (mirroring the original
-	// default branch: regen at the very front, CurePoison between summon and pow; this function
-	// no longer touches those fields).
-	// 抗毒只累加 SPECIAL.PoisonResist：抵抗當下已在 getPoison 決定，此處不另記紀錄。
-	// Poison resist only accumulates SPECIAL.PoisonResist: the block itself was decided in
-	// getPoison, so no separate record is added here.
+	/**
+	 * CurePoison 與 HpRegen／SpRegen 由 SkillEffect.default 處理（對齊原始 default 分支：
+	 * regen 在最前、CurePoison 在 summon 與 pow 之間；本函式不再觸碰這些欄位）。
+	 * CurePoison and HpRegen / SpRegen are handled by SkillEffect.default (mirroring the original
+	 * default branch: regen at the very front, CurePoison between summon and pow; this function
+	 * no longer touches those fields).
+	 * 抗毒只累加 SPECIAL.PoisonResist：抵抗當下已在 getPoison 決定，此處不另記紀錄。
+	 * Poison resist only accumulates SPECIAL.PoisonResist: the block itself was decided in
+	 * getPoison, so no separate record is added here.
+	 */
 	if (skill.poisonResist) getPoisonResist(target, skill.poisonResist);
-	// 擊退：強制目標移至後排（對齊原始 KnockBack；POSITION 已為 Back 時為 no-op、不產紀錄）。
-	// Knockback: force the target to the back row (mirrors original KnockBack; no-op, and no record,
-	// when the target is already in the back row).
+	/**
+	 * 擊退：強制目標移至後排（對齊原始 KnockBack；POSITION 已為 Back 時為 no-op、不產紀錄）。
+	 * Knockback: force the target to the back row (mirrors original KnockBack; no-op, and no record,
+	 * when the target is already in the back row).
+	 */
 	if (skill.knockback && target.POSITION !== EnumPosition.Back)
 	{
 		target.POSITION = EnumPosition.Back;
@@ -284,9 +301,11 @@ export function statusChanges(skill: ISkillDef, actor: Character, target: Charac
 			text: EnumMoveText.Knockback,
 		});
 	}
-	// 技能指定目標移動方向（對齊原始 Move：已在該站位時 no-op、不印字）。
-	// Skill-specified target movement (mirrors original Move: a target already in that row is a
-	// no-op and prints nothing).
+	/**
+	 * 技能指定目標移動方向（對齊原始 Move：已在該站位時 no-op、不印字）。
+	 * Skill-specified target movement (mirrors original Move: a target already in that row is a
+	 * no-op and prints nothing).
+	 */
 	if (skill.move && target.POSITION !== skill.move)
 	{
 		const text = skill.move === EnumPosition.Front ? EnumMoveText.Front : EnumMoveText.Back;
@@ -332,9 +351,11 @@ export function barrierGuard(skill: ISkillDef, target: Character): IBattleEvent 
 	if (target.SPECIAL.Barrier > 0 && !skill.pierce)
 	{
 		target.SPECIAL.Barrier--;
-		// 帶 skill 編號：攔截是「這次技能」造成的，上級事件引擎才能掛回同一筆技能事件。
-		// Carries the skill number: the interception belongs to *this* skill use, so the upper event
-		// engine can attach it to the same skill event.
+		/**
+		 * 帶 skill 編號：攔截是「這次技能」造成的，上級事件引擎才能掛回同一筆技能事件。
+		 * Carries the skill number: the interception belongs to *this* skill use, so the upper event
+		 * engine can attach it to the same skill event.
+		 */
 		return {
 			type: EnumBattleEventType.Guard,
 			actor: charIdToString(target.no),
@@ -415,8 +436,10 @@ export function applySkill(skill: ISkillDef, user: Character, target: Character,
 		return { heal: applied, events };
 	}
 
-	// 絕對防禦 Barrier：消耗一次，完全抵擋（判定集中在 barrierGuard，全專案單一規則）
-	// Absolute guard: one layer consumed, the hit fully blocked (the rule lives in barrierGuard only)
+	/**
+	 * 絕對防禦 Barrier：消耗一次，完全抵擋（判定集中在 barrierGuard，全專案單一規則）
+	 * Absolute guard: one layer consumed, the hit fully blocked (the rule lives in barrierGuard only)
+	 */
 	const guard = barrierGuard(skill, target);
 	if (guard) return { damage: 0, events: [guard] };
 

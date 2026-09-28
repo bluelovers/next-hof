@@ -643,8 +643,10 @@ const summonActions: IBattleAction[] = [
 	logAction(
 		EnumActionType.Summon,
 		summonMage1,
-		// 整行＝「施放者 技能」＋「首個召喚單位 joined to the team.」，兩段皆取自建構器
-		// The whole line is "caster skill" + "first summoned unit joined to the team.", both from builders
+		/**
+		 * 整行＝「施放者 技能」＋「首個召喚單位 joined to the team.」，兩段皆取自建構器
+		 * The whole line is "caster skill" + "first summoned unit joined to the team.", both from builders
+		 */
 		`${buildActMessage(summonMage1.name, SKILL_GRAVEYARD.name)}: ${buildSummonMessage(summonedUnits[0].name)}`,
 		EnumTeamSideUI.Right,
 		{
@@ -717,7 +719,9 @@ const magicCircleActions: IBattleAction[] = [
  */
 const logMessagesActions: IBattleAction[] = [
 	// ---- 蓄力開始（`start charging.`；文案由 castType 決定，不再硬編碼成 casting）----
-	// Charge start (`start charging.`; the copy follows castType and is no longer hardcoded to casting)
+	/**
+	 * Charge start (`start charging.`; the copy follows castType and is no longer hardcoded to casting)
+	 */
 	namedLogAction(
 		EnumActionType.Casting,
 		mage1,
@@ -730,7 +734,9 @@ const logMessagesActions: IBattleAction[] = [
 	),
 
 	// ---- SP 傷害（`NSP Damage to target`，數值與 SP 之間無空格）----
-	// SP damage (`NSP Damage to target`, no space between the value and "SP Damage")
+	/**
+	 * SP damage (`NSP Damage to target`, no space between the value and "SP Damage")
+	 */
 	logAction(
 		EnumActionType.SpDamage,
 		undefined,
@@ -740,7 +746,9 @@ const logMessagesActions: IBattleAction[] = [
 	),
 
 	// ---- 回復 HP／SP（`name Recovered N HP`；HP→recover、SP→support）----
-	// Recover HP / SP (`name Recovered N HP`; HP → recover, SP → support)
+	/**
+	 * Recover HP / SP (`name Recovered N HP`; HP → recover, SP → support)
+	 */
 	namedLogAction(EnumActionType.Recover, healer1, buildRecoveredText(84, 'HP'), EnumTeamSideUI.Left, {
 		value: 84,
 		valueUnit: 'HP',
@@ -755,7 +763,9 @@ const logMessagesActions: IBattleAction[] = [
 	}),
 
 	// ---- 吸取（`Drained N HP from target`，行首無施放者）----
-	// Drain (`Drained N HP from target`, no caster name at the head)
+	/**
+	 * Drain (`Drained N HP from target`, no caster name at the head)
+	 */
 	logAction(
 		EnumActionType.Drain,
 		undefined,
@@ -784,7 +794,9 @@ const logMessagesActions: IBattleAction[] = [
 	),
 
 	// ---- 持續回復（`gained SP regeneration +15%`）----
-	// Regen (`gained SP regeneration +15%`)
+	/**
+	 * Regen (`gained SP regeneration +15%`)
+	 */
 	namedLogAction(
 		EnumActionType.Regen,
 		mage1,
@@ -803,21 +815,27 @@ const logMessagesActions: IBattleAction[] = [
 	),
 
 	// ---- 復活（`name <recover>revived</recover>!`；名稱預設色、只有 revived 上色）----
-	// Revive (`name <recover>revived</recover>!`; the name keeps the default colour, only revived is coloured)
+	/**
+	 * Revive (`name <recover>revived</recover>!`; the name keeps the default colour, only revived is coloured)
+	 */
 	namedLogAction(EnumActionType.Revive, hero1, EnumLogCopy.Revived, EnumTeamSideUI.Right, {
 		emphasis: 'revived',
 		attribute: EnumAttributeType.Recover,
 	}),
 
 	// ---- 增益（quicked／casting shorted／barriered，support 色）----
-	// Buff (quicked / casting shorted / barriered, support colour)
+	/**
+	 * Buff (quicked / casting shorted / barriered, support colour)
+	 */
 	namedLogAction(EnumActionType.Buff, mage1, EnumLogCopy.Barriered, EnumTeamSideUI.Right),
 	namedLogAction(EnumActionType.Buff, hero1, EnumLogCopy.Quicked, EnumTeamSideUI.Right),
 	namedLogAction(EnumActionType.Buff, mage1, EnumLogCopy.CastingShorted, EnumTeamSideUI.Right),
 
 	// ---- 減益（能力下降，原始日誌無 span）/ Debuff (stat down, no span in the original log) ----
-	// 文案模板由 buildStatChangeText 持有，資料端只給統計項目・方向・數值
-	// The template lives in buildStatChangeText; the data only supplies the stat, direction and value
+	/**
+	 * 文案模板由 buildStatChangeText 持有，資料端只給統計項目・方向・數值
+	 * The template lives in buildStatChangeText; the data only supplies the stat, direction and value
+	 */
 	namedLogAction(
 		EnumActionType.Debuff,
 		goblinAxe,
@@ -826,9 +844,13 @@ const logMessagesActions: IBattleAction[] = [
 	),
 
 	// ---- 中毒：施加（spdmg）／每回合傷害（spdmg）／解除（無 span）／抗毒（support）----
-	// Poison: apply (spdmg) / per-turn damage (spdmg) / cure (no span) / resist (support)
+	/**
+	 * Poison: apply (spdmg) / per-turn damage (spdmg) / cure (no span) / resist (support)
+	 */
 	// ---- 中毒施加（`get <spdmg>poisoned</spdmg>!`；名稱預設色、只有 poisoned 上色）----
-	// Poison apply (`get <spdmg>poisoned</spdmg>!`; the name keeps the default colour, only poisoned is coloured)
+	/**
+	 * Poison apply (`get <spdmg>poisoned</spdmg>!`; the name keeps the default colour, only poisoned is coloured)
+	 */
 	namedLogAction(
 		EnumActionType.Poison,
 		goblinAxe,
@@ -853,9 +875,11 @@ const logMessagesActions: IBattleAction[] = [
 	namedLogAction(
 		EnumActionType.Poison,
 		goblinAxe,
-		// 所有格片段由 buildPossessiveText 產出，整行鏡像仍由唯一合併點接出（不空格）
-		// The possessive fragment comes from buildPossessiveText and the mirror still from the single
-		// join point (no space)
+		/**
+		 * 所有格片段由 buildPossessiveText 產出，整行鏡像仍由唯一合併點接出（不空格）
+		 * The possessive fragment comes from buildPossessiveText and the mirror still from the single
+		 * join point (no space)
+		 */
 		buildPossessiveText('poison has cured.'),
 		EnumTeamSideUI.Left,
 		{ attribute: EnumAttributeType.Normal },
@@ -868,13 +892,17 @@ const logMessagesActions: IBattleAction[] = [
 		{ attribute: EnumAttributeType.Support },
 	),
 	// ---- 自我中毒（無名稱、無 span；對照 5.4 `Got poisoned`）----
-	// Self-poison (no name, no span; mirrors 5.4 `Got poisoned`)
+	/**
+	 * Self-poison (no name, no span; mirrors 5.4 `Got poisoned`)
+	 */
 	namedLogAction(EnumActionType.Poison, undefined, EnumLogCopy.PoisonSelf, EnumTeamSideUI.Left, {
 		attribute: EnumAttributeType.Normal,
 	}),
 
 	// ---- 屬性升降（`STR rise 10%`、上限升降，原始日誌無 span）----
-	// Stat change (`STR rise 10%`, cap changes; no span in the original log)
+	/**
+	 * Stat change (`STR rise 10%`, cap changes; no span in the original log)
+	 */
 	namedLogAction(
 		EnumActionType.StatChange,
 		hero1,
@@ -926,15 +954,17 @@ const logMessagesActions: IBattleAction[] = [
 		EnumTeamSideUI.Left,
 	),
 
-	// ---- 延遲（`name Delayed （15 ⏳↘ 25/100）`，對照 Skill.php 的 `Name Delayed` 與
-	// DelayByRate 括號輸出）----
-	// Delay (`name Delayed (15 ⏳↘ 25/100)`, mirroring Skill.php's `Name Delayed` and
-	// DelayByRate's parenthesised output)
-	// 名稱後的固定文案只由 battleUtils.EnumLogCopy.Delay 持有，此處引用成員、不重打字串；
-	// 前後值交給結構化資料，括號與 `⏳↘` 由渲染端組出。
-	// The fixed copy after the name is owned solely by battleUtils.EnumLogCopy.Delay: this side
-	// references the member instead of retyping it; the ends go to the structured value and the
-	// renderer builds the parentheses and the `⏳↘`.
+	/**
+	 * ---- 延遲（`name Delayed （15 ⏳↘ 25/100）`，對照 Skill.php 的 `Name Delayed` 與
+	 * DelayByRate 括號輸出）----
+	 * Delay (`name Delayed (15 ⏳↘ 25/100)`, mirroring Skill.php's `Name Delayed` and
+	 * DelayByRate's parenthesised output)
+	 * 名稱後的固定文案只由 battleUtils.EnumLogCopy.Delay 持有，此處引用成員、不重打字串；
+	 * 前後值交給結構化資料，括號與 `⏳↘` 由渲染端組出。
+	 * The fixed copy after the name is owned solely by battleUtils.EnumLogCopy.Delay: this side
+	 * references the member instead of retyping it; the ends go to the structured value and the
+	 * renderer builds the parentheses and the `⏳↘`.
+	 */
 	namedLogAction(EnumActionType.Delay, mage1, EnumLogCopy.Delay, EnumTeamSideUI.Right, {
 		valueChange: buildValueChangeFromDelay(15, 25, 100),
 	}),
@@ -949,14 +979,18 @@ const logMessagesActions: IBattleAction[] = [
 	),
 
 	// ---- 施放失敗：武器不符 / Failed to cast: weapon mismatch ----
-	// 首行 `.u` 底線名稱＋技能圖示，失敗字樣 `.dmg`；次行無樣式原因。
-	// First line: `.u` underlined name + skill icon, the ` Failed ` word in `.dmg`; second line: unstyled reason.
+	/**
+	 * 首行 `.u` 底線名稱＋技能圖示，失敗字樣 `.dmg`；次行無樣式原因。
+	 * First line: `.u` underlined name + skill icon, the ` Failed ` word in `.dmg`; second line: unstyled reason.
+	 */
 	logAction(
 		EnumActionType.Fail,
 		goblinAxe,
-		// 失敗原因同時存進結構化欄位 failReason（供渲染端另起一行），message 只是整行鏡像
-		// The reason also lives in the structured `failReason` field (the renderer prints it on its
-		// own line) while `message` is only the whole-line mirror
+		/**
+		 * 失敗原因同時存進結構化欄位 failReason（供渲染端另起一行），message 只是整行鏡像
+		 * The reason also lives in the structured `failReason` field (the renderer prints it on its
+		 * own line) while `message` is only the whole-line mirror
+		 */
 		buildFailMessage(goblinAxe.name, SKILL_FATAL_STAB.name, '(Weapon type doesnt match)'),
 		EnumTeamSideUI.Left,
 		{
@@ -965,9 +999,11 @@ const logMessagesActions: IBattleAction[] = [
 			attribute: EnumAttributeType.Dmg,
 		},
 	),
-	// 純文字資訊：整行即文案（InfoMessage 不輸出粗體主詞，避免與狀態列重複名稱）
-	// Plain info: the whole line is the copy (InfoMessage prints no bold subject so the name is
-	// not repeated next to the status-row data)
+	/**
+	 * 純文字資訊：整行即文案（InfoMessage 不輸出粗體主詞，避免與狀態列重複名稱）
+	 * Plain info: the whole line is the copy (InfoMessage prints no bold subject so the name is
+	 * not repeated next to the status-row data)
+	 */
 	logAction(
 		EnumActionType.Info,
 		mage1,
@@ -988,7 +1024,9 @@ const logMessagesActions: IBattleAction[] = [
 	namedLogAction(EnumActionType.LevelUp, hero1, EnumLogCopy.LevelUp, EnumTeamSideUI.Right),
 
 	// ---- 掉落道具（`name dropped` 後接道具圖示＋`<b class="u">道具名</b>.`）----
-	// Dropped item (`name dropped` followed by the item icon + `<b class="u">item name</b>.`)
+	/**
+	 * Dropped item (`name dropped` followed by the item icon + `<b class="u">item name</b>.`)
+	 */
 	logAction(
 		EnumActionType.ItemDrop,
 		goblinWarriorA,
@@ -1010,7 +1048,9 @@ const logMessagesActions: IBattleAction[] = [
 	),
 
 	// ---- 純文字資訊（無名稱、無 span；對照 4.8 / 6.7 / 3.3 / 7.4 / 7.5 / 3.2 等）----
-	// Plain info text (no name, no span; mirrors 4.8 / 6.7 / 3.3 / 7.4 / 7.5 / 3.2, …)
+	/**
+	 * Plain info text (no name, no span; mirrors 4.8 / 6.7 / 3.3 / 7.4 / 7.5 / 3.2, …)
+	 */
 	logAction(EnumActionType.Info, undefined, buildDamageCountMessage(6), EnumTeamSideUI.Left),
 	logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoNoTarget, EnumTeamSideUI.Left),
 	logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoAttackGone, EnumTeamSideUI.Left),
@@ -1026,7 +1066,9 @@ const logMessagesActions: IBattleAction[] = [
 	),
 	logAction(EnumActionType.Info, undefined, EnumLogCopy.InfoNoMorePatterns, EnumTeamSideUI.Left),
 	// ---- HP/SP 交換（3 行區塊：exchanged rate of HP and SP. ＋ HP 行 ＋ SP 行）----
-	// HP/SP exchange (3-line block: exchanged rate of HP and SP. + HP line + SP line)
+	/**
+	 * HP/SP exchange (3-line block: exchanged rate of HP and SP. + HP line + SP line)
+	 */
 	namedLogAction(EnumActionType.EnergyExchange, hero1, EnumLogCopy.EnergyExchange, EnumTeamSideUI.Right, {
 		energyExchange: {
 			hpFrom: 500,
@@ -1041,10 +1083,12 @@ const logMessagesActions: IBattleAction[] = [
 	}),
 
 	// ==================== 基礎行動型別 / Basic action types ====================
-	// 以下在其它故事（Default / Summon / MagicCircle）已有更完整的情境；這裡各補一筆，
-	// 確保「完整日誌訊息覆蓋」真的涵蓋 EnumActionType 的全部 30 個成員。
-	// These already appear in richer context in other stories (Default / Summon / MagicCircle);
-	// one entry each here guarantees the full-log-coverage set actually spans all 30 EnumActionType members.
+	/**
+	 * 以下在其它故事（Default / Summon / MagicCircle）已有更完整的情境；這裡各補一筆，
+	 * 確保「完整日誌訊息覆蓋」真的涵蓋 EnumActionType 的全部 30 個成員。
+	 * These already appear in richer context in other stories (Default / Summon / MagicCircle);
+	 * one entry each here guarantees the full-log-coverage set actually spans all 30 EnumActionType members.
+	 */
 
 	// ---- 技能行（施放者＋技能名，dmg 色）/ Skill line (caster + skill name) ----
 	skillAction(goblinWarriorB, SKILL_FATAL_STAB, EnumTeamSideUI.Left),
@@ -1195,11 +1239,13 @@ function createBattleData(units: IShowcaseUnit[], overrides: IBattleDataOverride
 	const rightUnits = overrides.rightUnits ?? statusUnits(unitsOfSide(units, EnumTeamSideUI.Right));
 	const { sprites, actions, snapshots } = overrides;
 
-	// 戰鬥結果以「實際顯示的單位」為準，確保 HP remain 分母（totalMaxHp）與畫面上的單位一致；
-	// totalDamage／totalExp／funds 等僅引擎可產出的欄位仍沿用撰寫值（BATTLE_RESULT）。
-	// The battle result is derived from the actually displayed units so the HP remain denominator
-	// (totalMaxHp) matches the on-screen units; only engine-only fields (totalDamage/totalExp/funds)
-	// keep their authored values (BATTLE_RESULT).
+	/**
+	 * 戰鬥結果以「實際顯示的單位」為準，確保 HP remain 分母（totalMaxHp）與畫面上的單位一致；
+	 * totalDamage／totalExp／funds 等僅引擎可產出的欄位仍沿用撰寫值（BATTLE_RESULT）。
+	 * The battle result is derived from the actually displayed units so the HP remain denominator
+	 * (totalMaxHp) matches the on-screen units; only engine-only fields (totalDamage/totalExp/funds)
+	 * keep their authored values (BATTLE_RESULT).
+	 */
 	const result: IBattleResult | undefined =
 		'result' in overrides
 			? overrides.result

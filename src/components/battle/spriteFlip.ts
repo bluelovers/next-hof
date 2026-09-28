@@ -37,8 +37,10 @@ import { EnumTeamSideUI, EnumSpriteImageDir } from './enums';
  */
 export function getSpriteImageDir(imageUrl: string): EnumSpriteImageDir
 {
-	// 先去掉 query / hash，再取第一層資料夾名稱（/image/<資料夾>/...）
-	// Strip query/hash, then take the first folder name (/image/<folder>/...).
+	/**
+	 * 先去掉 query / hash，再取第一層資料夾名稱（/image/<資料夾>/...）
+	 * Strip query/hash, then take the first folder name (/image/<folder>/...).
+	 */
 	const clean = imageUrl.split('?')[0].split('#')[0];
 	const m = clean.match(/^\/image\/([^/]+)\//);
 	const dir = m ? m[1] : null;

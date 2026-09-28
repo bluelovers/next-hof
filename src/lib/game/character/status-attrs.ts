@@ -1,15 +1,17 @@
-// 狀態屬性單一事實來源 / Single source of truth for status attributes
-// 整合原 status-key.ts（鍵名衍生）與 status-attrs.ts（屬性對照表）：
-// 兩者高度耦合（status-attrs 使用 status-key 的鍵名對照表建構 UPMAP/DOWNMAP/PLUSMAP），
-// 合併為單一模块後，狀態屬性的「鍵名」與「讀寫語意」不再分散維護。
-// Integrates the former status-key.ts (key-name derivation) and status-attrs.ts
-// (attribute table): the two were tightly coupled (status-attrs built UPMAP/DOWNMAP/PLUSMAP
-// from status-key's key-name lookups), so merging them into one module keeps every status
-// attribute's "key name" and "read/write semantics" in a single place.
-//
-// 所有系統（技能 effect、被動 passive、裝備 equip、戰鬥變數 battle-variable、
-// 工廠 factory、等級調整 level-fix）都從此處取得「屬性清單」與「屬性↔角色欄位對應」，
-// 與「Up*/Down*/Plus*/P_* 鍵名對照」，避免在各模組重複列舉屬性名稱與 getter/setter。
+/**
+ * 狀態屬性單一事實來源 / Single source of truth for status attributes
+ * 整合原 status-key.ts（鍵名衍生）與 status-attrs.ts（屬性對照表）：
+ * 兩者高度耦合（status-attrs 使用 status-key 的鍵名對照表建構 UPMAP/DOWNMAP/PLUSMAP），
+ * 合併為單一模块後，狀態屬性的「鍵名」與「讀寫語意」不再分散維護。
+ * Integrates the former status-key.ts (key-name derivation) and status-attrs.ts
+ * (attribute table): the two were tightly coupled (status-attrs built UPMAP/DOWNMAP/PLUSMAP
+ * from status-key's key-name lookups), so merging them into one module keeps every status
+ * attribute's "key name" and "read/write semantics" in a single place.
+ *
+ * 所有系統（技能 effect、被動 passive、裝備 equip、戰鬥變數 battle-variable、
+ * 工廠 factory、等級調整 level-fix）都從此處取得「屬性清單」與「屬性↔角色欄位對應」，
+ * 與「Up* /Down* /Plus* /P_* 鍵名對照」，避免在各模組重複列舉屬性名稱與 getter/setter。
+ */
 
 import { MAX_STATUS_MAXIMUM } from '../constants';
 import type { Character } from './Character';
@@ -21,11 +23,13 @@ import {
 } from 'ts-type';
 
 // ============================================================================
-// 狀態屬性鍵名衍生 / Status attribute key-name derivation
-// 由 EnumStatusPrefix + EnumStatusAttr 靜態對照產生 Up*/Down*/Plus* 鍵名，
-// 杜絕在各處使用字串聯合（'Up'+key, 'P_'+name）產生鍵名。
-// Static lookups from EnumStatusPrefix + EnumStatusAttr produce Up*/Down*/Plus* keys,
-// eliminating string concatenation ('Up'+key, 'P_'+name) at call sites.
+/**
+ * 狀態屬性鍵名衍生 / Status attribute key-name derivation
+ * 由 EnumStatusPrefix + EnumStatusAttr 靜態對照產生 Up* /Down* /Plus* 鍵名，
+ * 杜絕在各處使用字串聯合（'Up'+key, 'P_'+name）產生鍵名。
+ * Static lookups from EnumStatusPrefix + EnumStatusAttr produce Up* /Down* /Plus* keys,
+ * eliminating string concatenation ('Up'+key, 'P_'+name) at call sites.
+ */
 // ============================================================================
 
 /**
@@ -127,9 +131,11 @@ export const {
 } = _buildStatRecord(EnumStatusPrefix.Plus, STATUS_ATTR_KEYS);
 
 // ============================================================================
-// 狀態屬性對照表 / Status attribute lookup table
-// 鍵為 EnumStatusAttr；每個屬性描述其角色欄位讀寫與 up/down/plus 語意。
-// DEF/MDEF 的 up/down 採百分比累計，與其他屬性不同，故自定。
+/**
+ * 狀態屬性對照表 / Status attribute lookup table
+ * 鍵為 EnumStatusAttr；每個屬性描述其角色欄位讀寫與 up/down/plus 語意。
+ * DEF/MDEF 的 up/down 採百分比累計，與其他屬性不同，故自定。
+ */
 // ============================================================================
 
 /**
@@ -401,19 +407,27 @@ function _makeAttr(
  * again at the get/set and algorithm-call sites). DEF/MDEF use custom %-based up/down, hence their own algorithms.
  */
 export const STATUS_ATTR_TABLE: Record<EnumStatusAttr, IStatusAttrEntry> = {
-	// 六維：僅有 plus（無自定 up/down，回退通用 upAttr/downAttr）/ base six: plus only (fall back to generic up/down)
+	/**
+	 * 六維：僅有 plus（無自定 up/down，回退通用 upAttr/downAttr）/ base six: plus only (fall back to generic up/down)
+	 */
 	[EnumStatusAttr.STR]: _makeAttr(EnumStatusAttr.STR, { plus: true }),
 	[EnumStatusAttr.INT]: _makeAttr(EnumStatusAttr.INT, { plus: true }),
 	[EnumStatusAttr.DEX]: _makeAttr(EnumStatusAttr.DEX, { plus: true }),
 	[EnumStatusAttr.SPD]: _makeAttr(EnumStatusAttr.SPD, { plus: true }),
 	[EnumStatusAttr.LUK]: _makeAttr(EnumStatusAttr.LUK, { plus: true }),
-	// ATK/MATK 增益無 MAX_STATUS_MAXIMUM 上限（對齊原始 UpATK/UpMATK）/ uncapped buff (mirrors UpATK/UpMATK)
+	/**
+	 * ATK/MATK 增益無 MAX_STATUS_MAXIMUM 上限（對齊原始 UpATK/UpMATK）/ uncapped buff (mirrors UpATK/UpMATK)
+	 */
 	[EnumStatusAttr.ATK]: _makeAttr(EnumStatusAttr.ATK, { up: upNoCap(EnumStatusAttr.ATK) }),
 	[EnumStatusAttr.MATK]: _makeAttr(EnumStatusAttr.MATK, { up: upNoCap(EnumStatusAttr.MATK) }),
-	// DEF/MDEF 採百分比累計 up/down（對齊原始 UpDEF/DownDEF）/ %-based up/down (mirrors UpDEF/DownDEF)
+	/**
+	 * DEF/MDEF 採百分比累計 up/down（對齊原始 UpDEF/DownDEF）/ %-based up/down (mirrors UpDEF/DownDEF)
+	 */
 	[EnumStatusAttr.DEF]: _makeAttr(EnumStatusAttr.DEF, { up: upDefPct(EnumStatusAttr.DEF), down: downAttr(EnumStatusAttr.DEF) }),
 	[EnumStatusAttr.MDEF]: _makeAttr(EnumStatusAttr.MDEF, { up: upDefPct(EnumStatusAttr.MDEF), down: downAttr(EnumStatusAttr.MDEF) }),
-	// MAXHP/MAXSP：無上限增益；減益夾制當前 HP/SP（對齊原始 UpMAXHP/DownMAXHP）/ uncapped buff; debuff clamps current HP/SP
+	/**
+	 * MAXHP/MAXSP：無上限增益；減益夾制當前 HP/SP（對齊原始 UpMAXHP/DownMAXHP）/ uncapped buff; debuff clamps current HP/SP
+	 */
 	[EnumStatusAttr.MAXHP]: _makeAttr(EnumStatusAttr.MAXHP, { up: upNoCap(EnumStatusAttr.MAXHP), down: downCapClamp(EnumStatusAttr.MAXHP), plus: true }),
 	[EnumStatusAttr.MAXSP]: _makeAttr(EnumStatusAttr.MAXSP, { up: upNoCap(EnumStatusAttr.MAXSP), down: downCapClamp(EnumStatusAttr.MAXSP), plus: true }),
 };
@@ -464,9 +478,13 @@ function buildStatusMaps(): {
 	for (const key of Object.keys(STATUS_ATTR_TABLE) as EnumStatusAttr[])
 	{
 		const e = STATUS_ATTR_TABLE[key];
-		// 使用 STATUS_UP_KEY_NAME 靜態對照表取代 'Up' + key 字串聯合
+		/**
+		 * 使用 STATUS_UP_KEY_NAME 靜態對照表取代 'Up' + key 字串聯合
+		 */
 		UPMAP[STATUS_UP_KEY_NAME[key]] = e.up ?? upAttr(key);
-		// 使用 STATUS_DOWN_KEY_NAME 靜態對照表取代 'Down' + key 字串聯合
+		/**
+		 * 使用 STATUS_DOWN_KEY_NAME 靜態對照表取代 'Down' + key 字串聯合
+		 */
 		DOWNMAP[STATUS_DOWN_KEY_NAME[key]] = e.down ?? downAttr(key);
 		if (e.plus) PLUSMAP[STATUS_PLUS_KEY_NAME[key]] = e.plus;
 	}
@@ -480,10 +498,12 @@ function buildStatusMaps(): {
 export const { UPMAP, DOWNMAP, PLUSMAP } = buildStatusMaps();
 
 // ============================================================================
-// 基礎六維與補正欄位 / Primary base stats & compensation fields
-// 以下所有匯出皆由 EnumStatusAttr 與 EnumCompPrefix 衍生，杜絕散落的原始字串。
-// Every export below is derived from EnumStatusAttr and EnumCompPrefix, eliminating
-// scattered raw strings (no second copy of the P_*/M_* names anywhere).
+/**
+ * 基礎六維與補正欄位 / Primary base stats & compensation fields
+ * 以下所有匯出皆由 EnumStatusAttr 與 EnumCompPrefix 衍生，杜絕散落的原始字串。
+ * Every export below is derived from EnumStatusAttr and EnumCompPrefix, eliminating
+ * scattered raw strings (no second copy of the P_* /M_* names anywhere).
+ */
 // ============================================================================
 
 /**

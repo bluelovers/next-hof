@@ -62,7 +62,8 @@ export const sampleBackgroundUrls = {
 	cave: '/image/land/bg_cave.png',
 	snow: '/image/land/bg_snow.png',
 	sand: '/image/land/bg_sand.png',
-	egypt: '/image/land/bg_egypt_001.png', // 實際圖檔尺寸 768×320 / actual file size 768×320
+	/** 實際圖檔尺寸 768×320 / actual file size 768×320 */
+	egypt: '/image/land/bg_egypt_001.png',
 } as const;
 
 /**
@@ -95,7 +96,9 @@ export function createSampleConfig(
 }
 
 // ============================================================================
-// 自動產生位置（展示版本）/ Auto-positioned (demo version)
+/**
+ * 自動產生位置（展示版本）/ Auto-positioned (demo version)
+ */
 // ============================================================================
 
 /** 名冊角色（不含尺寸，位置由 computeBattleSpritePositions 計算） / Roster char (no size; position computed) */
@@ -224,8 +227,10 @@ export function createAutoSampleSprites(
 		left: toPositionChars(demoRoster.left),
 		right: toPositionChars(demoRoster.right),
 	};
-	// 不傳 flip：交由 computeBattleSpritePositions 依圖檔目錄自動推導翻轉
-	// Omit flip so computeBattleSpritePositions auto-derives flipping from the directory.
+	/**
+	 * 不傳 flip：交由 computeBattleSpritePositions 依圖檔目錄自動推導翻轉
+	 * Omit flip so computeBattleSpritePositions auto-derives flipping from the directory.
+	 */
 	return computeBattleSpritePositions(input, { ...sampleFieldSize, ...options });
 }
 
@@ -292,16 +297,20 @@ export function createMixedSampleSprites(
 		left: toPositionChars(mixedRoster.left),
 		right: toPositionChars(mixedRoster.right),
 	};
-	// 不傳 flip：交由 computeBattleSpritePositions 依各圖檔目錄個別推導翻轉
-	// Omit flip so computeBattleSpritePositions auto-derives flip per sprite's directory.
+	/**
+	 * 不傳 flip：交由 computeBattleSpritePositions 依各圖檔目錄個別推導翻轉
+	 * Omit flip so computeBattleSpritePositions auto-derives flip per sprite's directory.
+	 */
 	return computeBattleSpritePositions(input, { ...sampleFieldSize, ...options });
 }
 
 // ============================================================================
-// 新增展示：扁平名冊 + groupBattleChars 自動分隊
-// NEW demo: flat roster + groupBattleChars auto-grouping
-// （這正是 IBattlePositionChar.side / .position 的實際用法）
-// (this is exactly what IBattlePositionChar.side / .position are for)
+/**
+ * 新增展示：扁平名冊 + groupBattleChars 自動分隊
+ * NEW demo: flat roster + groupBattleChars auto-grouping
+ * （這正是 IBattlePositionChar.side / .position 的實際用法）
+ * (this is exactly what IBattlePositionChar.side / .position are for)
+ */
 // ============================================================================
 
 /**
@@ -383,11 +392,15 @@ export function createFlatSampleSprites(
 	options?: Partial<IComputeSpritePositionsOptions>,
 ): IBattleSprite[]
 {
-	// 扁平名冊 → groupBattleChars 依 side/position 自動分隊 → 傳入計算
-	// Flat roster → groupBattleChars auto-groups by side/position → passed to compute.
+	/**
+	 * 扁平名冊 → groupBattleChars 依 side/position 自動分隊 → 傳入計算
+	 * Flat roster → groupBattleChars auto-groups by side/position → passed to compute.
+	 */
 	const input = groupBattleChars(toBattlePositionChars(flatRosterSample));
-	// 不傳 flip：交由 computeBattleSpritePositions 依圖檔目錄自動推導翻轉
-	// Omit flip so computeBattleSpritePositions auto-derives flipping from the directory.
+	/**
+	 * 不傳 flip：交由 computeBattleSpritePositions 依圖檔目錄自動推導翻轉
+	 * Omit flip so computeBattleSpritePositions auto-derives flipping from the directory.
+	 */
 	return computeBattleSpritePositions(input, { ...sampleFieldSize, ...options });
 }
 

@@ -1,5 +1,7 @@
-// 行為模式組裝 / IBehavior pattern assembly
-// 對應 docs/log/battle/04 §4.2（buildPattern / MultiFactJudge）。
+/**
+ * 行為模式組裝 / IBehavior pattern assembly
+ * 對應 docs/log/battle/04 §4.2（buildPattern / MultiFactJudge）。
+ */
 
 import type { Character } from '../character/Character';
 import type { IPatternItem } from '../types';

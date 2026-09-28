@@ -1,6 +1,8 @@
-// 戰鬥引擎 / Battle engine
-// 對應 docs/log/battle/02（Battle）、03、04、05 的核心流程：
-// 建隊 → setBattleVariable → SetDelay → Action（自動回復→中毒→判定→技能）→ 行動順序 → 結果。
+/**
+ * 戰鬥引擎 / Battle engine
+ * 對應 docs/log/battle/02（Battle）、03、04、05 的核心流程：
+ * 建隊 → setBattleVariable → SetDelay → Action（自動回復→中毒→判定→技能）→ 行動順序 → 結果。
+ */
 
 import {
 	EnumState, EnumExpect,
@@ -226,8 +228,10 @@ export class Battle implements IBattleConfig
 		const method = skill.target?.[1] ?? EnumTargetMethod.Individual;
 		const count = skill.target?.[2] ?? 1;
 
-		// 候選池（原版 Skill.php 的 $candidate：只依 target 類型取整隊，含死亡者）
-		// Candidate pool (the original Skill.php's $candidate: the whole side by target type, dead included)
+		/**
+		 * 候選池（原版 Skill.php 的 $candidate：只依 target 類型取整隊，含死亡者）
+		 * Candidate pool (the original Skill.php's $candidate: the whole side by target type, dead included)
+		 */
 		const pool =
 			t === EnumTargetType.Enemy ? [...enemyTeam.all()]
 				: t === EnumTargetType.Friend ? [...friendTeam.all()]
@@ -275,35 +279,46 @@ export class Battle implements IBattleConfig
 		const skill = getSkill(skillNo, this.repo);
 		if (!skill) return;
 
-		// 詠唱/蓄力（charge）：首回合設定 expect，次回合執行
+		/**
+		 * 詠唱/蓄力（charge）：首回合設定 expect，次回合執行
+		 */
 		if (skill.charge && actor.expect === null)
 		{
 			actor.expect = skillNo;
-			// 原始 Skill.php:85–94 依傷害類型分流：物理 → EXPECT_CHARGE、魔法 → EXPECT_CAST。
-			// 3055（CastAsist）只對 expect_type===Cast 者生效，正是靠這條分流區分。
-			// Original Skill.php:85-94 branches on the damage type: Physical → EXPECT_CHARGE,
-			// Magic → EXPECT_CAST. 3055 (CastAsist) only affects expect_type === Cast, which is
-			// exactly what this split distinguishes.
+			/**
+			 * 原始 Skill.php:85–94 依傷害類型分流：物理 → EXPECT_CHARGE、魔法 → EXPECT_CAST。
+			 * 3055（CastAsist）只對 expect_type===Cast 者生效，正是靠這條分流區分。
+			 * Original Skill.php:85-94 branches on the damage type: Physical → EXPECT_CHARGE,
+			 * Magic → EXPECT_CAST. 3055 (CastAsist) only affects expect_type === Cast, which is
+			 * exactly what this split distinguishes.
+			 */
 			actor.expect_type = skill.type === EnumSkillDamageType.Physical ? EnumExpect.Charge : EnumExpect.Cast;
 			this.log.push({ type: EnumBattleEventType.Cast, actor: charIdToString(actor.no), skill: skillNo });
-			// 戰鬥的總行動回數減少(蓄力不計為行動)
+			/**
+			 * 戰鬥的總行動回數減少(蓄力不計為行動)
+			 */
 			this.actions--;
 			return;
 		}
 		if (actor.expect !== null && actor.expect !== skillNo)
 		{
-			return; // 正在詠唱其他技能
+			/** 正在詠唱其他技能 */
+			return;
 		}
 		actor.expect = null;
 		actor.expect_type = null;
 
-		// SP 檢查（怪物 ×0.7 折扣）
+		/**
+		 * SP 檢查（怪物 ×0.7 折扣）
+		 */
 		const need = Math.ceil(skill.sp * (actor.isMon() ? 0.7 : 1));
 		if (skill.sp > 0 && actor.SP < need) return;
 		if (skill.sp > 0) actor.SP -= need;
 
-		// 技能 `sacrifice`：施法前犧牲自身 HP（對齊原始 Skill.php:142，作用於使用者、每次施法一次）。
-		// Skill `sacrifice`: self HP cost before casting (mirrors original Skill.php:142, on the user, once per cast).
+		/**
+		 * 技能 `sacrifice`：施法前犧牲自身 HP（對齊原始 Skill.php:142，作用於使用者、每次施法一次）。
+		 * Skill `sacrifice`: self HP cost before casting (mirrors original Skill.php:142, on the user, once per cast).
+		 */
 		if (skill.sacrifice)
 		{
 			sacrificeHp(actor, skill.sacrifice);
@@ -314,17 +329,21 @@ export class Battle implements IBattleConfig
 			}
 		}
 
-		// 實際施放技能，計為一次行動
+		/**
+		 * 實際施放技能，計為一次行動
+		 */
 		this.log.push({ type: EnumBattleEventType.Act, actor: charIdToString(actor.no), skill: skillNo });
 
 		const targets = this.selectTargets(actor, skill);
-		// 選不到目標：原始 SkillEffect 收到 `$target === false` 時印 `No target.Failed!` 並 return。
-		// Act 與 SP 消耗都發生在選目標**之前**（原版 Skill.php:112–145 同序），因此這裡只補一條
-		// 結構化 Info，行動行照常保留。
-		// No target: the original SkillEffect prints `No target.Failed!` and returns when
-		// `$target === false`. Both the Act record and the SP cost happen *before* target selection
-		// (the original Skill.php:112-145 does the same), so only a structured Info is added here
-		// and the action line stays.
+		/**
+		 * 選不到目標：原始 SkillEffect 收到 `$target === false` 時印 `No target.Failed!` 並 return。
+		 * Act 與 SP 消耗都發生在選目標**之前**（原版 Skill.php:112–145 同序），因此這裡只補一條
+		 * 結構化 Info，行動行照常保留。
+		 * No target: the original SkillEffect prints `No target.Failed!` and returns when
+		 * `$target === false`. Both the Act record and the SP cost happen *before* target selection
+		 * (the original Skill.php:112-145 does the same), so only a structured Info is added here
+		 * and the action line stays.
+		 */
 		if (targets.length === 0)
 		{
 			this.log.push({ type: EnumBattleEventType.Info, text: EnumInfoText.NoTarget });
@@ -337,9 +356,11 @@ export class Battle implements IBattleConfig
 				const guard = Defending(tgt.team as BattleTeam, tgt, skill);
 				if (guard) realTarget = guard;
 			}
-			// 特例與 default 分支全部交給 SkillEffect（對齊原始 Battle::SkillEffect 呼叫）
-			// Specials and the default branch are all delegated to SkillEffect (mirrors the original
-			// Battle::SkillEffect call)
+			/**
+			 * 特例與 default 分支全部交給 SkillEffect（對齊原始 Battle::SkillEffect 呼叫）
+			 * Specials and the default branch are all delegated to SkillEffect (mirrors the original
+			 * Battle::SkillEffect call)
+			 */
 			const res = this.skillEffect.apply(skill, skillNo, actor, realTarget);
 			for (const ev of res.events) this.log.push(ev);
 			if (realTarget.HP <= 0 && realTarget.STATE !== EnumState.Dead)
@@ -349,30 +370,36 @@ export class Battle implements IBattleConfig
 			}
 		}
 
-		// 魔方陣：只產紀錄（value 省略，數量與種類由展示層依技能定義回推）。
-		// 魔方陣數（BattleTeam.mc）目前沒有任何引擎決策消費者，故不改動戰鬥狀態。
-		// Magic circle: record only (no `value`; the display derives amount and kind from the skill
-		// definition). BattleTeam.mc has no engine-side consumer yet, so battle state stays untouched.
-		//
-		// 移植 divergence：原始把 MagicCircleAdd／MagicCircleDeleteEnemy 放在 Effect.php 的 default
-		// 最前段、MagicCircleDeleteTeam 放在 Skill.php 的選目標之前；TS 統一在每次施放記一筆，
-		// 因此 SkillEffect.default 刻意不再處理魔方陣。
-		// Port divergence: the original puts MagicCircleAdd / MagicCircleDeleteEnemy at the head of
-		// Effect.php's default and MagicCircleDeleteTeam before target selection in Skill.php;
-		// TypeScript records one entry per cast here instead, so SkillEffect.default deliberately
-		// leaves magic circles alone.
+		/**
+		 * 魔方陣：只產紀錄（value 省略，數量與種類由展示層依技能定義回推）。
+		 * 魔方陣數（BattleTeam.mc）目前沒有任何引擎決策消費者，故不改動戰鬥狀態。
+		 * Magic circle: record only (no `value`; the display derives amount and kind from the skill
+		 * definition). BattleTeam.mc has no engine-side consumer yet, so battle state stays untouched.
+		 *
+		 * 移植 divergence：原始把 MagicCircleAdd／MagicCircleDeleteEnemy 放在 Effect.php 的 default
+		 * 最前段、MagicCircleDeleteTeam 放在 Skill.php 的選目標之前；TS 統一在每次施放記一筆，
+		 * 因此 SkillEffect.default 刻意不再處理魔方陣。
+		 * Port divergence: the original puts MagicCircleAdd / MagicCircleDeleteEnemy at the head of
+		 * Effect.php's default and MagicCircleDeleteTeam before target selection in Skill.php;
+		 * TypeScript records one entry per cast here instead, so SkillEffect.default deliberately
+		 * leaves magic circles alone.
+		 */
 		if (skill.MagicCircleAdd || skill.MagicCircleDelete || skill.MagicCircleDeleteTeam || skill.MagicCircleDeleteEnemy)
 		{
 			this.log.push({ type: EnumBattleEventType.MagicCircle, actor: charIdToString(actor.no), skill: skillNo });
 		}
 
-		// 召喚改由 SkillEffect.default 處理（含召喚力 summonPower 與 quick），每次施放只執行一次，
-		// 且該分支會提前 return——這裡不再另外套用。
-		// Summoning is handled by SkillEffect.default (including summonPower and quick), once per
-		// cast, and that branch returns early — it is no longer applied here as well.
+		/**
+		 * 召喚改由 SkillEffect.default 處理（含召喚力 summonPower 與 quick），每次施放只執行一次，
+		 * 且該分支會提前 return——這裡不再另外套用。
+		 * Summoning is handled by SkillEffect.default (including summonPower and quick), once per
+		 * cast, and that branch returns early — it is no longer applied here as well.
+		 */
 
-		// 使用後使用者移動方向（對齊原始 Skill.php:206 umove，每次施法一次）。
-		// Post-use user movement (mirrors original Skill.php:206 umove, once per cast).
+		/**
+		 * 使用後使用者移動方向（對齊原始 Skill.php:206 umove，每次施法一次）。
+		 * Post-use user movement (mirrors original Skill.php:206 umove, once per cast).
+		 */
 		if (skill.umove) actor.POSITION = skill.umove;
 	}
 
@@ -385,10 +412,12 @@ export class Battle implements IBattleConfig
 		autoRegeneration(actor);
 		const hpBeforePoison = actor.HP;
 		const poisonLost = poisonDamage(actor);
-		// 每回合毒傷：不依附任何技能（帶 value 與前後 HP，展示層據此渲染毒傷行），
-		// 因此上級事件引擎會把它歸類為一般事件。
-		// Per-turn poison damage: attached to no skill (it carries the value and before/after HP the
-		// display needs), so the upper event engine classes it as a general event.
+		/**
+		 * 每回合毒傷：不依附任何技能（帶 value 與前後 HP，展示層據此渲染毒傷行），
+		 * 因此上級事件引擎會把它歸類為一般事件。
+		 * Per-turn poison damage: attached to no skill (it carries the value and before/after HP the
+		 * display needs), so the upper event engine classes it as a general event.
+		 */
 		if (poisonLost > 0)
 		{
 			this.log.push({
@@ -432,8 +461,10 @@ export class Battle implements IBattleConfig
 			corpse: this.resolveCorpse(c),
 			no: charIdToString(c.no),
 			name: c.name,
-			// c.team 是 BattleTeam 反向參照，需取其 side 才是 Team0/Team1 列舉
-			// c.team is a BattleTeam back-reference; take its `side` for the Team0/Team1 enum
+			/**
+			 * c.team 是 BattleTeam 反向參照，需取其 side 才是 Team0/Team1 列舉
+			 * c.team is a BattleTeam back-reference; take its `side` for the Team0/Team1 enum
+			 */
 			team: (c.team as BattleTeam).side,
 			hp: c.HP,
 			maxHp: c.MAXHP,
@@ -452,7 +483,9 @@ export class Battle implements IBattleConfig
 	{
 		while (!this.result)
 		{
-			// 每 BATTLE_STAT_TURNS 次行動插入一張快照（對齊 PHP BattleState）
+			/**
+			 * 每 BATTLE_STAT_TURNS 次行動插入一張快照（對齊 PHP BattleState）
+			 */
 			if (this.actions % BATTLE_STAT_TURNS === 0 && this.actions !== this.lastSnapshotActions)
 			{
 				this.lastSnapshotActions = this.actions;
@@ -478,7 +511,9 @@ export class Battle implements IBattleConfig
 				break;
 			}
 
-			// 回合上限：超過則延伸，最多 BATTLE_MAX_EXTENDS 次後判平手
+			/**
+			 * 回合上限：超過則延伸，最多 BATTLE_MAX_EXTENDS 次後判平手
+			 */
 			if (this.turn > BATTLE_MAX_TURNS + this.extend * TURN_EXTENDS)
 			{
 				if (this.extend >= BATTLE_MAX_EXTENDS)
@@ -490,7 +525,9 @@ export class Battle implements IBattleConfig
 				this.turn = 0;
 			}
 		}
-		// 補最終快照（若與上一張不同）
+		/**
+		 * 補最終快照（若與上一張不同）
+		 */
 		const lastSnap = this.snapshots[this.snapshots.length - 1];
 		if (!lastSnap || lastSnap.at !== this.log.length)
 		{

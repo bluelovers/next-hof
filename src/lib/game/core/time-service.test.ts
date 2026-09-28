@@ -27,8 +27,10 @@ describe('GameTime (fake-timer)', () =>
 
 		t.start(1000);
 		expect(elapsed(t)).toBe(1000);
-		// 回呼讀到本輪最終時間，而非各自排程邊界（對齊原生 setTimeout）
-		// Callbacks read the run's final time, not their own scheduled boundaries (native-like)
+		/**
+		 * 回呼讀到本輪最終時間，而非各自排程邊界（對齊原生 setTimeout）
+		 * Callbacks read the run's final time, not their own scheduled boundaries (native-like)
+		 */
 		expect(seen).toEqual([1000]);
 
 		t.start(500);
@@ -57,8 +59,10 @@ describe('GameTime (fake-timer)', () =>
 			fires++;
 		}, 100);
 		t.start(350);
-		// 一次 start 跨 100 / 200 / 300 三個週期邊界 → 補償觸發 3 次、不漂移
-		// One start crosses the 100 / 200 / 300 boundaries → 3 catch-up fires, no drift
+		/**
+		 * 一次 start 跨 100 / 200 / 300 三個週期邊界 → 補償觸發 3 次、不漂移
+		 * One start crosses the 100 / 200 / 300 boundaries → 3 catch-up fires, no drift
+		 */
 		expect(fires).toBe(3);
 		expect(elapsed(t)).toBe(350);
 	});

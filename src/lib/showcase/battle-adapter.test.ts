@@ -43,7 +43,9 @@ import {
 } from './battle-adapter';
 
 // ==================== 3.1 固定種子跑完整場 ====================
-// Task 3.1: run a complete battle with a fixed seed
+/**
+ * Task 3.1: run a complete battle with a fixed seed
+ */
 describe('3.1 runShowcaseBattle', () =>
 {
 	it('completes a battle with outcome in {win, lose, draw} and is reproducible', () =>
@@ -77,8 +79,10 @@ describe('3.1 runShowcaseBattle', () =>
 });
 
 // ==================== 3.2 單位/隊伍轉接 ====================
-// Task 3.2: unit/team adapter
-// 側別已翻轉：敵方＝左隊 EnumTeamSideUI.Left、我方＝右隊 EnumTeamSideUI.Right
+/**
+ * Task 3.2: unit/team adapter
+ * 側別已翻轉：敵方＝左隊 EnumTeamSideUI.Left、我方＝右隊 EnumTeamSideUI.Right
+ */
 describe('3.2 buildTeam / toBattleUnit', () =>
 {
 	const run = runShowcaseBattle({ charNos: [100, 102], monNos: [1000, 1002], seed: 11 });
@@ -86,7 +90,9 @@ describe('3.2 buildTeam / toBattleUnit', () =>
 	it('maps party and encounter into left/right teams with correct sizes', () =>
 	{
 		const { leftTeam, rightTeam } = run.data;
-		// left = enemies, right = allies
+		/**
+		 * left = enemies, right = allies
+		 */
 		expect(leftTeam.side).toBe(EnumTeamSideUI.Left);
 		expect(rightTeam.side).toBe(EnumTeamSideUI.Right);
 		expect(leftTeam.units).toHaveLength(2);
@@ -99,7 +105,9 @@ describe('3.2 buildTeam / toBattleUnit', () =>
 	{
 		const { leftTeam, rightTeam } = run.data;
 
-		// leftTeam = enemies → slime is on left
+		/**
+		 * leftTeam = enemies → slime is on left
+		 */
 		const slime = leftTeam.units.find((u) => u.name === SEED.mon1002.name);
 		expect(slime).toBeDefined();
 		expect(slime!.level).toBe(SEED.mon1002.level);
@@ -140,8 +148,10 @@ describe('3.2 buildTeam / toBattleUnit', () =>
 });
 
 // ==================== 3.3 事件 → 日誌轉接 ====================
-// Task 3.3: event → action adapter
-// 側別翻轉後：100(我方)=EnumTeamSideUI.Right, 1000(敵方)=EnumTeamSideUI.Left
+/**
+ * Task 3.3: event → action adapter
+ * 側別翻轉後：100(我方)=EnumTeamSideUI.Right, 1000(敵方)=EnumTeamSideUI.Left
+ */
 describe('3.3 mapBattleEvent', () =>
 {
 	const lookup: IUnitLookup = new Map<number, IUnitRef>([
@@ -182,19 +192,25 @@ describe('3.3 mapBattleEvent', () =>
 			EnumActionType.Poison,
 		]);
 
-		// Act → skill
+		/**
+		 * Act → skill
+		 */
 		expect(actions[0].type).toBe(EnumActionType.Skill);
 		expect(actions[0].source).toBe('Warrior');
 
-		// Cast 依 skill.type 決定文案（seed skill 2000 預設 casting）：
-		// text 是粗體名稱之後的片段，message 由唯一合併點接成整行（與渲染端一致）
+		/**
+		 * Cast 依 skill.type 決定文案（seed skill 2000 預設 casting）：
+		 * text 是粗體名稱之後的片段，message 由唯一合併點接成整行（與渲染端一致）
+		 */
 		expect(actions[1].type).toBe(EnumActionType.Casting);
 		expect(actions[1].source).toBe('Warrior');
 		expect(actions[1].text).toMatch(/^start (charging|casting)\.$/);
 		expect(actions[1].message).toBe(`Warrior ${actions[1].text}`);
 
-		// Damage 供給結構化 valueChange（hpBefore → hpAfter），兩端符號交給渲染端決定
-		// Damage supplies a structured valueChange (hpBefore → hpAfter) and leaves the symbol to the renderer
+		/**
+		 * Damage 供給結構化 valueChange（hpBefore → hpAfter），兩端符號交給渲染端決定
+		 * Damage supplies a structured valueChange (hpBefore → hpAfter) and leaves the symbol to the renderer
+		 */
 		expect(actions[2].type).toBe(EnumActionType.Damage);
 		expect(actions[2].source).toBe('Warrior');
 		expect(actions[2].target).toBe('GoblinAxe');
@@ -202,21 +218,29 @@ describe('3.3 mapBattleEvent', () =>
 		expect(actions[2].valueChange).toEqual({ from: 200, to: 158 });
 		expect(actions[2].side).toBe(EnumTeamSideUI.Right);
 
-		// Heal 同樣供給結構化 valueChange / Heal supplies the structured valueChange too
+		/**
+		 * Heal 同樣供給結構化 valueChange / Heal supplies the structured valueChange too
+		 */
 		expect(actions[3].type).toBe(EnumActionType.Heal);
 		expect(actions[3].valueChange).toEqual({ from: 158, to: 168 });
 
-		// Guard（Barrier，actor === target）→ protect
+		/**
+		 * Guard（Barrier，actor === target）→ protect
+		 */
 		expect(actions[4].message).toContain('barrier');
 		expect(actions[4].side).toBe(EnumTeamSideUI.Left);
 
-		// Death → down，來源＝倒下者，側別＝目標側
+		/**
+		 * Death → down，來源＝倒下者，側別＝目標側
+		 */
 		expect(actions[5].source).toBe('GoblinAxe');
 		expect(actions[5].side).toBe(EnumTeamSideUI.Left);
 
-		// Poison → poison，來源＝中毒單位；text 保留結構化文案，message 由 composeAction 合併
-		// Poison → poison with the poisoned unit as the source; `text` keeps the structured copy
-		// while composeAction joins `message`
+		/**
+		 * Poison → poison，來源＝中毒單位；text 保留結構化文案，message 由 composeAction 合併
+		 * Poison → poison with the poisoned unit as the source; `text` keeps the structured copy
+		 * while composeAction joins `message`
+		 */
 		expect(actions[6].type).toBe(EnumActionType.Poison);
 		expect(actions[6].source).toBe('GoblinAxe');
 		expect(actions[6].text).toBe('poisoned');
@@ -261,8 +285,10 @@ describe('3.3 mapBattleEvent', () =>
 			repo,
 		);
 		expect(charge.castType).toBe(EnumChargeKind.Charging);
-		// text＝名稱之後的片段、message＝唯一合併點接出的整行
-		// `text` = the fragment after the name, `message` = the whole line from the single join point
+		/**
+		 * text＝名稱之後的片段、message＝唯一合併點接出的整行
+		 * `text` = the fragment after the name, `message` = the whole line from the single join point
+		 */
 		expect(charge.text).toBe('start charging.');
 		expect(charge.message).toBe('Warrior start charging.');
 
@@ -295,8 +321,10 @@ describe('3.3 mapBattleEvent', () =>
 		expect(action.target).toBe('GoblinAxe');
 		expect(action.side).toBe(EnumTeamSideUI.Right);
 		expect(action.skill?.name).toBeDefined();
-		// target＝被召喚單位 def no、value＝等級、圖依 def no 查 sprite-map
-		// target = summoned def no, value = level, image looked up in sprite-map by def no
+		/**
+		 * target＝被召喚單位 def no、value＝等級、圖依 def no 查 sprite-map
+		 * target = summoned def no, value = level, image looked up in sprite-map by def no
+		 */
 		expect(action.summoned).toEqual([
 			{ name: 'GoblinAxe', level: 10, imageUrl: '/image/char/mon_053.png' },
 		]);
@@ -305,10 +333,12 @@ describe('3.3 mapBattleEvent', () =>
 
 	it('poison damage event carries the structured value, poison apply keeps the default copy', () =>
 	{
-		// 每回合毒傷（Battle.Action 生產）：value 與前後 HP 交給 PoisonMessage 結構化渲染，
-		// text 是同一行的純文字鏡像（buildPoisonDamageText）
-		// Per-turn poison damage (produced by Battle.Action): value and before/after HP go to
-		// PoisonMessage as structured fields, and `text` mirrors that same line
+		/**
+		 * 每回合毒傷（Battle.Action 生產）：value 與前後 HP 交給 PoisonMessage 結構化渲染，
+		 * text 是同一行的純文字鏡像（buildPoisonDamageText）
+		 * Per-turn poison damage (produced by Battle.Action): value and before/after HP go to
+		 * PoisonMessage as structured fields, and `text` mirrors that same line
+		 */
 		const damage = mapBattleEvent(
 			{ type: EnumBattleEventType.Poison, target: '1000', value: 31, hpBefore: 140, hpAfter: 109 },
 			lookup,
@@ -320,8 +350,10 @@ describe('3.3 mapBattleEvent', () =>
 		expect(damage.valueChange).toEqual({ from: 140, to: 109 });
 		expect(damage.message).toBe('GoblinAxe got 31 damage by poison.');
 
-		// 施毒成功（statusChanges 生產，無 value）沿用預設文案
-		// Poison applied (produced by statusChanges, no value) keeps the default copy
+		/**
+		 * 施毒成功（statusChanges 生產，無 value）沿用預設文案
+		 * Poison applied (produced by statusChanges, no value) keeps the default copy
+		 */
 		const applied = mapBattleEvent(
 			{ type: EnumBattleEventType.Poison, actor: '100', target: '1000', skill: 1000 },
 			lookup,
@@ -331,9 +363,11 @@ describe('3.3 mapBattleEvent', () =>
 		expect(applied.message).toBe(`GoblinAxe ${DEFAULT_EVENT_TEXT.poison}`);
 	});
 
-	// 魔方陣事件：種類由技能定義中哪個 MagicCircle* 欄位決定，數量優先取 event.value
-	// Magic-circle events: the kind comes from whichever MagicCircle* field the skill
-	// definition carries, and the amount prefers `value` on the event
+	/**
+	 * 魔方陣事件：種類由技能定義中哪個 MagicCircle* 欄位決定，數量優先取 event.value
+	 * Magic-circle events: the kind comes from whichever MagicCircle* field the skill
+	 * definition carries, and the amount prefers `value` on the event
+	 */
 	const withSkill = (skill: Partial<ISkillDef>): IDataRepository =>
 		Object.assign(Object.create(repo), { getSkill: () => skill as ISkillDef });
 
@@ -351,9 +385,11 @@ describe('3.3 mapBattleEvent', () =>
 		expect(draw.magicCircle?.amount).toBe(1);
 		expect(draw.message).toBe('Warrior draw MagicCircle x1');
 
-		// 數量缺省時取技能定義的對應欄位（PHP 亦以 $skill[...] 印出數量）
-		// When `value` is absent the matching skill field supplies the amount (PHP prints the
-		// amount from $skill[...] as well)
+		/**
+		 * 數量缺省時取技能定義的對應欄位（PHP 亦以 $skill[...] 印出數量）
+		 * When `value` is absent the matching skill field supplies the amount (PHP prints the
+		 * amount from $skill[...] as well)
+		 */
 		const erase = mapBattleEvent(
 			{ type: EnumBattleEventType.MagicCircle, actor: '100', skill: 3420 },
 			lookup,
@@ -437,7 +473,9 @@ describe('3.3 mapBattleEvent', () =>
 			}
 		});
 
-		// 順序一致：damage 值序列逐筆相符
+		/**
+		 * 順序一致：damage 值序列逐筆相符
+		 */
 		const evDamage = events
 			.filter((e) => e.type === EnumBattleEventType.Damage)
 			.map((e) => e.value);
@@ -450,8 +488,10 @@ describe('3.3 mapBattleEvent', () =>
 });
 
 // ==================== 3.4 結果轉接 ====================
-// Task 3.4: result adapter
-// 側別翻轉後：leftTeam = 敵方, rightTeam = 我方
+/**
+ * Task 3.4: result adapter
+ * 側別翻轉後：leftTeam = 敵方, rightTeam = 我方
+ */
 describe('3.4 buildResultData', () =>
 {
 	it('win branch: ally wipeout names the ally team, winnerSide=EnumTeamSideUI.Right', () =>
@@ -468,10 +508,14 @@ describe('3.4 buildResultData', () =>
 		expect(result.winner).toBe('My Party');
 		expect(result.winnerSide).toBe(EnumTeamSideUI.Right);
 		expect(result.isDraw).toBe(false);
-		// leftTeam = enemies
+		/**
+		 * leftTeam = enemies
+		 */
 		expect(result.leftTeam.totalUnits).toBe(1);
 		expect(result.leftTeam.hpRemain).toBe(0);
-		// rightTeam = allies
+		/**
+		 * rightTeam = allies
+		 */
 		expect(result.rightTeam.alive).toBeGreaterThan(0);
 		expect(result.rightTeam.totalUnits).toBe(3);
 		expect(result.rightTeam.hpRemain).toBeGreaterThan(0);
@@ -492,7 +536,9 @@ describe('3.4 buildResultData', () =>
 		expect(result.winner).toBe('Dark Force');
 		expect(result.winnerSide).toBe(EnumTeamSideUI.Left);
 		expect(result.isDraw).toBe(false);
-		// leftTeam = enemies (still standing on our loss), rightTeam = allies (wiped out)
+		/**
+		 * leftTeam = enemies (still standing on our loss), rightTeam = allies (wiped out)
+		 */
 		expect(result.leftTeam.alive).toBeGreaterThan(0);
 		expect(result.rightTeam.alive).toBe(0);
 	});
@@ -549,9 +595,13 @@ describe('3.4 buildResultData', () =>
 			lookup,
 		});
 
-		// leftTeam=enemies 收到 actor=1000 的傷害 12
+		/**
+		 * leftTeam=enemies 收到 actor=1000 的傷害 12
+		 */
 		expect(result.leftTeam.totalDamage).toBe(12);
-		// rightTeam=allies 收到 actor=100 的傷害 30
+		/**
+		 * rightTeam=allies 收到 actor=100 的傷害 30
+		 */
 		expect(result.rightTeam.totalDamage).toBe(30);
 		expect(result.rightTeam.totalMaxHp).toBe(ally.MAXHP);
 		expect(result.leftTeam.totalMaxHp).toBe(enemy.MAXHP);
@@ -559,8 +609,10 @@ describe('3.4 buildResultData', () =>
 });
 
 // ==================== 3.5 精靈轉接 ====================
-// Task 3.5: sprite adapter
-// 名冊以敵方(EnumTeamSideUI.Left)在前、我方(EnumTeamSideUI.Right)在後
+/**
+ * Task 3.5: sprite adapter
+ * 名冊以敵方(EnumTeamSideUI.Left)在前、我方(EnumTeamSideUI.Right)在後
+ */
 describe('3.5 buildSprites / buildPositionRoster', () =>
 {
 	const charNos = [100, 104];
@@ -574,7 +626,9 @@ describe('3.5 buildSprites / buildPositionRoster', () =>
 	it('roster lists enemies(left) first then allies(right) with a real image', () =>
 	{
 		expect(roster).toHaveLength(charNos.length + monNos.length);
-		// 前半為敵方(EnumTeamSideUI.Left)，後半為我方(EnumTeamSideUI.Right)
+		/**
+		 * 前半為敵方(EnumTeamSideUI.Left)，後半為我方(EnumTeamSideUI.Right)
+		 */
 		expect(roster.filter((r) => r.side === EnumTeamSideUI.Left)).toHaveLength(monNos.length);
 		expect(roster.filter((r) => r.side === EnumTeamSideUI.Right)).toHaveLength(charNos.length);
 		for (const r of roster)
@@ -611,12 +665,16 @@ describe('3.5 buildSprites / buildPositionRoster', () =>
 		{
 			if (leftIds.has(s.unitUuid))
 			{
-				// 敵方(EnumTeamSideUI.Left)使用 char/ 圖(預設朝右) → 不翻轉（面向場地中心的右側）
+				/**
+				 * 敵方(EnumTeamSideUI.Left)使用 char/ 圖(預設朝右) → 不翻轉（面向場地中心的右側）
+				 */
 				expect(s.flipped).toBe(false);
 			}
 			else
 			{
-				// 我方(EnumTeamSideUI.Right)使用 char/ 圖(預設朝右) → 翻轉朝左
+				/**
+				 * 我方(EnumTeamSideUI.Right)使用 char/ 圖(預設朝右) → 翻轉朝左
+				 */
 				expect(s.flipped).toBe(true);
 			}
 		}
@@ -624,7 +682,9 @@ describe('3.5 buildSprites / buildPositionRoster', () =>
 });
 
 // ==================== 3.3b 事件轉接的組裝元件 ====================
-// Task 3.3b: composable pieces of the event adapter
+/**
+ * Task 3.3b: composable pieces of the event adapter
+ */
 describe('3.3b 事件轉接的組裝元件 / event adapter composition', () =>
 {
 	const lookup: IUnitLookup = new Map<number, IUnitRef>([
@@ -640,11 +700,15 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () =>
 			lookup,
 			repo,
 		);
-		// maxHp／maxSp 一併解析，供 EnergyExchange 換算比率 / maxHp / maxSp resolve too, for
-		// EnergyExchange's rate computation
+		/**
+		 * maxHp／maxSp 一併解析，供 EnergyExchange 換算比率 / maxHp / maxSp resolve too, for
+		 * EnergyExchange's rate computation
+		 */
 		expect(ctx.actor).toEqual({ name: 'Warrior', side: EnumTeamSideUI.Right, maxHp: 1000, maxSp: 100 });
 		expect(ctx.target).toEqual({ name: 'GoblinAxe', side: EnumTeamSideUI.Left, maxHp: 600, maxSp: 50 });
-		// 歸屬側別優先取 actor（Damage 的施作者側）/ the owning side prefers the actor (the damage dealer)
+		/**
+		 * 歸屬側別優先取 actor（Damage 的施作者側）/ the owning side prefers the actor (the damage dealer)
+		 */
 		expect(ctx.side).toBe(EnumTeamSideUI.Right);
 		expect(ctx.skillDef).toEqual(repo.getSkill(1000));
 		expect(ctx.skillName).toBe(repo.getSkill(1000)?.name);
@@ -695,7 +759,9 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () =>
 		expect(over.source).toBe('GoblinAxe');
 		expect(over.side).toBe(EnumTeamSideUI.Left);
 		expect(over.attribute).toBe(EnumAttributeType.Dmg);
-		// 未覆寫的欄位仍來自上下文 / fields the mapper omits still come from the context
+		/**
+		 * 未覆寫的欄位仍來自上下文 / fields the mapper omits still come from the context
+		 */
 		expect(over.target).toBe('GoblinAxe');
 	});
 
@@ -706,16 +772,20 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () =>
 			lookup,
 			repo,
 		);
-		// 只給 text → message 由 buildActionMessage 合併，兩者同一份輸入、不會各自漂移
-		// Only `text` is given → composeAction joins it with buildActionMessage, so both come from
-		// one input and cannot drift apart
+		/**
+		 * 只給 text → message 由 buildActionMessage 合併，兩者同一份輸入、不會各自漂移
+		 * Only `text` is given → composeAction joins it with buildActionMessage, so both come from
+		 * one input and cannot drift apart
+		 */
 		const named = composeAction(ctx, { type: EnumActionType.Buff, text: 'got barriered!' });
 		expect(named.text).toBe('got barriered!');
 		expect(named.message).toBe('Warrior got barriered!');
 		expect(named.source).toBe('Warrior');
 
-		// 明確給 message 時以其為準（傷害、守護等非「名稱＋文字」版面）
-		// An explicit `message` wins (damage, guard and the other non "name + text" layouts)
+		/**
+		 * 明確給 message 時以其為準（傷害、守護等非「名稱＋文字」版面）
+		 * An explicit `message` wins (damage, guard and the other non "name + text" layouts)
+		 */
 		const explicit = composeAction(ctx, { type: EnumActionType.Info, message: 'plain' });
 		expect(explicit.text).toBeUndefined();
 		expect(explicit.message).toBe('plain');
@@ -731,9 +801,11 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () =>
 		];
 		const actions = events.map((ev) => mapBattleEvent(ev, lookup, repo));
 
-		// 渲染端只讀 source／text，不必把 message 切開；message 只是純文字鏡像
-		// The renderer reads source / text only and never cuts `message` open; `message` is just
-		// the plain-text mirror
+		/**
+		 * 渲染端只讀 source／text，不必把 message 切開；message 只是純文字鏡像
+		 * The renderer reads source / text only and never cuts `message` open; `message` is just
+		 * the plain-text mirror
+		 */
 		expect(actions.map((a) => a.text)).toEqual([
 			'gained buff.',
 			'got debuffed.',
@@ -809,13 +881,17 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () =>
 		const magic = { no: 2, name: 'Fireball', type: EnumSkillDamageType.Magic } as ISkillDef;
 		expect(chargeKindOf(physical)).toBe(EnumChargeKind.Charging);
 		expect(chargeKindOf(magic)).toBe(EnumChargeKind.Casting);
-		// 缺技能定義（查無／事件沒帶 skill）→ casting / absent definition → casting
+		/**
+		 * 缺技能定義（查無／事件沒帶 skill）→ casting / absent definition → casting
+		 */
 		expect(chargeKindOf(undefined)).toBe(EnumChargeKind.Casting);
 	});
 });
 
 // ==================== 3.4b 展示資料組裝 ====================
-// Task 3.4b: display-data assembly
+/**
+ * Task 3.4b: display-data assembly
+ */
 describe('3.4b 展示資料組裝 / display data assembly', () =>
 {
 	const lookup: IUnitLookup = new Map<number, IUnitRef>([
@@ -865,7 +941,9 @@ describe('3.4b 展示資料組裝 / display data assembly', () =>
 		];
 
 		const data = buildDisplayData({
-			// 只需頁面層欄位，不必重跑整場戰鬥 / only page-level fields, no need to run a whole battle
+			/**
+			 * 只需頁面層欄位，不必重跑整場戰鬥 / only page-level fields, no need to run a whole battle
+			 */
 			input: { title: 'Custom', allyTeamName: 'Alpha' },
 			allies,
 			enemies,
@@ -882,9 +960,13 @@ describe('3.4b 展示資料組裝 / display data assembly', () =>
 		expect(data.actions).toHaveLength(1);
 		expect(data.actions[0].message).toBe(`7 Damage to ${enemies[0].name}`);
 		expect(data.actions[0].valueChange).toEqual({ from: 10, to: 3 });
-		// 沒有給快照 → snapshots 欄位省略 / no snapshots supplied → the field stays out
+		/**
+		 * 沒有給快照 → snapshots 欄位省略 / no snapshots supplied → the field stays out
+		 */
 		expect(data.snapshots).toBeUndefined();
-		// 我方（右隊）獲勝 / the allies (right team) win
+		/**
+		 * 我方（右隊）獲勝 / the allies (right team) win
+		 */
 		expect(data.result?.winner).toBe('Alpha');
 		expect(data.result?.winnerSide).toBe(EnumTeamSideUI.Right);
 	});

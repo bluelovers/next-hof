@@ -15,7 +15,9 @@ const meta: Meta<typeof GameDescription> = {
 	title: 'Info/GameDescription',
 	component: GameDescription,
 	parameters: {
-		// Storybook 裝飾器配置 / Storybook decorators configuration
+		/**
+		 * Storybook 裝飾器配置 / Storybook decorators configuration
+		 */
 		decorators: [GameDescriptionDarkDecorator],
 	},
 };
@@ -29,7 +31,9 @@ export const Basic: Story = {};
 /** 長遊戲簡介 / Long game description (simulated) */
 export const LongDescription: Story = {
 	parameters: {
-		// 這裡可以添加額外的描述內容
-		// Additional description content can be added here
+		/**
+		 * 這裡可以添加額外的描述內容
+		 * Additional description content can be added here
+		 */
 	},
 };

@@ -26,7 +26,8 @@ describe('BattleTeam (8.1)', () =>
 		team.add(c2);
 		team.add(summon);
 
-		expect(team.CountAlive()).toBe(2); // 召喚物不計入
+		/** 召喚物不計入 */
+		expect(team.CountAlive()).toBe(2);
 		expect(team.CountAliveChars()).toBe(2);
 		expect(team.CountTrueChars()).toBe(2);
 		expect(team.CountDead()).toBe(0);

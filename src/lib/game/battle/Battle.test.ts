@@ -63,7 +63,9 @@ describe('Battle event producers (9.6)', () =>
 
 	it('a summon skill joins the summoned unit and records summon + magic circle', () =>
 	{
-		// 倉庫自行加技能：不污染共用 repo / add the skill to a private repo so the shared one stays clean
+		/**
+		 * 倉庫自行加技能：不污染共用 repo / add the skill to a private repo so the shared one stays clean
+		 */
 		const localRepo = createLocalRepo();
 		localRepo.addSkill({
 			no: 9001, name: 'SummonSlime', sp: 0, type: EnumSkillDamageType.Physical,
@@ -80,8 +82,10 @@ describe('Battle event producers (9.6)', () =>
 		const team = battle.teams[EnumTeamSide.Team0];
 		expect(team.members).toHaveLength(2);
 		expect(team.members[1].isSummon()).toBe(true);
-		// 契約：target＝def no、value＝等級（展示層 mapMagicCircle／mapSummon 依此回推）
-		// Contract: target = def no, value = level (the display's mapMagicCircle / mapSummon reads it back)
+		/**
+		 * 契約：target＝def no、value＝等級（展示層 mapMagicCircle／mapSummon 依此回推）
+		 * Contract: target = def no, value = level (the display's mapMagicCircle / mapSummon reads it back)
+		 */
 		expect(battle.log.filter((e) => e.type === EnumBattleEventType.Summon)).toEqual([
 			{ type: EnumBattleEventType.Summon, actor: '100', target: '1002', value: 1, skill: 9001 },
 		]);
@@ -174,7 +178,9 @@ describe('Integration 2v2 (11.1)', () =>
 		expect(battle.log.length).toBeGreaterThan(0);
 		expect(battle.log.some((e) => e.type === EnumBattleEventType.Damage)).toBe(true);
 
-		// 確定性：相同 seed 重跑得到相同結果與日誌長度
+		/**
+		 * 確定性：相同 seed 重跑得到相同結果與日誌長度
+		 */
 		const rng2 = new RNG(12345);
 		const timeService2 = new GameTime();
 		const p1b = newChar({ ...repo.getCharBase(100)!, str: 200 }, repo, rng2);
@@ -199,7 +205,9 @@ describe('corpse policy inheritance (battle > team > character)', () =>
 		battle.run();
 
 		const byId = new Map(battle.snapshots[0].units.map((u) => [u.unitUuid, u]));
-		// c.team 是 BattleTeam 物件；快照必須取其 side，而非整個物件
+		/**
+		 * c.team 是 BattleTeam 物件；快照必須取其 side，而非整個物件
+		 */
 		expect(byId.get(ally.unitUuid)!.team).toBe(EnumTeamSide.Team0);
 		expect(byId.get(enemy.unitUuid)!.team).toBe(EnumTeamSide.Team1);
 	});
@@ -208,11 +216,17 @@ describe('corpse policy inheritance (battle > team > character)', () =>
 	{
 		const rng = new RNG(3);
 		const strong = { ...repo.getCharBase(100)!, str: 5000 };
-		// 角色級 true：即使戰鬥級 false 仍留屍體
+		/**
+		 * 角色級 true：即使戰鬥級 false 仍留屍體
+		 */
 		const keeps = newChar({ ...strong, corpse: true }, repo, rng);
-		// 角色級未設定：繼承戰鬥級（true）
+		/**
+		 * 角色級未設定：繼承戰鬥級（true）
+		 */
 		const inherits = newChar(strong, repo, rng);
-		// 角色級 false：即使戰鬥級 true 也不留屍體
+		/**
+		 * 角色級 false：即使戰鬥級 true 也不留屍體
+		 */
 		const vanishes = newMon({ ...repo.getMon(1000)!, corpse: false }, repo, rng);
 
 		const battle = new Battle([keeps, inherits], [vanishes], {
@@ -239,18 +253,25 @@ describe('corpse policy inheritance (battle > team > character)', () =>
 		const battle = new Battle([ally], [enemy], {
 			repo,
 			rng,
-			// 戰鬥級未設定（＝false）
-			teamCorpse: { [EnumTeamSide.Team0]: true }, // 隊伍級 true 覆寫
+			/**
+			 * 戰鬥級未設定（＝false）
+			 */
+			/** 隊伍級 true 覆寫 */
+			teamCorpse: { [EnumTeamSide.Team0]: true },
 		});
 		battle.run();
 
-		// 另建一場：確認完全未設定時預設不留屍體
+		/**
+		 * 另建一場：確認完全未設定時預設不留屍體
+		 */
 		const battle2 = new Battle([newChar(strong, repo, rng)], [bare], { repo, rng });
 		battle2.run();
 
 		const byId = new Map(battle.snapshots[0].units.map((u) => [u.unitUuid, u]));
-		expect(byId.get(ally.unitUuid)!.corpse).toBe(true); // team-level true
-		expect(byId.get(enemy.unitUuid)!.corpse).toBe(false); // battle-level default false
+		/** team-level true */
+		expect(byId.get(ally.unitUuid)!.corpse).toBe(true);
+		/** battle-level default false */
+		expect(byId.get(enemy.unitUuid)!.corpse).toBe(false);
 
 		const byId2 = new Map(battle2.snapshots[0].units.map((u) => [u.unitUuid, u]));
 		expect([...byId2.values()].every((u) => u.corpse === false)).toBe(true);
@@ -265,11 +286,15 @@ describe('corpse policy inheritance (battle > team > character)', () =>
 			className: 'corpse-frost',
 			style: { opacity: 0.5 },
 		};
-		// 角色級物件規格：整包勝出，不與戰鬥級物件做欄位合併
-		// Character-level object spec: wins as a whole, no field merging with the battle level
+		/**
+		 * 角色級物件規格：整包勝出，不與戰鬥級物件做欄位合併
+		 * Character-level object spec: wins as a whole, no field merging with the battle level
+		 */
 		const decorated = newChar({ ...strong, corpse: spec }, repo, rng);
-		// 角色級未設定：繼承戰鬥級物件
-		// Character level unset: inherits the battle-level object
+		/**
+		 * 角色級未設定：繼承戰鬥級物件
+		 * Character level unset: inherits the battle-level object
+		 */
 		const inherits = newChar(strong, repo, rng);
 		const enemy = newMon(repo.getMon(1000)!, repo, rng);
 
@@ -284,8 +309,10 @@ describe('corpse policy inheritance (battle > team > character)', () =>
 		const byId = new Map(battle.snapshots[0].units.map((u) => [u.unitUuid, u]));
 		expect(byId.get(decorated.unitUuid)!.corpse).toEqual(spec);
 		expect(byId.get(inherits.unitUuid)!.corpse).toEqual({ className: 'battle-wide' });
-		// 隊伍級 false 否決戰鬥級物件（仍以 falsy 判定）
-		// Team-level false vetoes the battle-level object (still judged falsy)
+		/**
+		 * 隊伍級 false 否決戰鬥級物件（仍以 falsy 判定）
+		 * Team-level false vetoes the battle-level object (still judged falsy)
+		 */
 		expect(byId.get(enemy.unitUuid)!.corpse).toBe(false);
 	});
 });

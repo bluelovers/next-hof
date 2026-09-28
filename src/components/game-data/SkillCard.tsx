@@ -75,8 +75,10 @@ function targetClass(target: EnumTargetType): string
 			return 'support';
 		case EnumTargetType.All:
 			return 'support';
-		// 防禦性預設：未來若 EnumTargetType 新增成員，此 default 避免遺漏處理。
-		// Defensive default: if EnumTargetType gains new members, this keeps behavior safe.
+		/**
+		 * 防禦性預設：未來若 EnumTargetType 新增成員，此 default 避免遺漏處理。
+		 * Defensive default: if EnumTargetType gains new members, this keeps behavior safe.
+		 */
 		default:
 			return 'support';
 	}
@@ -96,8 +98,10 @@ function scopeClass(scope: EnumTargetMethod): string
 			return 'spdmg';
 		case EnumTargetMethod.All:
 			return 'charge';
-		// 防禦性預設：未來若 EnumTargetMethod 新增成員，此 default 避免遺漏處理。
-		// Defensive default: if EnumTargetMethod gains new members, this keeps behavior safe.
+		/**
+		 * 防禦性預設：未來若 EnumTargetMethod 新增成員，此 default 避免遺漏處理。
+		 * Defensive default: if EnumTargetMethod gains new members, this keeps behavior safe.
+		 */
 		default:
 			return 'recover';
 	}
@@ -220,7 +224,9 @@ function DefaultStatChangesRenderer({ stats }: { stats: ISkillStatChanges })
 {
 	const parts: React.ReactNode[] = [];
 
-	// Up* — 臨時增益（charge 金色 + %）
+	/**
+	 * Up* — 臨時增益（charge 金色 + %）
+	 */
 	if (stats.upStats)
 	{
 		for (const [key, val] of Object.entries(stats.upStats))
@@ -237,7 +243,9 @@ function DefaultStatChangesRenderer({ stats }: { stats: ISkillStatChanges })
 		}
 	}
 
-	// Down* — 臨時減益（dmg 紅色 + %）
+	/**
+	 * Down* — 臨時減益（dmg 紅色 + %）
+	 */
 	if (stats.downStats)
 	{
 		for (const [key, val] of Object.entries(stats.downStats))
@@ -254,7 +262,9 @@ function DefaultStatChangesRenderer({ stats }: { stats: ISkillStatChanges })
 		}
 	}
 
-	// Plus* — 永久加算（charge 金色，無%）
+	/**
+	 * Plus* — 永久加算（charge 金色，無%）
+	 */
 	if (stats.plusStats)
 	{
 		for (const [key, val] of Object.entries(stats.plusStats))
@@ -483,7 +493,9 @@ export const SkillCard: React.FC<ISkillCardProps> = ({
 		</div>
 	);
 
-	// 允許完全覆寫整個卡片 / Allow full card override
+	/**
+	 * 允許完全覆寫整個卡片 / Allow full card override
+	 */
 	if (renderCard)
 	{
 		return <>{renderCard(skill, defaultContent)}</>;

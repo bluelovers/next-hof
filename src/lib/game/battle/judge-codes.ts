@@ -1,6 +1,8 @@
-// 判定碼與預設模式常量 / Judge codes and default pattern constants
-// 單一事實來源：所有 judge code、預設 action、pattern 預設值集中定義於此。
-// Single source of truth: all judge codes, default actions, and pattern defaults are centralized here.
+/**
+ * 判定碼與預設模式常量 / Judge codes and default pattern constants
+ * 單一事實來源：所有 judge code、預設 action、pattern 預設值集中定義於此。
+ * Single source of truth: all judge codes, default actions, and pattern defaults are centralized here.
+ */
 
 /** AI 判定碼 / AI judge codes */
 export enum EnumJudgeCode

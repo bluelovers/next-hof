@@ -6,16 +6,19 @@ import { calcBasicDamageOriginal } from './effect.original';
 
 describe('calcBasicDamageOriginal (對照原始 PHP CalcBasicDamage)', () =>
 {
-	// 戰鬥六維（STR/INT/DEX/MAXHP/HP/level/def）皆為預設 0，需手動設定（對齊 Skill.test.ts 模式）。
-	// Battle stats (STR/INT/DEX/MAXHP/HP/level/def) default to 0 and must be set manually
-	// (mirrors the Skill.test.ts fixture pattern).
+	/**
+	 * 戰鬥六維（STR/INT/DEX/MAXHP/HP/level/def）皆為預設 0，需手動設定（對齊 Skill.test.ts 模式）。
+	 * Battle stats (STR/INT/DEX/MAXHP/HP/level/def) default to 0 and must be set manually
+	 * (mirrors the Skill.test.ts fixture pattern).
+	 */
 	const makeUser = () =>
 	{
 		const u = new Character({
 			no: 1, name: 'u', types: [EnumCharType.Char], level: 1,
 			str: 100, int: 100, dex: 10, spd: 10, luk: 10, maxhp: 300, maxsp: 50,
 		});
-		u.STR = 100; // 戰鬥六維需手動設定 / battle stat must be set explicitly
+		/** 戰鬥六維需手動設定 / battle stat must be set explicitly */
+		u.STR = 100;
 		u.atk = [0, 0];
 		return u;
 	};
@@ -42,16 +45,20 @@ describe('calcBasicDamageOriginal (對照原始 PHP CalcBasicDamage)', () =>
 	it('無條件穿透：角色帶 SPECIAL.Pierce 但 option.pierce=false 時，原始仍加算穿透（移植版不會）', () =>
 	{
 		const user = makeUser();
-		user.SPECIAL.Pierce = [50, 0]; // 物理穿透 50
+		/** 物理穿透 50 */
+		user.SPECIAL.Pierce = [50, 0];
 		const target = makeTarget(false);
 		const orig = calcBasicDamageOriginal({
 			type: EnumSkillDamageType.Physical,
 			pow: 100,
 		}, user, target, { pierce: false });
-		// base 100；無 def；穿透 +50 → 150
+		/**
+		 * base 100；無 def；穿透 +50 → 150
+		 */
 		expect(orig).toBe(150);
 		const port = calcBasicDamage({ type: EnumSkillDamageType.Physical, pow: 100 } as never, user, target);
-		expect(port).toBe(100); // 移植版不套用穿透（skill.pierce 未設）
+		/** 移植版不套用穿透（skill.pierce 未設） */
+		expect(port).toBe(100);
 	});
 
 	it('Barrier：目標有 Barrier 時原始傷害歸 0 並消耗一次（移植版由 Battle 處理）', () =>
@@ -72,7 +79,9 @@ describe('calcBasicDamageOriginal (對照原始 PHP CalcBasicDamage)', () =>
 			type: EnumSkillDamageType.Physical,
 			pow: 100,
 		}, user, target, { multiply: 4 });
-		// base 100 ×4 = 400
+		/**
+		 * base 100 ×4 = 400
+		 */
 		expect(orig).toBe(400);
 	});
 
@@ -84,7 +93,9 @@ describe('calcBasicDamageOriginal (對照原始 PHP CalcBasicDamage)', () =>
 		target.HP = 50;
 		target.MAXHP = 300;
 		target.level = 20;
-		// base 100；無 def → dmg 100；玩家保護：HP>10 && dmg>=HP → dmg = HP-1 = 49
+		/**
+		 * base 100；無 def → dmg 100；玩家保護：HP>10 && dmg>=HP → dmg = HP-1 = 49
+		 */
 		const orig = calcBasicDamageOriginal({ type: EnumSkillDamageType.Physical, pow: 100 }, user, target);
 		expect(orig).toBe(49);
 	});
