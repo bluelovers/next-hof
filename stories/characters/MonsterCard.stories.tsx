@@ -7,14 +7,14 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { CardDarkDecorator } from '../../decorators';
-import { MonsterCard } from '../../../src/components/monsters/MonsterCard';
+import { CardDarkDecorator } from '../decorators';
+import { MonsterCard } from '../../src/components/monsters/MonsterCard';
 
 const IMG = '/image/char';
 
 /** 背景裝飾器 — 模擬遊戲深色背景 / Dark game background decorator */
 const meta: Meta<typeof MonsterCard> = {
-	title: 'Monsters/MonsterCard',
+	title: 'Characters/Monsters/MonsterCard',
 	component: MonsterCard,
 	parameters: {
 		docs: {
