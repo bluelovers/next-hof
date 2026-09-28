@@ -1,0 +1,25 @@
+no: '100'
+equip:
+    - Sword
+    - TwoHandSword
+    - Shield
+    - Armor
+    - Cloth
+    - Robe
+    - Item
+coe:
+    maxhp: 3
+    maxsp: 0.5
+pattern: null
+job: '100'
+img: mon_079
+job_name: Warrior
+gender:
+    1:
+        img: mon_079
+        job_name: Warrior
+    2:
+        img: mon_080r
+        job_name: Warrior
+info:
+    desc: "戦士系基本職。\nそこそこ耐えて、攻撃もそこそこ。"
