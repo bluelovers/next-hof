@@ -12,6 +12,8 @@ import {
 	EnumTargetMethod,
 	EnumTargetType,
 	EnumWeaponType,
+	type IItemDef,
+	type IJobDefCore,
 } from '#/lib/game/types';
 import { TEST_FIXTURES_ROOT } from '#/yaml-paths';
 import {
@@ -25,7 +27,7 @@ import {
 	loadAllUnions,
 } from './yaml-load';
 import { convertItemYaml, convertJobYaml, convertSkillYaml } from './yaml-convert';
-import type { IRawItemYaml, IRawJobYaml, IRawSkillYaml } from './yaml-types';
+import type { IRawSkillYaml } from './yaml-types';
 
 /** 載入 fixture 的通用 helper（缺檔拋出具體路徑）/ shared fixture loader (throws with the missing path) */
 function mustLoad<T>(load: () => T | undefined, file: string): T

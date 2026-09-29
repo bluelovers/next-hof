@@ -26,22 +26,22 @@ const Slime = monsterSprites.slime.name;
 
 /** 滿血滿 SP 的單位 / Full HP and SP */
 export const fullHealthUnit: IBattleUnit = {
-	name: Hero1, level: 3, hp: 349, maxHp: 349, sp: 349, maxSp: 53, side: EnumTeamSideUI.Left,
+	name: Hero1, level: 3, hp: 349, maxhp: 349, sp: 349, maxsp: 53, side: EnumTeamSideUI.Left,
 };
 
 /** 低血量單位 / Low HP */
 export const lowHealthUnit: IBattleUnit = {
-	name: Hero1, level: 3, hp: 42, maxHp: 349, sp: 180, maxSp: 53, side: EnumTeamSideUI.Left,
+	name: Hero1, level: 3, hp: 42, maxhp: 349, sp: 180, maxsp: 53, side: EnumTeamSideUI.Left,
 };
 
 /** 瀕死單位 / Near death */
 export const nearDeathUnit: IBattleUnit = {
-	name: Mage1, level: 3, hp: 1, maxHp: 159, sp: 30, maxSp: 112, side: EnumTeamSideUI.Left, status: EnumUnitStatus.Alive,
+	name: Mage1, level: 3, hp: 1, maxhp: 159, sp: 30, maxsp: 112, side: EnumTeamSideUI.Left, status: EnumUnitStatus.Alive,
 };
 
 /** 陣亡單位 / Downed unit */
 export const downedUnit: IBattleUnit = {
-	name: Healer1, level: 3, hp: 0, maxHp: 213, sp: 0, maxSp: 89, side: EnumTeamSideUI.Left, status: EnumUnitStatus.Down,
+	name: Healer1, level: 3, hp: 0, maxhp: 213, sp: 0, maxsp: 89, side: EnumTeamSideUI.Left, status: EnumUnitStatus.Down,
 };
 
 /** 詠唱中 / Casting */
@@ -49,21 +49,21 @@ export const castingUnit: IBattleUnit = {
 	name: Mage1,
 	level: 3,
 	hp: 159,
-	maxHp: 159,
+	maxhp: 159,
 	sp: 80,
-	maxSp: 112,
+	maxsp: 112,
 	side: EnumTeamSideUI.Left,
 	status: EnumUnitStatus.Casting,
 };
 
 /** SP 不足 / Low SP */
 export const lowSpUnit: IBattleUnit = {
-	name: Priest1, level: 3, hp: 213, maxHp: 213, sp: 5, maxSp: 89, side: EnumTeamSideUI.Left,
+	name: Priest1, level: 3, hp: 213, maxhp: 213, sp: 5, maxsp: 89, side: EnumTeamSideUI.Left,
 };
 
 /** 高等級敵人 / High level enemy */
 export const highLevelEnemyUnit: IBattleUnit = {
-	name: GoblinWarriorA, level: 4, hp: 263, maxHp: 263, sp: 200, maxSp: 174, side: EnumTeamSideUI.Right,
+	name: GoblinWarriorA, level: 4, hp: 263, maxhp: 263, sp: 200, maxsp: 174, side: EnumTeamSideUI.Right,
 };
 
 // ==================== BattleTeamInfo 隊伍資料 / BattleTeamInfo team data ====================
@@ -72,10 +72,10 @@ export const highLevelEnemyUnit: IBattleUnit = {
 export const goblinTeamInfo = {
 	name: 'ゴブリンと遊ぶ(最弱)',
 	units: [
-		{ name: GoblinWarriorA, level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: EnumTeamSideUI.Left },
-		{ name: GoblinWarriorB, level: 4, hp: 263, maxHp: 263, sp: 263, maxSp: 174, side: EnumTeamSideUI.Left },
-		{ name: GoblinWarriorC, level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: EnumTeamSideUI.Left },
-		{ name: GoblinAxe, level: 1, hp: 213, maxHp: 213, sp: 213, maxSp: 154, side: EnumTeamSideUI.Left },
+		{ name: GoblinWarriorA, level: 4, hp: 263, maxhp: 263, sp: 263, maxsp: 174, side: EnumTeamSideUI.Left },
+		{ name: GoblinWarriorB, level: 4, hp: 263, maxhp: 263, sp: 263, maxsp: 174, side: EnumTeamSideUI.Left },
+		{ name: GoblinWarriorC, level: 1, hp: 213, maxhp: 213, sp: 213, maxsp: 154, side: EnumTeamSideUI.Left },
+		{ name: GoblinAxe, level: 1, hp: 213, maxhp: 213, sp: 213, maxsp: 154, side: EnumTeamSideUI.Left },
 	] as IBattleUnit[],
 };
 
@@ -83,10 +83,10 @@ export const goblinTeamInfo = {
 export const testTeamInfo = {
 	name: 'TestTeam',
 	units: [
-		{ name: Hero1, level: 3, hp: 349, maxHp: 349, sp: 349, maxSp: 53, side: EnumTeamSideUI.Right },
-		{ name: Mage1, level: 3, hp: 159, maxHp: 159, sp: 159, maxSp: 112, side: EnumTeamSideUI.Right },
-		{ name: Healer1, level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: EnumTeamSideUI.Right },
-		{ name: Priest1, level: 3, hp: 213, maxHp: 213, sp: 213, maxSp: 89, side: EnumTeamSideUI.Right },
+		{ name: Hero1, level: 3, hp: 349, maxhp: 349, sp: 349, maxsp: 53, side: EnumTeamSideUI.Right },
+		{ name: Mage1, level: 3, hp: 159, maxhp: 159, sp: 159, maxsp: 112, side: EnumTeamSideUI.Right },
+		{ name: Healer1, level: 3, hp: 213, maxhp: 213, sp: 213, maxsp: 89, side: EnumTeamSideUI.Right },
+		{ name: Priest1, level: 3, hp: 213, maxhp: 213, sp: 213, maxsp: 89, side: EnumTeamSideUI.Right },
 	] as IBattleUnit[],
 };
 
@@ -94,10 +94,10 @@ export const testTeamInfo = {
 export const championTeamInfo = {
 	name: 'ChampionGuild',
 	units: [
-		{ name: 'Paladin', level: 99, hp: 9999, maxHp: 9999, sp: 5000, maxSp: 5000, side: EnumTeamSideUI.Right },
-		{ name: 'ArchMage', level: 95, hp: 3200, maxHp: 3200, sp: 8000, maxSp: 8000, side: EnumTeamSideUI.Right },
-		{ name: 'HighPriest', level: 90, hp: 4500, maxHp: 4500, sp: 6000, maxSp: 6000, side: EnumTeamSideUI.Right },
-		{ name: 'Ranger', level: 88, hp: 3800, maxHp: 3800, sp: 4000, maxSp: 4000, side: EnumTeamSideUI.Right },
+		{ name: 'Paladin', level: 99, hp: 9999, maxhp: 9999, sp: 5000, maxsp: 5000, side: EnumTeamSideUI.Right },
+		{ name: 'ArchMage', level: 95, hp: 3200, maxhp: 3200, sp: 8000, maxsp: 8000, side: EnumTeamSideUI.Right },
+		{ name: 'HighPriest', level: 90, hp: 4500, maxhp: 4500, sp: 6000, maxsp: 6000, side: EnumTeamSideUI.Right },
+		{ name: 'Ranger', level: 88, hp: 3800, maxhp: 3800, sp: 4000, maxsp: 4000, side: EnumTeamSideUI.Right },
 	] as IBattleUnit[],
 };
 
@@ -109,9 +109,9 @@ export const segmentLeftUnits: IBattleUnit[] = [
 		name: GoblinAxe,
 		level: 1,
 		hp: 180,
-		maxHp: 213,
+		maxhp: 213,
 		sp: 90,
-		maxSp: 154,
+		maxsp: 154,
 		side: EnumTeamSideUI.Left,
 		sprite: { url: getMonSpriteUrl(1000) },
 	},
@@ -119,9 +119,9 @@ export const segmentLeftUnits: IBattleUnit[] = [
 		name: Slime,
 		level: 2,
 		hp: 213,
-		maxHp: 213,
+		maxhp: 213,
 		sp: 154,
-		maxSp: 154,
+		maxsp: 154,
 		side: EnumTeamSideUI.Left,
 		sprite: { url: getMonSpriteUrl(1002) },
 	},
@@ -133,9 +133,9 @@ export const segmentRightUnits: IBattleUnit[] = [
 		name: Hero1,
 		level: 3,
 		hp: 349,
-		maxHp: 349,
+		maxhp: 349,
 		sp: 53,
-		maxSp: 53,
+		maxsp: 53,
 		side: EnumTeamSideUI.Right,
 		sprite: { url: getCharSpriteUrl(100) },
 	},
@@ -143,9 +143,9 @@ export const segmentRightUnits: IBattleUnit[] = [
 		name: Mage1,
 		level: 3,
 		hp: 120,
-		maxHp: 159,
+		maxhp: 159,
 		sp: 112,
-		maxSp: 112,
+		maxsp: 112,
 		side: EnumTeamSideUI.Right,
 		sprite: { url: getCharSpriteUrl(102) },
 	},

@@ -19,6 +19,7 @@ import {
 	EnumTargetMethod,
 	EnumTargetType,
 	EnumWeaponType,
+	IJobDefCore,
 	type IAtkTuple,
 	type IBehavior,
 	type ICharCore,
@@ -40,12 +41,10 @@ import {
 } from '#/lib/game/types';
 import { EnumPosition } from '#/lib/game/constants';
 import { COMP_FIELDS } from '#/lib/game/character/status-attrs';
-import { SKILL_EXTRA_NUMERIC_KEYS as SHARED_SKILL_EXTRA_NUMERIC_KEYS } from './yaml-skill-keys';
+import { SKILL_EXTRA_NUMERIC_KEYS } from './yaml-skill-keys';
 import type {
 	IRawCharYaml,
 	IRawCombatCoreYaml,
-	IRawItemYaml,
-	IRawJobYaml,
 	IRawMonYaml,
 	IRawSkillYaml,
 } from './yaml-types';
@@ -408,7 +407,7 @@ export function convertBonuses(raw: Record<string, string | number | undefined>)
 /**
  * 道具轉換 / Convert a raw item YAML into IItemDef
  */
-export function convertItemYaml(raw: IRawItemYaml): IItemDef
+export function convertItemYaml(raw: IItemDef): IItemDef
 {
 	const itemType = raw.type ? ITEM_TYPE_ALIASES[raw.type] : undefined;
 	return {
@@ -436,11 +435,11 @@ export function convertItemYaml(raw: IRawItemYaml): IItemDef
  * gender 鍵 1/2 → EnumGender；原始檔 pattern 恆為 null（無 AI 模式）→ 省略（undefined）。
  * gender keys 1/2 → EnumGender; the source `pattern: null` (no AI pattern) → omitted (undefined).
  */
-export function convertJobYaml(raw: IRawJobYaml): IJobDef
+export function convertJobYaml(raw: IJobDefCore): IJobDef
 {
 	const coe: IGrowthCoefficients = { ...raw.coe };
 
-	const gender: Partial<Record<EnumGender, IGenderOverride>> = {};
+	const gender: Record<EnumGender, IGenderOverride> = {} as any;
 	for (const [k, v] of Object.entries(raw.gender ?? {}))
 	{
 		const g = JOB_GENDER_ALIASES[k];
@@ -460,9 +459,6 @@ export function convertJobYaml(raw: IRawJobYaml): IJobDef
 		info: raw.info && typeof raw.info.desc === 'string' ? { desc: raw.info.desc } : undefined,
 	};
 }
-
-/** 常數加成鍵（Plus／Up／Down 系列，單一事實來源：yaml-skill-keys） */
-const SKILL_EXTRA_NUMERIC_KEYS = SHARED_SKILL_EXTRA_NUMERIC_KEYS;
 
 /**
  * 技能轉換 / Convert a raw skill YAML into ISkillDef

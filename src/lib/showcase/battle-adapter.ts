@@ -18,7 +18,7 @@ import { RNG } from '#/lib/game/core/rng';
 import { createSeedRepository } from '#/lib/game/data/seed-data';
 import type { IDataRepository } from '#/lib/game/data/repository';
 import { EnumBattleEventType, EnumInfoText, EnumResource, EnumSkillDamageType, EnumValueWho } from '#/lib/game/types';
-import type { IBattleEvent, IBattleSnapshot, ISkillDef } from '#/lib/game/types';
+import type { IBattleEvent, IBattleSnapshot, ISkillDef, IStatsHpSpAll, IStatsHpSpMax } from '#/lib/game/types';
 import { EnumStatusAttr } from '#/lib/game/character/status-enum';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
 import {
@@ -74,6 +74,7 @@ import {
 import type { IBattlePositionChar } from '#/components/battle/computeSpritePositions';
 import { getSpriteImageSize } from '#/components/battle/spriteImageSizes';
 import { getCharSpriteUrl, getMonSpriteUrl } from './sprite-map';
+import { ITSRequiredPick } from 'ts-type';
 
 /** 預設戰鬥種子（固定，保證可重現）/ Default battle seed (fixed, reproducible) */
 export const DEFAULT_SHOWCASE_SEED = 42;
@@ -94,20 +95,16 @@ const SHOWCASE_BATTLEFIELD_BG = '/image/land/bg_grass.png';
  * 單位名稱／側別／上限查詢條目（事件 actor/target 為 `String(no)`，需 no → 名稱/side）
  * Unit name/side/cap lookup entry (event actor/target are `String(no)`; needs no → name/side)
  *
- * `maxHp`／`maxSp` 供 EnergyExchange（3013）把交換前後值換算成比率，只有建表處會填。
- * `maxHp` / `maxSp` let EnergyExchange (3013) turn the before/after values into rates; only the
+ * `maxhp`／`maxsp` 供 EnergyExchange（3013）把交換前後值換算成比率，只有建表處會填。
+ * `maxhp` / `maxsp` let EnergyExchange (3013) turn the before/after values into rates; only the
  * lookup builder fills them.
  */
-export interface IUnitRef
+export interface IUnitRef extends Required<IStatsHpSpMax>
 {
 	/** 單位名稱（查無時回傳原始 no 字串）/ Unit name (raw no string when unknown) */
 	name: string;
 	/** 隊伍側 / Team side */
 	side: ITeamSide;
-	/** HP 上限 / maximum HP */
-	maxHp: number;
-	/** SP 上限 / maximum SP */
-	maxSp: number;
 }
 
 /** no → 單位查詢表 / no → unit lookup */
@@ -208,9 +205,9 @@ export function toBattleUnit(c: Character, side: ITeamSide): IBattleUnit
 		name: c.name,
 		level: c.level,
 		hp: Math.max(0, c.HP),
-		maxHp: c.MAXHP,
+		maxhp: c.MAXHP,
 		sp: Math.max(0, c.SP),
-		maxSp: c.MAXSP,
+		maxsp: c.MAXSP,
 		status: c.STATE === EnumState.Dead ? EnumUnitStatus.Down : c.expect !== null
 			? EnumUnitStatus.Casting
 			: EnumUnitStatus.Alive,
@@ -236,8 +233,8 @@ export function buildTeam(
 }
 
 /**
- * 建立 no → { name, side, maxHp, maxSp } 查詢表（我方先建、敵方後建；seed 編號互斥）
- * Build the no → { name, side, maxHp, maxSp } lookup (allies first, enemies after; seed nos are disjoint)
+ * 建立 no → { name, side, maxhp, maxsp } 查詢表（我方先建、敵方後建；seed 編號互斥）
+ * Build the no → { name, side, maxhp, maxsp } lookup (allies first, enemies after; seed nos are disjoint)
  *
  * 側別已翻轉：我方＝'right'、敵方＝'left'（與原版頁面一致）
  * Side flipped: allies = 'right', enemies = 'left' (matches original page)
@@ -250,11 +247,11 @@ export function buildUnitLookup(
 	const lookup = new Map<number, IUnitRef>();
 	for (const c of allies)
 	{
-		lookup.set(c.no, { name: c.name, side: EnumTeamSideUI.Right, maxHp: c.MAXHP, maxSp: c.MAXSP });
+		lookup.set(c.no, { name: c.name, side: EnumTeamSideUI.Right, maxhp: c.MAXHP, maxsp: c.MAXSP });
 	}
 	for (const c of enemies)
 	{
-		lookup.set(c.no, { name: c.name, side: EnumTeamSideUI.Left, maxHp: c.MAXHP, maxSp: c.MAXSP });
+		lookup.set(c.no, { name: c.name, side: EnumTeamSideUI.Left, maxhp: c.MAXHP, maxsp: c.MAXSP });
 	}
 	return lookup;
 }
@@ -267,9 +264,9 @@ export interface IResolvedRef
 	/** 隊伍側（查無時 undefined）/ team side (undefined when unknown) */
 	side?: ITeamSide;
 	/** HP 上限（查無時 undefined；供 EnergyExchange 換算比率）/ maximum HP (undefined when unknown; lets EnergyExchange derive rates) */
-	maxHp?: number;
+	maxhp?: number;
 	/** SP 上限（查無時 undefined；供 EnergyExchange 換算比率）/ maximum SP (undefined when unknown; lets EnergyExchange derive rates) */
-	maxSp?: number;
+	maxsp?: number;
 }
 
 /**
@@ -283,8 +280,8 @@ export function resolveRef(key: string | undefined, lookup: IUnitLookup): IResol
 	return {
 		name: info?.name ?? key,
 		side: info?.side,
-		maxHp: info?.maxHp,
-		maxSp: info?.maxSp,
+		maxhp: info?.maxhp,
+		maxsp: info?.maxsp,
 	};
 }
 
@@ -1079,8 +1076,8 @@ const mapEnergyExchange: IEventMapper = (ev, ctx) =>
 {
 	const hp = ev.valueChanges?.find((c) => c.unit !== EnumResource.Sp);
 	const sp = ev.valueChanges?.find((c) => c.unit === EnumResource.Sp);
-	const hpRate = percentOf(hp?.from ?? 0, ctx.target.maxHp ?? 0);
-	const spRate = percentOf(sp?.from ?? 0, ctx.target.maxSp ?? 0);
+	const hpRate = percentOf(hp?.from ?? 0, ctx.target.maxhp ?? 0);
+	const spRate = percentOf(sp?.from ?? 0, ctx.target.maxsp ?? 0);
 	return composeAction(ctx, {
 		type: EnumActionType.EnergyExchange,
 		source: ctx.target.name,
@@ -1201,12 +1198,8 @@ export interface IResultDataInput
  * 單隊 HP 統計的最小單位形狀（Character 與展示用 IBattleUnit 皆可映射至此）
  * Minimal unit shape for one-team HP stats (both Character and showcase IBattleUnit map to this)
  */
-export interface ITeamHpUnit
+export interface ITeamHpUnit extends ITSRequiredPick<IStatsHpSpAll, 'hp' | 'maxhp'>
 {
-	/** 目前 HP / current HP */
-	hp: number;
-	/** 最大 HP / max HP */
-	maxHp: number;
 	/** 是否陣亡 / whether downed */
 	dead: boolean;
 }
@@ -1234,7 +1227,7 @@ export function computeTeamHpStats(units: readonly ITeamHpUnit[]): {
 	for (const u of units)
 	{
 		hpRemain += Math.max(0, u.hp);
-		totalMaxHp += u.maxHp;
+		totalMaxHp += u.maxhp;
 		if (!u.dead) alive++;
 	}
 	return { hpRemain, totalMaxHp, alive, totalUnits: units.length };
@@ -1285,7 +1278,7 @@ function buildTeamStats(
 	 * HP stats extracted into the shared helper (the showcase data also uses computeTeamHpStats)
 	 */
 	const hp = computeTeamHpStats(
-		members.map((c) => ({ hp: c.HP, maxHp: c.MAXHP, dead: c.STATE === EnumState.Dead })),
+		members.map((c) => ({ hp: c.HP, maxhp: c.MAXHP, dead: c.STATE === EnumState.Dead })),
 	);
 	return { ...hp, totalDamage: computeSideDamage(events, lookup, side) };
 }
@@ -1416,9 +1409,9 @@ function toSnapshotDisplay(snap: IBattleSnapshot, repo?: IDataRepository): IBatt
 				imageUrl,
 				corpse: u.corpse,
 				hp: u.hp,
-				maxHp: u.maxHp,
+				maxhp: u.maxhp,
 				sp: u.sp,
-				maxSp: u.maxSp,
+				maxsp: u.maxsp,
 				dead,
 				status: dead ? EnumUnitStatus.Down : undefined,
 				/**

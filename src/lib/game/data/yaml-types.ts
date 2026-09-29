@@ -34,6 +34,7 @@ import type {
 	IPatternItem,
 	ISpecial,
 } from '#/lib/game/types';
+import type { IResourceId } from '#/lib/types/seg-types';
 import { SKILL_EXTRA_NUMERIC_KEYS } from './yaml-skill-keys';
 
 /**
@@ -111,62 +112,6 @@ export interface IRawMonYaml extends IRawCombatCoreYaml, IAtkDefFields, INamedIc
 }
 
 /**
- * 原始道具定義（Item/item.*.yml）/ Raw item definition (Item/item.*.yml)
- * 補正欄位（P_* / M_*）由 ICompBonuses 提供（單一事實來源）。
- * Compensation fields (P_* / M_*) come from ICompBonuses (SSOT).
- */
-export interface IRawItemYaml extends ICompBonuses, IAtkDefFields, INamedIconDef
-{
-	/** 武器／裝備型別（PascalCase；含 Key/Map/Special 等無對應成員的值）/ weapon/equipment type (PascalCase; includes values like Key/Map/Special without enum members) */
-	type?: string;
-	/** 類別細分（WEAPON / GUARD / OTHER）/ sub-category (WEAPON / GUARD / OTHER) */
-	type2?: string;
-	/** 購入價格 / buy price */
-	buy?: number;
-	/** 賣出價格 / sell price */
-	sell?: number;
-	/** 雙手武器標記 / two-handed flag */
-	dh?: boolean | string | number;
-	/** 裝備負荷 / equipment weight */
-	handle?: number;
-	/** 習得條件 { 職業編號: 等級 } / learn requirement (INumberTable) */
-	need?: INumberTable;
-	/** 強化後基礎道具名 / base item name after refinement */
-	base_name?: string;
-	/** 附加召喚效果值 / attached summon bonus */
-	P_SUMMON?: number;
-	/** 附加貫穿效果值（P_PIERCE = [物理, 魔法]）/ attached pierce bonus (P_PIERCE = [phys, mag]) */
-	P_PIERCE?: IAtkTuple;
-}
-
-/**
- * 原始職業定義（Job/job.*.yml）/ Raw job definition (Job/job.*.yml)
- */
-export interface IRawJobYaml
-{
-	/** 職業編號 / job number */
-	no?: number;
-	/** 職業名稱 / job name */
-	job_name?: string;
-	/** 職業編號欄位（no 之外的另一份）/ job number (a duplicate seat alongside `no`) */
-	job?: number;
-	/** 可裝備的武器／裝備型別 / equippable weapon/armor types */
-	equip?: (string | number)[];
-	/** 成長係數 / growth coefficients（IGrowthCoefficients） */
-	coe?: IGrowthCoefficients;
-	/** 行為樣式（原始檔恆為 null＝無 AI 模式）/ behavior pattern (always null in the source = no AI pattern) */
-	pattern?: unknown;
-	/** 職業圖示 / job icon */
-	img?: string;
-	/** 依性別區分的名稱／圖示（鍵為 1=男、2=女）/ per-gender name/icon (keys: 1 = male, 2 = female; value IGenderOverride) */
-	gender?: Record<string, IGenderOverride>;
-	/** 說明資訊 / description info */
-	info?: IDescInfo;
-	/** 擴充資料（共用 IDataEx；job 用 job_base＋job_conditions）/ extra data (shared IDataEx; job uses job_base + job_conditions) */
-	data_ex?: IDataEx;
-}
-
-/**
  * 原始技能定義（Skill/skill.*.yml）/ Raw skill definition (Skill/skill.*.yml)
  * 補正欄位（P_* / M_*）由 ICompBonuses 提供（單一事實來源）；source 內尚有 name2 等未收錄鍵。
  * Compensation fields (P_* / M_*) come from ICompBonuses (SSOT); the source also has
@@ -223,7 +168,7 @@ export interface IRawSkillYaml extends ICompBonuses, IRawSkillExtraNumerics, INa
 	/** 使用後移動方向 / post-use movement */
 	umove?: string;
 	/** 武器限制 / weapon-type restriction */
-	limit?: Record<string, boolean | string | number>;
+	limit?: Record<string, boolean | IResourceId>;
 	/** 犧牲比例 % / sacrifice % */
 	sacrifice?: number;
 	/** 解毒旗標 / cure-poison flag */
@@ -263,24 +208,28 @@ export interface IRawGuardYaml
 	_i18n?: Record<string, IDescInfo>;
 }
 
-/**
- * 原始判定碼設定（Judge/judge.*.yml）/ Raw judge-code setting (Judge/judge.*.yml)
- * 純資料層（UI 說明用）。/ data-layer only (UI copy).
- */
-export interface IRawJudgeYaml
+export interface IRawJudgeYamlSub
 {
 	/** 判定碼 / judge code */
 	no: number;
 	/** 說明 / description */
 	exp?: string;
 	/** 標籤 { no, exp } / tag { no, exp } */
-	tag?: { no?: string | number; exp?: string };
+	tag?: { no?: IResourceId; exp?: string };
 	/** 是否需要 quantity / whether quantity is required */
-	quantity?: boolean | string | number;
+	quantity?: boolean;
+}
+
+/**
+ * 原始判定碼設定（Judge/judge.*.yml）/ Raw judge-code setting (Judge/judge.*.yml)
+ * 純資料層（UI 說明用）。/ data-layer only (UI copy).
+ */
+export interface IRawJudgeYaml extends IRawJudgeYamlSub
+{
 	/** CSS class / css class */
 	css?: string;
 	/** 子判定 / sub judge codes */
-	subs?: unknown;
+	subs?: Record<IResourceId, IRawJudgeYamlSub>;
 	/** 詳細說明 / detail info */
 	info?: IDescInfo;
 }
@@ -322,13 +271,13 @@ export interface IRawSkilltreeYaml
 export interface IRawUnionYaml
 {
 	/** 獨特怪物 id（補零字串）/ union id (zero-padded string) */
-	no: string | number;
+	no: IResourceId;
 	/** 獨特怪物名稱 / union name */
 	name?: string;
 	/** 核心資料（隊伍、基底怪物、條件）/ core data (team, base monster, conditions) */
 	data?: {
 		team?: { name?: string; servant?: IEncounterTable };
-		base?: { type?: string; no?: string | number };
+		base?: { type?: string; no?: IResourceId };
 		conditions?: { lv_limit?: number };
 	};
 	/** 展示資料（共用 IDataEx；union 用 name/level/img/land/cycle）/ display data (shared IDataEx; union uses name/level/img/land/cycle) */

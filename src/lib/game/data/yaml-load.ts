@@ -11,14 +11,13 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse } from 'yaml';
-import { EnumGuardKind } from '#/lib/game/types';
+import { EnumGuardKind, type IItemDef, type IJobDefCore } from '#/lib/game/types';
+import type { IResourceId } from '#/lib/types/seg-types';
 import { COMP_FIELDS } from '#/lib/game/character/status-attrs';
 import { SKILL_EXTRA_NUMERIC_KEYS } from './yaml-skill-keys';
 import type {
 	IRawCharYaml,
 	IRawGuardYaml,
-	IRawItemYaml,
-	IRawJobYaml,
 	IRawJudgeYaml,
 	IRawLandYaml,
 	IRawMonYaml,
@@ -58,8 +57,6 @@ export enum EnumResourceKind
 
 /** 全部資源種類（由列舉衍生）/ all resource kinds (derived from the enum) */
 export const RESOURCE_KINDS: readonly EnumResourceKind[] = Object.values(EnumResourceKind);
-
-export type IResourceId = string | number;
 
 /**
  * 資源檔名模式：`{kind}.{id}.yml` / resource file name pattern: `{kind}.{id}.yml`
@@ -335,7 +332,7 @@ export function resourceDir(kind: EnumResourceKind, root: string): string
  * @param root 資源根目錄 / resource root
  * @returns 原始資料；檔案不存在時回 undefined / raw data; undefined when the file is absent
  */
-export function loadResourceYaml<T>(kind: EnumResourceKind, id: IResourceId, root: string): T | undefined
+export function loadResourceYaml<T>(kind: EnumResourceKind, id: string | number, root: string): T | undefined
 {
 	const file = join(resourceDir(kind, root), `${kind.toLowerCase()}.${String(id)}.yml`);
 	if (!existsSync(file)) return undefined;
@@ -394,15 +391,15 @@ export function loadMonYaml(no: IResourceId, root: string): IRawMonYaml | undefi
 }
 
 /** 依編號讀取道具 / Load an item resource by number */
-export function loadItemYaml(no: IResourceId, root: string): IRawItemYaml | undefined
+export function loadItemYaml(no: IResourceId, root: string): IItemDef | undefined
 {
-	return loadResourceYaml<IRawItemYaml>(EnumResourceKind.Item, no, root);
+	return loadResourceYaml<IItemDef>(EnumResourceKind.Item, no, root);
 }
 
 /** 依編號讀取職業 / Load a job resource by number */
-export function loadJobYaml(no: IResourceId, root: string): IRawJobYaml | undefined
+export function loadJobYaml(no: IResourceId, root: string): IJobDefCore | undefined
 {
-	return loadResourceYaml<IRawJobYaml>(EnumResourceKind.Job, no, root);
+	return loadResourceYaml<IJobDefCore>(EnumResourceKind.Job, no, root);
 }
 
 /** 依編號讀取技能 / Load a skill resource by number */
@@ -454,15 +451,15 @@ export function loadAllMons(root: string): IRawMonYaml[]
 }
 
 /** 讀取全部道具資源 / Load all item resources */
-export function loadAllItems(root: string): IRawItemYaml[]
+export function loadAllItems(root: string): IItemDef[]
 {
-	return loadAllResourceYaml<IRawItemYaml>(EnumResourceKind.Item, root);
+	return loadAllResourceYaml<IItemDef>(EnumResourceKind.Item, root);
 }
 
 /** 讀取全部職業資源 / Load all job resources */
-export function loadAllJobs(root: string): IRawJobYaml[]
+export function loadAllJobs(root: string): IJobDefCore[]
 {
-	return loadAllResourceYaml<IRawJobYaml>(EnumResourceKind.Job, root);
+	return loadAllResourceYaml<IJobDefCore>(EnumResourceKind.Job, root);
 }
 
 /** 讀取全部技能資源 / Load all skill resources */

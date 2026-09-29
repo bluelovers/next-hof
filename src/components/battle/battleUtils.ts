@@ -866,12 +866,12 @@ export function calcTotalLevel(units: { level: number }[]): number
  * @param units - 單位列表 / Unit list
  * @returns 當前 HP 總和與最大 HP 總和 / Current and max HP totals
  */
-export function calcTotalHp(units: { hp: number; maxHp: number }[]): { current: number; max: number }
+export function calcTotalHp(units: { hp: number; maxhp: number }[]): { current: number; max: number }
 {
 	return units.reduce(
 		(acc, u) => ({
 			current: acc.current + u.hp,
-			max: acc.max + u.maxHp,
+			max: acc.max + u.maxhp,
 		}),
 		{ current: 0, max: 0 },
 	);
@@ -961,9 +961,9 @@ export function snapshotUnitToBattleUnit(unit: IBattleSnapshotDisplayUnit): IBat
 		name: unit.name,
 		level: unit.level ?? 0,
 		hp: unit.hp,
-		maxHp: unit.maxHp,
+		maxhp: unit.maxhp,
 		sp: unit.sp,
-		maxSp: unit.maxSp,
+		maxsp: unit.maxsp,
 		status,
 		side: unit.side,
 		/**

@@ -155,11 +155,11 @@ interface IShowcaseUnit
 	/** 目前 HP / Current HP */
 	hp: number;
 	/** 最大 HP / Max HP */
-	maxHp: number;
+	maxhp: number;
 	/** 目前 SP / Current SP */
 	sp: number;
 	/** 最大 SP / Max SP */
-	maxSp: number;
+	maxsp: number;
 	/** 隊伍側 / Team side */
 	side: EnumTeamSideUI;
 	/** 站位：前衛 / 後衛 / Position: front / back */
@@ -175,9 +175,9 @@ const goblinWarriorA: IShowcaseUnit = {
 	name: GoblinWarriorA,
 	level: 4,
 	hp: 263,
-	maxHp: 263,
+	maxhp: 263,
 	sp: 263,
-	maxSp: 174,
+	maxsp: 174,
 	side: EnumTeamSideUI.Left,
 	position: EnumPosition.Front,
 	imageUrl: spriteUrlByFile('mon_052.png'),
@@ -187,9 +187,9 @@ const goblinWarriorB: IShowcaseUnit = {
 	name: GoblinWarriorB,
 	level: 4,
 	hp: 263,
-	maxHp: 263,
+	maxhp: 263,
 	sp: 263,
-	maxSp: 174,
+	maxsp: 174,
 	side: EnumTeamSideUI.Left,
 	position: EnumPosition.Front,
 	imageUrl: spriteUrlByFile('mon_052.png'),
@@ -199,9 +199,9 @@ const goblinWarriorC: IShowcaseUnit = {
 	name: GoblinWarriorC,
 	level: 1,
 	hp: 213,
-	maxHp: 213,
+	maxhp: 213,
 	sp: 213,
-	maxSp: 154,
+	maxsp: 154,
 	side: EnumTeamSideUI.Left,
 	position: EnumPosition.Front,
 	imageUrl: spriteUrlByFile('mon_052.png'),
@@ -211,9 +211,9 @@ const goblinAxe: IShowcaseUnit = {
 	name: GoblinAxe,
 	level: 1,
 	hp: 213,
-	maxHp: 213,
+	maxhp: 213,
 	sp: 213,
-	maxSp: 154,
+	maxsp: 154,
 	side: EnumTeamSideUI.Left,
 	position: EnumPosition.Back,
 	imageUrl: spriteUrlByFile('mon_053.png'),
@@ -226,9 +226,9 @@ const hero1: IShowcaseUnit = {
 	name: Hero1,
 	level: 3,
 	hp: 349,
-	maxHp: 349,
+	maxhp: 349,
 	sp: 349,
-	maxSp: 53,
+	maxsp: 53,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Front,
 	imageUrl: spriteUrlByFile('mon_018.png', EnumSpriteImageDir.CharRev),
@@ -238,9 +238,9 @@ const mage1: IShowcaseUnit = {
 	name: Mage1,
 	level: 3,
 	hp: 159,
-	maxHp: 159,
+	maxhp: 159,
 	sp: 159,
-	maxSp: 112,
+	maxsp: 112,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Back,
 	imageUrl: spriteUrlByFile('mon_214.png', EnumSpriteImageDir.CharRev),
@@ -250,9 +250,9 @@ const healer1: IShowcaseUnit = {
 	name: Healer1,
 	level: 3,
 	hp: 213,
-	maxHp: 213,
+	maxhp: 213,
 	sp: 213,
-	maxSp: 89,
+	maxsp: 89,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Back,
 	imageUrl: spriteUrlByFile('mon_214.png', EnumSpriteImageDir.CharRev),
@@ -262,9 +262,9 @@ const priest1: IShowcaseUnit = {
 	name: Priest1,
 	level: 3,
 	hp: 213,
-	maxHp: 213,
+	maxhp: 213,
 	sp: 213,
-	maxSp: 89,
+	maxsp: 89,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Front,
 	imageUrl: spriteUrlByFile('mon_079.png', EnumSpriteImageDir.CharRev),
@@ -292,9 +292,9 @@ const summonGoblinAxe: IShowcaseUnit = {
 	name: GoblinAxe,
 	level: 1,
 	hp: 213,
-	maxHp: 213,
+	maxhp: 213,
 	sp: 154,
-	maxSp: 154,
+	maxsp: 154,
 	side: EnumTeamSideUI.Left,
 	position: EnumPosition.Front,
 	imageUrl: spriteUrlByFile('mon_053.png'),
@@ -304,9 +304,9 @@ const summonHero1: IShowcaseUnit = {
 	name: Hero1,
 	level: 3,
 	hp: 349,
-	maxHp: 349,
+	maxhp: 349,
 	sp: 53,
-	maxSp: 53,
+	maxsp: 53,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Back,
 	imageUrl: spriteUrlByFile('mon_018.png', EnumSpriteImageDir.CharRev),
@@ -316,9 +316,9 @@ const summonMage1: IShowcaseUnit = {
 	name: Mage1,
 	level: 3,
 	hp: 159,
-	maxHp: 159,
+	maxhp: 159,
 	sp: 112,
-	maxSp: 112,
+	maxsp: 112,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Back,
 	imageUrl: spriteUrlByFile('mon_214.png', EnumSpriteImageDir.CharRev),
@@ -328,9 +328,9 @@ const mummy1: IShowcaseUnit = {
 	name: Mummy,
 	level: 10,
 	hp: 472,
-	maxHp: 472,
+	maxhp: 472,
 	sp: 179,
-	maxSp: 179,
+	maxsp: 179,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Front,
 	imageUrl: spriteUrlByFile('mon_146.png', EnumSpriteImageDir.CharRev),
@@ -340,9 +340,9 @@ const mummyPrisoner: IShowcaseUnit = {
 	name: MummyPrisoner,
 	level: 10,
 	hp: 682,
-	maxHp: 682,
+	maxhp: 682,
 	sp: 179,
-	maxSp: 179,
+	maxsp: 179,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Front,
 	imageUrl: spriteUrlByFile('mon_146r.png', EnumSpriteImageDir.CharRev),
@@ -352,9 +352,9 @@ const mummy2: IShowcaseUnit = {
 	name: Mummy,
 	level: 10,
 	hp: 472,
-	maxHp: 472,
+	maxhp: 472,
 	sp: 179,
-	maxSp: 179,
+	maxsp: 179,
 	side: EnumTeamSideUI.Right,
 	position: EnumPosition.Front,
 	imageUrl: spriteUrlByFile('mon_146.png', EnumSpriteImageDir.CharRev),
@@ -393,8 +393,8 @@ function withHp(units: IShowcaseUnit[], patch: Record<string, number>): IShowcas
  */
 function statusUnit(unit: IShowcaseUnit): IBattleUnit
 {
-	const { name, level, hp, maxHp, sp, maxSp, side } = unit;
-	return { name, level, hp, maxHp, sp, maxSp, side };
+	const { name, level, hp, maxhp, sp, maxsp, side } = unit;
+	return { name, level, hp, maxhp, sp, maxsp, side };
 }
 
 function statusUnits(units: IShowcaseUnit[]): IBattleUnit[]
@@ -426,8 +426,8 @@ function snapshotUnit(unit: IShowcaseUnit,
 	overrides: Partial<IBattleSnapshotDisplayUnit> = {},
 ): IBattleSnapshotDisplayUnit
 {
-	const { unitUuid, name, level, hp, maxHp, sp, maxSp, side, imageUrl } = unit;
-	return { unitUuid, name, level, hp, maxHp, sp, maxSp, side, imageUrl, dead: false, ...overrides };
+	const { unitUuid, name, level, hp, maxhp, sp, maxsp, side, imageUrl } = unit;
+	return { unitUuid, name, level, hp, maxhp, sp, maxsp, side, imageUrl, dead: false, ...overrides };
 }
 
 function snapshotUnits(units: IShowcaseUnit[]): IBattleSnapshotDisplayUnit[]
@@ -1241,7 +1241,7 @@ interface IBattleDataOverrides
  */
 function toHpUnit(u: IBattleUnit): ITeamHpUnit
 {
-	return { hp: u.hp, maxHp: u.maxHp, dead: u.status === EnumUnitStatus.Down };
+	return { hp: u.hp, maxhp: u.maxhp, dead: u.status === EnumUnitStatus.Down };
 }
 
 /**

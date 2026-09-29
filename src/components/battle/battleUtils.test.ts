@@ -113,9 +113,9 @@ describe('snapshotUnitToBattleUnit', () =>
 			name: 'Goblin',
 			side: EnumTeamSideUI.Left,
 			hp: 0,
-			maxHp: 100,
+			maxhp: 100,
 			sp: 0,
-			maxSp: 10,
+			maxsp: 10,
 			dead: true,
 		});
 		expect(dead.status).toBe(EnumUnitStatus.Down);
@@ -125,9 +125,9 @@ describe('snapshotUnitToBattleUnit', () =>
 			name: 'Mage',
 			side: EnumTeamSideUI.Right,
 			hp: 50,
-			maxHp: 100,
+			maxhp: 100,
 			sp: 20,
-			maxSp: 50,
+			maxsp: 50,
 			dead: false,
 			chargeKind: EnumChargeKind.Casting,
 		});
@@ -140,8 +140,8 @@ describe('segmentUnitsForSide', () =>
 {
 	it('uses the snapshot state filtered by side', () =>
 	{
-		const left = { name: 'Goblin', side: EnumTeamSideUI.Left, hp: 30, maxHp: 100, sp: 0, maxSp: 10, dead: false };
-		const right = { name: 'Hero', side: EnumTeamSideUI.Right, hp: 80, maxHp: 100, sp: 0, maxSp: 10, dead: false };
+		const left = { name: 'Goblin', side: EnumTeamSideUI.Left, hp: 30, maxhp: 100, sp: 0, maxsp: 10, dead: false };
+		const right = { name: 'Hero', side: EnumTeamSideUI.Right, hp: 80, maxhp: 100, sp: 0, maxsp: 10, dead: false };
 		const segment = splitActionsBySnapshots([action('a')], [snapshot(0, [left, right])])[0];
 
 		expect(segmentUnitsForSide(segment, EnumTeamSideUI.Left, []).map((u) => u.name)).toEqual(['Goblin']);
@@ -152,7 +152,7 @@ describe('segmentUnitsForSide', () =>
 	{
 		const segment = splitActionsBySnapshots([action('a')])[0];
 		const fallback = [
-			{ name: 'Hero', level: 1, hp: 1, maxHp: 1, sp: 0, maxSp: 0, side: EnumTeamSideUI.Right },
+			{ name: 'Hero', level: 1, hp: 1, maxhp: 1, sp: 0, maxsp: 0, side: EnumTeamSideUI.Right },
 		];
 		expect(segmentUnitsForSide(segment, EnumTeamSideUI.Right, fallback)).toEqual(fallback);
 		expect(segmentUnitsForSide(segment, EnumTeamSideUI.Left, fallback)).toEqual([]);
@@ -179,9 +179,9 @@ describe('resolveSegmentSprites', () =>
 			name: `unit-${id}`,
 			side: EnumTeamSideUI.Left,
 			hp: dead ? 0 : 1,
-			maxHp: 1,
+			maxhp: 1,
 			sp: 0,
-			maxSp: 0,
+			maxsp: 0,
 			dead,
 			/**
 			 * 預設留屍體；個別測試可覆寫為 false / 省略來驗證不留屍體
@@ -237,9 +237,9 @@ describe('resolveSegmentSprites', () =>
 			name: 'unit-u1',
 			side: EnumTeamSideUI.Left,
 			hp: 0,
-			maxHp: 1,
+			maxhp: 1,
 			sp: 0,
-			maxSp: 0,
+			maxsp: 0,
 			dead: true,
 		};
 		expect(resolveSegmentSprites(sprites, snapshot(0, [unset]))).toHaveLength(0);

@@ -39,10 +39,10 @@ export const BattleUnit: React.FC<IBattleUnitProps> = ({
 	showSpBar = true,
 }) =>
 {
-	const { name, hp, maxHp, sp, maxSp, status } = unit;
+	const { name, hp, maxhp, sp, maxsp, status } = unit;
 	const statusClass = getStatusClass(status);
-	const hpPct = clampPercent(hp, maxHp);
-	const spPct = clampPercent(sp, maxSp);
+	const hpPct = clampPercent(hp, maxhp);
+	const spPct = clampPercent(sp, maxsp);
 
 	return (
 		<div className={`unit-summary ${statusClass}`}>
@@ -59,7 +59,7 @@ export const BattleUnit: React.FC<IBattleUnitProps> = ({
 						/>
 					</div>
 					<span className={`hp-text ${getStateTextClass(status, EnumAttributeType.Recover)}`}>
-            HP: {hp}/{maxHp}
+            HP: {hp}/{maxhp}
           </span>
 				</div>
 			)}
@@ -75,7 +75,7 @@ export const BattleUnit: React.FC<IBattleUnitProps> = ({
 						/>
 					</div>
 					<span className={`sp-text ${getStateTextClass(status, EnumAttributeType.Support)}`}>
-            SP: {sp}/{maxSp}
+            SP: {sp}/{maxsp}
           </span>
 				</div>
 			)}

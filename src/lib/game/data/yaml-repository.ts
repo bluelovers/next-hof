@@ -21,6 +21,7 @@ import {
 } from './yaml-load';
 import { convertCharYaml, convertMonYaml, convertSkillYaml, convertItemYaml, convertJobYaml } from './yaml-convert';
 import type { ICharDef, IItemDef, IJobDef, IMonDef, ISkillDef } from '#/lib/game/types';
+import type { IResourceId } from '#/lib/types/seg-types';
 
 /** YAML 倉庫建置結果 / Results of building a YAML-backed repository */
 export interface IYamlRepositoryResult
@@ -66,7 +67,7 @@ export function createYamlRepository(root: string): IYamlRepositoryResult
  * 依資源種類列出已存在的 id / List the existing ids of a kind
  * （檔案層級探勘用；不會讀取內容）/ lists the file-level ids (no content read)
  */
-export function listResourceIds(kind: EnumResourceKind, root: string): (string | number)[]
+export function listResourceIds(kind: EnumResourceKind, root: string): (IResourceId)[]
 {
 	switch (kind)
 	{
@@ -80,10 +81,10 @@ export function listResourceIds(kind: EnumResourceKind, root: string): (string |
 }
 
 /** 讀取某種類全部 id（不轉換）/ load all ids of a kind (no conversion) */
-function loadAllResourceIds(kind: EnumResourceKind, root: string): (string | number)[]
+function loadAllResourceIds(kind: EnumResourceKind, root: string): (IResourceId)[]
 {
 	// 以 raw 物件上的 no 欄位取值（Guard/Land 等文字 id 亦統一為 no）
-	return (loadAllResourceYaml(kind, root) as Array<{ no?: string | number }>).map((r) => r.no).filter(
-		(v): v is string | number => v !== undefined,
+	return (loadAllResourceYaml(kind, root) as Array<{ no?: IResourceId }>).map((r) => r.no).filter(
+		(v): v is IResourceId => v !== undefined,
 	);
 }

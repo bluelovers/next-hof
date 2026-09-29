@@ -111,20 +111,20 @@ describe('3.2 buildTeam / toBattleUnit', () =>
 		const slime = leftTeam.units.find((u) => u.name === SEED.mon1002.name);
 		expect(slime).toBeDefined();
 		expect(slime!.level).toBe(SEED.mon1002.level);
-		expect(slime!.maxHp).toBe(SEED.mon1002.maxhp);
+		expect(slime!.maxhp).toBe(SEED.mon1002.maxhp);
 
 		const warrior = rightTeam.units.find((u) => u.name === SEED.char100.name);
 		expect(warrior).toBeDefined();
 		expect(warrior!.level).toBe(SEED.char100.level);
-		expect(warrior!.maxHp).toBe(SEED.char100.maxhp);
-		expect(warrior!.maxSp).toBe(SEED.char100.maxsp);
+		expect(warrior!.maxhp).toBe(SEED.char100.maxhp);
+		expect(warrior!.maxsp).toBe(SEED.char100.maxsp);
 
 		for (const u of [...leftTeam.units, ...rightTeam.units])
 		{
 			expect(u.hp).toBeGreaterThanOrEqual(0);
-			expect(u.hp).toBeLessThanOrEqual(u.maxHp);
+			expect(u.hp).toBeLessThanOrEqual(u.maxhp);
 			expect(u.sp).toBeGreaterThanOrEqual(0);
-			expect(u.sp).toBeLessThanOrEqual(u.maxSp);
+			expect(u.sp).toBeLessThanOrEqual(u.maxsp);
 			expect([EnumUnitStatus.Alive, EnumUnitStatus.Down, EnumUnitStatus.Casting]).toContain(u.status);
 			expect(u.unitUuid).toBeTruthy();
 			expect(u.spd).toBeGreaterThan(0);
@@ -143,7 +143,7 @@ describe('3.2 buildTeam / toBattleUnit', () =>
 		const team = buildTeam('T', [dead], EnumTeamSideUI.Left);
 		expect(team.units[0].status).toBe(EnumUnitStatus.Down);
 		expect(team.units[0].hp).toBe(0);
-		expect(team.units[0].maxHp).toBe(SEED.char100.maxhp);
+		expect(team.units[0].maxhp).toBe(SEED.char100.maxhp);
 	});
 });
 
@@ -155,8 +155,8 @@ describe('3.2 buildTeam / toBattleUnit', () =>
 describe('3.3 mapBattleEvent', () =>
 {
 	const lookup: IUnitLookup = new Map<number, IUnitRef>([
-		[100, { name: 'Warrior', side: EnumTeamSideUI.Right, maxHp: 1000, maxSp: 100 }],
-		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left, maxHp: 600, maxSp: 50 }],
+		[100, { name: 'Warrior', side: EnumTeamSideUI.Right, maxhp: 1000, maxsp: 100 }],
+		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left, maxhp: 600, maxsp: 50 }],
 	]);
 	const repo = createSeedRepository();
 
@@ -688,8 +688,8 @@ describe('3.5 buildSprites / buildPositionRoster', () =>
 describe('3.3b 事件轉接的組裝元件 / event adapter composition', () =>
 {
 	const lookup: IUnitLookup = new Map<number, IUnitRef>([
-		[100, { name: 'Warrior', side: EnumTeamSideUI.Right, maxHp: 1000, maxSp: 100 }],
-		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left, maxHp: 600, maxSp: 50 }],
+		[100, { name: 'Warrior', side: EnumTeamSideUI.Right, maxhp: 1000, maxsp: 100 }],
+		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left, maxhp: 600, maxsp: 50 }],
 	]);
 	const repo = createSeedRepository();
 
@@ -701,11 +701,11 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () =>
 			repo,
 		);
 		/**
-		 * maxHp／maxSp 一併解析，供 EnergyExchange 換算比率 / maxHp / maxSp resolve too, for
+		 * maxhp／maxsp 一併解析，供 EnergyExchange 換算比率 / maxhp / maxsp resolve too, for
 		 * EnergyExchange's rate computation
 		 */
-		expect(ctx.actor).toEqual({ name: 'Warrior', side: EnumTeamSideUI.Right, maxHp: 1000, maxSp: 100 });
-		expect(ctx.target).toEqual({ name: 'GoblinAxe', side: EnumTeamSideUI.Left, maxHp: 600, maxSp: 50 });
+		expect(ctx.actor).toEqual({ name: 'Warrior', side: EnumTeamSideUI.Right, maxhp: 1000, maxsp: 100 });
+		expect(ctx.target).toEqual({ name: 'GoblinAxe', side: EnumTeamSideUI.Left, maxhp: 600, maxsp: 50 });
 		/**
 		 * 歸屬側別優先取 actor（Damage 的施作者側）/ the owning side prefers the actor (the damage dealer)
 		 */
@@ -728,8 +728,8 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () =>
 		expect(resolveRef('100', lookup)).toEqual({
 			name: 'Warrior',
 			side: EnumTeamSideUI.Right,
-			maxHp: 1000,
-			maxSp: 100,
+			maxhp: 1000,
+			maxsp: 100,
 		});
 		expect(resolveRef('9999', lookup)).toEqual({ name: '9999' });
 		expect(resolveRef(undefined, lookup)).toEqual({});
@@ -895,8 +895,8 @@ describe('3.3b 事件轉接的組裝元件 / event adapter composition', () =>
 describe('3.4b 展示資料組裝 / display data assembly', () =>
 {
 	const lookup: IUnitLookup = new Map<number, IUnitRef>([
-		[100, { name: 'Warrior', side: EnumTeamSideUI.Right, maxHp: 1000, maxSp: 100 }],
-		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left, maxHp: 600, maxSp: 50 }],
+		[100, { name: 'Warrior', side: EnumTeamSideUI.Right, maxhp: 1000, maxsp: 100 }],
+		[1000, { name: 'GoblinAxe', side: EnumTeamSideUI.Left, maxhp: 600, maxsp: 50 }],
 	]);
 
 	it('computeSideDamage sums only the events whose actor belongs to that side', () =>

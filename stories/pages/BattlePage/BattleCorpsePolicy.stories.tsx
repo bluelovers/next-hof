@@ -283,9 +283,9 @@ function buildDemoData(
 		name,
 		side,
 		hp: 0,
-		maxHp: 100,
+		maxhp: 100,
 		sp: 0,
-		maxSp: 10,
+		maxsp: 10,
 		dead: true,
 		corpse,
 	});
@@ -294,9 +294,9 @@ function buildDemoData(
 		name,
 		level: 1,
 		hp: 0,
-		maxHp: 100,
+		maxhp: 100,
 		sp: 0,
-		maxSp: 10,
+		maxsp: 10,
 		status: EnumUnitStatus.Down,
 		side,
 	});

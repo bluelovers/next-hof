@@ -467,9 +467,9 @@ export class Battle implements IBattleConfig
 			 */
 			team: (c.team as BattleTeam).side,
 			hp: c.HP,
-			maxHp: c.MAXHP,
+			maxhp: c.MAXHP,
 			sp: c.SP,
-			maxSp: c.MAXSP,
+			maxsp: c.MAXSP,
 			dead: c.STATE === EnumState.Dead,
 			expectSkill: c.expect,
 		}));

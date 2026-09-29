@@ -7,6 +7,8 @@ import { EnumState, EnumPosition, EnumTeamSide } from './constants';
 import type { ICompField, IStatusUpKey, IStatusDownKey } from './character/status-attrs';
 import type { EnumStatusAttr } from './character/status-enum';
 import type { ICorpsePolicy, ICorpsePolicyField } from './battle/corpse-policy';
+import { ITSRequiredPick, ITSRequiredWith } from 'ts-type';
+import type { IResourceId } from '#/lib/types/seg-types';
 
 /**
  * 角色類型 / Character type
@@ -676,24 +678,26 @@ export interface IGenderOverride
  * 職業定義 / Job definition
  * 介面 / interface
  */
-export interface IJobDef
+export interface IJobDefCore extends ITSRequiredWith<IGenderOverride, 'job_name'>
 {
 	/** 職業編號（資料來源可能為字串）/ job number (may arrive as a string in raw data) */
-	no: number | string;
-	/** 職業名稱 / job name */
-	job_name?: string;
+	no: IResourceId;
+	/** 職業編號欄位（no 之外的另一份）/ job number (a duplicate seat alongside `no`) */
+	job?: number;
 	/** 可裝備的武器／裝備型別 / equippable weapon/armor types */
 	equip?: EnumWeaponType[];
 	/** 成長係數（maxhp/maxsp 及其餘六維的成長率）/ growth coefficients (IGrowthCoefficients) */
 	coe?: IGrowthCoefficients;
-	/** 戰鬥行為樣式（省略＝無 AI 模式）/ battle behavior pattern (omitted = no AI pattern) */
-	pattern?: IBehavior;
-	/** 職業圖示路徑 / job icon path */
-	img?: string;
 	/** 依性別（EnumGender）區分的名稱與圖示 / per-gender (EnumGender) name and icon overrides */
 	gender?: Partial<Record<EnumGender, IGenderOverride>>;
 	/** 職業說明資訊 / job description info（IDescInfo） */
 	info?: IDescInfo;
+	/** 擴充資料（共用 IDataEx；job 用 job_base＋job_conditions）/ extra data (shared IDataEx; job uses job_base + job_conditions) */
+	data_ex?: IDataEx;
+}
+
+export interface IJobDef extends IJobDefCore
+{
 	/** 職業階級（數字越小越高階）/ job rank (lower = higher tier) */
 	rank?: number;
 }
@@ -740,7 +744,7 @@ export type IDefTuple = [physPct: number, physFlat: number, magPct: number, magF
  * - `ICharCore`（角色／怪物共通基屬；`ICharDef`／`IMonDef` 繼承）/ shared char & mon base
  *   (`ICharDef` / `IMonDef` inherit it)
  * - `IItemDef`（武器／裝備自身的攻防）/ item's own attack & reduction
- * - raw 的 `IRawMonYaml`／`IRawItemYaml`（YAML 原始欄位）/ raw `IRawMonYaml` / `IRawItemYaml`
+ * - raw 的 `IRawMonYaml`／`IItemDef`（YAML 原始欄位）/ raw `IRawMonYaml` / `IItemDef`
  */
 export interface IAtkDefFields
 {
@@ -798,7 +802,7 @@ export type INumberTable<K extends string | number = string | number> = Record<K
  * 單一事實來源：IMonDef.servant、land.monster、union 隨行表與 raw 對應欄位皆引用。
  * SSOT: referenced by IMonDef.servant, land.monster, union escorts and their raw counterparts.
  */
-export type IEncounterTable = Record<string | number, IWeightPair>;
+export type IEncounterTable = Record<IResourceId, IWeightPair>;
 
 /**
  * 說明區塊（`info` 欄位共用）/ description block (shared by `info` fields)
@@ -823,7 +827,42 @@ export type IEquipTable = Partial<INumberTable<EnumEquipSlot>>;
  * 單一事實來源：IJobDef.coe 與 raw coe 皆引用。
  * SSOT: referenced by IJobDef.coe and the raw coe shape.
  */
-export type IGrowthCoefficients = Pick<ICombatStats, 'maxhp' | 'maxsp'>;
+export interface IGrowthCoefficients extends IStatsHpSpMax
+{
+
+}
+
+export interface IStatsHpSp
+{
+	/** 目前 HP（省略時視為滿血）/ current HP (full HP when omitted) */
+	hp?: number;
+	/** 目前 SP（省略時視為滿 SP）/ current SP (full SP when omitted) */
+	sp?: number;
+}
+
+export interface IStatsHpSpMax
+{
+	/** HP 上限 / max HP */
+	maxhp?: number;
+	/** SP 上限 / max SP */
+	maxsp?: number;
+}
+
+export interface IStatsHpSpAll extends IStatsHpSp, IStatsHpSpMax {}
+
+export interface IStatsBase
+{
+	/** 力量（物理攻擊主因）/ strength (main physical-attack stat) */
+	str?: number;
+	/** 智力（魔法攻擊主因）/ intelligence (main magic-attack stat) */
+	int?: number;
+	/** 敏捷（命中／迴避相關）/ dexterity (hit/evasion related) */
+	dex?: number;
+	/** 速度（行動順序與 Delay 距離）/ speed (action order and delay distance) */
+	spd?: number;
+	/** 幸運 / luck */
+	luk?: number;
+}
 
 /**
  * 戰鬥數值（角色/怪物共用，單一事實來源）/ Combat stats (shared by char & mon; single source of truth)
@@ -836,28 +875,10 @@ export type IGrowthCoefficients = Pick<ICombatStats, 'maxhp' | 'maxsp'>;
  * (Character construction) or later derivation (job coefficients). Both ICharCore and the
  * raw YAML types reference this interface instead of re-declaring the fields.
  */
-export interface ICombatStats
+export interface ICombatStats extends IStatsHpSp, IStatsHpSpMax, IStatsBase
 {
 	/** 等級 / level */
 	level?: number;
-	/** HP 上限 / max HP */
-	maxhp?: number;
-	/** 目前 HP（省略時視為滿血）/ current HP (full HP when omitted) */
-	hp?: number;
-	/** SP 上限 / max SP */
-	maxsp?: number;
-	/** 目前 SP（省略時視為滿 SP）/ current SP (full SP when omitted) */
-	sp?: number;
-	/** 力量（物理攻擊主因）/ strength (main physical-attack stat) */
-	str?: number;
-	/** 智力（魔法攻擊主因）/ intelligence (main magic-attack stat) */
-	int?: number;
-	/** 敏捷（命中／迴避相關）/ dexterity (hit/evasion related) */
-	dex?: number;
-	/** 速度（行動順序與 Delay 距離）/ speed (action order and delay distance) */
-	spd?: number;
-	/** 幸運 / luck */
-	luk?: number;
 }
 
 /**
@@ -913,7 +934,7 @@ export interface IJobDataEx
 	/** 轉職條件（含 job_from 來源職業表）/ job-change conditions (incl. the job_from source table) */
 	job_conditions?: {
 		/** 轉職來源 { 職業編號: 等級條件 } / source jobs { job no: level condition } */
-		job_from?: Record<string | number, { lv?: number }>;
+		job_from?: Record<IResourceId, { lv?: number }>;
 	};
 }
 
@@ -1337,7 +1358,7 @@ export type { EnumState };
  * side (EnumTeamSideUI), the engine's dead vs the display's status, level/no/expectSkill —
  * so no conversion function is needed and no existing behaviour changes.
  */
-export interface IBattleUnitVitals
+export interface IBattleUnitVitals extends Required<IStatsHpSpAll>
 {
 	/**
 	 * 戰鬥單位實例唯一識別碼（Character.unitUuid）
@@ -1352,14 +1373,6 @@ export interface IBattleUnitVitals
 	unitUuid?: string;
 	/** 名稱 / name */
 	name: string;
-	/** 目前 HP / current HP */
-	hp: number;
-	/** HP 上限 / max HP */
-	maxHp: number;
-	/** 目前 SP / current SP */
-	sp: number;
-	/** SP 上限 / max SP */
-	maxSp: number;
 }
 
 /**
