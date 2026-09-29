@@ -10,31 +10,48 @@ import type { Character } from './Character';
 import type { RNG } from '../core/rng';
 
 /**
+ * 玩家保護規則（單一事實來源）/ Player protection rule (single source of truth)
+ *
+ * 對齊原始 CalcBasicDamage／HpDamage 尾端的玩家保護：傷害 >20 的玩家目標，
+ * 會致死時保留 1 HP，低等（level<10 且 MAXHP<200）再額外減傷。
+ * hpDamage 與原始版傷害計算（calcBasicDamageOriginal，見 effect.core.ts）共用本函式，
+ * 取代兩處各寫一份的相同判斷。
+ * Mirrors the player protection at the end of the original CalcBasicDamage / HpDamage: for damage
+ * > 20 against a player target, a lethal hit leaves 1 HP and a low-level target (level < 10 and
+ * MAXHP < 200) takes an extra reduction. hpDamage and the original damage calculation
+ * (calcBasicDamageOriginal, see effect.core.ts) share this function, replacing the identical
+ * condition that used to be written in both places.
+ *
+ * @param char - 受保護方（玩家角色才生效）/ the protected unit (only player characters are affected)
+ * @param dmg - 套用保護前的傷害 / damage before protection
+ * @returns 套用保護後的傷害值 / the damage after protection
+ */
+export function applyPlayerProtection(char: Character, dmg: number): number
+{
+	if (!char.isChar() || dmg <= 20) return dmg;
+	if (char.HP > 10 && dmg >= char.HP)
+	{
+		/** 留 1 HP（不致死）/ leave 1 HP (non-lethal) */
+		return char.HP - 1;
+	}
+	if (char.level < 10 && char.MAXHP < 200)
+	{
+		/** 低等減傷 / low-level reduction */
+		return dmg - Math.max(10, 25 - char.level);
+	}
+	return dmg;
+}
+
+/**
  * 造成傷害（套用玩家保護機制），回傳實際扣血量
  * Deal damage (with player protection), returning the HP actually lost
  *
- * 玩家保護 / player protection:
- * - 傷害 >20 且會致死（HP>10 且 dmg>=HP）時保留 1 HP。
- *   kills are prevented (HP>10 and dmg>=HP) by leaving 1 HP when damage > 20.
- * - 低等（level<10 且 MAXHP<200）再額外減傷 max(10, 25-level)。
- *   low level (level<10 and MAXHP<200) takes an extra reduction of max(10, 25-level).
+ * 保護規則見 applyPlayerProtection（單一事實來源）。
+ * See applyPlayerProtection for the rule (single source of truth).
  */
 export function hpDamage(char: Character, dmg: number): number
 {
-	if (char.isChar() && dmg > 20)
-	{
-		if (char.HP > 10 && dmg >= char.HP)
-		{
-			/** 留 1 HP（不致死） */
-			dmg = char.HP - 1;
-		}
-		else if (char.level < 10 && char.MAXHP < 200)
-		{
-			/** 低等減傷 */
-			dmg -= Math.max(10, 25 - char.level);
-		}
-	}
-	dmg = Math.max(0, dmg);
+	dmg = Math.max(0, applyPlayerProtection(char, dmg));
 	const before = char.HP;
 	char.HP = Math.max(0, char.HP - dmg);
 	return before - char.HP;

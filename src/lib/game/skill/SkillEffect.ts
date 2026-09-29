@@ -73,7 +73,8 @@ import {
 	EnumSkillPriority,
 	EnumValueWho,
 } from '../types';
-import type { IDamageOption, ISkillResult } from './effect';
+import type { IDamageOption } from './effect.core';
+import type { ISkillResult } from './effect';
 import { applyDamage, applySkill, barrierGuard, calcBasicDamage, calcRecoveryValue, statusChanges } from './effect';
 
 /** Move 事件的 `text` 使用 EnumMoveText（展示層依 token 對照 EnumLogCopy 的位移成員）/

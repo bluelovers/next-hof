@@ -39,7 +39,7 @@ describe('calcBasicDamageOriginal (對照原始 PHP CalcBasicDamage)', () =>
 		const target = makeTarget(true);
 		const orig = calcBasicDamageOriginal({ type: EnumSkillDamageType.Physical, pow: 160 }, user, target);
 		expect(orig).toBe(123);
-		expect(calcBasicDamage({ type: EnumSkillDamageType.Physical, pow: 160 } as never, user, target)).toBe(123);
+		expect(calcBasicDamage({ type: EnumSkillDamageType.Physical, pow: 160 }, user, target)).toBe(123);
 	});
 
 	it('無條件穿透：角色帶 SPECIAL.Pierce 但 option.pierce=false 時，原始仍加算穿透（移植版不會）', () =>
@@ -56,7 +56,7 @@ describe('calcBasicDamageOriginal (對照原始 PHP CalcBasicDamage)', () =>
 		 * base 100；無 def；穿透 +50 → 150
 		 */
 		expect(orig).toBe(150);
-		const port = calcBasicDamage({ type: EnumSkillDamageType.Physical, pow: 100 } as never, user, target);
+		const port = calcBasicDamage({ type: EnumSkillDamageType.Physical, pow: 100 }, user, target);
 		/** 移植版不套用穿透（skill.pierce 未設） */
 		expect(port).toBe(100);
 	});

@@ -15,11 +15,12 @@ import {
 	STATUS_UP_KEYS,
 	STATUS_DOWN_KEYS,
 	STATUS_PLUS_KEYS,
-	EnumDefSlot,
 } from '../character/status-attrs';
 import type { IStatusUpKey, IStatusDownKey, IStatusPlusKey } from '../character/status-attrs';
 import type { ISkillDef, IBattleEvent } from '../types';
-import { EnumInfluence, EnumBattleEventType, EnumMoveText, EnumSkillDamageType } from '../types';
+import { EnumBattleEventType, EnumMoveText, EnumSkillDamageType } from '../types';
+import { EnumDamageVariant, computeBasicDamage } from './effect.core';
+import type { IDamageOption, IDamageSkillSource } from './effect.core';
 import type { RNG } from '../core/rng';
 
 /**
@@ -37,129 +38,38 @@ export interface ISkillResult
 }
 
 /**
- * 基礎傷害計算的選項 / Options for the basic damage calculation
- * 介面 / interface
+ * 物理/魔法基礎傷害計算（對應 CalcBasicDamage，移植版）
+ * Physical/magic basic damage calculation (ported variant; mirrors CalcBasicDamage)
  *
- * 對應原始 CalcBasicDamage 的 `$option`（`multiply` 與 `pierce` 兩鍵）。
- * Mirrors the original CalcBasicDamage's `$option` (its `multiply` and `pierce` keys).
- */
-export interface IDamageOption
-{
-	/**
-	 * 傷害倍率（於 pow 之後、min／def 之前套用；對齊原始 `if ($option["multiply"]) $dmg *= …`）
-	 * damage multiplier (applied after pow and before min / def; mirrors the original
-	 * `if ($option["multiply"]) $dmg *= …`)
-	 */
-	multiply?: number;
-	/**
-	 * 無視目標 def 的 %／定值減免（skill.pierce 同樣跳過 def，兩者皆可）；
-	 * 對齊原始 `if (!$option["pierce"])`，不影響 skill.pierce 的 SPECIAL.Pierce 加成。
-	 * skip the target's % and flat def reductions (either skill.pierce or this flag does it);
-	 * mirrors the original `if (!$option["pierce"])` and never affects skill.pierce's
-	 * SPECIAL.Pierce bonus.
-	 */
-	pierce?: boolean;
-}
-
-/**
- * 物理/魔法基礎傷害計算（對應 CalcBasicDamage）
- * Physical/magic basic damage calculation (mirrors CalcBasicDamage)
+ * 公式本體只有單一事實來源：effect.core.ts 的 computeBasicDamage。
+ * 本函式僅以 EnumDamageVariant.Adapted 套用移植版規則（三處差異列於該列舉）：
+ * - Barrier 由 barrierGuard 於呼叫前處理、玩家保護由 hpDamage 於扣血時套用（不內聯）
+ * - def 豁免與穿透加算皆受 skill.pierce 閘控
+ * The formula body has a single source of truth: computeBasicDamage in effect.core.ts. This
+ * function only applies the ported rules via EnumDamageVariant.Adapted (the three differences are
+ * documented on that enum): Barrier / player protection stay outside the formula, and both the
+ * def exception and the pierce bonus are gated by skill.pierce.
  *
- * 流程 / flow:
- * 1. 依 skill.type 決定 STR/INT 與物理/魔法 atk 索引；inf=Dex 時改用 DEX。
- *    pick STR/INT and the physical/magic atk slot by skill.type; inf=Dex uses DEX instead.
- * 2. base = sqrt(能力)×10 + 使用者對應 atk，再乘 pow%；option.multiply 再乘倍率。
- *    base = sqrt(stat)×10 + user's matching atk, scaled by pow%; option.multiply then scales it.
- * 3. 非 pierce 時套用目標 def 的 % 減免與定值減免。
- *    without pierce, apply the target's % and flat def reductions.
- * 4. 保底最小傷害為「扣防禦前 raw」的 10%（對齊原始 `$min = $dmg*(1/10)` 在扣防前計算），
- *    扣防＋穿透後再與 min 比較；pierce 時另加 SPECIAL.Pierce×pow%。
- *    floor damage is 10% of the PRE-defence `raw` (mirrors original `$min` computed before defence),
- *    compared after defence + pierce; pierce additionally adds SPECIAL.Pierce×pow%.
+ * 注意：原始 PHP 的「Barrier 內聯、無條件穿透、內聯玩家保護」請見
+ * effect.original.ts 的 calcBasicDamageOriginal（同一份公式的 Original 規則組態）。
+ * Note: the original PHP behaviour (inline Barrier, unconditional pierce, inline player
+ * protection) lives in calcBasicDamageOriginal in effect.original.ts — the Original preset of the
+ * very same formula.
  *
- * 注意：移植版（適應版）的穿透加算僅在 skill.pierce 為真時觸發，且 Barrier／玩家保護分別由
- * Battle.UseSkill 與 hpDamage 處理。原始 PHP 的「無條件穿透」與內聯 Barrier／保護，請見
- * effect.original.ts 的 calcBasicDamageOriginal 作為比較基準。
- * Note: the port (adapted) gates the Pierce bonus on skill.pierce and delegates Barrier / player
- * protection to Battle.UseSkill / hpDamage. For the original's unconditional Pierce and inline
- * Barrier / protection, see calcBasicDamageOriginal in effect.original.ts as the comparison baseline.
- *
- * @param skill - 技能定義 / skill definition
+ * @param skill - 技能欄位（ISkillDef 或最小物件字面）/ skill fields (ISkillDef or a minimal literal)
  * @param user - 施放者（提供能力與 atk）/ the caster (supplies stats and atk)
  * @param target - 目標（提供 def 與 Pierce 參照）/ the target (supplies def)
  * @param option - 倍率／穿透選項（缺省＝無）/ multiplier / pierce options (none when omitted)
  * @returns 最終傷害 / the final damage
  */
 export function calcBasicDamage(
-	skill: ISkillDef,
+	skill: IDamageSkillSource,
 	user: Character,
 	target: Character,
 	option?: IDamageOption,
 ): number
 {
-	const atkIdx = skill.type;
-	const isMagic = skill.type;
-
-	const stat = skill.inf === EnumInfluence.Dex
-		? user.DEX
-		: (isMagic ? user.INT : user.STR);
-	const base = Math.sqrt(stat) * 10 + (user.atk[atkIdx] ?? 0);
-	let raw = base * (skill.pow ?? 100) / 100;
-
-	/**
-	 * 倍率（原始 `$option["multiply"]`）：pow 之後、min／def 之前。
-	 * Multiplier (the original `$option["multiply"]`): after pow, before min / def.
-	 */
-	if (option?.multiply) raw *= option.multiply;
-
-	/**
-	 * 保底基準：對齊原始 `$min = $dmg * (1/10)`，於「扣防禦前」計算。
-	 * Floor reference: mirrors original `$min = $dmg * (1/10)`, computed BEFORE defence reduction.
-	 */
-	const min = raw * 0.1;
-
-	/**
-	 * 跳過 def：skill.pierce 或 option.pierce 任一為真即無視減傷（原始由 `$option["pierce"]` 決定）。
-	 * Skip def: either skill.pierce or option.pierce nullifies reduction (the original decides by
-	 * `$option["pierce"]`).
-	 */
-	if (!skill.pierce && !option?.pierce)
-	{
-		if (isMagic)
-		{
-			raw = raw * (1 - (target.def[EnumDefSlot.MagPct] ?? 0) / 100);
-			raw = raw - (target.def[EnumDefSlot.MagFlat] ?? 0);
-		}
-		else
-		{
-			raw = raw * (1 - (target.def[EnumDefSlot.PhysPct] ?? 0) / 100);
-			raw = raw - (target.def[EnumDefSlot.PhysFlat] ?? 0);
-		}
-	}
-
-	let dmg = raw;
-
-	/**
-	 * 穿透加算：移植版（適應版）僅在 skill.pierce 為真時加算 SPECIAL.Pierce。
-	 * 原始 PHP 為「無條件」加算；完整還原請見 effect.original.ts 的 calcBasicDamageOriginal。
-	 * Pierce bonus: the port (adapted) adds SPECIAL.Pierce only when skill.pierce is set.
-	 * The original PHP adds it unconditionally; see calcBasicDamageOriginal in effect.original.ts.
-	 */
-	if (skill.pierce)
-	{
-		/** Pierce 缺省（undefined）時不賦預設值，直接視為無穿透 */
-		const pierce = user.SPECIAL.Pierce;
-		if (pierce)
-		{
-			const p = pierce[atkIdx];
-			dmg += (p * (skill.pow ?? 100)) / 100;
-		}
-	}
-
-	/** 保底最小傷害（扣防＋穿透後再與 min 比較） */
-	if (dmg < min) dmg = min;
-
-	return Math.ceil(dmg);
+	return computeBasicDamage(skill, user, target, option, EnumDamageVariant.Adapted);
 }
 
 /**
@@ -384,43 +294,70 @@ export function barrierGuard(skill: ISkillDef, target: Character): IBattleEvent 
 }
 
 /**
+ * Barrier 攔截判定 → calcBasicDamage → Damage 事件（applyDamage 與 applySkill 的共同傷害路徑）
+ * Barrier interception → calcBasicDamage → Damage record (the damage path shared by applyDamage
+ * and applySkill)
+ *
+ * 兩個公開函式的傷害流程原本各寫一份（違反單一事實來源），已收斂至本函式；
+ * 是否在傷害之後再套狀態變化，由呼叫方決定。
+ * The damage flow used to be written separately in both public functions (an SSoT violation) and
+ * is now collapsed into this one; whether status changes follow the damage is up to the caller.
+ *
+ * @returns result＝傷害結果；guarded＝是否遭 Barrier 攔截（攔截時呼叫方不得再套狀態變化）
+ *          result = the damage outcome; guarded = whether the barrier intercepted (the caller
+ *          must not apply status changes in that case)
+ */
+function _damageOnce(
+	skill: ISkillDef,
+	user: Character,
+	target: Character,
+): { result: ISkillResult; guarded: boolean }
+{
+	const guard = barrierGuard(skill, target);
+	if (guard) return { result: { damage: 0, events: [guard] }, guarded: true };
+
+	const dmg = calcBasicDamage(skill, user, target);
+	const hpBefore = target.HP;
+	const applied = hpDamage(target, dmg);
+	return {
+		result: {
+			damage: applied,
+			events: [
+				{
+					type: EnumBattleEventType.Damage,
+					actor: charIdToString(user.no),
+					target: charIdToString(target.no),
+					skill: skill.no,
+					value: applied,
+					hpBefore,
+					hpAfter: target.HP,
+				},
+			],
+		},
+		guarded: false,
+	};
+}
+
+/**
  * 執行一次傷害效果但「不套狀態變化」（Barrier 攔截 → calcBasicDamage → Damage 事件）。
  * Execute one damage effect *without* status changes (Barrier → calcBasicDamage → Damage record).
  *
- * 與 applySkill 的差別只有一點：本函式產出 Damage 事件後即返回。SkillEffect.default 的
- * 原始分支（`if ($skill["pow"]) { ... $dmg = CalcBasicDamage; DamageHP; }`）在 PHP 裡
- * **不**呼叫 StatusChanges——狀態變化統一由 default 尾端的那次 StatusChanges 處理——
- * 因此不能直接沿用會多做一次狀態變化的 applySkill。
- * The only difference from applySkill: it returns right after the Damage record. The original
- * default branch (`if ($skill["pow"]) { ... CalcBasicDamage; DamageHP; }`) does **not** call
- * StatusChanges — the single StatusChanges at the end of default owns that — so applySkill
- * (which would apply the statuses one extra time) cannot be used there.
+ * 傷害流程共用 _damageOnce（SSoT），本函式在產出 Damage 事件後即返回，**不**套狀態變化。
+ * 理由：SkillEffect.default 的原始分支（`if ($skill["pow"]) { ... $dmg = CalcBasicDamage;
+ * DamageHP; }`）在 PHP 裡不呼叫 StatusChanges——狀態變化統一由 default 尾端的那次
+ * StatusChanges 處理——因此不能沿用會多做一次狀態變化的 applySkill。
+ * The damage flow is shared via _damageOnce (SSoT); this function returns right after the Damage
+ * record and applies **no** status changes. Reason: SkillEffect's original default branch
+ * (`if ($skill["pow"]) { ... CalcBasicDamage; DamageHP; }`) does not call StatusChanges — the
+ * single StatusChanges at the end of default owns that — so applySkill, which would apply the
+ * statuses one extra time, cannot be used there.
  *
  * @returns 技能執行結果（damage＝實際扣血；Barrier 攔截時為 0）/ skill result (damage = HP actually
  * lost; 0 when the barrier intercepted)
  */
 export function applyDamage(skill: ISkillDef, user: Character, target: Character): ISkillResult
 {
-	const guard = barrierGuard(skill, target);
-	if (guard) return { damage: 0, events: [guard] };
-
-	const dmg = calcBasicDamage(skill, user, target);
-	const hpBefore = target.HP;
-	const applied = hpDamage(target, dmg);
-	return {
-		damage: applied,
-		events: [
-			{
-				type: EnumBattleEventType.Damage,
-				actor: charIdToString(user.no),
-				target: charIdToString(target.no),
-				skill: skill.no,
-				value: applied,
-				hpBefore,
-				hpAfter: target.HP,
-			},
-		],
-	};
+	return _damageOnce(skill, user, target).result;
 }
 
 /**
@@ -455,25 +392,13 @@ export function applySkill(skill: ISkillDef, user: Character, target: Character,
 	}
 
 	/**
-	 * 絕對防禦 Barrier：消耗一次，完全抵擋（判定集中在 barrierGuard，全專案單一規則）
-	 * Absolute guard: one layer consumed, the hit fully blocked (the rule lives in barrierGuard only)
+	 * 傷害路徑共用 _damageOnce（SSoT）；Barrier 攔截時直接返回，不套狀態變化。
+	 * The damage path is shared via _damageOnce (SSoT); when the barrier intercepts we return
+	 * without applying status changes.
 	 */
-	const guard = barrierGuard(skill, target);
-	if (guard) return { damage: 0, events: [guard] };
+	const { result, guarded } = _damageOnce(skill, user, target);
+	if (guarded) return result;
 
-	const dmg = calcBasicDamage(skill, user, target);
-
-	const hpBefore = target.HP;
-	const applied = hpDamage(target, dmg);
-	events.push({
-		type: EnumBattleEventType.Damage,
-		actor: charIdToString(user.no),
-		target: charIdToString(target.no),
-		skill: skill.no,
-		value: applied,
-		hpBefore,
-		hpAfter: target.HP,
-	});
-	events.push(...statusChanges(skill, user, target, rng));
-	return { damage: applied, events };
+	result.events.push(...statusChanges(skill, user, target, rng));
+	return result;
 }
