@@ -118,7 +118,7 @@ export class Character implements ICharCore
 	HP = 0;
 	MAXSP = 0;
 	SP = 0;
-	/** 物理/魔法攻擊（來源於裝備；索引同 EnumAtkSlot）/ physical/magic attack from equipment (indices match EnumAtkSlot) */
+	/** 物理/魔法攻擊（來源於裝備；索引同 EnumSkillDamageType）/ physical/magic attack from equipment (indices match EnumSkillDamageType) */
 	atk: IAtkTuple = [0, 0];
 	/** [物理%, 物理定值, 魔法%, 魔法定值] 減傷（索引同 EnumDefSlot）/ [phys%, phys flat, mag%, mag flat] reductions (indices match EnumDefSlot) */
 	def: IDefTuple = [0, 0, 0, 0];
@@ -260,13 +260,14 @@ export class Character implements ICharCore
 				(current?.[1] ?? 0) + (add[1] ?? 0),
 			];
 			this.SPECIAL.Pierce = next;
-			return next as unknown as NonNullable<ISpecial[K]>;
+			return next as NonNullable<ISpecial[K]>;
 		}
+		const _key = key as Exclude<keyof ISpecial, 'Pierce'>;
 		/** 數值鍵：缺省 undefined 視為 0 參與運算（只累加，不建立多餘欄位） */
-		const current = this.SPECIAL[key] as number | undefined;
+		const current = this.SPECIAL[_key];
 		const next = (current ?? 0) + (amount as number);
-		this.setSpecial(key, next as unknown as ISpecial[K]);
-		return next as unknown as NonNullable<ISpecial[K]>;
+		this.setSpecial(_key, next);
+		return next as NonNullable<ISpecial[K]>;
 	}
 
 	setSpecial<K extends keyof ISpecial>(key: K, value: ISpecial[K]): void

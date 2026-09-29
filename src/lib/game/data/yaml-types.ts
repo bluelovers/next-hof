@@ -92,7 +92,7 @@ export interface IRawMonYaml extends IRawCombatCoreYaml, INamedIconDef
 	SPECIAL?: ISpecial;
 	/**
 	 * 基礎攻擊力（有語意的二元組）[物理, 魔法] / base attack 2-tuple [physical, magic]
-	 * 索引語意同 EnumAtkSlot。 / index semantics follow EnumAtkSlot.
+	 * 索引語意同 EnumSkillDamageType。 / index semantics follow EnumSkillDamageType.
 	 */
 	atk?: IAtkTuple;
 	/**

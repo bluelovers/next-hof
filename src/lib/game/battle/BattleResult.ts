@@ -7,7 +7,7 @@ import type { BattleTeam } from '../team/BattleTeam';
 
 /**
  * 戰鬥結果 / Battle outcome
- * 列舉 / enumeration
+ *
  */
 export enum EnumOutcome
 {

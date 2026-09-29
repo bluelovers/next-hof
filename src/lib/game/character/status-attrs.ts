@@ -14,6 +14,7 @@
  */
 
 import { MAX_STATUS_MAXIMUM } from '../constants';
+import { EnumSkillDamageType } from '../types';
 import type { Character } from './Character';
 import { EnumStatusAttr, EnumVital } from './status-enum';
 import {
@@ -141,20 +142,8 @@ export const {
 // ============================================================================
 
 /**
- * atk 陣列索引（物理/魔法）/ atk array indices (physical/magic)
- * 列舉 / enumeration
- */
-export enum EnumAtkSlot
-{
-	/** 物理攻擊（atk[0]）/ physical attack (atk[0]) */
-	Phys = 0,
-	/** 魔法攻擊（atk[1]）/ magic attack (atk[1]) */
-	Mag = 1,
-}
-
-/**
  * def 陣列索引（物理%, 物理-, 魔法%, 魔法-）/ def array indices
- * 列舉 / enumeration
+ *
  */
 export enum EnumDefSlot
 {
@@ -201,10 +190,10 @@ export interface IStatusAttrEntry
  *
  * 每個 EnumStatusAttr 對應「角色身上的哪個欄位／槽位」只在此處定義一次；後續 get/set 與所有
  * 演算法皆由 STATUS_FIELD 查表取得，杜絕槽位在 get/set 與演算法呼叫處重複書寫（先前 ATK 的
- * EnumAtkSlot.Phys、DEF 的 EnumDefSlot.PhysPct 等同時出現在多處，違反單一事實來源）。
+ * EnumSkillDamageType.Physical、DEF 的 EnumDefSlot.PhysPct 等同時出現在多處，違反單一事實來源）。
  * Each EnumStatusAttr maps to "which Character field/slot" exactly once here; every get/set and
  * algorithm later resolves it from STATUS_FIELD, so a slot is never written in multiple places
- * (previously e.g. EnumAtkSlot.Phys for ATK appeared in get/set AND the up-call, violating SSoT).
+ * (previously e.g. the physical slot for ATK appeared in get/set AND the up-call, violating SSoT).
  */
 interface IStatusField
 {
@@ -239,7 +228,15 @@ const _field = (key: IScalarStatusAttr | EnumVital): IStatusField =>
 	};
 };
 
-const _atkField = (slot: EnumAtkSlot): IStatusField => ({
+/**
+ * atk 槽位存取器（單一事實來源）/ atk slot accessor (SSoT)
+ *
+ * atk 槽位與技能傷害類型共用 EnumSkillDamageType（0＝Physical＝atk[0]、1＝Magic＝atk[1]），
+ * 故不再另立 EnumAtkSlot（Phys / Mag）重複定義同一組索引。
+ * The atk slot shares EnumSkillDamageType with the skill damage type (0 = Physical = atk[0],
+ * 1 = Magic = atk[1]), so the duplicate EnumAtkSlot (Phys / Mag) index enum was removed.
+ */
+const _atkField = (slot: EnumSkillDamageType): IStatusField => ({
 	get: (c) => c.atk[slot],
 	set: (c, v) => { c.atk[slot] = v; },
 });
@@ -251,8 +248,8 @@ const _defField = (slot: EnumDefSlot): IStatusField => ({
 
 /**
  * 屬性↔欄位對照（單一事實來源）/ Attribute→field mapping (SSoT)
- * 鍵為 EnumStatusAttr；atk/def 經由 EnumAtkSlot / EnumDefSlot 列舉索引，不寫死數字或字串。
- * Keyed by EnumStatusAttr; atk/def indexed via the EnumAtkSlot / EnumDefSlot enums (no hardcoded numbers/strings).
+ * 鍵為 EnumStatusAttr；atk/def 經由 EnumSkillDamageType / EnumDefSlot 列舉索引，不寫死數字或字串。
+ * Keyed by EnumStatusAttr; atk/def indexed via the EnumSkillDamageType / EnumDefSlot enums (no hardcoded numbers/strings).
  */
 const STATUS_FIELD: Record<EnumStatusAttr, IStatusField> = {
 	[EnumStatusAttr.STR]: _field(EnumStatusAttr.STR),
@@ -260,8 +257,8 @@ const STATUS_FIELD: Record<EnumStatusAttr, IStatusField> = {
 	[EnumStatusAttr.DEX]: _field(EnumStatusAttr.DEX),
 	[EnumStatusAttr.SPD]: _field(EnumStatusAttr.SPD),
 	[EnumStatusAttr.LUK]: _field(EnumStatusAttr.LUK),
-	[EnumStatusAttr.ATK]: _atkField(EnumAtkSlot.Phys),
-	[EnumStatusAttr.MATK]: _atkField(EnumAtkSlot.Mag),
+	[EnumStatusAttr.ATK]: _atkField(EnumSkillDamageType.Physical),
+	[EnumStatusAttr.MATK]: _atkField(EnumSkillDamageType.Magic),
 	[EnumStatusAttr.DEF]: _defField(EnumDefSlot.PhysPct),
 	[EnumStatusAttr.MDEF]: _defField(EnumDefSlot.MagPct),
 	[EnumStatusAttr.MAXHP]: _field(EnumStatusAttr.MAXHP),

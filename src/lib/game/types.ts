@@ -10,7 +10,7 @@ import type { ICorpsePolicy, ICorpsePolicyField } from './battle/corpse-policy';
 
 /**
  * 角色類型 / Character type
- * 列舉 / enumeration
+ *
  *
  * 以 Set<EnumCharType> 存於 Character.types，可同時持有複數類型：
  * Stored as Set<EnumCharType> on Character.types; a unit may hold several types at once:
@@ -33,7 +33,7 @@ export enum EnumCharType
 
 /**
  * 裝備欄位 / Equipment slot
- * 列舉 / enumeration
+ *
  *
  * 作為 Character.equip（Partial<Record>）的鍵；欄位可缺省＝該處未裝備。
  * Keys of Character.equip (Partial<Record>); a missing key means the slot is empty.
@@ -56,7 +56,7 @@ export enum EnumEquipSlot
 
 /**
  * 武器類型 / Weapon type
- * 列舉 / enumeration
+ *
  *
  * 同時是「武器分類」與「道具分類」的單一事實來源（值採 PascalCase，與 YAML 來源一致）：
  * Single source of truth for both weapon classes and item categories (PascalCase values, matching the YAML source):
@@ -117,7 +117,7 @@ export enum EnumWeaponType
 
 /**
  * 防禦種類 / Guard kind
- * 列舉 / enumeration
+ *
  *
  * 決定前排守護者「何時替後排擋傷」（由 guard.ts guardActive() 逐次判定）：
  * Decides when a front-row guardian intercepts damage for the back row (re-evaluated per hit by guard.ts guardActive()):
@@ -226,7 +226,7 @@ export interface IBehavior
 
 /**
  * 技能目標類型 / Skill target type
- * 列舉 / enumeration
+ *
  *
  * 決定「以誰為中心」選取目標（ITargetSpec 第 1 元，Battle.selectTargets 據此分支）：
  * Determines the camp used as the selection center (ITargetSpec element 1; branches in Battle.selectTargets):
@@ -249,7 +249,7 @@ export enum EnumTargetType
 
 /**
  * 技能目標方式 / Skill target method
- * 列舉 / enumeration
+ *
  *
  * 決定「在該陣營內取幾個」（ITargetSpec 第 2 元）：
  * Determines how many targets are taken within the chosen camp (ITargetSpec element 2):
@@ -319,8 +319,8 @@ export interface ISpecial
 	/** 絕對防禦次數：>0 時消耗一次並使該次傷害歸 0（pierce 可穿透）/ absolute guard charges: consumes one to nullify a hit (pierced by pierce) */
 	Barrier?: number;
 	/**
-	 * 貫穿值（索引同 EnumAtkSlot：0=物理、1=魔法；pierce 技能加算至傷害）
-	 * pierce damage (IAtkTuple; indices follow EnumAtkSlot: 0 = physical, 1 = magic; added when skill.pierce is set)
+	 * 貫穿值（索引同 EnumSkillDamageType：0=物理、1=魔法；pierce 技能加算至傷害）
+	 * pierce damage (IAtkTuple; indices follow EnumSkillDamageType: 0 = physical, 1 = magic; added when skill.pierce is set)
 	 */
 	Pierce?: IAtkTuple;
 	/** 召喚加成（裝備 P_SUMMON 累加）/ summon bonus (accumulated from equipment P_SUMMON) */
@@ -337,7 +337,7 @@ export interface ISpecial
 
 /**
  * 技能影響能力（參照基礎六維）/ Skill influencing stat
- * 列舉 / enumeration
+ *
  *
  * 決定傷害公式採用的主要能力（effect.ts calcBasicDamage）：
  * Selects the primary stat used by the damage formula (effect.ts calcBasicDamage):
@@ -356,7 +356,7 @@ export enum EnumInfluence
 
 /**
  * 技能優先條件 / Skill priority condition
- * 列舉 / enumeration
+ *
  *
  * AI 目標選擇的優先判斷（供 judge/pattern 層參考）：
  * Priority hints for AI target selection (consumed by the judge/pattern layer):
@@ -380,24 +380,26 @@ export enum EnumSkillPriority
 }
 
 /**
- * 技能傷害類型 / Skill damage type
- * 列舉 / enumeration
+ * 技能傷害類型（同時為 atk 陣列槽位索引，單一事實來源）
  *
- * Physical＝0（物理：STR／物理 atk 槽）、Magic＝1（魔法：INT／魔法 atk 槽）；
- * 成員值與 YAML 來源一致。
- * Physical = 0 (physical: STR / physical atk slot), Magic = 1 (magic: INT / magic atk slot);
- * member values match the YAML source.
+ * Physical＝0（物理：STR／atk[0]）、Magic＝1（魔法：INT／atk[1]）；
+ * 成員值與 YAML 來源一致，並採完整鍵名（Physical / Magic）。
+ *
+ * 本列舉即 atk 槽位索引的唯一來源：status-attrs.ts 原本另立 EnumAtkSlot（Phys / Mag），
+ * 與本列舉定義完全相同的 0＝物理、1＝魔法，屬重複定義，已併入本列舉；
+ * atk 讀寫、pierce、equip 等索引一律引用 EnumSkillDamageType。
  *
  * calcBasicDamage 據此選擇能力與 atk/def 的物理／魔法索引；
  * showcase battle-adapter 據此決定蓄力文案（Physical→charging、Magic→casting）。
- * calcBasicDamage picks the stat and the physical/magic atk/def slots from this value;
- * the showcase battle-adapter picks the charge wording (Physical → charging, Magic → casting).
+ *
+ * @see {@link IAtkTuple}
+ * @see {@link calcBasicDamage}
  */
 export enum EnumSkillDamageType
 {
-	/** 物理（YAML 值 0）/ physical (YAML value 0) */
+	/** 物理：YAML 值 0、atk[0] / physical: YAML value 0, atk[0] */
 	Physical = 0,
-	/** 魔法（YAML 值 1）/ magic (YAML value 1) */
+	/** 魔法：YAML 值 1、atk[1] / magic: YAML value 1, atk[1] */
 	Magic = 1,
 }
 
@@ -592,7 +594,7 @@ export interface ISkillDef extends ICompBonuses, ISkillUpFields, ISkillDownField
 
 /**
  * 道具類別細分 / Item sub-category
- * 列舉 / enumeration
+ *
  *
  * 對應 YAML item.type2 的有限集合（成員值與 YAML 來源一致，全大寫）：
  * Mirrors the closed set of YAML item.type2 values (member values match the YAML source, uppercase):
@@ -629,7 +631,7 @@ export interface IItemDef extends ICompBonuses, INamedIconDef
 	buy?: number;
 	/** 賣出價格（金幣）/ sell price (gold) */
 	sell?: number;
-	/** 攻擊力（索引同 EnumAtkSlot：0=物理、1=魔法）/ attack power (indices follow EnumAtkSlot: 0 = physical, 1 = magic) */
+	/** 攻擊力（索引同 EnumSkillDamageType：0=物理、1=魔法）/ attack power (indices follow EnumSkillDamageType: 0 = physical, 1 = magic) */
 	atk?: IAtkTuple;
 	/** 減傷四槽（索引同 EnumDefSlot：物理%減、物理定值減、魔法%減、魔法定值減）/ four reduction slots (indices follow EnumDefSlot: physical %, physical flat, magic %, magic flat) */
 	def?: IDefTuple;
@@ -649,7 +651,7 @@ export interface IItemDef extends ICompBonuses, INamedIconDef
 
 /**
  * 性別 / Gender
- * 列舉 / enumeration
+ *
  *
  * 作為 IJobDef.gender 的鍵（Partial<Record>）：0＝男性、1＝女性。
  * Keys of IJobDef.gender (Partial<Record>): 0 = male, 1 = female.
@@ -716,8 +718,8 @@ export interface IMonReward
 
 /**
  * 攻擊力二元組 / attack 2-tuple
- * 索引同 EnumAtkSlot：0=物理、1=魔法。單一事實來源（raw 與 target 共用）。
- * Index semantics follow EnumAtkSlot: 0 = physical, 1 = magic. SSOT (shared by raw & target).
+ * 索引同 EnumSkillDamageType：0=物理、1=魔法。單一事實來源（raw 與 target 共用）。
+ * Index semantics follow EnumSkillDamageType: 0 = physical, 1 = magic. SSOT (shared by raw & target).
  */
 export type IAtkTuple = [phys: number, mag: number];
 
@@ -852,8 +854,8 @@ export interface ICharCore extends ICorpsePolicyField, ICombatStats, Omit<INamed
 	/** AI 行為樣式（怪物戰鬥決策用）/ AI behavior pattern (monster battle decisions) */
 	behavior?: IBehavior;
 	/**
-	 * 基礎攻擊力（索引同 EnumAtkSlot：0=物理、1=魔法）
-	 * Base attack (indices follow EnumAtkSlot: 0 = physical, 1 = magic).
+	 * 基礎攻擊力（索引同 EnumSkillDamageType：0=物理、1=魔法）
+	 * Base attack (indices follow EnumSkillDamageType: 0 = physical, 1 = magic).
 	 * 共通基屬：角色由裝備累加、怪物由資料層給定。
 	 * Shared base: chars accumulate from equipment, mons get it from the data layer.
 	 */
@@ -978,7 +980,7 @@ export interface IMonDef extends ICharCore, INamedIconDef
 
 /**
  * 戰鬥事件類型 / Battle event type
- * 列舉 / enumeration
+ *
  *
  * 生產點（單一事實來源，見各成員註解）/ Producers (single source of truth; see each member):
  * - Battle.UseSkill → Act、Cast、Death、MagicCircle、Summon、Info（無目標失敗）
@@ -1173,7 +1175,7 @@ export enum EnumBattleEventType
  */
 /**
  * 數值變化的資源維度 / Resource dimension of a value change
- * 列舉 / enumeration
+ *
  *
  * 單一事實來源：IBattleValueChange.unit 與 IBattleEvent.unit 共用，取代裸字串 'hp' / 'sp' / 'delay'。
  * Single source of truth shared by IBattleValueChange.unit and IBattleEvent.unit, replacing the bare
@@ -1191,7 +1193,7 @@ export enum EnumResource
 
 /**
  * 數值變化的歸屬 / Owner of a value change
- * 列舉 / enumeration
+ *
  *
  * 單一事實來源：取代裸字串 'actor' / 'target'，指明這段變化是行動者還是目標的。
  * Single source of truth replacing the bare strings 'actor' / 'target'; says whether the change is
@@ -1207,7 +1209,7 @@ export enum EnumValueWho
 
 /**
  * 資訊事件的結構化 token / Structured token of an Info event
- * 列舉 / enumeration
+ *
  *
  * 「文字類」事件（Damage x6!／heal x2!／over-cap 等）的 text 不是可顯示字串，而是一個 token，
  * 展示層依 token 選 EnumLogCopy 成員或 buildXxx 建構器。此 enum 是 token 的單一事實來源，
@@ -1230,7 +1232,7 @@ export enum EnumInfoText
 
 /**
  * 位移事件的結構化 token / Structured token of a Move event
- * 列舉 / enumeration
+ *
  *
  * 單一事實來源：取代裸字串 'front' / 'back' / 'knockback' / 'forward'。
  * Single source of truth replacing the bare strings 'front' / 'back' / 'knockback' / 'forward'.

@@ -19,7 +19,7 @@
 
 import { EnumSkillDamageType, EnumInfluence } from '../types';
 import type { Character } from '../character/Character';
-import { EnumAtkSlot, EnumDefSlot } from '../character/status-attrs';
+import { EnumDefSlot } from '../character/status-attrs';
 
 /**
  * 傳入技能的最小必要欄位（結構型別，可直接傳入 ISkillDef）。
@@ -71,11 +71,12 @@ export function calcBasicDamageOriginal(
 	option: ICalcOption = {},
 ): number
 {
-	const isMagic = skill.type === EnumSkillDamageType.Magic;
+	const atkIdx = skill.type;
+	const isMagic = skill.type;
+
 	const stat = skill.inf === EnumInfluence.Dex
 		? user.DEX
 		: (isMagic ? user.INT : user.STR);
-	const atkIdx = isMagic ? EnumAtkSlot.Mag : EnumAtkSlot.Phys;
 
 	let dmg = Math.sqrt(stat) * 10;
 	dmg += user.atk[atkIdx] ?? 0;

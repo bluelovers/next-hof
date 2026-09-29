@@ -5,9 +5,9 @@
  */
 
 import type { Character } from '../character/Character';
-import { COMP_FIELDS, EnumAtkSlot, EnumDefSlot } from '../character/status-attrs';
+import { COMP_FIELDS, EnumDefSlot } from '../character/status-attrs';
 import type { IDataRepository } from '../data/repository';
-import { EnumEquipSlot, EnumWeaponType } from '../types';
+import { EnumEquipSlot, EnumSkillDamageType, EnumWeaponType } from '../types';
 import { parseItem } from './Item';
 
 /** 玩家最大負荷：5 + floor(level/10) + floor(DEX/5) / max equipment weight: 5 + floor(level/10) + floor(DEX/5) */
@@ -50,8 +50,8 @@ export function CalcEquips(char: Character, repo: IDataRepository): void
 		if (!item) continue;
 		if (slot === EnumEquipSlot.MainHand) char.WEAPON = item.type as EnumWeaponType;
 
-		char.atk[EnumAtkSlot.Phys] += item.atk?.[EnumAtkSlot.Phys] ?? 0;
-		char.atk[EnumAtkSlot.Mag] += item.atk?.[EnumAtkSlot.Mag] ?? 0;
+		char.atk[EnumSkillDamageType.Physical] += item.atk?.[EnumSkillDamageType.Physical] ?? 0;
+		char.atk[EnumSkillDamageType.Magic] += item.atk?.[EnumSkillDamageType.Magic] ?? 0;
 		char.def[EnumDefSlot.PhysPct] += item.def?.[EnumDefSlot.PhysPct] ?? 0;
 		char.def[EnumDefSlot.PhysFlat] += item.def?.[EnumDefSlot.PhysFlat] ?? 0;
 		char.def[EnumDefSlot.MagPct] += item.def?.[EnumDefSlot.MagPct] ?? 0;

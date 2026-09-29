@@ -15,7 +15,6 @@ import {
 	STATUS_UP_KEYS,
 	STATUS_DOWN_KEYS,
 	STATUS_PLUS_KEYS,
-	EnumAtkSlot,
 	EnumDefSlot,
 } from '../character/status-attrs';
 import type { IStatusUpKey, IStatusDownKey, IStatusPlusKey } from '../character/status-attrs';
@@ -98,11 +97,12 @@ export function calcBasicDamage(
 	option?: IDamageOption,
 ): number
 {
-	const isMagic = skill.type === EnumSkillDamageType.Magic;
+	const atkIdx = skill.type;
+	const isMagic = skill.type;
+
 	const stat = skill.inf === EnumInfluence.Dex
 		? user.DEX
 		: (isMagic ? user.INT : user.STR);
-	const atkIdx = isMagic ? EnumAtkSlot.Mag : EnumAtkSlot.Phys;
 	const base = Math.sqrt(stat) * 10 + (user.atk[atkIdx] ?? 0);
 	let raw = base * (skill.pow ?? 100) / 100;
 
@@ -171,7 +171,7 @@ export function calcBasicDamage(
  */
 export function calcRecoveryValue(skill: ISkillDef, user: Character): number
 {
-	const heal = Math.sqrt(user.INT) * 10 + (user.atk[EnumAtkSlot.Mag] ?? 0);
+	const heal = Math.sqrt(user.INT) * 10 + (user.atk[EnumSkillDamageType.Magic] ?? 0);
 	return Math.ceil(heal * (skill.pow ?? 100) / 100);
 }
 

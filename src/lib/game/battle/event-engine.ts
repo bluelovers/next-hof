@@ -28,7 +28,6 @@ import { EnumBattleEventType } from '../types';
 
 /**
  * 事件分類（兩類涵蓋所有戰鬥紀錄）/ Event class (two classes cover every battle record)
- * 列舉 / enumeration
  */
 export enum EnumEventClass
 {
@@ -40,7 +39,6 @@ export enum EnumEventClass
 
 /**
  * 效果系統（技能事件的分派對象）/ Effect system (dispatch target of a skill event)
- * 列舉 / enumeration
  *
  * 只列「引擎有生產點、可被分派」的效果；尚無生產點的欄位（knockback、sacrifice、delay…）
  * 不在此列，偵測時也不會回報，避免出現「偵測到卻永遠沒有紀錄」的空系統。
@@ -251,7 +249,6 @@ export function detectSkillEffects(skill: ISkillDef): EnumSkillEffect[]
 /**
  * 效果系統衍生的後續事件（不進 Battle.log，由引擎在分派後補上）
  * Follow-up event derived by an effect system (never enters Battle.log; added by the engine after dispatch)
- * 列舉 / enumeration
  */
 export enum EnumFollowUpType
 {
