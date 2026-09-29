@@ -621,7 +621,7 @@ export enum EnumItemCategory
  * 道具定義 / Item definition
  * 介面 / interface
  */
-export interface IItemDef extends ICompBonuses, INamedIconDef
+export interface IItemDef extends ICompBonuses, IAtkDefFields, INamedIconDef
 {
 	/** 武器／裝備型別（同時決定可裝備欄位）/ weapon/equipment type (also decides the equip slot) */
 	type: EnumWeaponType;
@@ -631,10 +631,6 @@ export interface IItemDef extends ICompBonuses, INamedIconDef
 	buy?: number;
 	/** 賣出價格（金幣）/ sell price (gold) */
 	sell?: number;
-	/** 攻擊力（索引同 EnumSkillDamageType：0=物理、1=魔法）/ attack power (indices follow EnumSkillDamageType: 0 = physical, 1 = magic) */
-	atk?: IAtkTuple;
-	/** 減傷四槽（索引同 EnumDefSlot：物理%減、物理定值減、魔法%減、魔法定值減）/ four reduction slots (indices follow EnumDefSlot: physical %, physical flat, magic %, magic flat) */
-	def?: IDefTuple;
 	/** 雙手武器（佔用手部＋副手）/ two-handed weapon (occupies both hand slots) */
 	dh?: boolean;
 	/** 裝備負荷（參與 Delay 系統運算）/ equipment weight (feeds the delay calculation) */
@@ -729,6 +725,43 @@ export type IAtkTuple = [phys: number, mag: number];
  * Index semantics follow EnumDefSlot: phys %, phys flat, mag %, mag flat. SSOT.
  */
 export type IDefTuple = [physPct: number, physFlat: number, magPct: number, magFlat: number];
+
+/**
+ * 攻擊／減傷欄位的共用形狀（`atk`／`def` 的單一事實來源）
+ * Shared shape of the attack/reduction fields (SSOT for `atk` / `def`)
+ *
+ * 所有同時帶 `atk` 與 `def` 的介面一律以 `extends` 繼承本型別，不再各自宣告；
+ * 完整欄位語意寫在下方「欄位自身」的 JSDoc，使繼承方在 IDE 悬停時仍取得有效說明。
+ * Every interface carrying both `atk` and `def` extends this type instead of re-declaring it;
+ * the full field semantics live in the field's own JSDoc below, so inheriting sites still
+ * surface an effective description on IDE hover.
+ *
+ * 使用方 / Consumers:
+ * - `ICharCore`（角色／怪物共通基屬；`ICharDef`／`IMonDef` 繼承）/ shared char & mon base
+ *   (`ICharDef` / `IMonDef` inherit it)
+ * - `IItemDef`（武器／裝備自身的攻防）/ item's own attack & reduction
+ * - raw 的 `IRawMonYaml`／`IRawItemYaml`（YAML 原始欄位）/ raw `IRawMonYaml` / `IRawItemYaml`
+ */
+export interface IAtkDefFields
+{
+	/**
+	 * 基礎攻擊力（有語意的二元組）[物理, 魔法] / base attack 2-tuple [physical, magic]
+	 * 索引語意同 EnumSkillDamageType。 / index semantics follow EnumSkillDamageType.
+	 *
+	 * 數值來源依介面而異：怪物由資料層給定、道具為其自身攻擊、角色由裝備累加。
+	 * The value's origin varies by interface: mons take it from the data layer, items carry
+	 * their own attack, chars accumulate it from equipment.
+	 */
+	atk?: IAtkTuple;
+	/**
+	 * 基礎減傷四槽（有語意的四元組）[物理%減, 物理定值減, 魔法%減, 魔法定值減]
+	 * base reduction 4-tuple; index semantics follow EnumDefSlot.
+	 *
+	 * 來源同 `atk`（怪物資料層／道具自身／角色由裝備累加）。
+	 * Origin follows `atk` (monster data layer / item itself / accumulated from equipment).
+	 */
+	def?: IDefTuple;
+}
 
 /**
  * 權重二元組 [權重, 旗標] / weight pair [weight, flag]
@@ -834,7 +867,7 @@ export interface ICombatStats
  * 六維與 HP/SP 由 ICombatStats 提供（可缺省）；本介面只宣告身分與列表欄位。
  * Stats/HP/SP come from ICombatStats (optional); this interface adds identity and list fields only.
  */
-export interface ICharCore extends ICorpsePolicyField, ICombatStats, Omit<INamedIconDef, 'img'>
+export interface ICharCore extends ICorpsePolicyField, ICombatStats, IAtkDefFields, Omit<INamedIconDef, 'img'>
 {
 	/**
 	 * 戰鬥單位實例唯一識別碼（資料提供者可指定；未提供時由 Character 自動產生）
@@ -853,20 +886,6 @@ export interface ICharCore extends ICorpsePolicyField, ICombatStats, Omit<INamed
 	skill?: number[];
 	/** AI 行為樣式（怪物戰鬥決策用）/ AI behavior pattern (monster battle decisions) */
 	behavior?: IBehavior;
-	/**
-	 * 基礎攻擊力（索引同 EnumSkillDamageType：0=物理、1=魔法）
-	 * Base attack (indices follow EnumSkillDamageType: 0 = physical, 1 = magic).
-	 * 共通基屬：角色由裝備累加、怪物由資料層給定。
-	 * Shared base: chars accumulate from equipment, mons get it from the data layer.
-	 */
-	atk?: IAtkTuple;
-	/**
-	 * 基礎減傷四槽（索引同 EnumDefSlot：物理%減、物理定值減、魔法%減、魔法定值減）
-	 * Base reduction slots (indices follow EnumDefSlot: phys %, phys flat, mag %, mag flat).
-	 * 共通基屬：與 atk 相同。
-	 * Shared base: same as `atk`.
-	 */
-	def?: IDefTuple;
 	/** 天生特殊能力（ISpecial；省略＝無該能力）/ innate special abilities (ISpecial; omitted = none) */
 	SPECIAL?: ISpecial;
 }

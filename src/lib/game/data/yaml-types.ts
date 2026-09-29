@@ -17,12 +17,12 @@
  */
 
 import type {
+	IAtkDefFields,
 	IAtkTuple,
 	IBehavior,
 	IDataEx,
 	ICombatStats,
 	ICompBonuses,
-	IDefTuple,
 	IDescInfo,
 	IEncounterTable,
 	IEquipTable,
@@ -86,20 +86,10 @@ export interface IRawCharYaml extends IRawCombatCoreYaml
  * The lowercase `special` key is a source typo (only mon.1000, an empty object) — the canonical
  * key is `SPECIAL` only.
  */
-export interface IRawMonYaml extends IRawCombatCoreYaml, INamedIconDef
+export interface IRawMonYaml extends IRawCombatCoreYaml, IAtkDefFields, INamedIconDef
 {
 	/** 特殊能力（以 ISpecial 為單一事實來源，省略＝無該能力）/ special abilities (ISpecial is the SSOT, omitted = no ability) */
 	SPECIAL?: ISpecial;
-	/**
-	 * 基礎攻擊力（有語意的二元組）[物理, 魔法] / base attack 2-tuple [physical, magic]
-	 * 索引語意同 EnumSkillDamageType。 / index semantics follow EnumSkillDamageType.
-	 */
-	atk?: IAtkTuple;
-	/**
-	 * 基礎減傷四槽（有語意的四元組）[物理%減, 物理定值減, 魔法%減, 魔法定值減]
-	 * base reduction 4-tuple; index semantics follow EnumDefSlot.
-	 */
-	def?: IDefTuple;
 	/** 說明資訊 / description info */
 	info?: IDescInfo;
 	/** 掉落與獎勵 / drop & reward */
@@ -125,7 +115,7 @@ export interface IRawMonYaml extends IRawCombatCoreYaml, INamedIconDef
  * 補正欄位（P_* / M_*）由 ICompBonuses 提供（單一事實來源）。
  * Compensation fields (P_* / M_*) come from ICompBonuses (SSOT).
  */
-export interface IRawItemYaml extends ICompBonuses, INamedIconDef
+export interface IRawItemYaml extends ICompBonuses, IAtkDefFields, INamedIconDef
 {
 	/** 武器／裝備型別（PascalCase；含 Key/Map/Special 等無對應成員的值）/ weapon/equipment type (PascalCase; includes values like Key/Map/Special without enum members) */
 	type?: string;
@@ -135,10 +125,6 @@ export interface IRawItemYaml extends ICompBonuses, INamedIconDef
 	buy?: number;
 	/** 賣出價格 / sell price */
 	sell?: number;
-	/** 攻擊力二元組 [物理, 魔法] / attack 2-tuple [physical, magic] */
-	atk?: IAtkTuple;
-	/** 減傷四元組 [物理%減, 物理定值減, 魔法%減, 魔法定值減] / reduction 4-tuple */
-	def?: IDefTuple;
 	/** 雙手武器標記 / two-handed flag */
 	dh?: boolean | string | number;
 	/** 裝備負荷 / equipment weight */
