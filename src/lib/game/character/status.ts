@@ -7,6 +7,7 @@
 
 import { EnumState, EnumPosition } from '../constants';
 import type { Character } from './Character';
+import { minusPercent, takePercent } from '../core/percent';
 import type { RNG } from '../core/rng';
 
 /**
@@ -142,7 +143,7 @@ export function getPoison(char: Character, bePoison: number, rng?: RNG): boolean
 
 	if (char.SPECIAL.PoisonResist && rng)
 	{
-		const chance = bePoison * (1 - char.SPECIAL.PoisonResist / 100);
+		const chance = minusPercent(bePoison, char.SPECIAL.PoisonResist);
 		if (rng.randInt(0, 99) < chance)
 		{
 			char.STATE = EnumState.Poison;
@@ -186,7 +187,7 @@ export function poisonDamage(char: Character, multiply = 1): number
 export function getPoisonResist(char: Character, no: number): number
 {
 	/** 缺省 undefined 時以 0 參與運算（不寫入實例） */
-	const add = Math.round((100 - (char.getSpecial('PoisonResist') ?? 0)) * (no / 100));
+	const add = Math.round(takePercent(100 - (char.getSpecial('PoisonResist') ?? 0), no));
 	return char.addSpecial('PoisonResist', add);
 }
 
@@ -208,7 +209,7 @@ export function getPoisonResist(char: Character, no: number): number
 export function sacrificeHp(char: Character, rate: number): number
 {
 	if (!rate) return 0;
-	let selfDamage = Math.ceil(char.MAXHP * (rate / 100));
+	let selfDamage = Math.ceil(takePercent(char.MAXHP, rate));
 	/** 後衛犧牲翻倍 */
 	if (char.POSITION !== EnumPosition.Front) selfDamage *= 2;
 	const before = char.HP;
@@ -235,11 +236,11 @@ export function autoRegeneration(char: Character): void
 {
 	if (char.SPECIAL.HpRegen)
 	{
-		hpRecover(char, Math.round(char.MAXHP * char.SPECIAL.HpRegen / 100));
+		hpRecover(char, Math.round(takePercent(char.MAXHP, char.SPECIAL.HpRegen)));
 	}
 	if (char.SPECIAL.SpRegen)
 	{
-		spRecover(char, Math.round(char.MAXSP * char.SPECIAL.SpRegen / 100));
+		spRecover(char, Math.round(takePercent(char.MAXSP, char.SPECIAL.SpRegen)));
 	}
 }
 

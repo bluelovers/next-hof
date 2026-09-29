@@ -15,6 +15,7 @@
 
 import { EnumState } from '../constants';
 import type { Character } from './Character';
+import { minusPercent } from '../core/percent';
 import type { RNG } from '../core/rng';
 
 /**
@@ -45,7 +46,7 @@ export function getPoisonOriginal(char: Character, bePoison: number, rng?: RNG):
 
 	if (char.SPECIAL.PoisonResist && rng)
 	{
-		const chance = bePoison * (1 - char.SPECIAL.PoisonResist / 100);
+		const chance = minusPercent(bePoison, char.SPECIAL.PoisonResist);
 		if (rng.randInt(0, 99) < chance)
 		{
 			/** 抗毒成功仍為 STATE_POISON */

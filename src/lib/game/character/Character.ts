@@ -10,7 +10,7 @@ import type { IBehavior, ISpecial, ICharCore, IMonReward, IAtkTuple, IDefTuple }
 import type { ICorpsePolicy } from '../battle/corpse-policy';
 import { EnumCharType, EnumEquipSlot, EnumWeaponType } from '../types';
 import type { RNG } from '../core/rng';
-import { percentOf } from '../core/percent';
+import { percentOf, plusPercent } from '../core/percent';
 import { nanoid } from 'nanoid';
 
 /**
@@ -293,7 +293,7 @@ export class Character implements ICharCore
 	 *
 	 * 原始公式 / original formula:
 	 *   Strength = 1 + (sqrt(DEX)×5 + LUK) / 250
-	 *   SPECIAL.Summon 為真時再 ×(100 + Summon) / 100
+	 *   SPECIAL.Summon 為真時再 ×(100 + Summon) / 100（＝ plusPercent(strength, Summon)）
 	 *   when SPECIAL.Summon is truthy, multiply by (100 + Summon) / 100
 	 *
 	 * @returns 召喚強度（>1 表示強化）/ summon strength (> 1 means a stronger summon)
@@ -302,7 +302,7 @@ export class Character implements ICharCore
 	{
 		const dexPart = Math.sqrt(this.DEX) * 5;
 		let strength = 1 + (dexPart + this.LUK) / 250;
-		if (this.SPECIAL.Summon) strength *= (100 + this.SPECIAL.Summon) / 100;
+		if (this.SPECIAL.Summon) strength = plusPercent(strength, this.SPECIAL.Summon);
 		return strength;
 	}
 }

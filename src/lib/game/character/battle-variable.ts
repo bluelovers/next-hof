@@ -9,6 +9,7 @@ import { BASE_STAT_COMP_MAP, PRIMARY_STATS } from './status-attrs';
 import { skillPassive } from '../skill/passive';
 import { CalcEquips } from '../item/equip';
 import type { IDataRepository } from '../data/repository';
+import { plusPercent } from '../core/percent';
 import type { RNG } from '../core/rng';
 
 /**
@@ -41,10 +42,10 @@ export function setBattleVariable(char: Character, repo: IDataRepository, rng: R
 		ch[m.battle] = ch[k] + ch[m.comp];
 	}
 
-	char.MAXHP = Math.round(char.maxhp * (1 + char.M_MAXHP / 100) + char.P_MAXHP);
-	char.HP = Math.round(char.hp * (1 + char.M_MAXHP / 100) + char.P_MAXHP);
-	char.MAXSP = Math.round(char.maxsp * (1 + char.M_MAXSP / 100) + char.P_MAXSP);
-	char.SP = Math.round(char.sp * (1 + char.M_MAXSP / 100) + char.P_MAXSP);
+	char.MAXHP = Math.round(plusPercent(char.maxhp, char.M_MAXHP) + char.P_MAXHP);
+	char.HP = Math.round(plusPercent(char.hp, char.M_MAXHP) + char.P_MAXHP);
+	char.MAXSP = Math.round(plusPercent(char.maxsp, char.M_MAXSP) + char.P_MAXSP);
+	char.SP = Math.round(plusPercent(char.sp, char.M_MAXSP) + char.P_MAXSP);
 
 	char.HP = Math.min(char.HP, char.MAXHP);
 	char.SP = Math.min(char.SP, char.MAXSP);

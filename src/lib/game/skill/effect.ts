@@ -21,6 +21,7 @@ import type { ISkillDef, IBattleEvent } from '../types';
 import { EnumBattleEventType, EnumMoveText, EnumSkillDamageType } from '../types';
 import { EnumDamageVariant, computeBasicDamage } from './effect.core';
 import type { IDamageOption, IDamageSkillSource } from './effect.core';
+import { takePercent } from '../core/percent';
 import type { RNG } from '../core/rng';
 
 /**
@@ -82,7 +83,7 @@ export function calcBasicDamage(
 export function calcRecoveryValue(skill: ISkillDef, user: Character): number
 {
 	const heal = Math.sqrt(user.INT) * 10 + (user.atk[EnumSkillDamageType.Magic] ?? 0);
-	return Math.ceil(heal * (skill.pow ?? 100) / 100);
+	return Math.ceil(takePercent(heal, skill.pow));
 }
 
 /**

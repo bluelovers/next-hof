@@ -5,6 +5,7 @@ import { Character } from './Character';
 import { createSeedRepository } from '../data/seed-data';
 import { newChar, newMon, newMonSummon } from './factory';
 import { levelFix } from './level-fix';
+import { plusPercent } from '../core/percent';
 import { setBattleVariable } from './battle-variable';
 import { getPoison, poisonDamage, consumeBarrier } from './status';
 import { EnumCharType } from '../types';
@@ -101,7 +102,7 @@ describe('battle-variable (4.3)', () =>
 		const rng = new RNG(4);
 		const char = newChar(repo.getCharBase(100)!, repo, rng);
 		expect(char.STR).toBe(char.str + char.P_STR);
-		expect(char.MAXHP).toBe(Math.round(char.maxhp * (1 + char.M_MAXHP / 100) + char.P_MAXHP));
+		expect(char.MAXHP).toBe(Math.round(plusPercent(char.maxhp, char.M_MAXHP) + char.P_MAXHP));
 
 		/**
 		 * 補正 P_STR 後重新計算

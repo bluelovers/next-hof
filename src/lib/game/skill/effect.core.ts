@@ -25,6 +25,7 @@
 import type { Character } from '../character/Character';
 import { applyPlayerProtection } from '../character/status';
 import { EnumDefSlot } from '../character/status-attrs';
+import { PERCENT_NONE, minusPercent, takePercent } from '../core/percent';
 import { EnumInfluence, EnumSkillDamageType } from '../types';
 import type { ISkillDef } from '../types';
 
@@ -131,7 +132,8 @@ export function computeBasicDamage(
 	 * 2. base = sqrt(能力)×10 + 使用者對應 atk，再乘 pow%。
 	 *    base = sqrt(stat)×10 + the user's matching atk, then scaled by pow%.
 	 */
-	let dmg = (Math.sqrt(stat) * 10 + (user.atk[atkIdx] ?? 0)) * (skill.pow ?? 100) / 100;
+	const base = Math.sqrt(stat) * 10 + (user.atk[atkIdx] ?? 0);
+	let dmg = takePercent(base, skill.pow);
 
 	/**
 	 * 3. 倍率（原始 `$option["multiply"]`）：pow 之後、min／def 之前。
@@ -168,12 +170,12 @@ export function computeBasicDamage(
 	{
 		if (isMagic)
 		{
-			dmg *= 1 - (target.def[EnumDefSlot.MagPct] ?? 0) / 100;
+			dmg = minusPercent(dmg, target.def[EnumDefSlot.MagPct], PERCENT_NONE);
 			dmg -= target.def[EnumDefSlot.MagFlat] ?? 0;
 		}
 		else
 		{
-			dmg *= 1 - (target.def[EnumDefSlot.PhysPct] ?? 0) / 100;
+			dmg = minusPercent(dmg, target.def[EnumDefSlot.PhysPct], PERCENT_NONE);
 			dmg -= target.def[EnumDefSlot.PhysFlat] ?? 0;
 		}
 	}
@@ -191,7 +193,7 @@ export function computeBasicDamage(
 		if (pierce)
 		{
 			const p = pierce[atkIdx];
-			if (p) dmg += p * (skill.pow ?? 100) / 100;
+			if (p) dmg += takePercent(p, skill.pow);
 		}
 	}
 

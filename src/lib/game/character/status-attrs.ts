@@ -14,6 +14,7 @@
  */
 
 import { MAX_STATUS_MAXIMUM } from '../constants';
+import { minusPercent, plusPercent, takePercent } from '../core/percent';
 import { EnumSkillDamageType } from '../types';
 import type { Character } from './Character';
 import { EnumStatusAttr, EnumVital } from './status-enum';
@@ -286,7 +287,7 @@ const CAP_VITAL: Partial<Record<EnumStatusAttr, EnumVital>> = {
 };
 
 /** 增益縮放：round(orig*(1+n/100))（upAttr 與 upNoCap 共用，單一事實來源）/ Buff scale shared by upAttr & upNoCap (SSoT) */
-const _scaleUp = (orig: number, n: number) => Math.round(orig * (1 + n / 100));
+const _scaleUp = (orig: number, n: number) => Math.round(plusPercent(orig, n));
 
 /**
  * 通用增益：round(orig*(1+n/100))，上限 orig*(MAX_STATUS_MAXIMUM/100)
@@ -298,7 +299,7 @@ const upAttr = (attr: EnumStatusAttr): IAttrFn => (c, n) =>
 {
 	const f = STATUS_FIELD[attr];
 	const orig = f.get(c);
-	const cap = orig * (MAX_STATUS_MAXIMUM / 100);
+	const cap = takePercent(orig, MAX_STATUS_MAXIMUM);
 	f.set(c, Math.min(_scaleUp(orig, n), cap));
 };
 
@@ -309,7 +310,7 @@ const upAttr = (attr: EnumStatusAttr): IAttrFn => (c, n) =>
 const downAttr = (attr: EnumStatusAttr): IAttrFn => (c, n) =>
 {
 	const f = STATUS_FIELD[attr];
-	f.set(c, Math.round(f.get(c) * (1 - n / 100)));
+	f.set(c, Math.round(minusPercent(f.get(c), n)));
 };
 
 /**
@@ -351,7 +352,7 @@ const upDefPct = (attr: EnumStatusAttr): IAttrFn => (c, n) =>
 {
 	const f = STATUS_FIELD[attr];
 	const cur = f.get(c);
-	f.set(c, cur + Math.floor((100 - cur) * (n / 100)));
+	f.set(c, cur + Math.floor(takePercent(100 - cur, n)));
 };
 
 /**

@@ -64,6 +64,7 @@ import {
 	spRecover,
 } from '../character/status';
 import { DOWNMAP, UPMAP } from '../character/status-attrs';
+import { minusPercent, takePercent } from '../core/percent';
 import type { IBattleEvent, ISkillDef } from '../types';
 import {
 	EnumBattleEventType,
@@ -599,8 +600,8 @@ export class SkillEffect
 				const spRate = target.spPercent();
 				const hpFrom = target.HP;
 				const spFrom = target.SP;
-				target.HP = Math.round(spRate / 100 * target.MAXHP);
-				target.SP = Math.round(hpRate / 100 * target.MAXSP);
+				target.HP = Math.round(takePercent(target.MAXHP, spRate));
+				target.SP = Math.round(takePercent(target.MAXSP, hpRate));
 				events.push({
 					type: EnumBattleEventType.EnergyExchange,
 					actor: charIdToString(char.no),
@@ -1411,7 +1412,7 @@ export class SkillEffect
 	 */
 	private delayByRate(target: Character, rate: number): void
 	{
-		target.delay += this.battle.DelayValue(target) * rate / 100;
+		target.delay += takePercent(this.battle.DelayValue(target), rate);
 	}
 
 	/**
@@ -1426,7 +1427,7 @@ export class SkillEffect
 	{
 		const min = this.minAliveDelay();
 		if (!Number.isFinite(min)) return;
-		target.delay = rate >= 100 ? min - 1 : min + (target.delay - min) * (1 - rate / 100);
+		target.delay = rate >= 100 ? min - 1 : min + minusPercent(target.delay - min, rate);
 	}
 
 	/**
