@@ -19,20 +19,22 @@
 import type {
 	IAtkDefFields,
 	IAtkTuple,
-	IBehavior,
-	IDataEx,
+	IBehaviorField,
+	ICharExtraFields,
 	ICombatStats,
 	ICompBonuses,
+	IDataEx,
 	IDescInfo,
 	IEncounterTable,
-	IEquipTable,
 	IGenderOverride,
 	IGrowthCoefficients,
-	IMonReward,
+	ILearnedSkillsField,
+	IMonExtraFields,
 	INamedIconDef,
 	INumberTable,
 	IPatternItem,
-	ISpecial,
+	ISkillSharedFields,
+	ISpecialField,
 } from '#/lib/game/types';
 import type { IResourceId } from '#/lib/types/seg-types';
 import { SKILL_EXTRA_NUMERIC_KEYS } from './yaml-skill-keys';
@@ -51,33 +53,27 @@ export type IRawSkillExtraNumerics = Partial<
  * 六維與 HP/SP 引用 ICombatStats；no/name 引用 INamedIconDef（無 img）。
  * Stats/HP/SP reference ICombatStats; no/name reference INamedIconDef (with img omitted).
  *
- * behavior 直接使用 IBehavior（載入後即與引擎目標同形：position 值即 EnumPosition、
- * guard 值即 EnumGuardKind、pattern 列即 IPatternItem——來源筆誤／空物件已於載入修正）。
- * behavior uses IBehavior directly (post-load it is identical to the engine target: position
- * values ARE EnumPosition, guard values ARE EnumGuardKind, pattern rows ARE IPatternItem;
- * source typos / empty objects are already fixed at load).
+ * behavior 繼承 IBehaviorField（單一事實來源；載入後即與引擎目標同形：
+ * position 值即 EnumPosition、guard 值即 EnumGuardKind、pattern 列即 IPatternItem——
+ * 來源筆誤／空物件已於載入修正）。
+ * behavior comes from IBehaviorField (SSOT; post-load it is identical to the engine target:
+ * position values ARE EnumPosition, guard values ARE EnumGuardKind, pattern rows ARE
+ * IPatternItem; source typos / empty objects are already fixed at load).
  */
-export interface IRawCombatCoreYaml extends ICombatStats, Omit<INamedIconDef, 'img'>
+export interface IRawCombatCoreYaml extends ICombatStats, IBehaviorField, Omit<INamedIconDef, 'img'>
 {
-	/** AI 行為 / AI behavior */
-	behavior?: IBehavior;
 }
 
 /**
  * 原始角色定義（char.*.yml）/ Raw player-character definition (char.*.yml)
+ *
+ * exp／job／equip／data_ex 繼承 ICharExtraFields、skill 繼承 ILearnedSkillsField
+ * （皆為與 `ICharDef` 同形的單一事實來源）。
+ * exp / job / equip / data_ex come from ICharExtraFields and skill from ILearnedSkillsField
+ * (both are SSOTs shared with `ICharDef`).
  */
-export interface IRawCharYaml extends IRawCombatCoreYaml
+export interface IRawCharYaml extends IRawCombatCoreYaml, ICharExtraFields, ILearnedSkillsField
 {
-	/** 目前累積經驗 / accumulated exp */
-	exp?: number;
-	/** 職業編號 / job number */
-	job?: number;
-	/** 已習得技能編號 / learned skill numbers */
-	skill?: number[];
-	/** 擴充資料（共用 IDataEx；char 只用 recruit_money）/ extra data (shared IDataEx; char uses recruit_money only) */
-	data_ex?: IDataEx;
-	/** 各欄位裝備 / equipped items per slot */
-	equip?: IEquipTable;
 }
 
 /**
@@ -87,28 +83,8 @@ export interface IRawCharYaml extends IRawCombatCoreYaml
  * The lowercase `special` key is a source typo (only mon.1000, an empty object) — the canonical
  * key is `SPECIAL` only.
  */
-export interface IRawMonYaml extends IRawCombatCoreYaml, IAtkDefFields, INamedIconDef
+export interface IRawMonYaml extends IRawCombatCoreYaml, IAtkDefFields, IMonExtraFields, ISpecialField, INamedIconDef
 {
-	/** 特殊能力（以 ISpecial 為單一事實來源，省略＝無該能力）/ special abilities (ISpecial is the SSOT, omitted = no ability) */
-	SPECIAL?: ISpecial;
-	/** 說明資訊 / description info */
-	info?: IDescInfo;
-	/** 掉落與獎勵 / drop & reward */
-	reward?: IMonReward;
-	/** AI 行為 / AI behavior */
-	behavior?: IBehavior;
-	/** 獨特怪物出現週期（秒）/ union spawn cycle (seconds) */
-	cycle?: number;
-	/** 獨特怪物土地（背景）/ union land (background) */
-	land?: string;
-	/** 獨特怪物等級限制 / union level limit */
-	lv_limit?: number;
-	/** 隨行僕從表 { 怪物編號: [出現權重, 旗標] } / escort table (IEncounterTable) */
-	servant?: IEncounterTable;
-	/** 隨行僕從數量 / escort count */
-	servantAmount?: number;
-	/** 必出隨行僕從編號 / guaranteed escort monster numbers */
-	servantSpecify?: number[];
 }
 
 /**
@@ -116,79 +92,38 @@ export interface IRawMonYaml extends IRawCombatCoreYaml, IAtkDefFields, INamedIc
  * 補正欄位（P_* / M_*）由 ICompBonuses 提供（單一事實來源）；source 內尚有 name2 等未收錄鍵。
  * Compensation fields (P_* / M_*) come from ICompBonuses (SSOT); the source also has
  * uncatalogued keys like `name2`.
+ *
+ * 旗標欄位（invalid／support／passive／quick／pierce／CurePoison／revive）繼承
+ * ISkillSharedFields：來源寫 `true`／`'1'`／`1`，載入時（Skill 的 COERCE_SPECS）已統一收斂為
+ * `number`（1／0），故**不是** `number | boolean`。
+ * The flag fields (invalid/support/passive/quick/pierce/CurePoison/revive) are inherited from
+ * ISkillSharedFields: the source writes `true`/`'1'`/`1`, and the Skill COERCE_SPECS collapse
+ * them to `number` (1/0) at load — never `number | boolean`.
+ *
+ * `limit` 的值在來源即為布林（`Whip: true`），且載入不經數值收斂 → `Record<string, boolean>`。
+ * `limit` values are booleans in the source (`Whip: true`) and are not coerced at load,
+ * so the shape is `Record<string, boolean>` (no resource-id branch).
  */
-export interface IRawSkillYaml extends ICompBonuses, IRawSkillExtraNumerics, INamedIconDef
+export interface IRawSkillYaml extends ICompBonuses, IRawSkillExtraNumerics, ISkillSharedFields, INamedIconDef
 {
-	/** 說明文字 / description text */
-	exp?: string;
 	/** SP 消耗 / SP cost */
 	sp?: number;
 	/** 傷害類型（0=物理、1=魔法）/ damage type (0 = physical, 1 = magic) */
 	type?: number;
-	/** 習得所需技能點 / skill points to learn */
-	learn?: number;
 	/** 目標規格三元組 [目標類型, 選取方式, 數量] / target 3-tuple [target type, selection method, count] */
 	target?: [type: string, method: string, count: number];
-	/** 威力倍率 % / power % */
-	pow?: number;
-	/** 命中率 / hit rate */
-	hit?: number;
-	/** 防禦貫穿旗標 / guard-bypass flag */
-	invalid?: number | boolean;
-	/** 支援魔法旗標 / support-magic flag */
-	support?: number | boolean;
-	/** 被動技能旗標 / passive flag */
-	passive?: number | boolean;
-	/** 快速行動旗標 / quick-action flag */
-	quick?: number | boolean;
 	/** 目標優先條件 / target priority */
 	priority?: string;
 	/** 詠唱/蓄力 [詠唱時間, 硬直] / charge [cast time, stiff] */
 	charge?: number[];
-	/** 行動後硬直 % / post-action stiff % */
-	stiff?: number;
 	/** 傷害參照能力 / influencing stat */
 	inf?: string;
-	/** 回復加成 / heal bonus */
-	HealBonus?: number;
-	/** 貫穿旗標 / pierce flag */
-	pierce?: number | boolean;
-	/** 行動延遲速率 % / action delay rate % */
-	delay?: number;
-	/** 擊退率 % / knockback % */
-	knockback?: number;
-	/** 施毒機率 % / poison chance % */
-	poison?: number;
-	/** 抗毒增益 % / poison-resist gain % */
-	poisonResist?: number;
-	/** 召喚怪物編號（單一或陣列）/ summon monster number (single or array) */
-	summon?: number | number[];
 	/** 施放後自身移動 / self movement after casting */
 	move?: string;
 	/** 使用後移動方向 / post-use movement */
 	umove?: string;
-	/** 武器限制 / weapon-type restriction */
-	limit?: Record<string, boolean | IResourceId>;
-	/** 犧牲比例 % / sacrifice % */
-	sacrifice?: number;
-	/** 解毒旗標 / cure-poison flag */
-	CurePoison?: number | boolean;
-	/** HP 回復 % / HP regen % */
-	HpRegen?: number;
-	/** SP 回復 % / SP regen % */
-	SpRegen?: number;
-	/** 蘇生旗標 / revive flag */
-	revive?: number | boolean;
-	/** SP 回復倍率 / SP recovery rate multiplier */
-	SpRecoveryRate?: number;
-	/** 增加己方魔方陣數 / add own magic circles */
-	MagicCircleAdd?: number;
-	/** 消除己方魔方陣數 / remove own magic circles */
-	MagicCircleDelete?: number;
-	/** 消耗己方魔方陣數 / consume own magic circles */
-	MagicCircleDeleteTeam?: number;
-	/** 消除敵方魔方陣數 / remove enemy magic circles */
-	MagicCircleDeleteEnemy?: number;
+	/** 武器限制 { 武器型別: 是否可使用 } / weapon restriction { weapon type: allowed } */
+	limit?: Record<string, boolean>;
 	/** 補正欄位的小寫變體（source 的 p_maxhp）/ lowercase compensation variant from the source */
 	p_maxhp?: number;
 }

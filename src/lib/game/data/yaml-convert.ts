@@ -330,24 +330,14 @@ const JOB_GENDER_ALIASES: Record<string, EnumGender> = {
 };
 
 /**
- * 旗標正規化（boolean → 1/0）/ Flag coercion (boolean → 1/0)
- * ISkillDef 的旗標欄位為 number（truthy）；boolean 轉 1/0。
- * Flag fields are numbers on ISkillDef; booleans coerce to 1/0.
+ * 目標規格轉換 / Convert a raw [type, method, count] spec into ITargetSpec
+ * raw 三元組的形狀由本類別的來源定案：前兩格為目標／選取方式字串、末格經載入收斂為 number。
+ * The raw 3-tuple's shape is fixed by this class's source: the first two entries are
+ * target/method strings, the last one is a number after load-time coercion.
  */
-export function toFlag(value: string | number | boolean | undefined): number
-{
-	if (typeof value === 'boolean') return value ? 1 : 0;
-	return toNumber(value);
-}
-
-/** 布林正規化 / Boolean coercion (item.dh, skill.limit) */
-export function toBool(value: string | number | boolean | undefined): boolean
-{
-	return value === true || value === 1 || value === '1' || value === 'true';
-}
-
-/** 目標規格轉換 / Convert a raw [type, method, count] spec into ITargetSpec */
-export function convertTarget(raw: (string | number)[] | undefined): ITargetSpec | undefined
+export function convertTarget(
+	raw: [type: string, method: string, count: number] | undefined,
+): ITargetSpec | undefined
 {
 	if (!Array.isArray(raw) || raw.length < 3) return undefined;
 	const type = String(raw[0]);
@@ -358,7 +348,7 @@ export function convertTarget(raw: (string | number)[] | undefined): ITargetSpec
 }
 
 /** 詠唱/蓄力轉換（[a] 或 [a, b] → [a, b ?? 0]）/ Convert a raw charge into the [cast, stiff] tuple */
-export function convertCharge(raw: (string | number)[] | undefined): [cast: number, stiff: number] | undefined
+export function convertCharge(raw: number[] | undefined): [cast: number, stiff: number] | undefined
 {
 	if (!Array.isArray(raw) || raw.length < 1) return undefined;
 	return [toNumber(raw[0]), toNumber(raw[1], 0)];
@@ -366,7 +356,7 @@ export function convertCharge(raw: (string | number)[] | undefined): [cast: numb
 
 /** 召喚轉換（單一編號或編號陣列）/ Convert a raw summon (single number or array) into number | number[] */
 export function convertSummon(
-	raw: string | number | (string | number)[] | undefined,
+	raw: number | number[] | undefined,
 ): number | number[] | undefined
 {
 	if (raw === undefined) return undefined;
@@ -374,9 +364,14 @@ export function convertSummon(
 	return toOptionalNumber(raw);
 }
 
-/** 武器限制轉換 / Convert a raw weapon-limit object into Partial<Record<EnumWeaponType, boolean>> */
+/**
+ * 武器限制轉換 / Convert a raw weapon-limit object into Partial<Record<EnumWeaponType, boolean>>
+ * 來源值全為布林（`Whip: true`），不是資源編號，故 raw 形狀為 `Record<string, boolean>`。
+ * Source values are all booleans (`Whip: true`), never resource ids, so the raw shape is
+ * `Record<string, boolean>`.
+ */
 export function convertLimit(
-	raw: Record<string, boolean | string | number> | undefined,
+	raw: Record<string, boolean> | undefined,
 ): Partial<Record<EnumWeaponType, boolean>> | undefined
 {
 	if (!raw) return undefined;
@@ -384,7 +379,7 @@ export function convertLimit(
 	for (const [k, v] of Object.entries(raw))
 	{
 		if (!(k in WEAPON_TYPE_LOOKUP)) continue;
-		out[k as EnumWeaponType] = toBool(v);
+		out[k as EnumWeaponType] = v;
 	}
 	return Object.keys(out).length > 0 ? out : undefined;
 }
@@ -392,8 +387,16 @@ export function convertLimit(
 /** 補正欄位鍵（ICompBonuses 9 鍵，單一事實來源：COMP_FIELDS）/ the 9 compensation keys (SSOT: COMP_FIELDS) */
 const BONUS_KEYS = COMP_FIELDS;
 
-/** 補正欄位複製 / Copy the 9 compensation keys from a raw record */
-export function convertBonuses(raw: Record<string, string | number | undefined>): ICompBonuses
+/**
+ * 補正欄位複製 / Copy the 9 compensation keys from a raw record
+ * 補正欄位在載入時已收斂為 number（Item／Skill 的 COERCE_SPECS 含 COMP_BONUS_FIELDS），
+ * 故參數形狀就是 `ICompBonuses`——不再是鬆散的 `string | number` 錄型別，
+ * 呼叫端也無需 `as unknown as` 轉型。
+ * Raw compensation fields are numbers after load (the Item/Skill COERCE_SPECS include
+ * COMP_BONUS_FIELDS), so the parameter shape is `ICompBonuses` itself — no loose
+ * `string | number` record and no `as unknown as` cast at the call sites.
+ */
+export function convertBonuses(raw: ICompBonuses): ICompBonuses
 {
 	const out: ICompBonuses = {};
 	for (const k of BONUS_KEYS)
@@ -420,13 +423,13 @@ export function convertItemYaml(raw: IItemDef): IItemDef
 		sell: raw.sell,
 		atk: raw.atk,
 		def: raw.def,
-		dh: raw.dh !== undefined ? toBool(raw.dh) : undefined,
+		dh: raw.dh,
 		handle: raw.handle,
 		need: toNumberRecord(raw.need),
 		base_name: raw.base_name,
 		P_SUMMON: raw.P_SUMMON,
 		P_PIERCE: raw.P_PIERCE,
-		...convertBonuses(raw as unknown as Record<string, string | number | undefined>),
+		...convertBonuses(raw),
 	};
 }
 
@@ -478,14 +481,14 @@ export function convertSkillYaml(raw: IRawSkillYaml): ISkillDef
 		target: convertTarget(raw.target),
 		pow: raw.pow,
 		hit: raw.hit,
-		invalid: raw.invalid !== undefined ? toFlag(raw.invalid) : undefined,
-		support: raw.support !== undefined ? toFlag(raw.support) : undefined,
+		invalid: raw.invalid,
+		support: raw.support,
 		priority: raw.priority !== undefined ? SKILL_PRIORITY_LOOKUP[raw.priority] : undefined,
 		charge: convertCharge(raw.charge),
 		stiff: raw.stiff,
 		inf: raw.inf !== undefined ? INF_LOOKUP[raw.inf] : undefined,
 		HealBonus: raw.HealBonus,
-		pierce: raw.pierce !== undefined ? toFlag(raw.pierce) : undefined,
+		pierce: raw.pierce,
 		delay: raw.delay,
 		knockback: raw.knockback,
 		poison: raw.poison,
@@ -494,13 +497,13 @@ export function convertSkillYaml(raw: IRawSkillYaml): ISkillDef
 		move: convertPosition(raw.move),
 		umove: convertPosition(raw.umove),
 		limit: convertLimit(raw.limit),
-		passive: raw.passive !== undefined ? toFlag(raw.passive) : undefined,
-		quick: raw.quick !== undefined ? toFlag(raw.quick) : undefined,
+		passive: raw.passive,
+		quick: raw.quick,
 		sacrifice: raw.sacrifice,
-		CurePoison: raw.CurePoison !== undefined ? toFlag(raw.CurePoison) : undefined,
+		CurePoison: raw.CurePoison,
 		HpRegen: raw.HpRegen,
 		SpRegen: raw.SpRegen,
-		revive: raw.revive !== undefined ? toFlag(raw.revive) : undefined,
+		revive: raw.revive,
 		SpRecoveryRate: raw.SpRecoveryRate,
 		MagicCircleAdd: raw.MagicCircleAdd,
 		MagicCircleDelete: raw.MagicCircleDelete,
@@ -508,14 +511,19 @@ export function convertSkillYaml(raw: IRawSkillYaml): ISkillDef
 		MagicCircleDeleteEnemy: raw.MagicCircleDeleteEnemy,
 	};
 
-	const rawLoose = raw as unknown as Record<string, string | number | boolean | undefined>;
+	/**
+	 * Plus*／Up*／Down* 29 鍵：raw 端 IRawSkillExtraNumerics 已定型為 `number`（載入時收斂），
+	 * 直接取用即可，無需鬆散錄型別（`string | number | boolean`）轉型。
+	 * The 29 Plus* / Up* / Down* keys: raw's IRawSkillExtraNumerics is already typed `number`
+	 * (coerced at load), so they are read directly — no loose-record cast.
+	 */
 	for (const k of SKILL_EXTRA_NUMERIC_KEYS)
 	{
-		const v = rawLoose[k];
-		if (v !== undefined) (skill as unknown as Record<string, number>)[k] = toNumber(v);
+		const v = raw[k];
+		if (v !== undefined) (skill as unknown as Record<string, number>)[k] = v;
 	}
 
-	Object.assign(skill, convertBonuses(raw as unknown as Record<string, string | number | undefined>));
+	Object.assign(skill, convertBonuses(raw));
 	if (raw.p_maxhp !== undefined) skill.P_MAXHP = raw.p_maxhp;
 
 	return skill;

@@ -93,7 +93,7 @@ function coerceNumberValue(value: unknown): unknown
  * Per-kind field description that drives the post-read numeric normalization.
  */
 type ICoerceSpec =
-	/** 值收斂為 number（null → 0、boolean 原樣保留）/ coerce the value to number (null → 0; booleans kept) */
+	/** 值收斂為 number（null → 0、boolean → 1/0、字串數值 → number）/ coerce the value to number (null → 0, boolean → 1/0, numeric string → number) */
 	| { kind: 'number' }
 	/** 標量或陣列皆收斂為 number / coerce both a scalar and an array of items */
 	| { kind: 'numberOrArray' }
