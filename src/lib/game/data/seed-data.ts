@@ -46,7 +46,7 @@ const job100: IJobDef = {
 		EnumWeaponType.Item,
 	],
 	coe: { maxhp: 3, maxsp: 0.5 },
-	pattern: null,
+
 	img: 'mon_079',
 	gender: {
 		[EnumGender.Male]: { img: 'mon_079', job_name: 'Warrior' },
@@ -63,7 +63,7 @@ const job200: IJobDef = {
 	job_name: 'Mage',
 	equip: [EnumWeaponType.Staff, EnumWeaponType.Robe, EnumWeaponType.Book, EnumWeaponType.Cloth, EnumWeaponType.Item],
 	coe: { maxhp: 2, maxsp: 1.5 },
-	pattern: null,
+
 	img: 'mon_018',
 	info: { desc: '以魔法攻擊見長的遠程職業 / Ranged job specialised in magic attacks' },
 };
@@ -83,7 +83,7 @@ const job300: IJobDef = {
 		EnumWeaponType.Item,
 	],
 	coe: { maxhp: 2.5, maxsp: 0.8 },
-	pattern: null,
+
 	img: 'mon_019',
 	info: { desc: '高敏捷的遠程物理職業 / High-agility physical ranged job' },
 };

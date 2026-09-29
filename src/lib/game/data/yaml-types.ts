@@ -33,7 +33,6 @@ import type {
 	INumberTable,
 	IPatternItem,
 	ISpecial,
-	ISpecialRawValue,
 } from '#/lib/game/types';
 import { SKILL_EXTRA_NUMERIC_KEYS } from './yaml-skill-keys';
 
@@ -83,15 +82,14 @@ export interface IRawCharYaml extends IRawCombatCoreYaml
 /**
  * 原始怪物定義（mon.*.yml）/ Raw monster definition (mon.*.yml）
  *
- * 注意原始檔欄位大小寫不一致：`special`（全小寫，防呆）與 `SPECIAL`（正式鍵）。
- * Note the source uses inconsistent casing: `special` (all lowercase, seen once) vs `SPECIAL` (the canonical key).
+ * 原始檔的小寫 `special` 為錯字（僅 mon.1000 出現且為空物件）——正規鍵只有大寫 `SPECIAL`。
+ * The lowercase `special` key is a source typo (only mon.1000, an empty object) — the canonical
+ * key is `SPECIAL` only.
  */
 export interface IRawMonYaml extends IRawCombatCoreYaml, INamedIconDef
 {
-	/** 特殊能力（正式鍵；鍵同 ISpecial，單一事實來源）/ special abilities (canonical key; keys follow ISpecial, SSOT) */
-	SPECIAL?: Partial<Record<keyof ISpecial, ISpecialRawValue>>;
-	/** 特殊能力（全小寫防呆鍵；僅 mon.1000 出現且為空物件）/ special abilities (all-lowercase key; seen once in mon.1000 as an empty object) */
-	special?: Partial<Record<keyof ISpecial, ISpecialRawValue>>;
+	/** 特殊能力（以 ISpecial 為單一事實來源，省略＝無該能力）/ special abilities (ISpecial is the SSOT, omitted = no ability) */
+	SPECIAL?: ISpecial;
 	/**
 	 * 基礎攻擊力（有語意的二元組）[物理, 魔法] / base attack 2-tuple [physical, magic]
 	 * 索引語意同 EnumAtkSlot。 / index semantics follow EnumAtkSlot.
@@ -170,8 +168,8 @@ export interface IRawJobYaml
 	equip?: (string | number)[];
 	/** 成長係數 / growth coefficients（IGrowthCoefficients） */
 	coe?: IGrowthCoefficients;
-	/** 行為樣式（原始檔恆為 null）/ behavior pattern (always null in the source) */
-	pattern?: unknown | null;
+	/** 行為樣式（原始檔恆為 null＝無 AI 模式）/ behavior pattern (always null in the source = no AI pattern) */
+	pattern?: unknown;
 	/** 職業圖示 / job icon */
 	img?: string;
 	/** 依性別區分的名稱／圖示（鍵為 1=男、2=女）/ per-gender name/icon (keys: 1 = male, 2 = female; value IGenderOverride) */

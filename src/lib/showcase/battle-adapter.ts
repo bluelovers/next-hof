@@ -11,6 +11,7 @@
 import { EnumState, EnumPosition, EnumTeamSide, MAX_CHAR } from '#/lib/game/constants';
 import { Battle } from '#/lib/game/battle/Battle';
 import { EnumOutcome } from '#/lib/game/battle/BattleResult';
+import { percentOf } from '#/lib/game/core/percent';
 import { newChar, newMon } from '#/lib/game/character/factory';
 import type { Character } from '#/lib/game/character/Character';
 import { RNG } from '#/lib/game/core/rng';
@@ -1078,12 +1079,8 @@ const mapEnergyExchange: IEventMapper = (ev, ctx) =>
 {
 	const hp = ev.valueChanges?.find((c) => c.unit !== EnumResource.Sp);
 	const sp = ev.valueChanges?.find((c) => c.unit === EnumResource.Sp);
-	const rateOf = (value: number | undefined, max: number | undefined): number =>
-		max !== undefined && max > 0 && value !== undefined
-			? Math.floor((value / max) * 100)
-			: 0;
-	const hpRate = rateOf(hp?.from, ctx.target.maxHp);
-	const spRate = rateOf(sp?.from, ctx.target.maxSp);
+	const hpRate = percentOf(hp?.from ?? 0, ctx.target.maxHp ?? 0);
+	const spRate = percentOf(sp?.from ?? 0, ctx.target.maxSp ?? 0);
 	return composeAction(ctx, {
 		type: EnumActionType.EnergyExchange,
 		source: ctx.target.name,

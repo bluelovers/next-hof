@@ -65,8 +65,13 @@ export function CalcEquips(char: Character, repo: IDataRepository): void
 		if (item.P_SUMMON) char.addSpecial('Summon', item.P_SUMMON);
 		if (item.P_PIERCE)
 		{
-			char.SPECIAL.Pierce[EnumAtkSlot.Phys] += item.P_PIERCE;
-			char.SPECIAL.Pierce[EnumAtkSlot.Mag] += item.P_PIERCE;
+			/** Pierce 恆由 defaultSpecial() 初始化；不存在時不寫入預設值，直接略過 */
+			const pierce = char.SPECIAL.Pierce;
+			if (pierce)
+			{
+				pierce[EnumAtkSlot.Phys] += item.P_PIERCE;
+				pierce[EnumAtkSlot.Mag] += item.P_PIERCE;
+			}
 		}
 	}
 }

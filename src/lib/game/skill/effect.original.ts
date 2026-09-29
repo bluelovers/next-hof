@@ -117,9 +117,15 @@ export function calcBasicDamageOriginal(
 	 * 穿透：原始「無條件」加算（只要有 SPECIAL.Pierce[slot] 即生效，與 option.pierce 無關）。
 	 * Pierce: the original adds it UNCONDITIONALLY whenever SPECIAL.Pierce[slot] is set, independent of option.pierce.
 	 */
-	if (user.SPECIAL.Pierce[atkIdx])
+	const pierce = user.SPECIAL.Pierce;
+	/** Pierce 缺省（undefined）時不賦預設值，直接視為無穿透 */
+	if (pierce)
 	{
-		dmg += (user.SPECIAL.Pierce[atkIdx] ?? 0) * (skill.pow ?? 100) / 100;
+		const v = pierce[atkIdx];
+		if (v)
+		{
+			dmg += v * (skill.pow ?? 100) / 100;
+		}
 	}
 
 	if (dmg < min) dmg = min;

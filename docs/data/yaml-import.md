@@ -68,9 +68,10 @@ HOF/Resource/{kind}/{kind}.{id}.yml   （10 類資源 / 10 resource kinds）
 ### 單一事實來源 / Single source of truth
 
 - 六維／HP/SP：`types.ts` 新增 **`ICombatStats`**（全欄位可缺省），`ICharCore` 與 raw 的 `IRawCombatCoreYaml` 皆引用之。
+- **共通基屬提升至 `ICharCore`**：`atk?: IAtkTuple`、`def?: IDefTuple`、`SPECIAL?: ISpecial` 定義一次——`ICharDef`／`IMonDef` 繼承，不再各自在子類重覆宣告（`IMonDef` 的小寫 `special` 錯字命名一併正名為 `SPECIAL`）。
 - **身分／圖示成員 `{no, name, img}`：`INamedIconDef` 定義一次**——`IItemDef`、`ISkillDef`、`IMonDef` 與 raw 的 item/skill/mon 皆 extends；`ICharCore`／`IRawCombatCoreYaml` 以 `Omit<INamedIconDef, 'img'>` 取 no/name（char 無圖示）——no/name 全專案只有一份。
 - 有語意 tuple／表型：`IAtkTuple`／`IDefTuple`／`IWeightPair`、`IEncounterTable`（servant／land.monster 遭遇表）、`INumberTable`（itemtable／need）、`IEquipTable`（equip 表）、`IDescInfo`（info 區塊）、`IGrowthCoefficients`（coe）皆定義於 `types.ts`，raw 與 target 共用。
-- 特殊能力：raw `SPECIAL`／`special` 型別為 `Partial<Record<keyof ISpecial, ISpecialRawValue>>`。
+- 特殊能力：raw `SPECIAL` 直接以 **`ISpecial`** 定型（全欄位選填，省略＝無該能力）；小寫 `special` 為來源錯字（僅 mon.1000）不處理；值於載入時收斂（`Undead: true` → 1、Pierce 為 `IAtkTuple`）。存取器 `getSpecial`/`addSpecial`/`setSpecial` 鍵為 `Exclude<keyof ISpecial, 'Pierce'>`（SSOT）且**不寫入預設值**（缺省回 undefined，消費端以 `?? 0` 讀取參與運算）。
 - `IBehavior` 與 `IBehavior` **同形**（`Omit<IBehavior, 'pattern'> & { pattern?: IRawPatternItemYaml[] }`）：position 值即 `EnumPosition`、guard 值即 `EnumGuardKind`——來源筆誤（`pro50`/`prpb50`）於**載入時修正**（`GUARD_ALIASES`），空物件 pattern `{ }` 於載入時視為 undefined（`?:`）。`IRawPatternItemYaml` ＝ `Partial<IPatternItem>`（quantity 亦選填；引擎以 `?? 0` 視省略同 0）；`IMonReward` derive 自 `IMonReward`（僅 itemtable 鍵改為字串）；`IEquipTable` ＝ `IEquipTable`；char/mon 的 `behavior` 收斂進 `IRawCombatCoreYaml`。
 - `IRawItemYaml`／`IRawSkillYaml` 的補正欄位（P_* / M_*）由 **`ICompBonuses`** 提供；yaml-load ／yaml-convert 的補正確率表由 **`COMP_FIELDS`**（status-attrs）衍生。
 - **`data_ex` 禁止 `Record<string, unknown>`**：各 kind 基底 `ICharDataEx`（recruit_money）／`IJobDataEx`（job_base＋job_conditions.job_from）／`IUnionDataEx`（name/level/img/land/cycle）各定義一次，共用的 **`IDataEx extends ICharDataEx, IJobDataEx, IUnionDataEx`** 只做組合；`ICharDef` 與 raw 的 char/job/union 全部指向 `IDataEx`。數值欄位於載入時收斂（union `level: '250'` → 250、job_from `lv`、char `recruit_money`）。

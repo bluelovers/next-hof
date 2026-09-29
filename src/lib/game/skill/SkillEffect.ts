@@ -511,7 +511,8 @@ export class SkillEffect
 				 * signature drops it.
 				 */
 				let heal = calcRecoveryValue(skill, char);
-				const rate = (target.HP / target.MAXHP) * 100;
+				/** 共用 HP 百分比邏輯（不重覆公式） */
+				const rate = target.hpPercent();
 				if (rate <= 30)
 				{
 					heal *= 2;
@@ -592,8 +593,9 @@ export class SkillEffect
 				 * When a cap is 0 the rate is undefined; a defensive guard pins it to 0 (the original
 				 * would compute NAN and store it on the character).
 				 */
-				const hpRate = target.MAXHP > 0 ? Math.floor(target.HP / target.MAXHP * 100) : 0;
-				const spRate = target.MAXSP > 0 ? Math.floor(target.SP / target.MAXSP * 100) : 0;
+				/** 共用 HP/SP 百分比邏輯（hpPercent 已含取整與 0 上限防呆） */
+				const hpRate = target.hpPercent();
+				const spRate = target.spPercent();
 				const hpFrom = target.HP;
 				const spFrom = target.SP;
 				target.HP = Math.round(spRate / 100 * target.MAXHP);

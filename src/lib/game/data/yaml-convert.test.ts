@@ -90,12 +90,11 @@ describe('yaml-load (fixtures)', () =>
 
 describe('number coercion helpers', () =>
 {
-	it('toNumber coerces quoted strings and tolerates null', () =>
+	it('toNumber coerces quoted strings and tolerates absence', () =>
 	{
 		expect(toNumber('1')).toBe(1);
 		expect(toNumber('140')).toBe(140);
 		expect(toNumber(30400)).toBe(30400);
-		expect(toNumber(null)).toBe(0);
 		expect(toNumber(undefined)).toBe(0);
 		expect(toNumber('abc')).toBe(0);
 		expect(toNumber('abc', 7)).toBe(7);
@@ -104,7 +103,6 @@ describe('number coercion helpers', () =>
 	it('toOptionalNumber returns undefined for absent/garbage', () =>
 	{
 		expect(toOptionalNumber('0')).toBe(0);
-		expect(toOptionalNumber(null)).toBeUndefined();
 		expect(toOptionalNumber(undefined)).toBeUndefined();
 		expect(toOptionalNumber('')).toBeUndefined();
 	});
@@ -112,7 +110,7 @@ describe('number coercion helpers', () =>
 	it('toNumberArray coerces arrays of strings', () =>
 	{
 		expect(toNumberArray(['20', 10, '0'])).toEqual([20, 10, 0]);
-		expect(toNumberArray(null)).toEqual([]);
+		expect(toNumberArray(undefined)).toEqual([]);
 	});
 
 	it('toNumberRecord maps string-keyed records to number keys', () =>
@@ -252,7 +250,7 @@ describe('convertMonYaml (fixtures)', () =>
 			dex: 100,
 			spd: 150,
 			luk: 50,
-			special: { PoisonResist: 50 },
+			SPECIAL: { PoisonResist: 50 },
 			atk: [100, 70],
 			def: [60, 30, 50, 30],
 			cycle: 259200,
@@ -298,7 +296,7 @@ describe('convertMonYaml (fixtures)', () =>
 			dex: 1,
 			spd: 10,
 			luk: 1,
-			special: { Undead: 1 },
+			SPECIAL: { Undead: 1 },
 			atk: [20, 10],
 			def: [10, 10, 0, 0],
 			reward: { moneyhold: 0, exphold: 0 },
@@ -349,7 +347,6 @@ describe('convertEquipYaml / convertBehaviorYaml', () =>
 	{
 		expect(convertBehaviorYaml({ pattern: undefined })).toBeUndefined();
 		expect(convertBehaviorYaml({})).toBeUndefined();
-		expect(convertBehaviorYaml(null)).toBeUndefined();
 		expect(convertBehaviorYaml(undefined)).toBeUndefined();
 	});
 

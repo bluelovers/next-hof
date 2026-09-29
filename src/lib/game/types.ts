@@ -311,24 +311,26 @@ export type ICompBonuses = Partial<Record<ICompField, number>>;
 export interface ISpecial
 {
 	/** 中毒抗性 %（getPoison 據此折減施毒機率）/ poison resistance % (getPoison reduces the chance by this) */
-	PoisonResist: number;
+	PoisonResist?: number;
 	/** 回復加成（被動技能累加；目前僅儲存，傷害公式尚未讀取）/ heal bonus (accumulated by passives; stored only, not yet read by the heal formula) */
-	HealBonus: number;
+	HealBonus?: number;
 	/** 絕對防禦次數：>0 時消耗一次並使該次傷害歸 0（pierce 可穿透）/ absolute guard charges: consumes one to nullify a hit (pierced by pierce) */
-	Barrier: number;
+	Barrier?: number;
 	/**
 	 * 貫穿值（索引同 EnumAtkSlot：0=物理、1=魔法；pierce 技能加算至傷害）
-	 * pierce damage (indices follow EnumAtkSlot: 0 = physical, 1 = magic; added when skill.pierce is set)
+	 * pierce damage (IAtkTuple; indices follow EnumAtkSlot: 0 = physical, 1 = magic; added when skill.pierce is set)
 	 */
-	Pierce: [phys: number, mag: number];
+	Pierce?: IAtkTuple;
 	/** 召喚加成（裝備 P_SUMMON 累加）/ summon bonus (accumulated from equipment P_SUMMON) */
-	Summon: number;
+	Summon?: number;
 	/** 不死系標記 / undead flag */
-	Undead: number;
+	Undead?: number;
+	/** 變身標記（技能 2057 SelfMetamorphorse 設定）/ metamorphosis flag (set by skill 2057) */
+	Metamo?: number;
 	/** 每回合 HP 回復 %（autoRegeneration 於行動前套用）/ per-turn HP regen % (applied by autoRegeneration before acting) */
-	HpRegen: number;
+	HpRegen?: number;
 	/** 每回合 SP 回復 %（autoRegeneration 於行動前套用）/ per-turn SP regen % (applied by autoRegeneration before acting) */
-	SpRegen: number;
+	SpRegen?: number;
 }
 
 /**
@@ -684,8 +686,8 @@ export interface IJobDef
 	equip?: EnumWeaponType[];
 	/** 成長係數（maxhp/maxsp 及其餘六維的成長率）/ growth coefficients (IGrowthCoefficients) */
 	coe?: IGrowthCoefficients;
-	/** 戰鬥行為樣式；null＝無 AI 模式 / battle behavior pattern; null = no AI pattern */
-	pattern?: IBehavior | null;
+	/** 戰鬥行為樣式（省略＝無 AI 模式）/ battle behavior pattern (omitted = no AI pattern) */
+	pattern?: IBehavior;
 	/** 職業圖示路徑 / job icon path */
 	img?: string;
 	/** 依性別（EnumGender）區分的名稱與圖示 / per-gender (EnumGender) name and icon overrides */
@@ -791,13 +793,6 @@ export type IGrowthCoefficients = {
 };
 
 /**
- * 特殊能力原始值型別 / raw SPECIAL value
- * 數值字串布林之標量；Pierce（索引同 EnumAtkSlot）為二元組。SSOT。
- * Scalar string/number/boolean, or the Pierce pair (indices follow EnumAtkSlot). SSOT.
- */
-export type ISpecialRawValue = string | number | boolean | [string | number, string | number];
-
-/**
  * 戰鬥數值（角色/怪物共用，單一事實來源）/ Combat stats (shared by char & mon; single source of truth)
  *
  * 所有欄位皆**可缺省**：原始資料可能缺漏（如 mon.1010 Bat 完全無六維、char.400 缺 HP/SP），
@@ -858,6 +853,22 @@ export interface ICharCore extends ICorpsePolicyField, ICombatStats, Omit<INamed
 	skill?: number[];
 	/** AI 行為樣式（怪物戰鬥決策用）/ AI behavior pattern (monster battle decisions) */
 	behavior?: IBehavior;
+	/**
+	 * 基礎攻擊力（索引同 EnumAtkSlot：0=物理、1=魔法）
+	 * Base attack (indices follow EnumAtkSlot: 0 = physical, 1 = magic).
+	 * 共通基屬：角色由裝備累加、怪物由資料層給定。
+	 * Shared base: chars accumulate from equipment, mons get it from the data layer.
+	 */
+	atk?: IAtkTuple;
+	/**
+	 * 基礎減傷四槽（索引同 EnumDefSlot：物理%減、物理定值減、魔法%減、魔法定值減）
+	 * Base reduction slots (indices follow EnumDefSlot: phys %, phys flat, mag %, mag flat).
+	 * 共通基屬：與 atk 相同。
+	 * Shared base: same as `atk`.
+	 */
+	def?: IDefTuple;
+	/** 天生特殊能力（ISpecial；省略＝無該能力）/ innate special abilities (ISpecial; omitted = none) */
+	SPECIAL?: ISpecial;
 }
 
 /**
@@ -944,33 +955,6 @@ export interface IMonDef extends ICharCore, INamedIconDef
 	 * Data-layer only: the engine stacks EnumCharType.Union via factory.newUnion() and does not read this field yet.
 	 */
 	isUnion?: boolean;
-	/**
-	 * 怪物基礎攻擊力（索引同 EnumAtkSlot：0=物理、1=魔法）/ monster base attack (indices follow EnumAtkSlot: 0 = physical, 1 = magic)
-	 *
-	 * YAML 直接給定（mon.*.yml `atk`）；目前僅資料層保留——
-	 * 開戰時 CalcEquips 以裝備累加 atk/def，怪物無裝備因此 atk/def 歸零；接入引擎為後續變更。
-	 * Given directly in the YAML (`atk`); data-layer only for now — at battle setup
-	 * CalcEquips rebuilds atk/def from equipment and monsters equip nothing, so this is
-	 * not yet consumed by the engine (wiring is a follow-up).
-	 */
-	atk?: IAtkTuple;
-	/**
-	 * 怪物基礎減傷四槽（索引同 EnumDefSlot：物理%減、物理定值減、魔法%減、魔法定值減）
-	 * monster base reduction slots (indices follow EnumDefSlot: physical %, physical flat, magic %, magic flat)
-	 *
-	 * 與 atk 相同：目前僅資料層保留（CalcEquips 由裝備重建，怪物未接入）。
-	 * Same as `atk`: data-layer only for now (CalcEquips rebuilds from equipment; not wired for monsters).
-	 */
-	def?: IDefTuple;
-	/**
-	 * 怪物天生特殊能力（YAML `SPECIAL`；例如 Undead / PoisonResist）
-	 * innate special abilities from the YAML `SPECIAL` block (e.g. Undead / PoisonResist)
-	 *
-	 * 轉換時已由 factory.newMon 併入 Character.SPECIAL（引擎可讀）；
-	 * 保留於 def 上供 UI／資料層查詢。
-	 * Merged into Character.SPECIAL by factory.newMon (engine-readable); kept on the def for UI/data queries.
-	 */
-	special?: Partial<ISpecial>;
 	/** 怪物說明資訊（YAML `info`；例如技能說明）/ monster description info (IDescInfo) */
 	info?: IDescInfo;
 	/**

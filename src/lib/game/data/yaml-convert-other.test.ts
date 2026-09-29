@@ -113,7 +113,7 @@ describe('convertJobYaml (fixtures)', () =>
 				EnumWeaponType.Item,
 			],
 			coe: { maxhp: 3, maxsp: 0.5 },
-			pattern: null,
+
 			img: 'mon_079',
 			gender: {
 				[EnumGender.Male]: { img: 'mon_079', job_name: 'Warrior' },

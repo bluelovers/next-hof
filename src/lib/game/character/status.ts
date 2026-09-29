@@ -168,9 +168,9 @@ export function poisonDamage(char: Character, multiply = 1): number
  */
 export function getPoisonResist(char: Character, no: number): number
 {
-	const add = Math.round((100 - char.SPECIAL.PoisonResist) * (no / 100));
-	char.SPECIAL.PoisonResist += add;
-	return char.SPECIAL.PoisonResist;
+	/** 缺省 undefined 時以 0 參與運算（不寫入實例） */
+	const add = Math.round((100 - (char.getSpecial('PoisonResist') ?? 0)) * (no / 100));
+	return char.addSpecial('PoisonResist', add);
 }
 
 /**
@@ -203,9 +203,11 @@ export function sacrificeHp(char: Character, rate: number): number
 /** 消耗一次 Barrier（絕對防禦），成功回傳 true / consume one Barrier charge (absolute guard), true on success */
 export function consumeBarrier(char: Character): boolean
 {
-	if (char.SPECIAL.Barrier > 0)
+	/** 缺省 undefined 時視為 0（無 Barrier），不寫入實例 */
+	const barrier = char.getSpecial('Barrier') ?? 0;
+	if (barrier > 0)
 	{
-		char.SPECIAL.Barrier--;
+		char.setSpecial('Barrier', barrier - 1);
 		return true;
 	}
 	return false;

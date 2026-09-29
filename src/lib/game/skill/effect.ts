@@ -147,8 +147,13 @@ export function calcBasicDamage(
 	 */
 	if (skill.pierce)
 	{
-		const p = user.SPECIAL.Pierce[atkIdx] ?? 0;
-		dmg += (p * (skill.pow ?? 100)) / 100;
+		/** Pierce 缺省（undefined）時不賦預設值，直接視為無穿透 */
+		const pierce = user.SPECIAL.Pierce;
+		if (pierce)
+		{
+			const p = pierce[atkIdx];
+			dmg += (p * (skill.pow ?? 100)) / 100;
+		}
 	}
 
 	/** 保底最小傷害（扣防＋穿透後再與 min 比較） */
@@ -357,9 +362,11 @@ export function statusChanges(skill: ISkillDef, actor: Character, target: Charac
  */
 export function barrierGuard(skill: ISkillDef, target: Character): IBattleEvent | null
 {
-	if (target.SPECIAL.Barrier > 0 && !skill.pierce)
+	/** 缺省 undefined 時視為 0（無 Barrier），不寫入實例 */
+	const barrier = target.getSpecial('Barrier') ?? 0;
+	if (barrier > 0 && !skill.pierce)
 	{
-		target.SPECIAL.Barrier--;
+		target.setSpecial('Barrier', barrier - 1);
 		/**
 		 * 帶 skill 編號：攔截是「這次技能」造成的，上級事件引擎才能掛回同一筆技能事件。
 		 * Carries the skill number: the interception belongs to *this* skill use, so the upper event

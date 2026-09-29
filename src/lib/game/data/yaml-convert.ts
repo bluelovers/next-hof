@@ -35,7 +35,6 @@ import {
 	type IPatternItem,
 	type ISkillDef,
 	type ISpecial,
-	type ISpecialRawValue,
 	type ITargetSpec,
 } from '#/lib/game/types';
 import { EnumPosition } from '#/lib/game/constants';
@@ -55,24 +54,24 @@ import type {
  * 字串／數字／布林／null → number；無法解析時回 fallback（預設 0）。
  * Coerce string / number / boolean / null to number; NaN falls back (default 0).
  */
-export function toNumber(value: string | number | boolean | null | undefined, fallback = 0): number
+export function toNumber(value: string | number | boolean | undefined, fallback = 0): number
 {
-	if (value === null || value === undefined || value === '') return fallback;
+	if (value === undefined || value === '') return fallback;
 	const n = Number(value);
 	return Number.isFinite(n) ? n : fallback;
 }
 
 /** 陣列數值正規化（字串陣列 → number 陣列）/ coerce a numeric array (strings → numbers) */
-export function toNumberArray(value: readonly (string | number)[] | null | undefined, fallback = 0): number[]
+export function toNumberArray(value: readonly (string | number)[] | undefined, fallback = 0): number[]
 {
 	if (!Array.isArray(value)) return [];
 	return value.map((v) => toNumber(v, fallback));
 }
 
 /** 可選數值正規化：無法解析或省略時回 undefined / optional numeric coercion (NaN/absent → undefined) */
-export function toOptionalNumber(value: string | number | null | undefined): number | undefined
+export function toOptionalNumber(value: string | number | undefined): number | undefined
 {
-	if (value === null || value === undefined || value === '') return undefined;
+	if (value === undefined || value === '') return undefined;
 	const n = Number(value);
 	return Number.isFinite(n) ? n : undefined;
 }
@@ -83,7 +82,7 @@ export function toOptionalNumber(value: string | number | null | undefined): num
  * Used for reward.itemtable ({ '6000': '1000' } → { 6000: 1000 }).
  */
 export function toNumberRecord(
-	value: Record<string, string | number> | null | undefined,
+	value: Record<string, string | number> | undefined,
 ): Record<number, number>
 {
 	const out: Record<number, number> = {};
@@ -102,7 +101,7 @@ export function toNumberRecord(
  * 未提供或無法辨識時回 undefined（開戰時 setBattleVariable 隨機決定）。
  * Returns undefined when absent/unknown (setBattleVariable randomizes at battle start anyway).
  */
-export function convertPosition(value: string | null | undefined): EnumPosition | undefined
+export function convertPosition(value: string | undefined): EnumPosition | undefined
 {
 	if (value === EnumPosition.Front || value === EnumPosition.Back) return value as EnumPosition;
 	return undefined;
@@ -114,7 +113,7 @@ export function convertPosition(value: string | null | undefined): EnumPosition 
  * null quantity is normalized to 0 at load and omission stays undefined;
  * rows with a missing judge/action are dropped.
  */
-export function convertPatternItem(raw: IPatternItem | null | undefined): IPatternItem | undefined
+export function convertPatternItem(raw: IPatternItem | undefined): IPatternItem | undefined
 {
 	if (!raw) return undefined;
 	const judge = raw.judge ?? Number.NaN;
@@ -128,7 +127,7 @@ export function convertPatternItem(raw: IPatternItem | null | undefined): IPatte
  * 空物件（pattern: { }）→ undefined（引擎會以預設收尾補普攻）。
  * Empty block (pattern: { }) → undefined (the engine's default tail supplies the basic attack).
  */
-export function convertBehaviorYaml(raw: IBehavior | null | undefined): IBehavior | undefined
+export function convertBehaviorYaml(raw: IBehavior | undefined): IBehavior | undefined
 {
 	if (!raw) return undefined;
 	const behavior: IBehavior = {};
@@ -150,19 +149,21 @@ export function convertBehaviorYaml(raw: IBehavior | null | undefined): IBehavio
 	return Object.keys(behavior).length > 0 ? behavior : undefined;
 }
 
-/** 獎勵轉換 / Convert a raw reward block */
-export function convertRewardYaml(raw: IMonReward | null | undefined): IMonReward | undefined
+/**
+ * 獎勵轉換 / Convert a raw reward block
+ * raw reward 即 IMonReward（單一事實來源）——僅處理「空物件 → undefined」。
+ * The raw reward IS IMonReward (SSOT); this only maps an empty object to undefined.
+ */
+export function convertRewardYaml(raw: IMonReward | undefined): IMonReward | undefined
 {
-	if (!raw) return undefined;
-	const reward: IMonReward = {};
-
-	if (raw.moneyhold !== undefined) reward.moneyhold = raw.moneyhold;
-	if (raw.exphold !== undefined) reward.exphold = raw.exphold;
-
-	const itemtable = toNumberRecord(raw.itemtable);
-	if (Object.keys(itemtable).length > 0) reward.itemtable = itemtable;
-
-	return Object.keys(reward).length > 0 ? reward : undefined;
+	if (!raw || Object.keys(raw).length === 0) return undefined;
+	const reward: IMonReward = { ...raw };
+	/** 空掉落表 = 無掉落，移除 itemtable 鍵 */
+	if (raw.itemtable && Object.keys(raw.itemtable).length === 0)
+	{
+		delete reward.itemtable;
+	}
+	return reward;
 }
 
 /**
@@ -170,7 +171,7 @@ export function convertRewardYaml(raw: IMonReward | null | undefined): IMonRewar
  * main_hand/off_hand/armor → EnumEquipSlot 鍵；未知欄位忽略。
  * main_hand/off_hand/armor → EnumEquipSlot keys; unknown keys are ignored.
  */
-export function convertEquipYaml(raw: IEquipTable | null | undefined): ICharDef['equip']
+export function convertEquipYaml(raw: IEquipTable | undefined): ICharDef['equip']
 {
 	if (!raw) return undefined;
 	const out: NonNullable<ICharDef['equip']> = {};
@@ -184,41 +185,17 @@ export function convertEquipYaml(raw: IEquipTable | null | undefined): ICharDef[
 }
 
 /**
- * SPECIAL 轉換 / Convert a raw SPECIAL block (both casings)
+ * SPECIAL 轉換 / Convert a raw SPECIAL block
  *
- * 原始檔同時出現大寫 `SPECIAL`（正式）與小寫 `special`（mon.1000 的空物件）；
- * 兩者合併、大寫優先。Undead: true → 1（ISpecial 為數值欄位）。
- * The source uses both `SPECIAL` (canonical) and `special` (mon.1000's empty object);
- * both are merged with the uppercase winning. Undead:true → 1 (ISpecial is numeric).
+ * 只讀大寫 `SPECIAL`（小寫 `special` 為來源錯字，不處理）。值已於載入收斂為 ISpecial 形狀
+ * （boolean → 1/0、Pierce 為 [n, n]）。
+ * Only the uppercase `SPECIAL` is read (the lowercase `special` is a source typo and ignored).
+ * Values are already ISpecial-shaped (booleans → 1/0, Pierce as [n, n]) from load-time normalization.
  */
 export function convertSpecialYaml(raw: IRawMonYaml): Partial<ISpecial> | undefined
 {
-	const merged: Record<string, ISpecialRawValue> = {};
-	if (raw.special) Object.assign(merged, raw.special);
-	if (raw.SPECIAL) Object.assign(merged, raw.SPECIAL);
-	if (Object.keys(merged).length === 0) return undefined;
-
-	const out: Partial<ISpecial> = {};
-	const undead = merged.Undead;
-	if (undead !== undefined && !Array.isArray(undead))
-	{
-		out.Undead = typeof undead === 'boolean' ? (undead ? 1 : 0) : toNumber(undead);
-	}
-
-	for (const key of ['PoisonResist', 'HealBonus', 'Barrier', 'Summon', 'HpRegen', 'SpRegen'] as (keyof ISpecial)[])
-	{
-		const v = merged[key];
-		if (v === undefined || Array.isArray(v)) continue;
-		(out as Record<string, number>)[key] = typeof v === 'boolean' ? (v ? 1 : 0) : toNumber(v);
-	}
-
-	const pierce = merged.Pierce;
-	if (Array.isArray(pierce) && pierce.length >= 2)
-	{
-		out.Pierce = [toNumber(pierce[0]), toNumber(pierce[1])];
-	}
-
-	return Object.keys(out).length > 0 ? out : undefined;
+	const merged: Partial<ISpecial> = { ...raw.SPECIAL };
+	return Object.keys(merged).length > 0 ? merged : undefined;
 }
 
 /**
@@ -273,7 +250,7 @@ export function convertMonYaml(raw: IRawMonYaml): IMonDef
 		img: raw.img ?? undefined,
 		atk: raw.atk,
 		def: raw.def,
-		special: convertSpecialYaml(raw),
+		SPECIAL: convertSpecialYaml(raw),
 		info: raw.info && typeof raw.info.desc === 'string' ? { desc: raw.info.desc } : undefined,
 		reward: convertRewardYaml(raw.reward),
 		behavior: convertBehaviorYaml(raw.behavior),
@@ -455,8 +432,8 @@ export function convertItemYaml(raw: IRawItemYaml): IItemDef
 
 /**
  * 職業轉換 / Convert a raw job YAML into IJobDef
- * gender 鍵 1/2 → EnumGender；pattern: null 原樣保留。
- * gender keys 1/2 → EnumGender; `pattern: null` is preserved as-is.
+ * gender 鍵 1/2 → EnumGender；原始檔 pattern 恆為 null（無 AI 模式）→ 省略（undefined）。
+ * gender keys 1/2 → EnumGender; the source `pattern: null` (no AI pattern) → omitted (undefined).
  */
 export function convertJobYaml(raw: IRawJobYaml): IJobDef
 {
@@ -481,7 +458,6 @@ export function convertJobYaml(raw: IRawJobYaml): IJobDef
 			?.map((e) => WEAPON_TYPE_LOOKUP[String(e)])
 			.filter((v): v is EnumWeaponType => v !== undefined),
 		coe: Object.keys(coe).length > 0 ? coe : undefined,
-		pattern: raw.pattern === null ? null : undefined,
 		img: raw.img,
 		gender: Object.keys(gender).length > 0 ? gender : undefined,
 		info: raw.info && typeof raw.info.desc === 'string' ? { desc: raw.info.desc } : undefined,

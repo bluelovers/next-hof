@@ -20,6 +20,6 @@ export function skillPassive(char: Character, repo: IDataRepository): void
 			const v = sk[f];
 			if (v) char[f] += v;
 		}
-		if (sk.HealBonus) char.SPECIAL.HealBonus += sk.HealBonus;
+		if (sk.HealBonus) char.addSpecial('HealBonus', sk.HealBonus);
 	}
 }

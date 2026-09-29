@@ -20,6 +20,7 @@ import {
 import { TEAM_SIDE_CLASS } from './types';
 import { computeSpriteFlipped } from './spriteFlip';
 import { corpseSpecOf } from '#/lib/game/battle/corpse-policy';
+import { percentOf } from '#/lib/game/core/percent';
 import type { EnumStatusAttr } from '#/lib/game/character/status-enum';
 import type {
 	IBattleAction,
@@ -51,8 +52,8 @@ const BAR_LOW_COLOR = '#cc3300';
  */
 export function clampPercent(value: number, max: number): number
 {
-	if (max <= 0) return 0;
-	return Math.max(0, Math.min(100, (value / max) * 100));
+	/** 共用百分比核心（含取整與 0 上限防呆）再夾制 0–100 */
+	return Math.max(0, Math.min(100, percentOf(value, max)));
 }
 
 /**

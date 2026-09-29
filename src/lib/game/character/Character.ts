@@ -6,10 +6,11 @@
  */
 
 import { EnumState, EnumPosition, EnumExpect } from '../constants';
-import type { IBehavior, ISpecial, ICharCore, IMonReward } from '../types';
+import type { IBehavior, ISpecial, ICharCore, IMonReward, IAtkTuple, IDefTuple } from '../types';
 import type { ICorpsePolicy } from '../battle/corpse-policy';
 import { EnumCharType, EnumEquipSlot, EnumWeaponType } from '../types';
 import type { RNG } from '../core/rng';
+import { percentOf } from '../core/percent';
 import { nanoid } from 'nanoid';
 
 /**
@@ -38,25 +39,6 @@ export interface ICharInit extends ICharCore
 	equip?: Partial<Record<EnumEquipSlot, number>>;
 	/** 怪物獎勵定義（僅怪物有）/ monster reward definition (monsters only) */
 	reward?: IMonReward;
-}
-
-/**
- * 特殊能力的初始值 / Initial values for SPECIAL
- * 回傳全零的 ISpecial（所有數值欄位歸零、Pierce 為 [0,0]）。
- * Returns an all-zero ISpecial (numeric fields at 0, Pierce as [0,0]).
- */
-export function defaultSpecial(): ISpecial
-{
-	return {
-		PoisonResist: 0,
-		HealBonus: 0,
-		Barrier: 0,
-		Pierce: [0, 0],
-		Summon: 0,
-		Undead: 0,
-		HpRegen: 0,
-		SpRegen: 0,
-	};
 }
 
 /**
@@ -137,18 +119,18 @@ export class Character implements ICharCore
 	MAXSP = 0;
 	SP = 0;
 	/** 物理/魔法攻擊（來源於裝備；索引同 EnumAtkSlot）/ physical/magic attack from equipment (indices match EnumAtkSlot) */
-	atk: [number, number] = [0, 0];
+	atk: IAtkTuple = [0, 0];
 	/** [物理%, 物理定值, 魔法%, 魔法定值] 減傷（索引同 EnumDefSlot）/ [phys%, phys flat, mag%, mag flat] reductions (indices match EnumDefSlot) */
-	def: [number, number, number, number] = [0, 0, 0, 0];
+	def: IDefTuple = [0, 0, 0, 0];
 	/** 目前主手武器型別（CalcEquips 寫入，供技能武器限制比對）/ current main-hand weapon type (written by CalcEquips for skill weapon limits) */
-	WEAPON: EnumWeaponType | undefined = undefined;
+	WEAPON?: EnumWeaponType;
 
 	/** 生死／中毒狀態 / alive-dead / poison state */
 	STATE: EnumState = EnumState.Alive;
 	/** 前衛／後衛站位（開戰隨機決定）/ front/back row (randomized at battle start) */
 	POSITION: EnumPosition = EnumPosition.Front;
 	/** 特殊能力（Barrier/Pierce/Regen 等）/ special abilities (Barrier/Pierce/Regen, ...) */
-	SPECIAL: ISpecial = defaultSpecial();
+	SPECIAL: ISpecial = {};
 
 	/** 已習得技能編號 / learned skill numbers */
 	skill: number[] = [];
@@ -158,8 +140,8 @@ export class Character implements ICharCore
 	behavior?: IBehavior;
 	/** 職業編號 / job number */
 	job?: number;
-	/** 怪物獎勵定義 / monster reward definition */
-	reward?: { moneyhold?: number; exphold?: number; itemtable?: Record<number, number> };
+	/** 怪物獎勵定義（IMonReward）/ monster reward definition (IMonReward) */
+	reward?: IMonReward;
 	/**
 	 * 死亡後是否留下屍體（角色級政策：false＝消失；物件＝指定圖／class／style；省略＝往上繼承）
 	 * Whether this unit leaves a corpse on death (character-level policy: false = vanish;
@@ -214,6 +196,11 @@ export class Character implements ICharCore
 		this.behavior = init.behavior;
 		this.reward = init.reward;
 		this.corpse = init.corpse;
+		/**
+		 * 天生特殊能力（init.SPECIAL）併入實例（缺省＝defaultSpecial 全零）。
+		 * Merge the innate SPECIAL from init (absent = the all-zero defaultSpecial).
+		 */
+		if (init.SPECIAL) Object.assign(this.SPECIAL, init.SPECIAL);
 	}
 
 	/** 將角色編號轉為字串（供事件日誌使用）/ Convert character number to string (for event logging) */
@@ -247,36 +234,36 @@ export class Character implements ICharCore
 		return this.types.has(EnumCharType.Union);
 	}
 
-	/** 以字串鍵讀取 SPECIAL 數值（缺省 0）/ read a SPECIAL value by string key (0 when absent) */
-	getSpecial(key: string): number
+	/** 以 ISpecial 數值鍵讀取（缺省 undefined，不另賦預設值）/ read by ISpecial numeric key (undefined when absent, no default written) */
+	getSpecial<K extends Exclude<keyof ISpecial, 'Pierce'>>(key: K): ISpecial[K]
 	{
-		return (this.SPECIAL as unknown as Record<string, number>)[key] ?? 0;
+		return this.SPECIAL[key];
 	}
 
-	/** 以字串鍵累加 SPECIAL 數值，回傳新值 / add to a SPECIAL value by string key, returning the new value */
-	addSpecial(key: string, amount: number): number
+	/** 以 ISpecial 數值鍵累加，回傳新值 / add to an ISpecial numeric key, returning the new value */
+	addSpecial<K extends Exclude<keyof ISpecial, 'Pierce'>>(key: K, amount: NonNullable<ISpecial[K]>): number
 	{
-		const s = this.SPECIAL as unknown as Record<string, number>;
-		s[key] = (s[key] ?? 0) + amount;
-		return s[key];
+		const next = (this.SPECIAL[key] ?? 0) + amount;
+		this.SPECIAL[key] = next;
+		return next;
 	}
 
-	/** 以字串鍵設定 SPECIAL 數值 / set a SPECIAL value by string key */
-	setSpecial(key: string, value: number): void
+	/** 以 ISpecial 數值鍵設定 / set an ISpecial numeric key */
+	setSpecial<K extends Exclude<keyof ISpecial, 'Pierce'>>(key: K, value: ISpecial[K]): void
 	{
-		(this.SPECIAL as unknown as Record<string, number>)[key] = value;
+		this.SPECIAL[key] = value;
 	}
 
-	/** HP 百分比（MAXHP=0 時回 0）/ HP percentage (0 when MAXHP is 0) */
+	/** HP 百分比（MAXHP=0 時回 0）/ HP percentage (percentOf; 0 when MAXHP is 0) */
 	hpPercent(): number
 	{
-		return this.MAXHP > 0 ? (this.HP / this.MAXHP) * 100 : 0;
+		return percentOf(this.HP, this.MAXHP);
 	}
 
-	/** SP 百分比（MAXSP=0 時回 0）/ SP percentage (0 when MAXSP is 0) */
+	/** SP 百分比（MAXSP=0 時回 0）/ SP percentage (percentOf; 0 when MAXSP is 0) */
 	spPercent(): number
 	{
-		return this.MAXSP > 0 ? (this.SP / this.MAXSP) * 100 : 0;
+		return percentOf(this.SP, this.MAXSP);
 	}
 
 	/**

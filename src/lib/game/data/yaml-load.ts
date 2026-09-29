@@ -73,14 +73,15 @@ const FILE_PATTERN = /^[a-z]+\.([^.]+)\.yml$/i;
 /* ------------------------------------------------------------------ */
 
 /**
- * 數值收斂：null → 0、字串數值 → number；非數值字串／其他型別原樣保留。
- * Coerce null → 0 and numeric strings → number; non-numeric input stays untouched.
- * （`quantity: null` 即 0 的同義，於載入時定案，raw 層不再有 null。）
- * (`quantity: null` means 0; resolved at load so the raw layer has no null.)
+ * 數值收斂：null → 0、boolean → 1/0、字串數值 → number；其餘原樣保留。
+ * Coerce null → 0, booleans → 1/0, and numeric strings → number; other input stays untouched.
+ * （`quantity: null` 即 0、`Undead: true` 即 1，皆於載入時定案。）
+ * (`quantity: null` means 0 and `Undead: true` means 1; both resolved at load.)
  */
 function coerceNumberValue(value: unknown): unknown
 {
 	if (value === null) return 0;
+	if (typeof value === 'boolean') return value ? 1 : 0;
 	if (typeof value === 'string' && value.trim() !== '')
 	{
 		const n = Number(value);
@@ -169,6 +170,7 @@ const COERCE_SPECS: Record<EnumResourceKind, ICoerceSpec> = {
 		kind: 'object',
 		fields: {
 			...CORE_NUMERIC_FIELDS,
+			SPECIAL: { kind: 'map', value: NUM_OR_ARRAY },
 			atk: NUM_ARRAY, def: NUM_ARRAY,
 			reward: { kind: 'object', fields: { moneyhold: NUM, exphold: NUM, itemtable: { kind: 'map', value: NUM } } },
 			behavior: { kind: 'object', fields: { guard: GUARD_SPEC, pattern: PATTERN_SPEC } },
