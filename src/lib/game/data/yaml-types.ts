@@ -149,8 +149,8 @@ export interface IRawItemYaml extends ICompBonuses, INamedIconDef
 	base_name?: string;
 	/** 附加召喚效果值 / attached summon bonus */
 	P_SUMMON?: number;
-	/** 附加貫穿效果值 / attached pierce bonus */
-	P_PIERCE?: number;
+	/** 附加貫穿效果值（P_PIERCE = [物理, 魔法]）/ attached pierce bonus (P_PIERCE = [phys, mag]) */
+	P_PIERCE?: IAtkTuple;
 }
 
 /**

@@ -28,6 +28,7 @@ import {
 	type IEncounterTable,
 	type IEquipTable,
 	type IGenderOverride,
+	type IGrowthCoefficients,
 	type IItemDef,
 	type IJobDef,
 	type IMonDef,
@@ -194,7 +195,7 @@ export function convertEquipYaml(raw: IEquipTable | undefined): ICharDef['equip'
  */
 export function convertSpecialYaml(raw: IRawMonYaml): Partial<ISpecial> | undefined
 {
-	const merged: Partial<ISpecial> = { ...raw.SPECIAL };
+	const merged: Partial<ISpecial> = { ...(raw as any).special, ...raw.SPECIAL };
 	return Object.keys(merged).length > 0 ? merged : undefined;
 }
 
@@ -437,11 +438,7 @@ export function convertItemYaml(raw: IRawItemYaml): IItemDef
  */
 export function convertJobYaml(raw: IRawJobYaml): IJobDef
 {
-	const coe: IJobDef['coe'] = {};
-	for (const [k, v] of Object.entries(raw.coe ?? {}))
-	{
-		coe[k] = v;
-	}
+	const coe: IGrowthCoefficients = { ...raw.coe };
 
 	const gender: Partial<Record<EnumGender, IGenderOverride>> = {};
 	for (const [k, v] of Object.entries(raw.gender ?? {}))

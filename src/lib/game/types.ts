@@ -305,8 +305,10 @@ export type ICompBonuses = Partial<Record<ICompField, number>>;
  * 特殊能力定義 / Special ability definition
  * 介面 / interface
  *
- * Character.SPECIAL 的結構；純數值欄位可經 getSpecial/addSpecial 以字串鍵存取。
- * Shape of Character.SPECIAL; numeric fields are also reachable by string key via getSpecial/addSpecial.
+ * Character.SPECIAL 的結構；各欄位可經 getSpecial/addSpecial/setSpecial 以字串鍵存取
+ * （數值鍵以數字累加，Pierce（IAtkTuple）逐槽累加）。
+ * Shape of Character.SPECIAL; every field is reachable by string key via getSpecial/addSpecial/setSpecial
+ * (numeric keys accumulate scalars, Pierce (IAtkTuple) accumulates per slot).
  */
 export interface ISpecial
 {
@@ -641,8 +643,8 @@ export interface IItemDef extends ICompBonuses, INamedIconDef
 	base_name?: string;
 	/** 附加的召喚效果值（SPECIAL.P_SUMMON）/ attached summon bonus (SPECIAL.P_SUMMON) */
 	P_SUMMON?: number;
-	/** 附加的貫穿效果值（SPECIAL.P_PIERCE）/ attached pierce bonus (SPECIAL.P_PIERCE) */
-	P_PIERCE?: number;
+	/** 附加的貫穿效果值（P_PIERCE = [物理, 魔法]）/ attached pierce bonus (P_PIERCE = [phys, mag]) */
+	P_PIERCE?: IAtkTuple;
 }
 
 /**
@@ -754,7 +756,7 @@ export interface INamedIconDef
  * 單一事實來源：IMonReward.itemtable、IItemDef.need 與 raw 對應欄位皆引用。
  * SSOT: referenced by IMonReward.itemtable, IItemDef.need and their raw counterparts.
  */
-export type INumberTable = Record<string | number, number>;
+export type INumberTable<K extends string | number = string | number> = Record<K, number>;
 
 /**
  * 怪物遭遇／隨行表：怪物編號 → [權重, 旗標] / monster encounter/escort table
@@ -779,18 +781,14 @@ export interface IDescInfo
  * 鍵為 EnumEquipSlot（單一事實來源）；ICharDef.equip 與 raw equip 皆引用。
  * Keyed by EnumEquipSlot (SSOT); referenced by ICharDef.equip and the raw equip shape.
  */
-export type IEquipTable = Partial<Record<EnumEquipSlot, number>>;
+export type IEquipTable = Partial<INumberTable<EnumEquipSlot>>;
 
 /**
  * 成長係數（maxhp/maxsp 及其餘六維）/ growth coefficients
  * 單一事實來源：IJobDef.coe 與 raw coe 皆引用。
  * SSOT: referenced by IJobDef.coe and the raw coe shape.
  */
-export type IGrowthCoefficients = {
-	maxhp?: number;
-	maxsp?: number;
-	[k: string]: number | undefined;
-};
+export type IGrowthCoefficients = Pick<ICombatStats, 'maxhp' | 'maxsp'>;
 
 /**
  * 戰鬥數值（角色/怪物共用，單一事實來源）/ Combat stats (shared by char & mon; single source of truth)

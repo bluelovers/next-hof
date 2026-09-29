@@ -39,7 +39,7 @@ export interface IHomePageProps
  */
 export const HomePage: React.FC<IHomePageProps> = ({
 	ranking = [],
-	onlineUsers = 1,
+	onlineUsers = 0,
 	maxUsers = 500,
 	retentionDays = 14,
 	onLogin,

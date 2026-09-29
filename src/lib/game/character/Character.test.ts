@@ -147,3 +147,34 @@ describe('status effects (4.4)', () =>
 		expect(consumeBarrier(char)).toBe(false);
 	});
 });
+
+describe('SPECIAL accessors (ISpecial keyed)', () =>
+{
+	it('addSpecial accumulates numeric keys and the Pierce tuple per slot', () =>
+	{
+		const char = new Character({
+			no: 1, name: 'sp', types: [EnumCharType.Char], level: 1,
+			str: 10, int: 10, dex: 10, spd: 10, luk: 10, maxhp: 300, maxsp: 50,
+		});
+
+		/**
+		 * 數值鍵：缺省 undefined 視為 0 起算，連續累加
+		 */
+		expect(char.addSpecial('PoisonResist', 30)).toBe(30);
+		expect(char.addSpecial('PoisonResist', 20)).toBe(50);
+		expect(char.getSpecial('PoisonResist')).toBe(50);
+
+		/**
+		 * Pierce：IAtkTuple 逐槽累加（[物理, 魔法]），缺省視為 [0, 0]
+		 */
+		expect(char.addSpecial('Pierce', [10, 0])).toEqual([10, 0]);
+		expect(char.addSpecial('Pierce', [5, 30])).toEqual([15, 30]);
+		expect(char.getSpecial('Pierce')).toEqual([15, 30]);
+
+		/**
+		 * setSpecial 寫入後再累加，維持既有值
+		 */
+		char.setSpecial('Pierce', [1, 1]);
+		expect(char.addSpecial('Pierce', [1, 2])).toEqual([2, 3]);
+	});
+});

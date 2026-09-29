@@ -184,7 +184,7 @@ const COERCE_SPECS: Record<EnumResourceKind, ICoerceSpec> = {
 		fields: {
 			no: NUM, buy: NUM, sell: NUM, atk: NUM_ARRAY, def: NUM_ARRAY, handle: NUM,
 			need: { kind: 'map', value: NUM },
-			P_SUMMON: NUM, P_PIERCE: NUM,
+			P_SUMMON: NUM, P_PIERCE: NUM_ARRAY,
 			...COMP_BONUS_FIELDS,
 		},
 	},

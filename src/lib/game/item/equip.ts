@@ -63,15 +63,10 @@ export function CalcEquips(char: Character, repo: IDataRepository): void
 		}
 
 		if (item.P_SUMMON) char.addSpecial('Summon', item.P_SUMMON);
-		if (item.P_PIERCE)
+		/** 特殊能力的累加統一走 addSpecial（Pierce 未初始化時由 [0, 0] 起算，不另寫入預設值） */
+		if (item.P_PIERCE?.length)
 		{
-			/** Pierce 恆由 defaultSpecial() 初始化；不存在時不寫入預設值，直接略過 */
-			const pierce = char.SPECIAL.Pierce;
-			if (pierce)
-			{
-				pierce[EnumAtkSlot.Phys] += item.P_PIERCE;
-				pierce[EnumAtkSlot.Mag] += item.P_PIERCE;
-			}
+			char.addSpecial('Pierce', item.P_PIERCE);
 		}
 	}
 }

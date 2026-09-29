@@ -235,21 +235,41 @@ export class Character implements ICharCore
 	}
 
 	/** 以 ISpecial 數值鍵讀取（缺省 undefined，不另賦預設值）/ read by ISpecial numeric key (undefined when absent, no default written) */
-	getSpecial<K extends Exclude<keyof ISpecial, 'Pierce'>>(key: K): ISpecial[K]
+	getSpecial<K extends keyof ISpecial>(key: K): ISpecial[K]
 	{
 		return this.SPECIAL[key];
 	}
 
-	/** 以 ISpecial 數值鍵累加，回傳新值 / add to an ISpecial numeric key, returning the new value */
-	addSpecial<K extends Exclude<keyof ISpecial, 'Pierce'>>(key: K, amount: NonNullable<ISpecial[K]>): number
+	/**
+	 * 以 ISpecial 鍵累加，回傳新值 / add to an ISpecial key, returning the new value
+	 *
+	 * 數值鍵（PoisonResist/Barrier/Regen 等）以數字累加；
+	 * Pierce 為 IAtkTuple（[物理, 魔法]），逐槽累加後回傳新 tuple。
+	 * Numeric keys accumulate scalars; Pierce (IAtkTuple, [phys, mag]) accumulates per slot
+	 * and returns the new tuple.
+	 */
+	addSpecial<K extends keyof ISpecial>(key: K, amount: NonNullable<ISpecial[K]>): NonNullable<ISpecial[K]>
 	{
-		const next = (this.SPECIAL[key] ?? 0) + amount;
-		this.SPECIAL[key] = next;
-		return next;
+		if (key === 'Pierce')
+		{
+			/** 缺省 undefined 視為 [0, 0] 參與運算（不另寫入預設值） */
+			const current = this.SPECIAL.Pierce;
+			const add = amount as IAtkTuple;
+			const next: IAtkTuple = [
+				(current?.[0] ?? 0) + (add[0] ?? 0),
+				(current?.[1] ?? 0) + (add[1] ?? 0),
+			];
+			this.SPECIAL.Pierce = next;
+			return next as unknown as NonNullable<ISpecial[K]>;
+		}
+		/** 數值鍵：缺省 undefined 視為 0 參與運算（只累加，不建立多餘欄位） */
+		const current = this.SPECIAL[key] as number | undefined;
+		const next = (current ?? 0) + (amount as number);
+		this.setSpecial(key, next as unknown as ISpecial[K]);
+		return next as unknown as NonNullable<ISpecial[K]>;
 	}
 
-	/** 以 ISpecial 數值鍵設定 / set an ISpecial numeric key */
-	setSpecial<K extends Exclude<keyof ISpecial, 'Pierce'>>(key: K, value: ISpecial[K]): void
+	setSpecial<K extends keyof ISpecial>(key: K, value: ISpecial[K]): void
 	{
 		this.SPECIAL[key] = value;
 	}
