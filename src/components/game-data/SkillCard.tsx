@@ -18,15 +18,8 @@ import type {
 	ISkillEffects,
 } from './GameDataTypes';
 import { EnumSkillType } from '#/components/battle/enums';
-import { EnumTargetType, EnumTargetMethod, type ITargetSpec } from '#/lib/game/types';
+import { EnumTargetType, EnumTargetMethod } from '#/lib/game/types';
 import './SkillCard.css';
-
-/**
- * 預設目標規格：`skill.target` 省略時採用，與 canonical `ISkillDef.target` 的預設值一致。
- * Default target spec used when `skill.target` is omitted; matches canonical `ISkillDef.target`.
- * 三元組 = [目標類型, 選取方式, 次數] / tuple = [target type, selection method, hit count]
- */
-const DEFAULT_TARGET_SPEC: ITargetSpec = [EnumTargetType.Enemy, EnumTargetMethod.Individual, 1];
 
 // ==================== Render Props / 子邏輯覆寫 ====================
 
@@ -180,13 +173,16 @@ function DefaultPowerRenderer({ skill }: { skill: ISkillData })
 {
 	if (skill.powerPct === undefined) return null;
 	const powClass = skill.isSupport ? 'recover' : 'dmg';
-	/** 次數取自目標規格三元組第 3 位（target[2]）/ hit count comes from target[2] of the spec tuple */
-	const hits = skill.target?.[2] ?? DEFAULT_TARGET_SPEC[2];
+	/**
+	 * 次數取自目標規格第 3 位（target[2]）；未設定 target 即無次數資訊，不顯示倍數。
+	 * Hit count comes from target[2]; without a configured target there is no hit count to show.
+	 */
+	const hits = skill.target?.[2];
 	return (
 		<>
 			{' / '}
 			<span className={powClass}>{skill.powerPct}%</span>
-			{hits > 1 && <span>x{hits}</span>}
+			{hits !== undefined && hits > 1 && <span>x{hits}</span>}
 		</>
 	);
 }
@@ -403,10 +399,11 @@ export const SkillCard: React.FC<ISkillCardProps> = ({
 }) =>
 {
 	/**
-	 * 目標規格三元組 [類型, 選取方式, 次數]，省略時採 canonical 預設 [Enemy, Individual, 1]。
-	 * Target spec tuple [type, method, count]; falls back to canonical's [Enemy, Individual, 1].
+	 * 目標規格三元組 [類型, 選取方式, 次數]；未設定即為不存在，不做任何預設。
+	 * Target spec tuple [type, method, count]; when absent it stays absent — no defaults are assumed.
 	 */
-	const [targetType, targetMethod] = skill.target ?? DEFAULT_TARGET_SPEC;
+	const targetType = skill.target?.[0];
+	const targetMethod = skill.target?.[1];
 
 	/** 預設內容 / Default content */
 	const defaultContent = (
@@ -417,19 +414,27 @@ export const SkillCard: React.FC<ISkillCardProps> = ({
 				: <DefaultNameRenderer skill={skill} />
 			}
 
-			{/* 目標 / Target（target[0]）/ from target[0] */}
-			{' / '}
-			{renderTarget
-				? renderTarget(targetType)
-				: <DefaultTargetRenderer target={targetType} />
-			}
+			{/* 目標 / Target（target[0]，未設定則不顯示）/ from target[0]; hidden when absent */}
+			{targetType !== undefined && (
+				<>
+					{' / '}
+					{renderTarget
+						? renderTarget(targetType)
+						: <DefaultTargetRenderer target={targetType} />
+					}
+				</>
+			)}
 
-			{/* 範圍 / Scope（target[1]）/ from target[1] */}
-			{' - '}
-			{renderScope
-				? renderScope(targetMethod)
-				: <DefaultScopeRenderer scope={targetMethod} />
-			}
+			{/* 範圍 / Scope（target[1]，未設定則不顯示）/ from target[1]; hidden when absent */}
+			{targetMethod !== undefined && (
+				<>
+					{' - '}
+					{renderScope
+						? renderScope(targetMethod)
+						: <DefaultScopeRenderer scope={targetMethod} />
+					}
+				</>
+			)}
 
 			{/* 消費（SP / 犧牲 / 魔方陣）/ Cost */}
 			{renderCost

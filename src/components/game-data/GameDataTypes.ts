@@ -145,12 +145,13 @@ export interface ISkillEffects
  * Categorized; all sub-interface fields are optional for backward compatibility.
  *
  * `name`/`target`/`learn` 與 canonical 同名，改由 `Pick<ISkillDef, ...>` 繼承；
- * `target` 因此為 canonical 的 `ITargetSpec` 三元組（省略時預設 [Enemy, Individual, 1]），
- * 原本拆解出的 `scope`（target[1]）與 `hits`（target[2]）不再重複宣告，請直接解構 `target`。
+ * `target` 因此為 canonical 的 `ITargetSpec` 三元組；未設定 `target` 即視為不存在，
+ * 不套用任何預設值，也不再重複宣告拆解欄位 `scope`（target[1]）與 `hits`（target[2]），
+ * 請直接解構 `target` 並依存在與否決定顯示。
  * `name`/`target`/`learn` duplicate canonical names and are inherited via `Pick<ISkillDef, ...>`;
- * `target` is therefore canonical's `ITargetSpec` tuple (defaults to [Enemy, Individual, 1] when
- * omitted), and the derived `scope` (target[1]) / `hits` (target[2]) fields are no longer
- * re-declared — destructure `target` instead.
+ * `target` is therefore canonical's `ITargetSpec` tuple. A missing `target` means exactly that —
+ * no default is applied — and the derived `scope` (target[1]) / `hits` (target[2]) fields are no
+ * longer re-declared; destructure `target` and render only what exists.
  */
 export interface ISkillData
 	extends ISkillCost,
