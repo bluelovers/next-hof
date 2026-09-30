@@ -24,7 +24,7 @@ import {
 	type ITeamBattleChars,
 } from '../../src/components/battle/computeSpritePositions';
 import { EnumTeamSideUI, EnumSpriteImageDir } from '../../src/components/battle/enums';
-import { EnumPosition } from '../../src/lib/game/constants';
+import { EnumPosition } from '../../src/lib/types/battle-enum';
 
 /** 共用敵方精靈樣本 / Shared enemy sprite samples */
 export const sampleEnemySprites: IBattleSprite[] = [

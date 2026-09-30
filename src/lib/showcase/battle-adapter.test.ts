@@ -1,11 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { EnumOutcome } from '#/lib/game/battle/BattleResult';
-import { EnumState, MAX_CHAR } from '#/lib/game/constants';
+import { MAX_CHAR } from '#/lib/game/constants';
+import { EnumState } from '#/lib/types/battle-enum';
 import { RNG } from '#/lib/game/core/rng';
 import { createSeedRepository, SEED } from '#/lib/game/data/seed-data';
 import { newChar, newMon } from '#/lib/game/character/factory';
-import { EnumBattleEventType, EnumSkillDamageType } from '#/lib/game/types';
-import type { IBattleEvent, ISkillDef } from '#/lib/game/types';
+import { EnumBattleEventType } from '#/lib/types/battle-enum';
+import { EnumSkillDamageType } from '#/lib/types/skill-enum';
+import type { IBattleEvent } from '#/lib/types/battle-types';
+import type { ISkillDef } from '#/lib/types/skill-types';
 import type { IDataRepository } from '#/lib/game/data/repository';
 import { SPRITE_PLACEHOLDER_URL } from './sprite-map';
 import {
@@ -16,7 +19,7 @@ import {
 	EnumMagicCircleKind,
 	EnumChargeKind,
 } from '#/components/battle/enums';
-import { EnumPosition } from '#/lib/game/constants';
+import { EnumPosition } from '#/lib/types/battle-enum';
 import {
 	DEFAULT_ALLY_TEAM_NAME,
 	DEFAULT_ENEMY_TEAM_NAME,

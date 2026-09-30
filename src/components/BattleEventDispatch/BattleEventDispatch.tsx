@@ -20,7 +20,7 @@
  * by the engine (single source of truth); no actor / target / skill field logic is stitched here.
  */
 import React from 'react';
-import type { IBattleEvent } from '#/lib/game/types';
+import type { IBattleEvent } from '#/lib/types/battle-types';
 import {
 	EnumEventClass,
 	EnumFollowUpType,

@@ -11,7 +11,9 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse } from 'yaml';
-import { EnumGuardKind, type IItemDef, type IJobDefCore } from '#/lib/game/types';
+import { EnumGuardKind } from '#/lib/types/battle-enum';
+import type { IItemDef } from '#/lib/types/item-types';
+import type { IJobDefCore } from '#/lib/types/job-types';
 import type { IResourceId } from '#/lib/types/seg-types';
 import { COMP_FIELDS } from '#/lib/game/character/status-attrs';
 import { SKILL_EXTRA_NUMERIC_KEYS } from './yaml-skill-keys';
@@ -24,7 +26,7 @@ import type {
 	IRawSkillYaml,
 	IRawSkilltreeYaml,
 	IRawUnionYaml,
-} from './yaml-types';
+} from '#/lib/types/raw/yaml-types';
 
 /**
  * 資源種類 / Resource kind

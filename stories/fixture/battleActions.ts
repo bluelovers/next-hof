@@ -10,8 +10,8 @@
  */
 import type { IBattleAction } from '../../src/components/battle/types';
 import { EnumActionType, EnumAttributeType, EnumStatDirection } from '#/components/battle/enums';
-import { EnumValueWho } from '#/lib/game/types';
-import { EnumStatusAttr } from '#/lib/game/character/status-enum';
+import { EnumValueWho } from '#/lib/types/battle-enum';
+import { EnumStatusAttr } from '#/lib/types/status-enum';
 import {
 	buildActionMessage,
 	buildDamageCountMessage,

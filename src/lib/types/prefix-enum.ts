@@ -25,9 +25,8 @@ export enum EnumStatusPrefix
 /**
  * 補正欄位前綴 / Compensation field prefixes
  * P_ 為定值加成、M_ 為百分比加成；用途與狀態操作前綴（EnumStatusPrefix）不同，故獨立成 enum。
- * 取代原先散落在 COMP_FIELDS 的硬編碼 'M_' 字串。
  * P_ = flat add, M_ = percent scale; distinct from status-op prefixes (EnumStatusPrefix), hence a
- * separate enum. Replaces the previously hardcoded 'M_' literal in COMP_FIELDS.
+ * separate enum.
  */
 export enum EnumCompPrefix
 {

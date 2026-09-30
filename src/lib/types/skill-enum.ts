@@ -100,9 +100,10 @@ export enum EnumSkillPriority
  * Physical＝0（物理：STR／atk[0]）、Magic＝1（魔法：INT／atk[1]）；
  * 成員值與 YAML 來源一致，並採完整鍵名（Physical / Magic）。
  *
- * 本列舉即 atk 槽位索引的唯一來源：status-attrs.ts 原本另立 EnumAtkSlot（Phys / Mag），
- * 與本列舉定義完全相同的 0＝物理、1＝魔法，屬重複定義，已併入本列舉；
- * atk 讀寫、pierce、equip 等索引一律引用 EnumSkillDamageType。
+ * 本列舉即 atk 槽位索引的唯一來源：atk 讀寫、pierce、equip 等索引一律引用
+ * EnumSkillDamageType，不另立槽位 enum。
+ * This enum is the sole source of the atk slot index: atk read/write, pierce and equip
+ * indices all reference EnumSkillDamageType; no separate slot enum exists.
  *
  * calcBasicDamage 據此選擇能力與 atk/def 的物理／魔法索引；
  * showcase battle-adapter 據此決定蓄力文案（Physical→charging、Magic→casting）。

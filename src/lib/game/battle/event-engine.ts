@@ -22,9 +22,10 @@
  */
 
 import { STATUS_UP_KEYS, STATUS_DOWN_KEYS, STATUS_PLUS_KEYS } from '../character/status-attrs';
-import type { IStatusUpKey, IStatusDownKey, IStatusPlusKey } from '../character/status-attrs';
-import type { IBattleEvent, ISkillDef } from '../types';
-import { EnumBattleEventType } from '../types';
+import type { IStatusUpKey, IStatusDownKey, IStatusPlusKey } from '#/lib/types/status-attr-types';
+import type { IBattleEvent } from '#/lib/types/battle-types';
+import type { ISkillDef } from '#/lib/types/skill-types';
+import { EnumBattleEventType } from '#/lib/types/battle-enum';
 
 /**
  * 事件分類（兩類涵蓋所有戰鬥紀錄）/ Event class (two classes cover every battle record)

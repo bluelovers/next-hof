@@ -7,8 +7,10 @@ import {
 	detectSkillEffects,
 	runEventEngine,
 } from './event-engine';
-import { EnumBattleEventType, EnumSkillDamageType, EnumTargetMethod, EnumTargetType } from '../types';
-import type { IBattleEvent, ISkillDef } from '../types';
+import { EnumBattleEventType } from '#/lib/types/battle-enum';
+import { EnumSkillDamageType, EnumTargetMethod, EnumTargetType } from '#/lib/types/skill-enum';
+import type { IBattleEvent } from '#/lib/types/battle-types';
+import type { ISkillDef } from '#/lib/types/skill-types';
 
 /** 複合效果技能：傷害＋施毒＋減益 / Multi-effect skill: damage + poison + debuff */
 const curse: ISkillDef = {

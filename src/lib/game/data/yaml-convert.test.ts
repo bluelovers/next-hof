@@ -8,8 +8,9 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { EnumEquipSlot, EnumGuardKind } from '#/lib/game/types';
-import { EnumPosition } from '#/lib/game/constants';
+import { EnumEquipSlot } from '#/lib/types/char-enum';
+import { EnumGuardKind } from '#/lib/types/battle-enum';
+import { EnumPosition } from '#/lib/types/battle-enum';
 import { TEST_FIXTURES_ROOT } from '#/yaml-paths';
 import { loadAllChars, loadAllMons, loadCharYaml, loadMonYaml } from './yaml-load';
 import {
@@ -22,7 +23,7 @@ import {
 	convertEquipYaml,
 	convertBehaviorYaml,
 } from './yaml-convert';
-import type { IRawCharYaml, IRawMonYaml } from './yaml-types';
+import type { IRawCharYaml, IRawMonYaml } from '#/lib/types/raw/yaml-types';
 
 /**
  * 載入角色 fixture；缺檔時拋出具體路徑的錯誤（避免 non-null assertion 產生無意義訊息）。

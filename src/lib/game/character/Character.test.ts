@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { RNG } from '../core/rng';
-import { EnumState } from '../constants';
+import { EnumState } from '#/lib/types/battle-enum';
 import { Character } from './Character';
 import { createSeedRepository } from '../data/seed-data';
 import { newChar, newMon, newMonSummon } from './factory';
@@ -8,7 +8,7 @@ import { levelFix } from './level-fix';
 import { plusPercent } from '../core/percent';
 import { setBattleVariable } from './battle-variable';
 import { getPoison, poisonDamage, consumeBarrier } from './status';
-import { EnumCharType } from '../types';
+import { EnumCharType } from '#/lib/types/char-enum';
 
 const repo = createSeedRepository();
 

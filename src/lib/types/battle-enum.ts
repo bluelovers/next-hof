@@ -7,8 +7,8 @@
 
 /**
  * 陣營側別 / Battle team side
- * 使用數值枚舉取代字串字面量，徹底消除 TEAM_0='0' / TEAM_1='1' 設計。
- * Uses numeric enum instead of string literals.
+ * 陣營以數值成員表示（Team0 / Team1），不用字串字面量。
+ * Teams are represented by numeric enum members (Team0 / Team1), not string literals.
  */
 export enum EnumTeamSide
 {

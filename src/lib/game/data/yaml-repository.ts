@@ -20,7 +20,11 @@ import {
 	EnumResourceKind,
 } from './yaml-load';
 import { convertCharYaml, convertMonYaml, convertSkillYaml, convertItemYaml, convertJobYaml } from './yaml-convert';
-import type { ICharDef, IItemDef, IJobDef, IMonDef, ISkillDef } from '#/lib/game/types';
+import type { ICharDef } from '#/lib/types/char-types';
+import type { IItemDef } from '#/lib/types/item-types';
+import type { IJobDef } from '#/lib/types/job-types';
+import type { IMonDef } from '#/lib/types/mon-types';
+import type { ISkillDef } from '#/lib/types/skill-types';
 import type { IResourceId } from '#/lib/types/seg-types';
 
 /** YAML 倉庫建置結果 / Results of building a YAML-backed repository */

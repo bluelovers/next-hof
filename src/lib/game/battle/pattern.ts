@@ -4,7 +4,7 @@
  */
 
 import type { Character } from '../character/Character';
-import type { IPatternItem } from '../types';
+import type { IPatternItem } from '#/lib/types/char-types';
 import { DecideJudge } from './judge';
 import {
 	DEFAULT_PATTERN_FLEE,

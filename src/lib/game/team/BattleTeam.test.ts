@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { RNG } from '../core/rng';
-import { EnumState, EnumTeamSide } from '../constants';
+import { EnumState, EnumTeamSide } from '#/lib/types/battle-enum';
 import { Character } from '../character/Character';
 import { BattleTeam } from './BattleTeam';
-import { EnumCharType } from '../types';
+import { EnumCharType } from '#/lib/types/char-enum';
 
 function mk(no: number, types: Character['types']): Character
 {

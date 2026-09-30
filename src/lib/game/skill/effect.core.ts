@@ -24,10 +24,10 @@
 
 import type { Character } from '../character/Character';
 import { applyPlayerProtection } from '../character/status';
-import { EnumDefSlot } from '../character/status-attrs';
+import { EnumDefSlot } from '#/lib/types/status-enum';
 import { PERCENT_NONE, minusPercent, takePercent } from '../core/percent';
-import { EnumInfluence, EnumSkillDamageType } from '../types';
-import type { ISkillDef } from '../types';
+import { EnumInfluence, EnumSkillDamageType } from '#/lib/types/skill-enum';
+import type { ISkillDef } from '#/lib/types/skill-types';
 
 /**
  * 傷害計算所需的技能欄位 / Skill fields required by the damage calculation

@@ -32,31 +32,6 @@ import './BattleFieldSpriteLabel.css';
 import { EnumSpriteLabelPlacement } from '#/components/battle/enums';
 import type { IStyleProps } from '#/components/shared/types';
 
-/**
- * 將純邏輯工具重新匯出，使 BattleFieldSpriteLabel 模組同時提供組件與標籤定位邏輯
- * Re-export the pure logic tool so the BattleFieldSpriteLabel module exposes both the
- * component and the label-positioning logic.
- */
-export {
-	computeSpriteLabelPosition,
-	computeLabelLeft,
-	computeLabelTop,
-	labelFitsInFrame,
-	clamp,
-	clampLabelToBoundary,
-	rectsOverlap,
-	largestFreeGap,
-	DEFAULT_LABEL_HEIGHT,
-	DEFAULT_GAP,
-	DEFAULT_IMAGE_SIZE,
-} from './labelPosition';
-export type {
-	ISpriteLabelPlacement,
-	ISpriteLabelPositionInput,
-	ISpriteLabelPositionResult,
-	IRect,
-} from './labelPosition';
-
 /** 戰場精靈名稱標籤屬性 / Battlefield sprite name label props */
 export interface IBattleFieldSpriteLabelProps extends IStyleProps
 {

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { Character } from '../character/Character';
-import { EnumCharType, EnumSkillDamageType } from '../types';
+import { EnumCharType } from '#/lib/types/char-enum';
+import { EnumSkillDamageType } from '#/lib/types/skill-enum';
 import { calcBasicDamage } from './effect';
 import { calcBasicDamageOriginal } from './effect.original';
 

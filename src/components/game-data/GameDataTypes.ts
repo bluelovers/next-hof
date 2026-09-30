@@ -6,7 +6,7 @@
  * Category reference: PHP skill.detail.php + docs/data/skill.md
  *
  * 與 canonical 的去重規則 / Dedupe rule against canonical:
- * 本檔欄位若與 `#/lib/game/types` 的 `ISkillDef` 同名（含僅大小寫不同者）一律不重複宣告，
+ * 本檔欄位若與 `#/lib/types/skill-types` 的 `ISkillDef` 同名（含僅大小寫不同者）一律不重複宣告，
  * 改以 `Pick<ISkillDef, ...>` 繼承；兩側宣告衝突時本檔優先度最低，以 canonical 為準。
  * Fields duplicating `ISkillDef` (same name, including case-only variants) are never
  * re-declared here — they are inherited via `Pick<ISkillDef, ...>`. On conflict this file
@@ -14,10 +14,10 @@
  */
 
 import { EnumSkillType } from '../battle/enums';
-import type { IPrimaryStat } from '#/lib/game/character/status-attrs';
-import type { EnumStatusAttr } from '#/lib/game/character/status-enum';
-import type { ISkillDef } from '#/lib/game/types';
-import { EnumPosition } from '#/lib/game/constants';
+import type { IPrimaryStat } from '#/lib/types/status-attr-types';
+import type { EnumStatusAttr } from '#/lib/types/status-enum';
+import type { ISkillDef } from '#/lib/types/skill-types';
+import { EnumPosition } from '#/lib/types/battle-enum';
 
 // ==================== 子類型 / Sub-types ====================
 

@@ -3,7 +3,7 @@
  * 對應 docs/data/skill.md。倉庫回傳的即為 ISkillDef（YAML 結構），此處提供正規化與取值。
  */
 
-import type { ISkillDef } from '../types';
+import type { ISkillDef } from '#/lib/types/skill-types';
 import type { IDataRepository } from '../data/repository';
 
 /**

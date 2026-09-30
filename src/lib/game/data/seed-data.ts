@@ -13,20 +13,24 @@
 
 import {
 	EnumWeaponType,
+	EnumItemCategory,
+} from '#/lib/types/item-enum';
+import {
 	EnumTargetType,
 	EnumTargetMethod,
-	EnumEquipSlot,
-	EnumGuardKind,
 	EnumSkillDamageType,
+} from '#/lib/types/skill-enum';
+import {
+	EnumEquipSlot,
 	EnumGender,
-	EnumItemCategory,
-	type ISkillDef,
-	type IItemDef,
-	type IJobDef,
-	type ICharDef,
-	type IMonDef,
-} from '../types';
-import { EnumPosition } from '../constants';
+} from '#/lib/types/char-enum';
+import { EnumGuardKind } from '#/lib/types/battle-enum';
+import type { ISkillDef } from '#/lib/types/skill-types';
+import type { IItemDef } from '#/lib/types/item-types';
+import type { IJobDef } from '#/lib/types/job-types';
+import type { ICharDef } from '#/lib/types/char-types';
+import type { IMonDef } from '#/lib/types/mon-types';
+import { EnumPosition } from '#/lib/types/battle-enum';
 import { EnumJudgeCode } from '../battle/judge-codes';
 import { InMemoryRepository, type IDataRepository } from './repository';
 

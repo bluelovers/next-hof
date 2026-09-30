@@ -13,7 +13,7 @@
 import type { IBattleSprite, IBattleSidePair } from './types';
 import type { ISpriteImageSize } from './spriteImageSizes';
 import { EnumTeamSideUI } from './enums';
-import { EnumPosition } from '#/lib/game/constants';
+import { EnumPosition } from '#/lib/types/battle-enum';
 import { getSpriteImageDir, computeSpriteFlipped, useFlipPositioning } from './spriteFlip';
 
 /** 角色輸入（含圖像尺寸與站位） / Character input (with image size and battle position) */

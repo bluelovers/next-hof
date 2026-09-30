@@ -18,7 +18,7 @@ import type {
 	ISkillEffects,
 } from './GameDataTypes';
 import { EnumSkillType } from '#/components/battle/enums';
-import { EnumTargetType, EnumTargetMethod } from '#/lib/game/types';
+import { EnumTargetType, EnumTargetMethod } from '#/lib/types/skill-enum';
 import './SkillCard.css';
 
 // ==================== Render Props / 子邏輯覆寫 ====================

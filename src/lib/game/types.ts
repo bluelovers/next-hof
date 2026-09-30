@@ -1,37 +1,10 @@
 /**
- * 共用型別定義轉送層 / Shared type definitions (facade)
- *
- * 型別定義已依域分類移至 #/lib/types/*：
- * - enum → *-enum.ts（如 prefix-enum.ts）
- * - 基底用型別 → base-types.ts；上級定義 → *-types.ts
- * - 原始 YAML 讀取型別 → #/lib/types/raw/
- * - 魔方陣欄位 → skill-magic-circle-fields.ts；Plus* 欄位 → skill-plus-fields.ts
- * Definitions are grouped under #/lib/types/*: enums live in *-enum.ts, base types in
- * base-types.ts, upper definitions in *-types.ts, raw YAML reading types in raw/, and the
- * magic-circle / Plus* field groups have their own files.
- *
- * 本檔僅保留既有匯入路徑（#/lib/game/types）的相容性，待使用端改為直接載入後即可移除。
- * This file only keeps the legacy import path (#/lib/game/types) working; it can be removed
- * once consumers import the source paths directly.
+ * 守護種類常數 / Guard kind constants
+ * 守護機率與 HP% 閾值集中定義於此，供 guard 判定引用。
+ * Guard probability percentages and HP% thresholds, referenced by guard checks.
  */
 
 import { EnumGuardKind } from '#/lib/types/battle-enum';
-
-export * from '#/lib/types/base-types';
-export * from '#/lib/types/battle-enum';
-export * from '#/lib/types/battle-types';
-export * from '#/lib/types/char-enum';
-export * from '#/lib/types/char-types';
-export * from '#/lib/types/data-ex-types';
-export * from '#/lib/types/item-enum';
-export * from '#/lib/types/item-types';
-export * from '#/lib/types/job-types';
-export * from '#/lib/types/mon-types';
-export * from '#/lib/types/skill-enum';
-export * from '#/lib/types/skill-magic-circle-fields';
-export * from '#/lib/types/skill-plus-fields';
-export * from '#/lib/types/skill-types';
-export { EnumState } from './constants';
 
 /**
  * 守護種類對應的機率值 / Guard kind probability values

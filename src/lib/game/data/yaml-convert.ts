@@ -12,34 +12,48 @@
 import {
 	EnumEquipSlot,
 	EnumGender,
+} from '#/lib/types/char-enum';
+import {
 	EnumInfluence,
-	EnumItemCategory,
 	EnumSkillDamageType,
 	EnumSkillPriority,
 	EnumTargetMethod,
 	EnumTargetType,
+} from '#/lib/types/skill-enum';
+import {
+	EnumItemCategory,
 	EnumWeaponType,
+} from '#/lib/types/item-enum';
+import {
 	IJobDefCore,
+	type IGenderOverride,
+	type IGrowthCoefficients,
+	type IJobDef,
+} from '#/lib/types/job-types';
+import {
 	type IAtkTuple,
-	type IBehavior,
-	type ICharCore,
-	type ICharDef,
-	type ICompBonuses,
 	type IDefTuple,
 	type IEncounterTable,
 	type IEquipTable,
-	type IGenderOverride,
-	type IGrowthCoefficients,
-	type IItemDef,
-	type IJobDef,
+} from '#/lib/types/base-types';
+import {
+	type IBehavior,
+	type ICharCore,
+	type ICharDef,
+	type IPatternItem,
+	type ISpecial,
+} from '#/lib/types/char-types';
+import {
+	type ICompBonuses,
+	type ISkillDef,
+	type ITargetSpec,
+} from '#/lib/types/skill-types';
+import type { IItemDef } from '#/lib/types/item-types';
+import {
 	type IMonDef,
 	type IMonReward,
-	type IPatternItem,
-	type ISkillDef,
-	type ISpecial,
-	type ITargetSpec,
-} from '#/lib/game/types';
-import { EnumPosition } from '#/lib/game/constants';
+} from '#/lib/types/mon-types';
+import { EnumPosition } from '#/lib/types/battle-enum';
 import { COMP_FIELDS } from '#/lib/game/character/status-attrs';
 import { SKILL_EXTRA_NUMERIC_KEYS } from './yaml-skill-keys';
 import type {
@@ -47,7 +61,7 @@ import type {
 	IRawCombatCoreYaml,
 	IRawMonYaml,
 	IRawSkillYaml,
-} from './yaml-types';
+} from '#/lib/types/raw/yaml-types';
 
 /**
  * 數值正規化 / Numeric coercion

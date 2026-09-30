@@ -8,7 +8,7 @@
  * effect detection, dispatch and follow-ups are all decided by the upper event engine
  * (runEventEngine) — the fixture derives none of them by hand.
  *
- * 紀錄內容對齊生產點契約（見 #/lib/game/types 的 EnumBattleEventType）：
+ * 紀錄內容對齊生產點契約（見 #/lib/types/battle-enum 的 EnumBattleEventType）：
  * - Act → Battle.UseSkill（同一筆技能執行的起點）
  * - Damage / Heal → skill/effect 的 applySkill（帶 skill、value、hpBefore/hpAfter）
  * - Debuff / Poison（施毒）→ skill/effect 的 statusChanges（帶 skill）
@@ -18,7 +18,7 @@
  * - Death → Battle.UseSkill（不帶 skill → 一般事件）
  * - SpDamage / SpHeal / Drain / Revive / Move / Delay / Quick / CastShort / BarrierGain /
  *   PoisonResist / Regen / StatChange / EnergyExchange → skill/effect 的 SkillEffect（13 種新事件）
- * Records follow the producer contracts (see EnumBattleEventType in #/lib/game/types):
+ * Records follow the producer contracts (see EnumBattleEventType in #/lib/types/battle-enum):
  * Act → Battle.UseSkill (start of one skill execution); Damage / Heal → applySkill (skill,
  * value, hpBefore / hpAfter); Debuff / poison-apply → statusChanges (skill); MagicCircle →
  * Battle.UseSkill (skill only; the display derives the amount from the definition); Summon →
@@ -41,12 +41,15 @@ import {
 	EnumBattleEventType,
 	EnumMoveText,
 	EnumResource,
+	EnumValueWho,
+} from '#/lib/types/battle-enum';
+import {
 	EnumSkillDamageType,
 	EnumTargetMethod,
 	EnumTargetType,
-	EnumValueWho,
-} from '#/lib/game/types';
-import type { IBattleEvent, ISkillDef } from '#/lib/game/types';
+} from '#/lib/types/skill-enum';
+import type { IBattleEvent } from '#/lib/types/battle-types';
+import type { ISkillDef } from '#/lib/types/skill-types';
 
 /** 複合效果技能：傷害＋施毒＋減益 / Multi-effect skill: damage + poison + debuff */
 const plagueHex: ISkillDef = {

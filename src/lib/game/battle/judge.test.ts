@@ -3,7 +3,7 @@ import { RNG } from '../core/rng';
 import { Character } from '../character/Character';
 import { DecideJudge } from './judge';
 import { EnumJudgeCode } from './judge-codes';
-import { EnumCharType } from '../types';
+import { EnumCharType } from '#/lib/types/char-enum';
 
 describe('AI judge (10.1)', () =>
 {

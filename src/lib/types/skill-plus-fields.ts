@@ -1,7 +1,7 @@
 /**
  * 技能 Plus* 永久加算欄位 / Skill Plus* permanent flat-bonus fields
- * 自 ISkillDef 抽離的 PlusSTR…PlusMAXSP 欄位組。
- * Extracted from ISkillDef: the PlusSTR…PlusMAXSP field group.
+ * PlusSTR…PlusMAXSP 欄位組（六維＋MAXHP/MAXSP）。
+ * The PlusSTR…PlusMAXSP field group (six base stats + MAXHP/MAXSP).
  */
 
 /**

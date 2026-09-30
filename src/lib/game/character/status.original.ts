@@ -13,7 +13,7 @@
  *   tick in the original (as-implemented); the port's unified STATE_Poison ticks normally.
  */
 
-import { EnumState } from '../constants';
+import { EnumState } from '#/lib/types/battle-enum';
 import type { Character } from './Character';
 import { minusPercent } from '../core/percent';
 import type { RNG } from '../core/rng';

@@ -4,7 +4,11 @@
  * 所有系統透過 IDataRepository 取得技能/職業/物品/怪物/角色定義。
  */
 
-import type { ISkillDef, IItemDef, IJobDef, ICharDef, IMonDef } from '../types';
+import type { ICharDef } from '#/lib/types/char-types';
+import type { IItemDef } from '#/lib/types/item-types';
+import type { IJobDef } from '#/lib/types/job-types';
+import type { IMonDef } from '#/lib/types/mon-types';
+import type { ISkillDef } from '#/lib/types/skill-types';
 
 /**
  * 資料儲存庫介面 / Data repository interface

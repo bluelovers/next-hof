@@ -5,7 +5,7 @@
  * Also ports GetPoisonResist / SacrificeHp from HOF/Class/Char/Battle/Effect.php.
  */
 
-import { EnumState, EnumPosition } from '../constants';
+import { EnumState, EnumPosition } from '#/lib/types/battle-enum';
 import type { Character } from './Character';
 import { minusPercent, takePercent } from '../core/percent';
 import type { RNG } from '../core/rng';

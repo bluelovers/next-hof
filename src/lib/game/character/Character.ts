@@ -5,10 +5,13 @@
  * 不採用 PHP 的多層繼承，保持可序列化與易測試。
  */
 
-import { EnumState, EnumPosition, EnumExpect } from '../constants';
-import type { IBehavior, ISpecial, ICharCore, IMonReward, IAtkTuple, IDefTuple } from '../types';
+import { EnumState, EnumPosition, EnumExpect } from '#/lib/types/battle-enum';
+import type { IBehavior, ISpecial, ICharCore } from '#/lib/types/char-types';
+import type { IMonReward } from '#/lib/types/mon-types';
+import type { IAtkTuple, IDefTuple } from '#/lib/types/base-types';
 import type { ICorpsePolicy } from '../battle/corpse-policy';
-import { EnumCharType, EnumEquipSlot, EnumWeaponType } from '../types';
+import { EnumCharType, EnumEquipSlot } from '#/lib/types/char-enum';
+import { EnumWeaponType } from '#/lib/types/item-enum';
 import type { RNG } from '../core/rng';
 import { percentOf, plusPercent } from '../core/percent';
 import { nanoid } from 'nanoid';

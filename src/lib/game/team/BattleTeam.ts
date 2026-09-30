@@ -3,7 +3,7 @@
  * 對應 docs/log/battle/04 §4（Battle_Team）。管理成員、存活統計與隨機選取。
  */
 
-import { EnumState, EnumTeamSide } from '../constants';
+import { EnumState, EnumTeamSide } from '#/lib/types/battle-enum';
 import type { Character } from '../character/Character';
 import type { RNG } from '../core/rng';
 import { weightedPick } from '../core/random';

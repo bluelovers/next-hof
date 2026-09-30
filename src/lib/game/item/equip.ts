@@ -5,9 +5,12 @@
  */
 
 import type { Character } from '../character/Character';
-import { COMP_FIELDS, EnumDefSlot } from '../character/status-attrs';
+import { COMP_FIELDS } from '../character/status-attrs';
+import { EnumDefSlot } from '#/lib/types/status-enum';
 import type { IDataRepository } from '../data/repository';
-import { EnumEquipSlot, EnumSkillDamageType, EnumWeaponType } from '../types';
+import { EnumEquipSlot } from '#/lib/types/char-enum';
+import { EnumSkillDamageType } from '#/lib/types/skill-enum';
+import { EnumWeaponType } from '#/lib/types/item-enum';
 import { parseItem } from './Item';
 
 /** 玩家最大負荷：5 + floor(level/10) + floor(DEX/5) / max equipment weight: 5 + floor(level/10) + floor(DEX/5) */

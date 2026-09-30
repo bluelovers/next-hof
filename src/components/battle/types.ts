@@ -19,9 +19,9 @@ import {
 	EnumChargeKind,
 	EnumMagicCircleKind,
 } from './enums';
-import { EnumPosition } from '#/lib/game/constants';
+import { EnumPosition } from '#/lib/types/battle-enum';
 import type { ICorpsePolicyField } from '#/lib/game/battle/corpse-policy';
-import type { IBattleUnitVitals, IUnitList } from '#/lib/game/types';
+import type { IBattleUnitVitals, IUnitList } from '#/lib/types/battle-types';
 import type { ICharacterSpriteProps } from '#/components/characters/CharacterSprite';
 
 /** 隊伍側別（UI 層）/ Team side (UI layer) */
@@ -527,11 +527,11 @@ export interface IBattleDisplayOptions
  * 快照單位（顯示側）
  * Snapshot unit (display side).
  *
- * 注意：此為「展示側」DTO，與引擎領域型別 #/lib/game/types 的 IBattleSnapshotUnit
+ * 注意：此為「展示側」DTO，與引擎領域型別 #/lib/types/battle-types 的 IBattleSnapshotUnit
  * 形狀不同（此處使用 EnumTeamSideUI / EnumUnitStatus 等 UI 列舉）。命名加 Display
  * 後綴以避免與領域型別撞名，確保單一事實來源與可追蹤性。
  * NOTE: this is a display-side DTO whose shape differs from the engine domain type
- * IBattleSnapshotUnit in #/lib/game/types (it uses UI enums like EnumTeamSideUI /
+ * IBattleSnapshotUnit in #/lib/types/battle-types (it uses UI enums like EnumTeamSideUI /
  * EnumUnitStatus). The Display suffix avoids colliding with the domain type.
  */
 export interface IBattleSnapshotDisplayUnit

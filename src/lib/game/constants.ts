@@ -2,9 +2,6 @@
  * 遊戲常數集中定義 / Centralized game tuning constants
  * 數值來源：docs/log/battle/05-battle-details.md §1 與 docs/data/README.md
  * 所有數值與原始 PHP setting.dist.php 一致，便於後續 YAML 匯入對照。
- *
- * 列舉定義已移至 #/lib/types/battle-enum.ts；此處轉出以保留既有匯入路徑。
- * The enums moved to #/lib/types/battle-enum.ts; re-exported here to keep legacy imports.
  */
 
 export const MAX_TIME = 1000;
@@ -58,5 +55,3 @@ export const SELLING_PRICE = 1 / 5;
  * 魔方陣上限 / Magic circle cap
  */
 export const MAGIC_CIRCLE_MAX = 5;
-
-export { EnumTeamSide, EnumState, EnumPosition, EnumExpect } from '#/lib/types/battle-enum';

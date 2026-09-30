@@ -21,7 +21,7 @@ import { TEAM_SIDE_CLASS } from './types';
 import { computeSpriteFlipped } from './spriteFlip';
 import { corpseSpecOf } from '#/lib/game/battle/corpse-policy';
 import { percentOf } from '#/lib/game/core/percent';
-import type { EnumStatusAttr } from '#/lib/game/character/status-enum';
+import type { EnumStatusAttr } from '#/lib/types/status-enum';
 import type {
 	IBattleAction,
 	IBattleSegment,

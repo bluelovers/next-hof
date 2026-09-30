@@ -4,10 +4,9 @@
  * 建隊 → setBattleVariable → SetDelay → Action（自動回復→中毒→判定→技能）→ 行動順序 → 結果。
  */
 
+import { EnumState, EnumExpect, EnumTeamSide } from '#/lib/types/battle-enum';
 import {
-	EnumState, EnumExpect,
 	BATTLE_MAX_TURNS, TURN_EXTENDS, BATTLE_MAX_EXTENDS, DELAY_BASE, BATTLE_STAT_TURNS,
-	EnumTeamSide,
 } from '../constants';
 import { Character, charIdToString } from '../character/Character';
 import { setBattleVariable } from '../character/battle-variable';
@@ -23,15 +22,18 @@ import { resolveCorpsePolicy, type ICorpsePolicy, type ICorpsePolicyField } from
 import type { IDataRepository } from '../data/repository';
 import type { RNG } from '../core/rng';
 import type { GameTime } from '../core/time-service';
-import type { ISkillDef, IBattleEvent, IBattleSnapshot } from '../types';
+import type { ISkillDef } from '#/lib/types/skill-types';
+import type { IBattleEvent, IBattleSnapshot } from '#/lib/types/battle-types';
 import {
 	EnumInfoText,
+	EnumBattleEventType,
+} from '#/lib/types/battle-enum';
+import {
 	EnumTargetType,
 	EnumTargetMethod,
-	EnumBattleEventType,
 	EnumSkillDamageType,
 	EnumSkillPriority,
-} from '../types';
+} from '#/lib/types/skill-enum';
 
 /**
  * 戰鬥配置 / Battle configuration

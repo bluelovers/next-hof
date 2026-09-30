@@ -14,9 +14,9 @@
  * Source: actual job skills from the GameDataPage (matching the PHP page output).
  */
 import type { ISkillData } from '../../src/components/game-data/GameDataTypes';
-import { EnumTargetType, EnumTargetMethod, EnumSkillPriority } from '../../src/lib/game/types';
+import { EnumTargetType, EnumTargetMethod, EnumSkillPriority } from '../../src/lib/types/skill-enum';
 import { EnumSkillType } from '../../src/components/battle/enums';
-import { EnumPosition } from '../../src/lib/game/constants';
+import { EnumPosition } from '../../src/lib/types/battle-enum';
 
 /** 技能定義集（單一事實來源） / Skill registry (SSOT) */
 export const skills = {

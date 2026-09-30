@@ -1,18 +1,16 @@
 /**
  * 狀態屬性模組 / Status attribute module
- * 整合原 status-key.ts（鍵名衍生）與 status-attrs.ts（屬性對照表）：
- * 兩者高度耦合（status-attrs 使用 status-key 的鍵名對照表建構 UPMAP/DOWNMAP/PLUSMAP），
- * 合併為單一模块後，狀態屬性的「鍵名」與「讀寫語意」不再分散維護。
- * Integrates the former status-key.ts (key-name derivation) and status-attrs.ts
- * (attribute table): the two were tightly coupled (status-attrs built UPMAP/DOWNMAP/PLUSMAP
- * from status-key's key-name lookups), so merging them into one module keeps every status
- * attribute's "key name" and "read/write semantics" in a single place.
+ * 整合狀態屬性的「鍵名衍生」與「屬性對照表」兩部分：
+ * 兩者高度耦合（UPMAP/DOWNMAP/PLUSMAP 由鍵名對照表建構），故同居本檔維護，
+ * 狀態屬性的「鍵名」與「讀寫語意」不分散。
+ * Integrates the two halves of status attributes: key-name derivation and the attribute
+ * table. The two are tightly coupled (UPMAP/DOWNMAP/PLUSMAP are built from the key-name
+ * lookups), so they live together and the "key name" and "read/write semantics" of every
+ * status attribute are not scattered.
  *
- * 本檔是狀態屬性「讀寫語意」的單一事實來源（本檔僅此一次提及）；enum 與型別定義已分類
- * 移至 #/lib/types/status-enum.ts、prefix-enum.ts、status-attr-types.ts，本檔轉出相容路徑。
+ * 本檔是狀態屬性「讀寫語意」的單一事實來源（本檔僅此一次提及）。
  * This module is the single source of truth for status read/write semantics (mentioned once
- * in this file); enums and types moved to #/lib/types/status-enum.ts, prefix-enum.ts and
- * status-attr-types.ts, re-exported here to keep the legacy import paths working.
+ * in this file).
  *
  * 所有系統（技能 effect、被動 passive、裝備 equip、戰鬥變數 battle-variable、
  * 工廠 factory、等級調整 level-fix）都從此處取得「屬性清單」與「屬性↔角色欄位對應」，
@@ -21,7 +19,7 @@
 
 import { MAX_STATUS_MAXIMUM } from '../constants';
 import { minusPercent, plusPercent, takePercent } from '../core/percent';
-import { EnumSkillDamageType } from '../types';
+import { EnumSkillDamageType } from '#/lib/types/skill-enum';
 import type { Character } from './Character';
 import { EnumDefSlot, EnumStatusAttr, EnumVital } from '#/lib/types/status-enum';
 import { EnumCompPrefix, EnumStatusPrefix } from '#/lib/types/prefix-enum';
@@ -40,20 +38,6 @@ import {
 	ITSStringLiteralPrefixed,
 	ITSStringLiteralPrefixedRecord,
 } from 'ts-type';
-
-// ---- 轉出相容 / Re-exports to keep legacy import paths ----
-export { EnumCompPrefix, EnumStatusPrefix } from '#/lib/types/prefix-enum';
-export { EnumDefSlot } from '#/lib/types/status-enum';
-export type {
-	IAttrFn,
-	IBaseStatComp,
-	ICompField,
-	IPrimaryStat,
-	IStatusAttrEntry,
-	IStatusDownKey,
-	IStatusPlusKey,
-	IStatusUpKey,
-} from '#/lib/types/status-attr-types';
 
 // ============================================================================
 /**

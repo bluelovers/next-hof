@@ -1,15 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import { RNG } from '../core/rng';
-import { EnumState, EnumTeamSide } from '../constants';
+import { EnumState, EnumTeamSide } from '#/lib/types/battle-enum';
 import { GameTime } from '../core/time-service';
 import { Character } from '../character/Character';
 import { createSeedRepository } from '../data/seed-data';
 import { InMemoryRepository } from '../data/repository';
 import { newChar, newMon } from '../character/factory';
 import { Battle } from './Battle';
-import { EnumCharType, EnumSkillDamageType, EnumTargetMethod, EnumTargetType } from '../types';
+import { EnumCharType } from '#/lib/types/char-enum';
+import { EnumSkillDamageType, EnumTargetMethod, EnumTargetType } from '#/lib/types/skill-enum';
 import { EnumOutcome } from './BattleResult';
-import { EnumBattleEventType } from '../types';
+import { EnumBattleEventType } from '#/lib/types/battle-enum';
 
 const repo = createSeedRepository();
 

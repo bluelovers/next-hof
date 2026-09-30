@@ -3,7 +3,8 @@
  * 對應 docs/data/item.md。倉庫回傳的即為 IItemDef（YAML 結構），此處提供正規化與取值。
  */
 
-import { EnumItemCategory, type IItemDef, type EnumWeaponType } from '../types';
+import { EnumItemCategory, type EnumWeaponType } from '#/lib/types/item-enum';
+import type { IItemDef } from '#/lib/types/item-types';
 import type { IDataRepository } from '../data/repository';
 
 /** 道具類別預設值（EnumItemCategory.Item）/ Default item category (EnumItemCategory.Item) */

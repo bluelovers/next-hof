@@ -21,7 +21,7 @@ import type {
 } from '#/components/battle/types';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
 import { EnumTeamSideUI, EnumUnitStatus } from '#/components/battle/enums';
-import { EnumPosition } from '#/lib/game/constants';
+import { EnumPosition } from '#/lib/types/battle-enum';
 import {
 	resolveCorpsePolicy,
 	type ICorpsePolicy,
