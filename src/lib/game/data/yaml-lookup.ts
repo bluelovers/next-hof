@@ -1,13 +1,8 @@
 /**
- * enum 對照表 / Enum lookup tables
+ * enum 對照表
  *
- * 以 enum 成員值為**單一事實來源**：`enumValueLookup(Object.values(SomeEnum))` 產生自我對照表，
- * 新增 enum 成員時自動涵蓋，不需在各轉換器手寫鍵值；來源特有的值（`Key`→`Other`、
- * `GUARD`→`Armor`、性別 `1`/`2`）以 `aliases` 參數登記收斂規則。
- * Enum member values are the single source of truth: `enumValueLookup(Object.values(SomeEnum))`
- * builds an identity table, so a new member is covered automatically and no converter
- * hand-writes the keys; source-only values (`Key` → `Other`, `GUARD` → `Armor`, gender
- * `1` / `2`) are registered as collapses through the `aliases` parameter.
+ * 以 enum 成員值建立自我對照表：新增成員時自動涵蓋，不需在各轉換器手寫鍵值；
+ * 來源特有的值（`Key`→`Other`、`GUARD`→`Armor`、性別 `1`/`2`）以 `aliases` 參數登記收斂規則。
  */
 
 import { EnumGender } from '#/lib/types/char-enum';
@@ -33,14 +28,8 @@ export function isEnumValue<T extends string>(value: string, values: readonly T[
 
 /**
  * enum 值 → 自我對照表 / Build a value-to-value lookup from an enum
- * 以列舉成員值為單一事實來源（新增成員自動涵蓋）；`aliases` 登記來源特有值的收斂規則。
- * Built from the enum member values (a new member auto-covers itself); `aliases` registers the
- * collapses for source-only values.
  *
- * 單一事實來源 / SSOT：yaml-lookup 的各張對照表與 yaml-coerce 的 `GUARD_ALIASES` 皆由此構建，
- * 不再各自以 `Object.fromEntries` 手寫同一套「值 → 值」映射。
- * Both the tables in yaml-lookup and `GUARD_ALIASES` in yaml-coerce are built by this helper,
- * instead of each hand-rolling the same value → value mapping via `Object.fromEntries`.
+ * 新增 enum 成員時自動涵蓋；`aliases` 登記來源特有值的收斂規則。
  */
 export function enumValueLookup<T extends string>(
 	values: readonly T[],

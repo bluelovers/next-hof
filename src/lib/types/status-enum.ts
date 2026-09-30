@@ -1,14 +1,10 @@
 /**
- * 狀態屬性 enum / Status attribute enums
+ * 狀態屬性 enum
  *
  * 獨立於實作模組 #/lib/game/character/status-attrs 之外，避免 value 層級的循環依賴：
  * status-attrs 在模組求值時便需要本 enum 作為對照表鍵型別（STATUS_ATTR_KEYS /
  * STATUS_ATTR_TABLE / 鍵名衍生），若 enum 定義在 status-attrs 內側會造成自身 value
  * 層級的循環匯入（列舉在模組求值時處於 TDZ 而崩潰）。
- * Kept outside the implementation module (#/lib/game/character/status-attrs) to avoid a
- * value-level circular import: status-attrs needs these enums at module-eval time as the
- * map-key types (STATUS_ATTR_KEYS / STATUS_ATTR_TABLE / key-name derivation); defining them
- * inside status-attrs would be self-referential (the enums would sit in their TDZ at eval).
  */
 
 /**

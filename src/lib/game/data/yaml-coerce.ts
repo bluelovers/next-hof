@@ -1,5 +1,5 @@
 /**
- * YAML 讀取後的數值收斂 / Post-read numeric coercion for YAML resources
+ * YAML 讀取後的數值收斂
  *
  * 數值字串、null、guard 筆誤、空物件等皆於**讀取時**定案
  */
@@ -62,10 +62,9 @@ const GUARD_SPEC: ICoerceSpec = { kind: 'guard' };
 
 /**
  * guard 字串 → EnumGuardKind / guard string → EnumGuardKind
- * 以 EnumGuardKind 成員值為單一事實來源（值即字串）；
+ *
+ * 成員值本身即字串，故可直接以 EnumGuardKind 成員值建立對照；
  * 另收錄來源筆誤別名（pro50／prpb50 → prob50）於載入時修正。
- * Built from EnumGuardKind member values (values ARE the strings) through the shared
- * `enumValueLookup`; source typos (pro50/prpb50 → prob50) are fixed here at load time.
  */
 export const GUARD_ALIASES: Record<string, EnumGuardKind> = enumValueLookup(
 	Object.values(EnumGuardKind),
@@ -81,7 +80,7 @@ const PATTERN_SPEC: ICoerceSpec = {
 	item: { kind: 'object', fields: { judge: NUM, quantity: NUM, action: NUM } },
 };
 
-/** 角色／怪物共用的核心數值欄位（單一事實來源） */
+/** 角色／怪物共用的核心數值欄位 */
 const CORE_NUMERIC_FIELDS: Record<string, ICoerceSpec> = {
 	no: NUM, level: NUM, maxhp: NUM, hp: NUM, maxsp: NUM, sp: NUM,
 	str: NUM, int: NUM, dex: NUM, spd: NUM, luk: NUM,
@@ -92,7 +91,7 @@ const COMP_BONUS_FIELDS: Record<string, ICoerceSpec> = Object.fromEntries(
 	COMP_FIELDS.map((k) => [k, NUM]),
 );
 
-/** 技能 Plus／Up／Down 系列（單一事實來源：yaml-skill-keys） */
+/** 技能 Plus／Up／Down 系列（鍵由 yaml-skill-keys 衍生） */
 const SKILL_UP_DOWN_PLUS_FIELDS: Record<string, ICoerceSpec> = Object.fromEntries(
 	SKILL_EXTRA_NUMERIC_KEYS.map((k) => [k, NUM]),
 );

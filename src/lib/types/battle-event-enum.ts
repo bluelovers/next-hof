@@ -1,9 +1,4 @@
-/**
- * 戰鬥事件相關 enum / Battle-event enums
- *
- * 與事件型別 battle-types.ts（IBattleEvent / IBattleValueChange）同域放置。
- * Kept next to the event types in battle-types.ts (IBattleEvent / IBattleValueChange).
- */
+/** 戰鬥事件相關 enum */
 
 /**
  * 戰鬥事件類型 / Battle event type

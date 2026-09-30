@@ -1,9 +1,7 @@
 /**
- * 前綴 enum / Prefix enums
+ * 前綴 enum
  *
  * 衍生鍵名時一律引用此處 enum，不在呼叫處拼接裸字串。
- * Key names are always derived from these enums, never assembled from bare strings at call
- * sites.
  */
 
 /**

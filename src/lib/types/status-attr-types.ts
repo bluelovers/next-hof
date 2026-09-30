@@ -1,9 +1,7 @@
 /**
- * 狀態屬性型別 / Status attribute types
+ * 狀態屬性型別
  *
- * 鍵名由 prefix-enum + status-enum 以樣板字面靜態衍生，呼叫處不再以字串聯合重寫。
- * Keys are derived as template literals from prefix-enum + status-enum, so call sites never
- * rebuild them via string concatenation.
+ * 鍵名由 prefix-enum + status-enum 以樣板字面靜態衍生，呼叫處一律引用衍生型別。
  */
 
 import type { Character } from '#/lib/game/character/Character';

@@ -1,11 +1,8 @@
 /**
- * YAML 資源倉庫建置 / YAML-backed repository builder
+ * YAML 資源倉庫建置
  *
  * 只把 Skill/Item/Job/Char/Mon 灌入 IDataRepository（對應其五個 getter）；
  * Guard/Judge/Land/Skilltree/Union 沒有定義型別，維持 raw 讀取、不註冊。
- * Only Skill / Item / Job / Char / Mon are seeded into IDataRepository (matching its five
- * getters); Guard / Judge / Land / Skilltree / Union have no definition types and stay raw,
- * unregistered.
  */
 
 import { InMemoryRepository, type IDataRepository } from './repository';

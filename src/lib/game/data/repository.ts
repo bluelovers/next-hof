@@ -1,8 +1,7 @@
 /**
- * 資料儲存抽象 / Data repository abstraction
+ * 資料儲存抽象
+ *
  * 所有系統透過 IDataRepository 取得技能/職業/物品/怪物/角色定義。
- * Every system fetches skill / job / item / monster / character definitions through
- * IDataRepository.
  */
 
 import type { ICharDef } from '#/lib/types/char-types';

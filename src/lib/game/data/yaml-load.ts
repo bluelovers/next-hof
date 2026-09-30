@@ -1,13 +1,8 @@
 /**
- * YAML 資源讀取器 / YAML resource loader
+ * YAML 資源讀取器
  *
  * 依賴 Node fs，僅供伺服器端／匯入腳本使用；瀏覽器端改以預轉換的 JSON 或 seed-data 餵入。
- * Depends on Node fs, so it is server-side / import-script only; browsers consume
- * pre-converted JSON or seed-data instead.
- *
  * 讀檔後立即套用數值正規化（yaml-coerce），因此下游拿到的 raw 資料不含 null 與字串數值。
- * Numeric normalization is applied right after reading (yaml-coerce), so downstream raw data
- * carries no nulls and no numeric strings.
  */
 
 import { existsSync, readdirSync, readFileSync } from 'node:fs';

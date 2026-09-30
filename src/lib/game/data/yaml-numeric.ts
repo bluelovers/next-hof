@@ -1,15 +1,11 @@
 /**
- * 數值正規化工具 / Numeric coercion helpers
+ * 數值正規化工具
  *
  * 與 yaml-coerce 的分工：yaml-coerce 走訪整份原始文件（依 COERCE_SPECS 逐欄收斂），屬讀取階段；
  * 本檔只在轉換階段收斂個別欄位，語意是「可解析則取值、否則回退」。兩者刻意分開——
  * 前者對未知值原樣保留，後者對無法解析的值回 fallback。
- * Division of labour with yaml-coerce: yaml-coerce walks the whole parsed document per spec (the
- * read stage), while this file coerces single fields at convert time with explicit fallback
- * semantics. Kept apart on purpose: the former keeps unknown values as-is, the latter falls back.
  *
  * `toNumberArray` / `toOptionalNumber` 目前僅測試引用，作為通用工具保留。
- * `toNumberArray` / `toOptionalNumber` are currently test-only and kept as general-purpose tools.
  */
 
 /**

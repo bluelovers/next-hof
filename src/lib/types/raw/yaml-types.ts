@@ -1,19 +1,12 @@
 /**
- * 原始 YAML 資源型別 / Raw YAML resource types
+ * 原始 YAML 資源型別
  * 對應 HOF Resource 下各資源目錄的 `*.yml` 結構。
- * Mirrors the `*.yml` files under the HOF Resource directories.
  *
- * **數值正規化 / Numeric normalization：**
- * 由 yaml-load 在讀取後統一將「數值字串」收斂為 number（`'1'` → 1），
+ * 數值正規化：由 yaml-load 在讀取後統一將「數值字串」收斂為 number（`'1'` → 1），
  * 故本層的數值欄位直接以 `number` 定型；文字欄位（名稱、圖示、desc）維持 string。
- * yaml-load normalizes numeric strings to numbers right after reading (`'1'` → 1),
- * so numeric fields here are typed `number`; textual fields stay `string`.
  *
- * **與上層共用形狀 / Shared shapes with the upper layer：**
  * 與 #/lib/types 形狀相同的區塊（戰鬥數值、pattern、reward、補正欄位）
- * 直接引用既有介面，不重覆宣告。
- * Blocks that mirror #/lib/types (combat stats, pattern, reward, compensation
- * fields) reference the existing interfaces instead of re-declaring them.
+ * 直接引用既有介面。
  */
 
 import type {

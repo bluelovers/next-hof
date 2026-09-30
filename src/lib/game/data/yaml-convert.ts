@@ -1,13 +1,8 @@
 /**
- * YAML → 現有型別轉換器 / YAML → existing-type converters
- * 原始 YAML 進入現有型別系統的唯一入口：既有實作只消費轉換後的定義型別，
- * 不直接接觸 YAML 欄位。
- * The single entry point from raw YAML into the existing type system: the existing
- * implementation consumes only converted definitions and never touches YAML fields directly.
+ * YAML → 現有型別轉換器
  *
+ * 原始 YAML 進入現有型別系統的唯一入口：既有實作只消費轉換後的定義型別，不直接接觸 YAML 欄位。
  * 數值字串／null／guard 筆誤／空物件等正規化已於讀取時完成（yaml-coerce），本層只承接乾淨值。
- * Numeric strings, nulls, guard typos and empty objects are already resolved at read time
- * (yaml-coerce), so this layer only ever sees clean values.
  */
 
 import {
@@ -204,13 +199,8 @@ export function convertSkillYaml(raw: IRawSkillYaml): ISkillDef
 	};
 
 	/**
-	 * Plus*／Up*／Down* 29 鍵與補正 P_* / M_* 9 鍵：兩端同為 `Partial<Record<K, number>>`（raw 端
-	 * 已於載入收斂為 number），逐鍵搬移、略過未定義者，**完全不需斷言**。
-	 * 取代原先的 `(skill as unknown as Record<string, number>)[k] = v` 與 `Object.assign`。
-	 * The 29 Plus*／Up*／Down* keys and the 9 P_* / M_* comps: both ends are
-	 * `Partial<Record<K, number>>` (raw is already numbers after load), so they are copied key
-	 * by key with absent keys skipped — **no assertion at all**. This replaces the former
-	 * `(skill as unknown as Record<string, number>)[k] = v` loop and the `Object.assign`.
+	 * Plus*／Up*／Down* 29 鍵與補正 P_* / M_* 9 鍵：raw 端已於載入收斂為 number，
+	 * 逐鍵搬移、略過未定義者，兩端皆不逐鍵手寫。
 	 */
 	copyNumericKeys(skill, raw, SKILL_EXTRA_NUMERIC_KEYS);
 	copyNumericKeys(skill, raw, COMP_FIELDS);

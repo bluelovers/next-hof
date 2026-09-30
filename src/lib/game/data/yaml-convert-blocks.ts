@@ -1,9 +1,7 @@
 /**
- * 共用區塊轉換器 / Shared block converters
+ * 共用區塊轉換器
  *
  * 數值字串／null／guard 筆誤／空物件等正規化已於讀取時（yaml-coerce）完成，本層只承接乾淨值。
- * Numeric strings, nulls, guard typos and empty objects are already resolved at read time
- * (yaml-coerce), so this layer consumes clean values directly.
  */
 
 import { EnumEquipSlot } from '#/lib/types/char-enum';
@@ -55,20 +53,8 @@ export function emptyToUndefined<T extends object>(value: T | undefined): T | un
 /**
  * 依鍵清單複製「已定義」的數值欄位 / Copy the defined numeric fields named by a key list
  *
- * 供轉換器把一組同型數值鍵（Plus*／Up*／Down*、補正 P_* / M_* 等）從 raw 逐鍵搬到目標定義，
- * 未定義的鍵略過（**不寫入 undefined**，避免 `toEqual` 比對多出鍵）。
- * Lets a converter move a group of same-typed numeric keys (Plus*／Up*／Down*, the P_* / M_*
- * comps, …) from the raw record onto the target definition, skipping absent keys (**never
- * writing `undefined`**, so a strict `toEqual` does not see an extra key).
- *
- * 型別上雙端皆為 `Partial<Record<K, number>>`，因此呼叫端完全不需 `as unknown as` 轉型
- * ——原先 `convertSkillYaml` 對 29 鍵逐一 `(skill as unknown as Record<string, number>)[k]`
- * 的斷言即由此取代（鍵集合仍由 SKILL_EXTRA_NUMERIC_KEYS / COMP_FIELDS 單一來源供給）。
- * Both ends are `Partial<Record<K, number>>` on the type level, so call sites need no
- * `as unknown as` at all — this replaces the per-key
- * `(skill as unknown as Record<string, number>)[k]` assertion that convertSkillYaml used to
- * make for all 29 keys (the key sets still come from the single sources
- * SKILL_EXTRA_NUMERIC_KEYS / COMP_FIELDS).
+ * 把一組同型數值鍵（Plus*／Up*／Down*、補正 P_* / M_* 等）從 raw 逐鍵搬到目標定義；
+ * 未定義的鍵略過——不寫入 undefined，避免 `toEqual` 比對多出鍵。
  *
  * @param target 目標定義 / target definition
  * @param source raw 來源（鍵已於載入收斂為 number）/ raw source (keys already numbers after load)
@@ -142,8 +128,7 @@ export function convertBehaviorYaml(raw: IBehavior | undefined): IBehavior | und
 
 /**
  * 獎勵轉換 / Convert a raw reward block
- * raw reward 即 IMonReward（單一事實來源）——僅處理「空物件 → undefined」。
- * The raw reward IS IMonReward (SSOT); this only maps an empty object to undefined.
+ * raw reward 即 IMonReward——僅處理「空物件 → undefined」。
  */
 export function convertRewardYaml(raw: IMonReward | undefined): IMonReward | undefined
 {
@@ -191,8 +176,7 @@ export function convertSpecialYaml(raw: IRawMonYaml): Partial<ISpecial> | undefi
 
 /**
  * 核心欄位轉換 / Shared conversion of the combat-core fields
- * 角色與怪物共用的 no/name/六維/HP/SP（單一事實來源：ICombatStats）。
- * Single source of truth for the fields shared by chars and mons (ICombatStats).
+ * 角色與怪物共用的 no/name/六維/HP/SP。
  *
  * 缺省數值**不補 0**——保持 undefined，由實例化（Character 建構）解析。
  * Missing stats stay undefined here (no 0 invention); instantiation resolves them.
@@ -275,17 +259,11 @@ export function convertLimit(
 	return emptyToUndefined(out);
 }
 
-/** 補正欄位鍵（ICompBonuses 9 鍵，單一事實來源：COMP_FIELDS）/ the 9 compensation keys (SSOT: COMP_FIELDS) */
+/** 補正欄位鍵（ICompBonuses 9 鍵，由 COMP_FIELDS 衍生） */
 const BONUS_KEYS = COMP_FIELDS;
 
 /**
  * 補正欄位複製 / Copy the 9 compensation keys from a raw record
- * 補正欄位在載入時已收斂為 number（Item／Skill 的 COERCE_SPECS 含 COMP_BONUS_FIELDS），
- * 故參數形狀就是 `ICompBonuses`——不再是鬆散的 `string | number` 錄型別，
- * 呼叫端也無需 `as unknown as` 轉型。
- * Raw compensation fields are numbers after load (the Item/Skill COERCE_SPECS include
- * COMP_BONUS_FIELDS), so the parameter shape is `ICompBonuses` itself — no loose
- * `string | number` record and no `as unknown as` cast at the call sites.
  */
 export function convertBonuses(raw: ICompBonuses): ICompBonuses
 {

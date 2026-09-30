@@ -1,10 +1,8 @@
 /**
- * 資源種類 / Resource kind
+ * 資源種類
  *
  * 成員值即 Resource 底下的子目錄名（`Char` → `root/Char`），因此改名等於改動磁碟路徑，
  * 必須與既有資源目錄同步。
- * Member values are the sub-directory names under Resource (`Char` → `root/Char`), so renaming
- * a member renames an on-disk path and must be synced with the resource directories.
  */
 export enum EnumResourceKind
 {
