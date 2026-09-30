@@ -4,16 +4,19 @@
  *
  * 類別分類參考：PHP skill.detail.php + docs/data/skill.md
  * Category reference: PHP skill.detail.php + docs/data/skill.md
+ *
+ * 與 canonical 的去重規則 / Dedupe rule against canonical:
+ * 本檔欄位若與 `#/lib/game/types` 的 `ISkillDef` 同名（含僅大小寫不同者）一律不重複宣告，
+ * 改以 `Pick<ISkillDef, ...>` 繼承；兩側宣告衝突時本檔優先度最低，以 canonical 為準。
+ * Fields duplicating `ISkillDef` (same name, including case-only variants) are never
+ * re-declared here — they are inherited via `Pick<ISkillDef, ...>`. On conflict this file
+ * has the lowest priority: canonical wins.
  */
 
 import { EnumSkillType } from '../battle/enums';
 import type { IPrimaryStat } from '#/lib/game/character/status-attrs';
 import type { EnumStatusAttr } from '#/lib/game/character/status-enum';
-import {
-	EnumTargetType,
-	EnumTargetMethod,
-	EnumSkillPriority,
-} from '#/lib/game/types';
+import type { ISkillDef } from '#/lib/game/types';
 import { EnumPosition } from '#/lib/game/constants';
 
 // ==================== 子類型 / Sub-types ====================
@@ -31,11 +34,13 @@ export type IAbilityStatName = Uppercase<IPrimaryStat>;
 /**
  * 消費相關 / Consumption
  * 對應 PHP: sp, sacrifice, MagicCircleDeleteTeam
+ *
+ * `sp` 與 canonical `ISkillDef.sp` 同名（且為必填），故由 Pick 繼承、不在此重複宣告。
+ * `sp` is a same-name duplicate of canonical `ISkillDef.sp` (and required), so it is
+ * inherited via Pick rather than re-declared here.
  */
-export interface ISkillCost
+export interface ISkillCost extends Pick<ISkillDef, 'sp'>
 {
-	/** SP 消耗 / SP cost */
-	sp?: number;
 	/** 犧牲比例 % / Sacrifice HP percentage */
 	sacrificePct?: number;
 	/** 消耗己方魔方陣數 / Magic circle consumption from own team */
@@ -59,8 +64,13 @@ export interface ISkillStatChanges
 /**
  * 戰鬥標誌 / Battle flags
  * 對應 PHP: type, invalid, quick, passive, support, priority, CurePoison
+ *
+ * `priority` 與 canonical 同名同型、`curePoison` 與 canonical `CurePoison` 僅大小寫不同，
+ * 兩者皆改由 `Pick<ISkillDef, ...>` 繼承；`skillType`/`is*` 為顯示層改名欄位，維持本檔宣告。
+ * `priority` (same name/type) and `curePoison` (case-only variant of `CurePoison`) are inherited
+ * via `Pick<ISkillDef, ...>`; `skillType`/`is*` are display-layer renames and stay declared here.
  */
-export interface ISkillFlags
+export interface ISkillFlags extends Pick<ISkillDef, 'priority' | 'CurePoison'>
 {
 	/** 技能類型 / Skill damage type */
 	skillType?: EnumSkillType;
@@ -72,17 +82,16 @@ export interface ISkillFlags
 	isPassive?: boolean;
 	/** 支援魔法（不觸發守護，pow 改為回復）/ Support magic */
 	isSupport?: boolean;
-	/** 目標優先選擇 / Target priority */
-	priority?: EnumSkillPriority;
-	/** 解毒 / Cure poison */
-	curePoison?: boolean;
 }
 
 /**
  * 詠唱與硬直 / Charge & cooldown
  * 對應 PHP: charge[], stiff, delay
+ *
+ * `stiff` 與 canonical `ISkillSharedFields.stiff` 同名同型，改由 Pick 繼承、不重複宣告。
+ * `stiff` duplicates canonical `ISkillSharedFields.stiff` (same name/type), so it is inherited.
  */
-export interface ISkillCharge
+export interface ISkillCharge extends Pick<ISkillDef, 'stiff'>
 {
 	/** 詠唱時間 / Charge time */
 	chargeTime?: number;
@@ -90,41 +99,40 @@ export interface ISkillCharge
 	cooldownTime?: number;
 	/** 行動延遲 % / Action delay percentage */
 	delayPct?: number;
-	/** 行動後硬直 / Post-action stiff (100 = double interval) */
-	stiff?: number;
 }
 
 /**
  * 其他效果 / Other effects
  * 對應 PHP: poison, knockback, HpRegen, SpRegen, SpRecoveryRate,
  *          summon, move, umove, pierce, MagicCircleAdd/Delete/DeleteEnemy
+ *
+ * 標示之欄位與 canonical 同名（`hpRegen`/`spRegen`/`spRecoveryRate` 與 `magicCircle*`
+ * 僅大小寫不同），一律由 `Pick<ISkillDef, ...>` 繼承；`poisonPct`/`knockbackPct`/`userMove`
+ * 為顯示層改名欄位，維持本檔宣告。
+ * The marked fields duplicate canonical ones (the `hpRegen`/`spRegen`/`spRecoveryRate` and
+ * `magicCircle*` ones differ only by case) and are inherited via `Pick<ISkillDef, ...>`;
+ * `poisonPct`/`knockbackPct`/`userMove` are display-layer renames and stay declared here.
  */
 export interface ISkillEffects
+	extends Pick<
+		ISkillDef,
+		| 'HpRegen'
+		| 'SpRegen'
+		| 'SpRecoveryRate'
+		| 'summon'
+		| 'move'
+		| 'pierce'
+		| 'MagicCircleAdd'
+		| 'MagicCircleDelete'
+		| 'MagicCircleDeleteEnemy'
+	>
 {
 	/** 中毒率 % / Poison chance % */
 	poisonPct?: number;
 	/** 擊退率 %（後衛化）/ Knockback chance % */
 	knockbackPct?: number;
-	/** 持續 HP 回復 / HP regeneration */
-	hpRegen?: boolean;
-	/** 持續 SP 回復 / SP regeneration */
-	spRegen?: boolean;
-	/** SP 回復倍率 / SP recovery rate multiplier */
-	spRecoveryRate?: number;
-	/** 召喚怪物編號 / Summon monster ID(s) */
-	summon?: number | number[];
-	/** 使用者隊列移動 / User position move */
-	move?: EnumPosition;
 	/** 使用者使用後移動 / User post-skill move */
 	userMove?: EnumPosition;
-	/** 防禦貫穿額外傷害 / Pierce damage (ignores DEF/MDEF) */
-	pierce?: number;
-	/** 魔方陣增加 / Magic circle add */
-	magicCircleAdd?: number;
-	/** 魔方陣消除 / Magic circle delete */
-	magicCircleDelete?: number;
-	/** 消除敵方魔方陣 / Delete enemy magic circle */
-	magicCircleDeleteEnemy?: number;
 }
 
 // ==================== 主介面 / Main Interface ====================
@@ -135,34 +143,33 @@ export interface ISkillEffects
  *
  * 分類組織，所有子介面欄位皆為可選，保持向下兼容。
  * Categorized; all sub-interface fields are optional for backward compatibility.
+ *
+ * `name`/`target`/`learn` 與 canonical 同名，改由 `Pick<ISkillDef, ...>` 繼承；
+ * `target` 因此為 canonical 的 `ITargetSpec` 三元組（省略時預設 [Enemy, Individual, 1]），
+ * 原本拆解出的 `scope`（target[1]）與 `hits`（target[2]）不再重複宣告，請直接解構 `target`。
+ * `name`/`target`/`learn` duplicate canonical names and are inherited via `Pick<ISkillDef, ...>`;
+ * `target` is therefore canonical's `ITargetSpec` tuple (defaults to [Enemy, Individual, 1] when
+ * omitted), and the derived `scope` (target[1]) / `hits` (target[2]) fields are no longer
+ * re-declared — destructure `target` instead.
  */
 export interface ISkillData
 	extends ISkillCost,
 		ISkillStatChanges,
 		ISkillFlags,
 		ISkillCharge,
-		ISkillEffects
+		ISkillEffects,
+		Pick<ISkillDef, 'name' | 'target' | 'learn'>
 {
 
 	// ---------- 基本資訊 / Basic info ----------
 	/** 技能編號 / Skill number (PHP: no) */
 	skillNo?: number;
-	/** 技能名稱 / Skill name */
-	name: string;
 	/** 圖示 URL / Icon URL */
 	iconUrl?: string;
 	/** 技能說明文字 / Skill description (PHP: exp) */
 	effect?: string;
 	/** 習得所需點數 / Learn point cost (PHP: learn, 0=initial) */
 	learnPts?: number;
-
-	// ---------- 目標與範圍 / Target & scope ----------
-	/** 目標 / Target */
-	target: EnumTargetType;
-	/** 範圍 / Scope */
-	scope: EnumTargetMethod;
-	/** 攻擊/作用次數 / Hit count (PHP: target[2]) */
-	hits?: number;
 
 	// ---------- 威力 / Power ----------
 	/** 威力倍率 % / Power percentage (PHP: pow) */
@@ -179,10 +186,6 @@ export interface ISkillData
 	// ---------- 武器限制 / Weapon limit ----------
 	/** 武器限制（PHP limit 物件的 keys）/ Weapon restriction */
 	weaponLimit?: string;
-
-	// ---------- 學習點數（radio 模式用）/ Learn points (radio mode) ----------
-	/** 學習所需技能點數（僅 radio 模式顯示）/ Learn points (radio mode only) */
-	learn?: number;
 
 	// ---------- 向下兼容 / Backward compatibility ----------
 	/** @deprecated 使用 sp 代替 / Use sp instead */

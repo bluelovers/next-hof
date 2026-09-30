@@ -18,8 +18,15 @@ import type {
 	ISkillEffects,
 } from './GameDataTypes';
 import { EnumSkillType } from '#/components/battle/enums';
-import { EnumTargetType, EnumTargetMethod } from '#/lib/game/types';
+import { EnumTargetType, EnumTargetMethod, type ITargetSpec } from '#/lib/game/types';
 import './SkillCard.css';
+
+/**
+ * 預設目標規格：`skill.target` 省略時採用，與 canonical `ISkillDef.target` 的預設值一致。
+ * Default target spec used when `skill.target` is omitted; matches canonical `ISkillDef.target`.
+ * 三元組 = [目標類型, 選取方式, 次數] / tuple = [target type, selection method, hit count]
+ */
+const DEFAULT_TARGET_SPEC: ITargetSpec = [EnumTargetType.Enemy, EnumTargetMethod.Individual, 1];
 
 // ==================== Render Props / 子邏輯覆寫 ====================
 
@@ -151,12 +158,10 @@ function DefaultScopeRenderer({ scope }: { scope: EnumTargetMethod })
  */
 function DefaultCostRenderer({ skill }: { skill: ISkillData })
 {
-	const sp = skill.sp ?? skill.spCost;
 	return (
 		<>
-			{sp !== undefined && (
-				<> / <span className="support">{sp}sp</span></>
-			)}
+			{/* sp 為 canonical 必填欄位，直接渲染 / sp is a required canonical field, rendered directly */}
+			<> / <span className="support">{skill.sp}sp</span></>
 			{skill.sacrificePct !== undefined && (
 				<> / <span className="dmg">Sacrifice:{skill.sacrificePct}%</span></>
 			)}
@@ -175,7 +180,8 @@ function DefaultPowerRenderer({ skill }: { skill: ISkillData })
 {
 	if (skill.powerPct === undefined) return null;
 	const powClass = skill.isSupport ? 'recover' : 'dmg';
-	const hits = skill.hits ?? 1;
+	/** 次數取自目標規格三元組第 3 位（target[2]）/ hit count comes from target[2] of the spec tuple */
+	const hits = skill.target?.[2] ?? DEFAULT_TARGET_SPEC[2];
 	return (
 		<>
 			{' / '}
@@ -208,7 +214,7 @@ function DefaultFlagsRenderer({ flags }: { flags: ISkillFlags })
 	{
 		tags.push(<span key="back" className="support">BackAttack</span>);
 	}
-	if (flags.curePoison)
+	if (flags.CurePoison)
 	{
 		tags.push(<span key="cure" className="support">CurePoison</span>);
 	}
@@ -330,17 +336,17 @@ function DefaultEffectsRenderer({ effects }: { effects: ISkillEffects })
 	{
 		parts.push(<span key="kb" className="dmg">Knockback:{effects.knockbackPct}%</span>);
 	}
-	if (effects.hpRegen)
+	if (effects.HpRegen)
 	{
 		parts.push(<span key="hpregen" className="support">HpRegen</span>);
 	}
-	if (effects.spRegen)
+	if (effects.SpRegen)
 	{
 		parts.push(<span key="spregen" className="support">SpRegen</span>);
 	}
-	if (effects.spRecoveryRate !== undefined)
+	if (effects.SpRecoveryRate !== undefined)
 	{
-		parts.push(<span key="sprate" className="support">SpRecovery:{effects.spRecoveryRate}</span>);
+		parts.push(<span key="sprate" className="support">SpRecovery:{effects.SpRecoveryRate}</span>);
 	}
 	if (effects.pierce !== undefined)
 	{
@@ -354,17 +360,17 @@ function DefaultEffectsRenderer({ effects }: { effects: ISkillEffects })
 	{
 		parts.push(<span key="summon" className="support">Summon</span>);
 	}
-	if (effects.magicCircleAdd !== undefined)
+	if (effects.MagicCircleAdd !== undefined)
 	{
-		parts.push(<span key="mca" className="charge">MagicCircleAdd x{effects.magicCircleAdd}</span>);
+		parts.push(<span key="mca" className="charge">MagicCircleAdd x{effects.MagicCircleAdd}</span>);
 	}
-	if (effects.magicCircleDelete !== undefined)
+	if (effects.MagicCircleDelete !== undefined)
 	{
-		parts.push(<span key="mcd" className="support">MagicCircleDelete x{effects.magicCircleDelete}</span>);
+		parts.push(<span key="mcd" className="support">MagicCircleDelete x{effects.MagicCircleDelete}</span>);
 	}
-	if (effects.magicCircleDeleteEnemy !== undefined)
+	if (effects.MagicCircleDeleteEnemy !== undefined)
 	{
-		parts.push(<span key="mcde" className="dmg">MagicCircleDeleteEnemy x{effects.magicCircleDeleteEnemy}</span>);
+		parts.push(<span key="mcde" className="dmg">MagicCircleDeleteEnemy x{effects.MagicCircleDeleteEnemy}</span>);
 	}
 
 	if (parts.length === 0) return null;
@@ -396,6 +402,12 @@ export const SkillCard: React.FC<ISkillCardProps> = ({
 	renderCard,
 }) =>
 {
+	/**
+	 * 目標規格三元組 [類型, 選取方式, 次數]，省略時採 canonical 預設 [Enemy, Individual, 1]。
+	 * Target spec tuple [type, method, count]; falls back to canonical's [Enemy, Individual, 1].
+	 */
+	const [targetType, targetMethod] = skill.target ?? DEFAULT_TARGET_SPEC;
+
 	/** 預設內容 / Default content */
 	const defaultContent = (
 		<div className="g-skill" data-no={skill.skillNo}>
@@ -405,18 +417,18 @@ export const SkillCard: React.FC<ISkillCardProps> = ({
 				: <DefaultNameRenderer skill={skill} />
 			}
 
-			{/* 目標 / Target */}
+			{/* 目標 / Target（target[0]）/ from target[0] */}
 			{' / '}
 			{renderTarget
-				? renderTarget(skill.target)
-				: <DefaultTargetRenderer target={skill.target} />
+				? renderTarget(targetType)
+				: <DefaultTargetRenderer target={targetType} />
 			}
 
-			{/* 範圍 / Scope */}
+			{/* 範圍 / Scope（target[1]）/ from target[1] */}
 			{' - '}
 			{renderScope
-				? renderScope(skill.scope)
-				: <DefaultScopeRenderer scope={skill.scope} />
+				? renderScope(targetMethod)
+				: <DefaultScopeRenderer scope={targetMethod} />
 			}
 
 			{/* 消費（SP / 犧牲 / 魔方陣）/ Cost */}
