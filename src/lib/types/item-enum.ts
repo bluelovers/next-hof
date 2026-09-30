@@ -3,13 +3,9 @@
  *
  *
  * 同時是「武器分類」與「道具分類」的共用定義（值採 PascalCase，與 YAML 來源一致）：
- * Shared definition for both weapon classes and item categories (PascalCase values, matching the YAML source):
  * - IItemDef.type 存放此值；IJobDef.equip 以此值做職業裝備白名單比對（equipAllowed）
- *   IItemDef.type stores this value; IJobDef.equip is whitelisted against it (equipAllowed)
  * - ISkillDef.limit 以 Partial<Record<EnumWeaponType, boolean>> 表達武器限制
- *   ISkillDef.limit expresses weapon restrictions as Partial<Record<EnumWeaponType, boolean>>
  * 非武器成員（Armor/Cloth/Robe/Item/Material/Other）供道具分類共用，勿視為可持握武器。
- * Non-weapon members (Armor/Cloth/Robe/Item/Material/Other) exist for item categories; they are not wieldable weapons.
  */
 export enum EnumWeaponType
 {
@@ -64,11 +60,8 @@ export enum EnumWeaponType
  *
  *
  * 對應 YAML item.type2 的有限集合（成員值與 YAML 來源一致，全大寫）：
- * Mirrors the closed set of YAML item.type2 values (member values match the YAML source, uppercase):
- * Weapon=WEAPON、Armor=ARMOR、Item=ITEM、Material=MATERIAL、Other=OTHER。
  *
  * 作為 IItemDef.type2 的型別；Item.ts 的 ITEM_TYPE_DEFAULT 指向 Item 成員作為預設值。
- * Type of IItemDef.type2; Item.ts's ITEM_TYPE_DEFAULT points at the Item member as the default.
  */
 export enum EnumItemCategory
 {

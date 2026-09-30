@@ -16,9 +16,7 @@ import { enumValueLookup } from './yaml-lookup';
 
 /**
  * 數值收斂：null → 0、boolean → 1/0、字串數值 → number；其餘原樣保留。
- * Coerce null → 0, booleans → 1/0, and numeric strings → number; other input stays untouched.
  * （`quantity: null` 即 0、`Undead: true` 即 1，皆於載入時定案。）
- * (`quantity: null` means 0 and `Undead: true` means 1; both resolved at load.)
  */
 function coerceNumberValue(value: unknown): unknown
 {
@@ -192,8 +190,6 @@ function coerceNode(value: unknown, spec: ICoerceSpec): unknown
 		/**
 		 * 數值欄位以 null→0 收斂（pattern `quantity: null`）；
 		 * 容器規格（object/map/array/tuple）對 null 直接原樣保留。
-		 * Numeric specs coerce null → 0 (pattern `quantity: null`);
-		 * container specs (object/map/array/tuple) keep null as-is.
 		 */
 		return spec.kind === 'number' || spec.kind === 'numberOrArray' ? coerceNumberValue(value) : value;
 	}

@@ -14,9 +14,6 @@ import { EnumInfluence, EnumSkillPriority } from '#/lib/types/skill-enum';
  *
  * 以「成員值集合」比對（字串 enum 的值即字面，故集合比對即可判定），
  * 讓轉換器免於 `value as EnumXxx` 這種繞過檢查的斷言。
- * Matches against the member-value set (a string enum's value IS its literal, so a set
- * membership test is sound), sparing converters the check-bypassing `value as EnumXxx`
- * assertion.
  *
  * @param value 待驗證的來源字串 / the source string to validate
  * @param values 列舉成員值（`Object.values(SomeEnum)`）/ enum member values (`Object.values(SomeEnum)`)

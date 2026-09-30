@@ -38,11 +38,8 @@ import { isEnumValue } from './yaml-lookup';
 /**
  * 空物件 → undefined / Empty object → undefined
  * 轉換器對「來源給了空 `{ }`」的統一收斂：空塊等同未提供，交由上層走預設路徑。
- * The shared rule converters apply when the source supplies an empty `{ }`: an empty block
- * means "absent", so the upper layer falls back to its default.
  *
  * 語意 / Semantics：`undefined` 與 `{ }` 都回 `undefined`；帶任一鍵則原樣回傳。
- * Both `undefined` and `{ }` yield `undefined`; any non-empty object is returned as-is.
  */
 export function emptyToUndefined<T extends object>(value: T | undefined): T | undefined
 {
@@ -87,8 +84,6 @@ export function convertPosition(value: string | undefined): EnumPosition | undef
 /**
  * 行為規則列轉換 / Convert one pattern row
  * quantity 的 null 已於載入收斂為 0、缺省保持 undefined；judge／action 缺省時略過該列。
- * null quantity is normalized to 0 at load and omission stays undefined;
- * rows with a missing judge/action are dropped.
  */
 export function convertPatternItem(raw: IPatternItem | undefined): IPatternItem | undefined
 {
@@ -164,9 +159,6 @@ export function convertEquipYaml(raw: IEquipTable | undefined): ICharDef['equip'
  *
  * 合併來源錯字的小寫 `special` 與正規鍵 `SPECIAL`（後者優先）。值已於載入收斂為 ISpecial 形狀
  * （boolean → 1/0、Pierce 為 [n, n]）；空塊（兩者皆空）回 undefined。
- * Merges the source-typo lowercase `special` with the canonical `SPECIAL` (the latter wins).
- * Values are already ISpecial-shaped (booleans → 1/0, Pierce as [n, n]) from load-time
- * normalization; an empty result (both sides empty) yields undefined.
  */
 export function convertSpecialYaml(raw: IRawMonYaml): Partial<ISpecial> | undefined
 {
@@ -217,8 +209,6 @@ export function convertServantYaml(
 /**
  * 目標規格轉換 / Convert a raw [type, method, count] spec into ITargetSpec
  * raw 三元組的形狀由本類別的來源定案：前兩格為目標／選取方式字串、末格經載入收斂為 number。
- * The raw 3-tuple's shape is fixed by this class's source: the first two entries are
- * target/method strings, the last one is a number after load-time coercion.
  */
 export function convertTarget(
 	raw: [type: string, method: string, count: number] | undefined,
@@ -242,8 +232,6 @@ export function convertCharge(raw: number[] | undefined): [cast: number, stiff: 
 /**
  * 武器限制轉換 / Convert a raw weapon-limit object into Partial<Record<EnumWeaponType, boolean>>
  * 來源值全為布林（`Whip: true`），不是資源編號，故 raw 形狀為 `Record<string, boolean>`。
- * Source values are all booleans (`Whip: true`), never resource ids, so the raw shape is
- * `Record<string, boolean>`.
  */
 export function convertLimit(
 	raw: Record<string, boolean> | undefined,

@@ -55,13 +55,9 @@ export enum EnumExpect
  *
  *
  * 決定前排守護者「何時替後排擋傷」（由 guard.ts guardActive() 逐次判定）：
- * Decides when a front-row guardian intercepts damage for the back row (re-evaluated per hit by guard.ts guardActive()):
  * - LifeNN：守護者自身 HP% <= NN 時生效（血量越低越常守）
- *   LifeNN: active while the guardian's own HP% <= N (guards more as HP drops)
  * - ProbNN：每次攻擊獨立擲骰 NN% 機率生效（需具備 rng，否則視為不發動）
- *   ProbNN: rolls an independent NN% chance per attack (requires rng; treated as inactive without it)
  * - Always/Never：恆真／恆假；behavior.guard 省略時預設 Always
- *   Always/Never: always true / always false; defaults to Always when behavior.guard is absent
  */
 export enum EnumGuardKind
 {

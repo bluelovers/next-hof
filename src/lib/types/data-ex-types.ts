@@ -46,8 +46,6 @@ export interface IUnionDataEx
  * 資源擴充資料（全部資源共用的單一 data_ex 定義）/ unified extra-data definition shared by all kinds
  * 由各 kind 基底組合而成（extends ICharDataEx、IJobDataEx、IUnionDataEx）；
  * 每個切面各自定義一次，IDataEx 只做組合。
- * Composed from the per-kind bases (extends ICharDataEx, IJobDataEx, IUnionDataEx);
- * each slice is defined once and IDataEx only aggregates.
  */
 export interface IDataEx extends ICharDataEx, IJobDataEx, IUnionDataEx
 {

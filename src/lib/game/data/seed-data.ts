@@ -7,8 +7,6 @@
  * - 戰鬥級：runShowcaseBattle 設 corpse: true（我方預設留屍體）
  * - 隊伍級：runShowcaseBattle 設 teamCorpse { Team1: false }（敵方預設不留）
  * - 角色級：本檔個別 def 的 corpse（覆寫上層），如下方的 Priest / DarkElfHunter / Slime
- * Corpse-policy 3-level demo (character level set here; team/battle levels in the showcase
- * battle config): battle-level corpse:true, team-level Team1:false, and per-def overrides below.
  */
 
 import {
@@ -287,8 +285,6 @@ const mon1002: IMonDef = {
 
 /**
  * 職業／角色／怪物集合（registry 與 SEED 共用同一份陣列）
- * Job / char / monster collections, shared by the repository builder and SEED so the
- * roster is declared exactly once instead of being listed twice.
  */
 const jobs: IJobDef[] = [job100, job200, job300];
 /** 可選角色集合（展示頁名冊，6 名）/ selectable chars (the showcase roster, 6) */

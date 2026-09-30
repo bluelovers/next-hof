@@ -3,11 +3,8 @@
  *
  *
  * 決定「以誰為中心」選取目標（ITargetSpec 第 1 元，Battle.selectTargets 據此分支）：
- * Determines the camp used as the selection center (ITargetSpec element 1; branches in Battle.selectTargets):
  * - Enemy／Friend：敵隊／己隊（含召喚物在內的隊伍成員）
- *   Enemy / Friend: members of the enemy / friendly team (summons included)
  * - All：不分敵我的全體存活者；Self：僅施法者自己（忽略選取方式）
- * - All: all living units on both sides; Self: the caster only (method ignored)
  */
 export enum EnumTargetType
 {
@@ -26,11 +23,8 @@ export enum EnumTargetType
  *
  *
  * 決定「在該陣營內取幾個」（ITargetSpec 第 2 元）：
- * Determines how many targets are taken within the chosen camp (ITargetSpec element 2):
  * - Individual：隨機 1 名；Multi：隨機抽 count 名（有放回，可能重複）
- *   Individual: 1 random pick; Multi: count random picks (with replacement, duplicates possible)
  * - All：全體存活者（第 3 元 count 被忽略）
- *   All: every living member (the 3rd element count is ignored)
  */
 export enum EnumTargetMethod
 {
@@ -47,11 +41,8 @@ export enum EnumTargetMethod
  *
  *
  * 決定傷害公式採用的主要能力（effect.ts calcBasicDamage）：
- * Selects the primary stat used by the damage formula (effect.ts calcBasicDamage):
  * - 省略（undefined）或 Str：物理用 STR、魔法用 INT（預設路徑）
- *   omitted (undefined) or Str: physical uses STR, magic uses INT (default path)
  * - Dex：無論物理／魔法一律改用 DEX
- *   Dex: always uses DEX regardless of physical/magic
  */
 export enum EnumInfluence
 {
@@ -66,11 +57,8 @@ export enum EnumInfluence
  *
  *
  * AI 目標選擇的優先判斷（供 judge/pattern 層參考）：
- * Priority hints for AI target selection (consumed by the judge/pattern layer):
  * - LowHpRate：優先低 HP 比率目標；Dead：目標已死亡（蘇生類技能）
- *   LowHpRate: prefer low-HP targets; Dead: target is dead (revive-type skills)
  * - Summon：優先召喚物；Charge：目標正在詠唱；Back：背擊（優先後排）
- *   Summon: prefer summons; Charge: target is casting; Back: back attack (prefer the back row)
  */
 export enum EnumSkillPriority
 {
@@ -88,21 +76,15 @@ export enum EnumSkillPriority
 
 /**
  * 技能傷害類型（同時為 atk 陣列槽位索引）
- * Skill damage type (also the atk array slot index)
  *
  * Physical＝0（物理：STR／atk[0]）、Magic＝1（魔法：INT／atk[1]）；
  * 成員值與 YAML 來源一致，並採完整鍵名（Physical / Magic）。
  *
  * 本列舉即 atk 槽位索引的唯一來源：atk 讀寫、pierce、equip 等索引一律引用
  * EnumSkillDamageType，不另立槽位 enum。
- * This enum is the sole source of the atk slot index: atk read/write, pierce and equip
- * indices all reference EnumSkillDamageType; no separate slot enum exists.
  *
  * calcBasicDamage 據此選擇能力與 atk/def 的物理／魔法索引；
  * showcase battle-adapter 據此決定蓄力文案（Physical→charging、Magic→casting）。
- *
- * @see {@link IAtkTuple}
- * @see {@link calcBasicDamage}
  */
 export enum EnumSkillDamageType
 {

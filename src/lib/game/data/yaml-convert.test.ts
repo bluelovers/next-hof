@@ -2,9 +2,6 @@
  * YAML 轉換器測試 / YAML converter tests
  * 測試資料來自 fixtures（`test/fixtures/Resource`，為實際 HOF Resource 檔案的原樣副本），
  * 統一經由 yaml-load 的 loader 讀取——不在測試內硬編碼資源內容。
- * Test data lives in fixtures (`test/fixtures/Resource`, verbatim copies of the real HOF
- * Resource files) and is read through the yaml-load loaders — no resource content is
- * hardcoded inside the tests.
  */
 
 import { describe, it, expect } from 'vitest';
@@ -25,8 +22,6 @@ import type { IRawCharYaml, IRawMonYaml } from '#/lib/types/raw/yaml-types';
 
 /**
  * 載入角色 fixture；缺檔時拋出具體路徑的錯誤（避免 non-null assertion 產生無意義訊息）。
- * Load a char fixture; throws with the concrete missing path instead of a bare non-null
- * assertion that would surface as an unrelated "undefined" error later.
  */
 function mustLoadChar(no: number): IRawCharYaml
 {

@@ -12,8 +12,6 @@
  *
  * 需要執行期迭代的場景（鍵名衍生、建表迴圈）使用 STATUS_ATTR_KEYS（enum 值的陣列），
  * 型別位置一律使用 EnumStatusAttr。
- * Runtime iteration (key-name derivation, table build loops) uses STATUS_ATTR_KEYS (the
- * array of enum values); type positions use EnumStatusAttr.
  */
 export enum EnumStatusAttr
 {
@@ -46,9 +44,6 @@ export enum EnumStatusAttr
  *
  * 與 EnumStatusAttr 的 MAXHP / MAXSP 上限成對：上限降低時須同步夾制當前值，
  * 讀寫當前值一律以 enum 表示，不使用字串聯合。
- * Pairs with the MAXHP / MAXSP caps in EnumStatusAttr: when a cap drops, the current
- * value must be clamped; the current value is always expressed as an enum, never a
- * string union.
  */
 export enum EnumVital
 {

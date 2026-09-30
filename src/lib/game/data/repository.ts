@@ -53,8 +53,6 @@ export interface IDefCollections
 /**
  * 具 `no` 編號的定義 / A definition carrying its `no` number
  * 五類定義皆 extends INamedIconDef（或其 `Omit<...,'img'>` 變體），`no` 恆為 number。
- * All five kinds extend INamedIconDef (or its `Omit<...,'img'>` variant), so `no` is always
- * a number — that is what lets the table key without a per-kind extractor.
  */
 interface INumberedDef
 {
@@ -66,8 +64,6 @@ interface INumberedDef
  * 以 no 為鍵的單一資源表 / One `no`-keyed resource table
  *
  * 五類定義共用的 Map 存取；鍵直接取自 `def.no`，不需各類自備取鍵函式。
- * The shared Map access for all five kinds; the key comes straight from `def.no`, so no
- * kind needs its own key extractor.
  */
 class EntityTable<T extends INumberedDef>
 {

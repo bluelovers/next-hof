@@ -7,10 +7,7 @@ import type { IDataEx } from './data-ex-types';
  * 模式項目 / Pattern item
  *
  * AI 行為規則列：buildPattern() 組裝（逃跑／特殊前置 + 角色自身 + 預設收尾），
- * AI behavior rule row: assembled by buildPattern() (flee/special prelude + own rules + default tail),
  * 再由 MultiFactJudge() 依序檢查——第一個 judge 成立且通過 quantity 回合門檻者，
- * then checked in order by MultiFactJudge() — the first row whose judge passes and whose
- * quantity turn gate is met yields its action.
  * 其 action 即本回合要施放的技能編號（1000 為預設攻擊）。
  */
 export interface IPatternItem
@@ -19,9 +16,7 @@ export interface IPatternItem
 	judge: number;
 	/**
 	 * 回合門檻：省略或 0＝恆可觸發，否則需 battle.turn >= quantity
-	 * turn gate: omitted or 0 = always eligible, else requires battle.turn >= quantity;
 	 * 省略（undefined）由引擎以 0 視之，與來源 `quantity: null`（載入時已收斂為 0）同義。
-	 * an omitted value counts as 0 in the engine, same as the source `quantity: null` (already normalized to 0 at load).
 	 */
 	quantity?: number;
 	/** 動作碼＝技能編號（1000 為預設攻擊）/ action code = skill number (1000 is the default attack) */
@@ -49,8 +44,6 @@ export interface IBehavior
  *
  * Character.SPECIAL 的結構；各欄位可經 getSpecial/addSpecial/setSpecial 以字串鍵存取
  * （數值鍵以數字累加，Pierce（IAtkTuple）逐槽累加）。
- * Shape of Character.SPECIAL; every field is reachable by string key via getSpecial/addSpecial/setSpecial
- * (numeric keys accumulate scalars, Pierce (IAtkTuple) accumulates per slot).
  */
 export interface ISpecial
 {
@@ -79,10 +72,8 @@ export interface ISpecial
 
 /**
  * 已習得技能列表欄位（`skill`）
- * Learned-skill list field (`skill`)
  *
  * 兩層宣告完全一致，一律以 `extends` 繼承本型別，不各自宣告。
- * Both layers declare it identically; every interface carrying `skill` extends this type.
  *
  * 使用方 / Consumers: `ICharCore`（→ `ICharDef`／`IMonDef`）與 raw `IRawCharYaml`
  */
@@ -94,12 +85,9 @@ export interface ILearnedSkillsField
 
 /**
  * AI 行為欄位（`behavior`）
- * AI-behavior field (`behavior`)
  *
  * 載入後即與引擎目標同形（position 值即 EnumPosition、guard 值即 EnumGuardKind、
  * pattern 列即 IPatternItem），一律以 `extends` 繼承，不各自宣告。
- * Post-load it is identical to the engine target (position values ARE EnumPosition,
- * guard values ARE EnumGuardKind, pattern rows ARE IPatternItem); extend instead of declaring.
  *
  * 使用方 / Consumers: `ICharCore`（→ `ICharDef`／`IMonDef`）與 raw `IRawCombatCoreYaml`
  */
@@ -111,10 +99,8 @@ export interface IBehaviorField
 
 /**
  * 特殊能力欄位（`SPECIAL`）
- * Special-ability field (`SPECIAL`)
  *
  * 以 ISpecial 為型別來源、全欄位選填（省略＝無該能力）；一律以 `extends` 繼承。
- * ISpecial is the type source (every member optional; omitted = no ability); extend instead of declaring.
  *
  * 使用方 / Consumers: `ICharCore`（→ `ICharDef`／`IMonDef`）與 raw `IRawMonYaml`
  */
@@ -126,12 +112,9 @@ export interface ISpecialField
 
 /**
  * 角色附加欄位（`ICharDef` 與 raw `IRawCharYaml` 同形）
- * Character extra fields shared by `ICharDef` and raw `IRawCharYaml`
  *
  * 兩層宣告完全一致（名稱、選取性、型別），於此定義一次、兩側皆 `extends` 繼承；
  * `skill`（已習得技能列表）同理，另見 ILearnedSkillsField。
- * Both layers declare these identically (name, optionality, type), so both extend this
- * interface; `skill` follows the same rule via ILearnedSkillsField.
  *
  * 使用方 / Consumers: `ICharDef`（target）與 raw `IRawCharYaml`
  */
@@ -153,23 +136,15 @@ export interface ICharExtraFields
  * 六維與 HP/SP 由 ICombatStats 提供、`atk`／`def` 由 IAtkDefFields、`skill` 由
  * ILearnedSkillsField、`behavior` 由 IBehaviorField、`SPECIAL` 由 ISpecialField 提供；
  * 本介面只宣告實例識別碼 `unitUuid`。
- * Stats/HP/SP come from ICombatStats, `atk` / `def` from IAtkDefFields, `skill` from
- * ILearnedSkillsField, `behavior` from IBehaviorField and `SPECIAL` from ISpecialField;
- * this interface declares the instance uid `unitUuid` only.
  */
 export interface ICharCore extends ICorpsePolicyField, ICombatStats, IAtkDefFields, ILearnedSkillsField, IBehaviorField, ISpecialField, Omit<INamedIconDef, 'img'>
 {
 	/**
 	 * 戰鬥單位實例唯一識別碼（資料提供者可指定；未提供時由 Character 自動產生）
-	 * Battle-unit instance uid (a data provider may supply one; otherwise Character generates it).
 	 *
 	 * 與 `no`（物種／定義編號）不同：同一 `no` 可有多個個體（同名怪物），`unitUuid` 用來識別
 	 * 「這一個」單位個體，召喚（新加入）、復活、型態變化等跨時間的追蹤都以此為準。
 	 * 命名刻意帶上 `unit`，以免與 item／map 等其他實體的 id 混淆。
-	 * Distinct from `no` (species / definition id): one `no` may have several individuals
-	 * (same-name monsters). `unitUuid` identifies *this* unit individual and is the key for
-	 * tracking it across summon (joining later), revive, and form changes. The `unit`
-	 * prefix is deliberate so it cannot be mistaken for an item/map id.
 	 */
 	unitUuid?: string;
 }

@@ -43,10 +43,6 @@ export interface IStatsBase
  * 所有欄位皆**可缺省**：原始資料可能缺漏（如 mon.1010 Bat 完全無六維、char.400 缺 HP/SP），
  * 缺漏表示「未定」，由實例化（Character 建構）或後續推導（職業係數）解析；
  * ICharCore／raw 型別皆引用本介面，避免重覆宣告。
- * Every field is optional: the source data may omit stats (e.g. mon.1010 Bat has none,
- * char.400 lacks HP/SP). An omitted stat is "unresolved" and is resolved at instantiation
- * (Character construction) or later derivation (job coefficients). Both ICharCore and the
- * raw YAML types reference this interface instead of re-declaring the fields.
  */
 export interface ICombatStats extends IStatsHpSp, IStatsHpSpMax, IStatsBase
 {
@@ -106,17 +102,12 @@ export type IEncounterTable = Record<IResourceId, IWeightPair>;
 
 /**
  * 攻擊／減傷欄位的共用形狀（`atk`／`def`）
- * Shared shape of the attack/reduction fields (`atk` / `def`)
  *
  * 所有同時帶 `atk` 與 `def` 的介面一律以 `extends` 繼承本型別，不再各自宣告；
  * 完整欄位語意寫在下方「欄位自身」的 JSDoc，使繼承方在 IDE 悬停時仍取得有效說明。
- * Every interface carrying both `atk` and `def` extends this type instead of re-declaring it;
- * the full field semantics live in the field's own JSDoc below, so inheriting sites still
- * surface an effective description on IDE hover.
  *
  * 使用方 / Consumers:
  * - `ICharCore`（角色／怪物共通基屬；`ICharDef`／`IMonDef` 繼承）/ shared char & mon base
- *   (`ICharDef` / `IMonDef` inherit it)
  * - `IItemDef`（武器／裝備自身的攻防）/ item's own attack & reduction
  * - raw 的 `IRawMonYaml`／`IItemDef`（YAML 原始欄位）/ raw `IRawMonYaml` / `IItemDef`
  */
@@ -127,25 +118,19 @@ export interface IAtkDefFields
 	 * 索引語意同 EnumSkillDamageType。 / index semantics follow EnumSkillDamageType.
 	 *
 	 * 數值來源依介面而異：怪物由資料層給定、道具為其自身攻擊、角色由裝備累加。
-	 * The value's origin varies by interface: mons take it from the data layer, items carry
-	 * their own attack, chars accumulate it from equipment.
 	 */
 	atk?: IAtkTuple;
 	/**
 	 * 基礎減傷四槽（有語意的四元組）[物理%減, 物理定值減, 魔法%減, 魔法定值減]
-	 * base reduction 4-tuple; index semantics follow EnumDefSlot.
 	 *
 	 * 來源同 `atk`（怪物資料層／道具自身／角色由裝備累加）。
-	 * Origin follows `atk` (monster data layer / item itself / accumulated from equipment).
 	 */
 	def?: IDefTuple;
 }
 
 /**
  * 具名目錄項目的身分與展示成員（no + name + img）
- * Identity & icon members of a named catalog item.
  * IItemDef、ISkillDef、IMonDef 與 raw 對應項皆引用（不再各檔重寫）。
- * Referenced by IItemDef, ISkillDef, IMonDef and their raw counterparts.
  */
 export interface INamedIconDef
 {

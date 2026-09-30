@@ -63,8 +63,6 @@ export function createYamlRepository(root: string): IYamlRepositoryResult
  * 種類 → 已轉換定義的 id 取值器 / kind → id extractor over the converted defs
  * 五類已定義轉換器，直接取用定義上的 `no`；其餘種類（Guard/Judge/Land/Skilltree/Union）
  * 為純資料層、無轉換器，落回 `loadAllResourceIds` 從 raw 物件取 `no`。
- * The five kinds with converters read `no` off the converted defs; the remaining data-layer
- * kinds have no converter and fall back to `loadAllResourceIds`, which reads `no` off raw.
  */
 const RESOURCE_ID_READERS: Partial<Record<EnumResourceKind, (root: string) => IResourceId[]>> = {
 	[EnumResourceKind.Char]: (root) => loadAllChars(root).map((r) => r.no),

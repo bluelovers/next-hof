@@ -32,7 +32,6 @@ import { SKILL_EXTRA_NUMERIC_KEYS } from '#/lib/game/data/yaml-skill-keys';
 /**
  * 技能擴充數值欄位（Plus*／Up*／Down*）/ skill extra numeric fields
  * 鍵為 SKILL_EXTRA_NUMERIC_KEYS 的字面聯集（29 鍵），具名屬性、非 index signature。
- * Keys are the 29-literal union of SKILL_EXTRA_NUMERIC_KEYS (named props, not an index signature).
  */
 export type IRawSkillExtraNumerics = Partial<
 	Record<(typeof SKILL_EXTRA_NUMERIC_KEYS)[number], number>
@@ -41,14 +40,10 @@ export type IRawSkillExtraNumerics = Partial<
 /**
  * 原始戰鬥核心欄位（角色與怪物共用）/ Raw combat-core fields (shared by char & mon)
  * 六維與 HP/SP 引用 ICombatStats；no/name 引用 INamedIconDef（無 img）。
- * Stats/HP/SP reference ICombatStats; no/name reference INamedIconDef (with img omitted).
  *
  * behavior 繼承 IBehaviorField（載入後即與引擎目標同形：
  * position 值即 EnumPosition、guard 值即 EnumGuardKind、pattern 列即 IPatternItem——
  * 來源筆誤／空物件已於載入修正）。
- * behavior comes from IBehaviorField (post-load it is identical to the engine target:
- * position values ARE EnumPosition, guard values ARE EnumGuardKind, pattern rows ARE
- * IPatternItem; source typos / empty objects are already fixed at load).
  */
 export interface IRawCombatCoreYaml extends ICombatStats, IBehaviorField, Omit<INamedIconDef, 'img'>
 {
@@ -59,8 +54,6 @@ export interface IRawCombatCoreYaml extends ICombatStats, IBehaviorField, Omit<I
  *
  * exp／job／equip／data_ex 繼承 ICharExtraFields、skill 繼承 ILearnedSkillsField
  * （皆為與 `ICharDef` 同形的共用宣告）。
- * exp / job / equip / data_ex come from ICharExtraFields and skill from ILearnedSkillsField
- * (both are shared declarations identical to `ICharDef`).
  */
 export interface IRawCharYaml extends IRawCombatCoreYaml, ICharExtraFields, ILearnedSkillsField
 {
@@ -69,20 +62,13 @@ export interface IRawCharYaml extends IRawCombatCoreYaml, ICharExtraFields, ILea
 /**
  * 原始怪物定義（mon.*.yml）/ Raw monster definition (mon.*.yml)
  *
- * 原始檔的小寫 `special` 為錯字（僅 mon.1000 出現且為空物件）——正規鍵只有大寫 `SPECIAL`。
- * The lowercase `special` key is a source typo (only mon.1000, an empty object) — the canonical
- * key is `SPECIAL` only.
+ * 小寫 `special` 與大寫 `SPECIAL` 的處理見 IRawMonYaml.special 欄位。
  */
 export interface IRawMonYaml extends IRawCombatCoreYaml, IAtkDefFields, IMonExtraFields, IMonExtraFieldsServant, ISpecialField, INamedIconDef
 {
 	/**
-	 * 來源錯字的小寫 `special` / the source-typo lowercase `special`
-	 * 僅 mon.1000 出現且恆為空物件 `{ }`——正規鍵只有大寫 `SPECIAL`。
-	 * 明確宣告此錯字鍵，讓 convertSpecialYaml 得以零 cast 讀出並與 `SPECIAL` 合併；
-	 * 除該轉換器外請勿新增使用點。
-	 * Appears only in mon.1000 and is always the empty object `{ }`; the canonical key is
-	 * uppercase `SPECIAL`. Declaring the typo key explicitly lets convertSpecialYaml read it
-	 * and merge it with `SPECIAL` without a cast — no new consumers beyond that converter.
+	 * 來源錯字的小寫 `special`（僅 mon.1000 出現且恆為空物件；正規鍵只有大寫 `SPECIAL`）
+	 * 除 convertSpecialYaml 讀取並與 `SPECIAL` 合併外，請勿新增使用點。
 	 */
 	special?: Partial<ISpecial>;
 }
@@ -90,19 +76,12 @@ export interface IRawMonYaml extends IRawCombatCoreYaml, IAtkDefFields, IMonExtr
 /**
  * 原始技能定義（Skill/skill.*.yml）/ Raw skill definition (Skill/skill.*.yml)
  * 補正欄位（P_* / M_*）由 ICompBonuses 提供；source 內尚有 name2 等未收錄鍵。
- * Compensation fields (P_* / M_*) come from ICompBonuses; the source also has
- * uncatalogued keys like `name2`.
  *
  * 旗標欄位（invalid／support／passive／quick／pierce／CurePoison／revive）繼承
  * ISkillSharedFields：來源寫 `true`／`'1'`／`1`，載入時（Skill 的 COERCE_SPECS）已統一收斂為
  * `number`（1／0），故**不是** `number | boolean`。
- * The flag fields (invalid/support/passive/quick/pierce/CurePoison/revive) are inherited from
- * ISkillSharedFields: the source writes `true`/`'1'`/`1`, and the Skill COERCE_SPECS collapse
- * them to `number` (1/0) at load — never `number | boolean`.
  *
  * `limit` 的值在來源即為布林（`Whip: true`），且載入不經數值收斂 → `Record<string, boolean>`。
- * `limit` values are booleans in the source (`Whip: true`) and are not coerced at load,
- * so the shape is `Record<string, boolean>` (no resource-id branch).
  */
 export interface IRawSkillYaml extends ICompBonuses, IRawSkillExtraNumerics, ISkillSharedFields, INamedIconDef
 {
@@ -131,7 +110,6 @@ export interface IRawSkillYaml extends ICompBonuses, IRawSkillExtraNumerics, ISk
 /**
  * 原始守護設定（Guard/guard.*.yml）/ Raw guard setting (Guard/guard.*.yml)
  * 鍵為守護種類字串（guard.always → id 'always'）；純資料層。
- * The id is the guard-kind string (guard.always → id 'always'); data-layer only.
  */
 export interface IRawGuardYaml
 {
@@ -172,7 +150,6 @@ export interface IRawJudgeYaml extends IRawJudgeYamlSub
 /**
  * 原始土地設定（Land/land.*.yml）/ Raw land setting (Land/land.*.yml)
  * no 為字串 id（ac0、blow01…）；純資料層。
- * `no` is a string id (ac0, blow01…); data-layer only.
  */
 export interface IRawLandYaml
 {
@@ -201,7 +178,6 @@ export interface IRawSkilltreeYaml
 /**
  * 原始獨特怪物設定（Union/union.*.yml）/ Raw union setting (Union/union.*.yml)
  * no 為補零字串（'0000'）；純資料層（對應 mon.*.yml 的獨特怪物細節）。
- * `no` is a zero-padded string ('0000'); data-layer only (the union details for the mon.*.yml bosses).
  */
 export interface IRawUnionYaml
 {

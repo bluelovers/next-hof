@@ -12,9 +12,6 @@ import type { ICorpsePolicy, ICorpsePolicyField } from '#/lib/game/battle/corpse
  *
  * 單一單位／單一資源的前後值；`who` 決定「這段變化是誰的」（Drain 的雙方、Delay 的自身），
  * `unit` 決定資源維度（hp／sp／delay）。展示層將其組成 valueChange（單筆）或 valueChanges（多筆）。
- * The before/after pair of one unit (or one resource); `who` says whose change it is (both sides
- * of a Drain, the caster's own delay) and `unit` names the resource (hp / sp / delay). The display
- * layer turns these into valueChange (single) or valueChanges (multiple).
  */
 export interface IBattleValueChange
 {
@@ -57,8 +54,6 @@ export interface IBattleEvent
 	unit?: EnumResource;
 	/**
 	 * 結構化數值變化（Drain 雙方、EnergyExchange 的 hp／sp 對、Delay 的前後分數）
-	 * structured value changes (both sides of a Drain, EnergyExchange's hp / sp pair, a Delay's
-	 * before/after score)
 	 */
 	valueChanges?: IBattleValueChange[];
 	/** 顯示文字（Info 等文字類事件）/ display text (for Info and other text events) */
@@ -67,7 +62,6 @@ export interface IBattleEvent
 
 /**
  * 單位共用核心欄位（共用組 1：識別碼＋名稱＋HP/SP）
- * Shared unit core fields (group 1: uid + name + HP/SP)
  *
  * 由引擎層 IBattleSnapshotUnit 與展示層 IBattleUnit／IBattleSnapshotDisplayUnit 共同繼承，
  * 這些完全同名同型的欄位只在這裡宣告一次。
@@ -75,24 +69,14 @@ export interface IBattleEvent
  * 例如引擎的 team（EnumTeamSide）vs 顯示層的 side（EnumTeamSideUI）、
  * 引擎的 dead vs 顯示層的 status、level/no/expectSkill 等——
  * 因此不需要任何轉換函式，也不會因强行統一而改變既有行為。
- * Inherited by the engine's IBattleSnapshotUnit and the display's IBattleUnit /
- * IBattleSnapshotDisplayUnit, so these identically named, identically typed fields are
- * declared exactly once. Incompatible fields are deliberately left declared on each layer —
- * e.g. the engine's team (EnumTeamSide) vs the display's side (EnumTeamSideUI), the engine's
- * dead vs the display's status, level/no/expectSkill — so no conversion function is needed
- * and no existing behaviour changes.
  */
 export interface IBattleUnitVitals extends Required<IStatsHpSpAll>
 {
 	/**
 	 * 戰鬥單位實例唯一識別碼（Character.unitUuid）
-	 * Battle-unit instance uid (Character.unitUuid)
 	 *
 	 * 展示層用來關聯戰場精靈與快照單位（sprite.unitUuid ↔ snapshot unitUuid）；
 	 * 引擎層 IBattleSnapshotUnit 將其收窄為必填（個體追蹤用）。
-	 * The display layer links battlefield sprites and snapshot units
-	 * (sprite.unitUuid ↔ snapshot unitUuid); the engine's IBattleSnapshotUnit narrows it
-	 * to required (per-instance tracking).
 	 */
 	unitUuid?: string;
 	/** 名稱 / name */
@@ -101,13 +85,9 @@ export interface IBattleUnitVitals extends Required<IStatsHpSpAll>
 
 /**
  * 單位列表容器（共用組 2：units 欄位）
- * Unit list container (group 2: the `units` field)
  *
  * 由引擎層 IBattleSnapshot 與展示層 IBattleTeam／IBattleSnapshotDisplay 共同繼承，
  * `units` 宣告只維護一份，元素型別以型別參數依各層指定。
- * Inherited by the engine's IBattleSnapshot and the display's IBattleTeam /
- * IBattleSnapshotDisplay so the `units` declaration is maintained once, with the element
- * type supplied per layer as a type parameter.
  */
 export interface IUnitList<TUnit>
 {
@@ -128,9 +108,6 @@ export interface IBattleSnapshotUnit extends ICorpsePolicyField, IBattleUnitVita
 	/**
 	 * 繼承 ICorpsePolicyField.corpse 並收窄為必填：引擎保證已完成
 	 * 角色 > 隊伍 > 戰鬥級繼承解析（false＝不留下屍體，物件＝帶圖／class／style 規格）。
-	 * Inherits ICorpsePolicyField.corpse and narrows it to required: the engine guarantees the
-	 * character > team > battle inheritance has been resolved (false = no corpse, object =
-	 * corpse carrying image/class/style spec).
 	 */
 	corpse: ICorpsePolicy;
 	/** 單位編號 String(char.no)（物種／定義編號）/ unit number as string (species / definition id) */

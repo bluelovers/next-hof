@@ -16,13 +16,9 @@ export interface IMonReward
 
 /**
  * 怪物附加欄位（`IMonDef` 與 raw `IRawMonYaml` 同形）
- * Monster extra fields shared by `IMonDef` and raw `IRawMonYaml`
  *
  * 說明、掉落與獨特怪物細節（週期／土地／等級限制／隨行表）在兩層的名稱、選取性、型別
  * 完全一致，於此定義一次、兩側皆 `extends` 繼承；`SPECIAL`／`behavior` 另見
- * ISpecialField／IBehaviorField。
- * Description, drops and union-monster details are identical on both sides, so both extend
- * this interface; `SPECIAL` / `behavior` live in ISpecialField / IBehaviorField.
  *
  * 使用方 / Consumers: `IMonDef`（target）與 raw `IRawMonYaml`
  */
