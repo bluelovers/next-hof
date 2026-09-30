@@ -48,6 +48,10 @@ export interface IMonExtraFields
 	land?: string;
 	/** 獨特怪物等級限制（YAML `lv_limit`）/ union monster level limit (YAML `lv_limit`) */
 	lv_limit?: number;
+}
+
+export interface IMonExtraFieldsServant
+{
 	/**
 	 * 獨特怪物隨行雜魚表 { 怪物編號: [出現權重, 0] }（YAML `servant`）
 	 * union escort table { monster no: [spawn weight, 0] } (YAML `servant`)
@@ -64,7 +68,7 @@ export interface IMonExtraFields
  * 怪物定義 / Monster definition
  * 介面 / interface
  */
-export interface IMonDef extends ICharCore, IMonExtraFields, INamedIconDef
+export interface IMonDef extends ICharCore, IMonExtraFields, IMonExtraFieldsServant, INamedIconDef
 {
 	/**
 	 * 獨特怪物標記 / union-monster flag

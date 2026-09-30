@@ -32,7 +32,7 @@ import type {
 	ISpecialField,
 } from '#/lib/types/char-types';
 import type { IDataEx } from '#/lib/types/data-ex-types';
-import type { IMonExtraFields } from '#/lib/types/mon-types';
+import type { IMonExtraFields, IMonExtraFieldsServant } from '#/lib/types/mon-types';
 import type { ICompBonuses, ISkillSharedFields } from '#/lib/types/skill-types';
 import type { IResourceId } from '#/lib/types/seg-types';
 import { SKILL_EXTRA_NUMERIC_KEYS } from '#/lib/game/data/yaml-skill-keys';
@@ -81,7 +81,7 @@ export interface IRawCharYaml extends IRawCombatCoreYaml, ICharExtraFields, ILea
  * The lowercase `special` key is a source typo (only mon.1000, an empty object) — the canonical
  * key is `SPECIAL` only.
  */
-export interface IRawMonYaml extends IRawCombatCoreYaml, IAtkDefFields, IMonExtraFields, ISpecialField, INamedIconDef
+export interface IRawMonYaml extends IRawCombatCoreYaml, IAtkDefFields, IMonExtraFields, IMonExtraFieldsServant, ISpecialField, INamedIconDef
 {
 }
 
