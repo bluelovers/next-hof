@@ -1,5 +1,5 @@
 /**
- * 狀態屬性單一事實來源 / Single source of truth for status attributes
+ * 狀態屬性模組 / Status attribute module
  * 整合原 status-key.ts（鍵名衍生）與 status-attrs.ts（屬性對照表）：
  * 兩者高度耦合（status-attrs 使用 status-key 的鍵名對照表建構 UPMAP/DOWNMAP/PLUSMAP），
  * 合併為單一模块後，狀態屬性的「鍵名」與「讀寫語意」不再分散維護。
@@ -7,6 +7,12 @@
  * (attribute table): the two were tightly coupled (status-attrs built UPMAP/DOWNMAP/PLUSMAP
  * from status-key's key-name lookups), so merging them into one module keeps every status
  * attribute's "key name" and "read/write semantics" in a single place.
+ *
+ * 本檔是狀態屬性「讀寫語意」的單一事實來源（本檔僅此一次提及）；enum 與型別定義已分類
+ * 移至 #/lib/types/status-enum.ts、prefix-enum.ts、status-attr-types.ts，本檔轉出相容路徑。
+ * This module is the single source of truth for status read/write semantics (mentioned once
+ * in this file); enums and types moved to #/lib/types/status-enum.ts, prefix-enum.ts and
+ * status-attr-types.ts, re-exported here to keep the legacy import paths working.
  *
  * 所有系統（技能 effect、被動 passive、裝備 equip、戰鬥變數 battle-variable、
  * 工廠 factory、等級調整 level-fix）都從此處取得「屬性清單」與「屬性↔角色欄位對應」，
@@ -17,12 +23,37 @@ import { MAX_STATUS_MAXIMUM } from '../constants';
 import { minusPercent, plusPercent, takePercent } from '../core/percent';
 import { EnumSkillDamageType } from '../types';
 import type { Character } from './Character';
-import { EnumStatusAttr, EnumVital } from './status-enum';
+import { EnumDefSlot, EnumStatusAttr, EnumVital } from '#/lib/types/status-enum';
+import { EnumCompPrefix, EnumStatusPrefix } from '#/lib/types/prefix-enum';
+import type {
+	IAttrFn,
+	IBaseStatComp,
+	ICompField,
+	IPrimaryStat,
+	IStatusAttrEntry,
+	IStatusDownKey,
+	IStatusPlusKey,
+	IStatusUpKey,
+} from '#/lib/types/status-attr-types';
 import {
 	ITSTemplateLiteralAllowedType,
 	ITSStringLiteralPrefixed,
 	ITSStringLiteralPrefixedRecord,
 } from 'ts-type';
+
+// ---- 轉出相容 / Re-exports to keep legacy import paths ----
+export { EnumCompPrefix, EnumStatusPrefix } from '#/lib/types/prefix-enum';
+export { EnumDefSlot } from '#/lib/types/status-enum';
+export type {
+	IAttrFn,
+	IBaseStatComp,
+	ICompField,
+	IPrimaryStat,
+	IStatusAttrEntry,
+	IStatusDownKey,
+	IStatusPlusKey,
+	IStatusUpKey,
+} from '#/lib/types/status-attr-types';
 
 // ============================================================================
 /**
@@ -34,37 +65,6 @@ import {
  */
 
 // ============================================================================
-
-/**
- * 狀態操作前綴（單一事實來源）/ Status operation prefixes (single source of truth)
- * 僅用於由 EnumStatusAttr 衍生 Up* / Down* / Plus* 操作鍵名，與補正欄位前綴無關。
- * Used solely to derive Up* / Down* / Plus* op keys from EnumStatusAttr; unrelated to comp-field prefixes.
- */
-export enum EnumStatusPrefix
-{
-	/** 增益前綴 / Up prefix */
-	Up = 'Up',
-	/** 減益前綴 / Down prefix */
-	Down = 'Down',
-	/** 永久加成前綴 / Plus prefix */
-	Plus = 'Plus',
-}
-
-/**
- * 補正欄位前綴（單一事實來源）/ Compensation field prefixes (single source of truth)
- * P_ 為定值加成、M_ 為百分比加成；用途與狀態操作前綴（EnumStatusPrefix）不同，故獨立成 enum。
- * 取代原先散落在 COMP_FIELDS 的硬編碼 'M_' 字串，使補正前綴亦受 enum 單一來源約束。
- * P_ = flat add, M_ = percent scale; distinct from status-op prefixes (EnumStatusPrefix), hence a
- * separate enum. Replaces the previously hardcoded 'M_' literal in COMP_FIELDS so comp prefixes are
- * also governed by a single enum source.
- */
-export enum EnumCompPrefix
-{
-	/** 定值加成前綴（P_*）/ flat-add prefix (P_*) */
-	Flat = 'P_',
-	/** 百分比加成前綴（M_*）/ percent-scale prefix (M_*) */
-	Percent = 'M_',
-}
 
 /**
  * 由前綴 + 屬性名稱建立「名稱→鍵名」對照表 / Build a name→key-name record from a prefix
@@ -99,9 +99,9 @@ export const STATUS_ATTR_KEYS: readonly EnumStatusAttr[] = Object.values(EnumSta
 
 /**
  * Up* / Down* / Plus* 的「鍵名對照」與「鍵陣列」皆由 _buildStatRecord 單一函式一併產生，
- * 不在別處以 .map() 重複衍生（單一事實來源）。
+ * 不在別處以 .map() 重複衍生。
  * Up* / Down* / Plus* key-name records and key arrays are all produced together by the single
- * _buildStatRecord function — nothing re-derives them via a separate .map() (single source of truth).
+ * _buildStatRecord function — nothing re-derives them via a separate .map().
  */
 export const {
 	/**
@@ -143,58 +143,14 @@ export const {
 // ============================================================================
 
 /**
- * def 陣列索引（物理%, 物理-, 魔法%, 魔法-）/ def array indices
- *
- */
-export enum EnumDefSlot
-{
-	/** 物理減傷 %（def[0]）/ physical damage reduction % (def[0]) */
-	PhysPct = 0,
-	/** 物理定值減傷（def[1]）/ physical flat damage reduction (def[1]) */
-	PhysFlat = 1,
-	/** 魔法減傷 %（def[2]）/ magic damage reduction % (def[2]) */
-	MagPct = 2,
-	/** 魔法定值減傷（def[3]）/ magic flat damage reduction (def[3]) */
-	MagFlat = 3,
-}
-
-/**
- * 屬性函式 / Attribute function
- * 型別別名 / type alias
- *
- * 接收角色與數值 n（% 或點數，依公式而定），直接對角色套用變化。
- * Receives the character and a number n (% or flat, depending on the formula)
- * and mutates the character in place.
- */
-export type IAttrFn = (c: Character, n: number) => void;
-
-/**
- * 狀態屬性項目 / Status attribute entry
- * 介面 / interface
- */
-export interface IStatusAttrEntry
-{
-	/** 讀取角色戰鬥屬性 / Read battle attribute from character */
-	get: (c: Character) => number;
-	/** 寫入角色戰鬥屬性 / Write battle attribute to character */
-	set: (c: Character, v: number) => void;
-	/** 自定 up 公式（省略則套用通用 upAttr）/ Custom up formula (falls back to upAttr) */
-	up?: IAttrFn;
-	/** 自定 down 公式（省略則套用通用 downAttr）/ Custom down formula (falls back to downAttr) */
-	down?: IAttrFn;
-	/** 是否存在 plus 操作（省略則無 Plus* 欄位）/ Whether plus op exists (omit = no Plus* field) */
-	plus?: IAttrFn;
-}
-
-/**
- * 屬性欄位存取器（單一事實來源）/ Attribute field accessor (single source of truth)
+ * 屬性欄位存取器 / Attribute field accessor
  *
  * 每個 EnumStatusAttr 對應「角色身上的哪個欄位／槽位」只在此處定義一次；後續 get/set 與所有
  * 演算法皆由 STATUS_FIELD 查表取得，杜絕槽位在 get/set 與演算法呼叫處重複書寫（先前 ATK 的
- * EnumSkillDamageType.Physical、DEF 的 EnumDefSlot.PhysPct 等同時出現在多處，違反單一事實來源）。
+ * EnumSkillDamageType.Physical、DEF 的 EnumDefSlot.PhysPct 等同時出現在多處）。
  * Each EnumStatusAttr maps to "which Character field/slot" exactly once here; every get/set and
  * algorithm later resolves it from STATUS_FIELD, so a slot is never written in multiple places
- * (previously e.g. the physical slot for ATK appeared in get/set AND the up-call, violating SSoT).
+ * (previously e.g. the physical slot for ATK appeared in get/set AND the up-call).
  */
 interface IStatusField
 {
@@ -213,7 +169,7 @@ type IScalarStatusAttr =
 	| EnumStatusAttr.MAXSP;
 
 /**
- * 欄位存取器工廠（單一事實來源）/ Field accessor factory (SSoT)
+ * 欄位存取器工廠 / Field accessor factory
  * 由 EnumStatusAttr / EnumVital 列舉值（即 Character 欄位名）取得 get/set，取代原先散落的
  * `(c) => c.X` / `(c, v) => { c.X = v; }` lambda，使欄位名只在此處出現一次。
  * Resolves get/set from an EnumStatusAttr / EnumVital value (== Character field name), replacing the
@@ -230,7 +186,7 @@ const _field = (key: IScalarStatusAttr | EnumVital): IStatusField =>
 };
 
 /**
- * atk 槽位存取器（單一事實來源）/ atk slot accessor (SSoT)
+ * atk 槽位存取器 / atk slot accessor
  *
  * atk 槽位與技能傷害類型共用 EnumSkillDamageType（0＝Physical＝atk[0]、1＝Magic＝atk[1]），
  * 故不再另立 EnumAtkSlot（Phys / Mag）重複定義同一組索引。
@@ -248,7 +204,7 @@ const _defField = (slot: EnumDefSlot): IStatusField => ({
 });
 
 /**
- * 屬性↔欄位對照（單一事實來源）/ Attribute→field mapping (SSoT)
+ * 屬性↔欄位對照 / Attribute→field mapping
  * 鍵為 EnumStatusAttr；atk/def 經由 EnumSkillDamageType / EnumDefSlot 列舉索引，不寫死數字或字串。
  * Keyed by EnumStatusAttr; atk/def indexed via the EnumSkillDamageType / EnumDefSlot enums (no hardcoded numbers/strings).
  */
@@ -267,7 +223,7 @@ const STATUS_FIELD: Record<EnumStatusAttr, IStatusField> = {
 };
 
 /**
- * 生命／精神當前值對照（單一事實來源）/ Current HP/SP vital mapping (SSoT)
+ * 生命／精神當前值對照 / Current HP/SP vital mapping
  * 鍵為 EnumVital 列舉（取代原先 'HP' | 'SP' 字串聯合），與 STATUS_FIELD 同構。
  * Keyed by the EnumVital enum (replacing the previous 'HP' | 'SP' string union); same shape as STATUS_FIELD.
  */
@@ -277,7 +233,7 @@ const VITAL_FIELD: Record<EnumVital, IStatusField> = {
 };
 
 /**
- * 上限屬性↔當前值對照（單一事實來源）/ Cap attribute ↔ current vital mapping (SSoT)
+ * 上限屬性↔當前值對照 / Cap attribute ↔ current vital mapping
  * 僅 MAXHP/MAXSP 有對應當前值；列舉對列舉（EnumStatusAttr → EnumVital），無字串聯合。
  * Only MAXHP/MAXSP have a current vital; enum-to-enum (EnumStatusAttr → EnumVital), no string union.
  */
@@ -286,14 +242,14 @@ const CAP_VITAL: Partial<Record<EnumStatusAttr, EnumVital>> = {
 	[EnumStatusAttr.MAXSP]: EnumVital.SP,
 };
 
-/** 增益縮放：round(orig*(1+n/100))（upAttr 與 upNoCap 共用，單一事實來源）/ Buff scale shared by upAttr & upNoCap (SSoT) */
+/** 增益縮放：round(orig*(1+n/100))（upAttr 與 upNoCap 共用）/ Buff scale shared by upAttr & upNoCap */
 const _scaleUp = (orig: number, n: number) => Math.round(plusPercent(orig, n));
 
 /**
  * 通用增益：round(orig*(1+n/100))，上限 orig*(MAX_STATUS_MAXIMUM/100)
  * Generic buff: round(orig*(1+n/100)), capped at orig*(MAX_STATUS_MAXIMUM/100)
- * 由 EnumStatusAttr 查 STATUS_FIELD 取得欄位（單一事實來源，取代原先 (get,set) 參數）。
- * Field resolved from STATUS_FIELD by EnumStatusAttr (SSoT; replaces the (get,set) parameters).
+ * 由 EnumStatusAttr 查 STATUS_FIELD 取得欄位（取代原先 (get,set) 參數）。
+ * Field resolved from STATUS_FIELD by EnumStatusAttr (replaces the (get,set) parameters).
  */
 const upAttr = (attr: EnumStatusAttr): IAttrFn => (c, n) =>
 {
@@ -325,10 +281,10 @@ const plusAttr = (attr: EnumStatusAttr): IAttrFn => (c, n) =>
 
 /**
  * 以下為「自定演算法」：僅 ATK/MATK、DEF/MDEF、MAXHP/MAXSP 需要的特殊 up/down 公式。
- * 全部以 EnumStatusAttr 為參數，由 STATUS_FIELD 查表取得欄位（單一事實來源），
+ * 全部以 EnumStatusAttr 為參數，由 STATUS_FIELD 查表取得欄位，
  * 不再以原始字串聯合（'MAXHP' | 'MAXSP'、'HP' | 'SP'）或槽位重複書寫。
  * Custom algorithms below: the special up/down formulas for ATK/MATK, DEF/MDEF, MAXHP/MAXSP.
- * All are parameterized by EnumStatusAttr and resolve the field via STATUS_FIELD (SSoT); no raw
+ * All are parameterized by EnumStatusAttr and resolve the field via STATUS_FIELD; no raw
  * string unions ('MAXHP' | 'MAXSP', 'HP' | 'SP') or duplicated slot literals.
  */
 
@@ -358,8 +314,8 @@ const upDefPct = (attr: EnumStatusAttr): IAttrFn => (c, n) =>
 /**
  * 上限減益 + 夾制當前值：round(cap*(1-n/100))，並將當前 HP/SP 壓低至新上限（MAXHP/MAXSP 共用）。
  * Cap debuff + current clamp: round(cap*(1-n/100)), then lowers current HP/SP to the new cap (shared by MAXHP/MAXSP).
- * 減益本體直接重用通用 downAttr（單一事實來源，不再與 downAttr 重複定義）。
- * The debuff body reuses the generic downAttr (SSoT; no longer a separate duplicate of downAttr).
+ * 減益本體直接重用通用 downAttr（不再與 downAttr 重複定義）。
+ * The debuff body reuses the generic downAttr (no longer a separate duplicate of downAttr).
  */
 const downCapClamp = (attr: EnumStatusAttr): IAttrFn => (c, n) =>
 {
@@ -372,7 +328,7 @@ const downCapClamp = (attr: EnumStatusAttr): IAttrFn => (c, n) =>
 };
 
 /**
- * 狀態屬性項目工廠（單一事實來源）/ Status attribute entry factory (single source of truth)
+ * 狀態屬性項目工廠 / Status attribute entry factory
  *
  * 欄位讀寫由 STATUS_FIELD[attr] 單一取得（get/set 只在 STATUS_FIELD 定義一次）；當 opts.plus
  * 為 true 時，內部以同一 attr 產生 plusAttr，杜絕 get/set lambda 重覆。up/down 缺省時由
@@ -397,7 +353,7 @@ function _makeAttr(
 }
 
 /**
- * 狀態屬性對照表（單一事實來源）/ Status attribute lookup table (single source of truth)
+ * 狀態屬性對照表 / Status attribute lookup table
  *
  * 鍵為 EnumStatusAttr；各屬性僅以 EnumStatusAttr 與演算法名稱描述，欄位槽位全部收斂至
  * STATUS_FIELD 單一定義（不再於 get/set 與演算法呼叫處重複書寫槽位）。DEF/MDEF 的 up/down
@@ -447,17 +403,6 @@ export const STATUS_ATTR_TABLE: Record<EnumStatusAttr, IStatusAttrEntry> = {
 };
 
 /**
- * 狀態操作鍵（單一事實來源）/ Status operation keys (single source of truth)
- * 由 EnumStatusPrefix + EnumStatusAttr 衍生；UPMAP / DOWNMAP / PLUSMAP 與 types.ts 的
- * ISkillUpFields / ISkillDownFields 共用，避免四處重寫 `Up${EnumStatusAttr}` 樣板字面。
- * Derived from EnumStatusPrefix + EnumStatusAttr; shared by UPMAP / DOWNMAP / PLUSMAP and types.ts's
- * ISkillUpFields / ISkillDownFields, so the `Up${EnumStatusAttr}` template literal is written once.
- */
-export type IStatusUpKey = `${EnumStatusPrefix.Up}${EnumStatusAttr}`;
-export type IStatusDownKey = `${EnumStatusPrefix.Down}${EnumStatusAttr}`;
-export type IStatusPlusKey = `${EnumStatusPrefix.Plus}${EnumStatusAttr}`;
-
-/**
  * Plus* 鍵陣列：只有「有登錄 plus 語意」的屬性（六維＋MAXHP/MAXSP）才存在，
  * 故先過濾屬性清單，再同樣由 _buildStatRecord 一併產生（型別 IStatusPlusKey[]）。
  * Plus* key array: only attributes with a registered plus semantics (six base + MAXHP/MAXSP) have it,
@@ -468,7 +413,7 @@ export const {
 } = _buildStatRecord(EnumStatusPrefix.Plus, STATUS_ATTR_KEYS.filter((k) => STATUS_ATTR_TABLE[k].plus !== undefined));
 
 /**
- * 由對照表衍生 Up* / Down* / Plus* 操作對照（單一事實來源衍生）/ Derived op maps
+ * 由對照表衍生 Up* / Down* / Plus* 操作對照 / Derived op maps
  *
  * 使用 STATUS_UP_KEY_NAME / STATUS_DOWN_KEY_NAME / STATUS_PLUS_KEY_NAME 靜態對照表
  * 取得鍵名，杜絕 'Up'+key 字串聯合；up/down 缺省時回退至通用 upAttr/downAttr；
@@ -521,7 +466,7 @@ export const { UPMAP, DOWNMAP, PLUSMAP } = buildStatusMaps();
 // ============================================================================
 
 /**
- * 基礎六維對照（單一事實來源）/ Primary stat mapping (single source of truth)
+ * 基礎六維對照 / Primary stat mapping
  * 小寫基礎欄位名 ↔ EnumStatusAttr 戰鬥欄位。PRIMARY_STATS 與 BASE_STAT_COMP_MAP 皆自此衍生，
  * 與 EnumStatusAttr 保持型別追溯，不再以獨立字串陣列重複列舉六維。
  * Lowercase base field name ↔ EnumStatusAttr battle field. PRIMARY_STATS and BASE_STAT_COMP_MAP
@@ -536,12 +481,6 @@ export const PRIMARY_STAT_MAP = {
 } as const;
 
 /**
- * 基礎六維型別 / Primary base stat type
- * 型別別名 / type alias（由 PRIMARY_STAT_MAP 衍生 / derived from PRIMARY_STAT_MAP）
- */
-export type IPrimaryStat = keyof typeof PRIMARY_STAT_MAP;
-
-/**
  * 基礎六維（建立/等級/戰鬥變數共用）/ Primary base stats (shared by factory, level-fix, battle-variable)
  * 由 PRIMARY_STAT_MAP 鍵衍生，與 EnumStatusAttr 保持型別追溯。
  * Derived from PRIMARY_STAT_MAP keys, type-traceable to EnumStatusAttr.
@@ -549,31 +488,20 @@ export type IPrimaryStat = keyof typeof PRIMARY_STAT_MAP;
 export const PRIMARY_STATS = Object.keys(PRIMARY_STAT_MAP) as IPrimaryStat[];
 
 /**
- * 補正欄位設定（單一事實來源）/ Compensation attribute config (single source of truth)
+ * 補正欄位設定 / Compensation attribute config
  * 每個補正前綴對應其套用的 EnumStatusAttr 清單；COMP_FIELDS 自此衍生。
  * Each comp prefix maps to the EnumStatusAttr list it applies to; COMP_FIELDS derives from this.
  * MAXHP/MAXSP 同時擁有 P_（定值）與 M_（百分比）兩種補正，故分別列入兩個清單。
  * MAXHP/MAXSP carry both P_ (flat) and M_ (percent) comps, hence appear in both lists.
  */
-const COMP_FLAT_ATTRS = [
+export const COMP_FLAT_ATTRS = [
 	EnumStatusAttr.STR, EnumStatusAttr.INT, EnumStatusAttr.DEX,
 	EnumStatusAttr.SPD, EnumStatusAttr.LUK, EnumStatusAttr.MAXHP, EnumStatusAttr.MAXSP,
 ] as const;
-const COMP_PERCENT_ATTRS = [EnumStatusAttr.MAXHP, EnumStatusAttr.MAXSP] as const;
+export const COMP_PERCENT_ATTRS = [EnumStatusAttr.MAXHP, EnumStatusAttr.MAXSP] as const;
 
 /**
- * 補正欄位型別（精確子集，非全 EnumStatusAttr）/ Compensation field type (exact subset, not the full EnumStatusAttr)
- * 由 COMP_FLAT_ATTRS / COMP_PERCENT_ATTRS 的實際成員衍生，故 ICompField 只包含實際出現的欄位
- * （不含 P_ATK / P_DEF 等不存在的組合）；前綴值來自 EnumCompPrefix。
- * Derived from the actual members of COMP_FLAT_ATTRS / COMP_PERCENT_ATTRS, so ICompField holds only
- * the real fields (no impossible combos like P_ATK / P_DEF); prefix values come from EnumCompPrefix.
- */
-export type ICompField =
-	| `${EnumCompPrefix.Flat}${typeof COMP_FLAT_ATTRS[number]}`
-	| `${EnumCompPrefix.Percent}${typeof COMP_PERCENT_ATTRS[number]}`;
-
-/**
- * 補正欄位（技能/道具共用，單一事實來源）/ Compensation fields (shared by passive & equip)
+ * 補正欄位（技能/道具共用）/ Compensation fields (shared by passive & equip)
  * 由 COMP_FLAT_ATTRS / COMP_PERCENT_ATTRS 與 EnumCompPrefix 衍生；P_* / M_* 屬性名稱直接引用 EnumStatusAttr，
  * 且 ICompField 精確對應實際出現的欄位。執行期值經 `as readonly ICompField[]` 收斂為精確子集型別
  * （字串 enum 在樣板字面中會加寬為 string，故於型別層級以精確聯集收斂）。
@@ -594,14 +522,6 @@ export const COMP_FIELDS = Object.freeze([
  * Derived from PRIMARY_STAT_MAP and EnumCompPrefix.Flat; comp uses a precise template-literal type
  * (not a widened string) to preserve type safety (battle: EnumStatusAttr; comp: `P_${EnumStatusAttr}`).
  */
-export interface IBaseStatComp
-{
-	/** 對應的戰鬥屬性（EnumStatusAttr）/ corresponding battle attribute (EnumStatusAttr) */
-	battle: EnumStatusAttr;
-	/** 補正欄位名（如 'P_STR'）/ compensation field name (e.g., 'P_STR') */
-	comp: `${EnumCompPrefix.Flat}${EnumStatusAttr}`;
-}
-
 export const BASE_STAT_COMP_MAP = Object.freeze(
 	Object.fromEntries(
 		(Object.keys(PRIMARY_STAT_MAP) as IPrimaryStat[]).map((s) => [

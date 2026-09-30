@@ -2,6 +2,9 @@
  * 遊戲常數集中定義 / Centralized game tuning constants
  * 數值來源：docs/log/battle/05-battle-details.md §1 與 docs/data/README.md
  * 所有數值與原始 PHP setting.dist.php 一致，便於後續 YAML 匯入對照。
+ *
+ * 列舉定義已移至 #/lib/types/battle-enum.ts；此處轉出以保留既有匯入路徑。
+ * The enums moved to #/lib/types/battle-enum.ts; re-exported here to keep legacy imports.
  */
 
 export const MAX_TIME = 1000;
@@ -56,54 +59,4 @@ export const SELLING_PRICE = 1 / 5;
  */
 export const MAGIC_CIRCLE_MAX = 5;
 
-/**
- * 陣營側別 / Battle team side
- * 使用數值枚舉取代字串字面量，徹底消除 TEAM_0='0' / TEAM_1='1' 設計。
- * Uses numeric enum instead of string literals.
- */
-export enum EnumTeamSide
-{
-	/** 陣營 0 / Team side 0 */
-	Team0 = 0,
-	/** 陣營 1 / Team side 1 */
-	Team1 = 1,
-}
-
-/**
- * 角色狀態列舉 / Character state enumeration
- */
-export enum EnumState
-{
-	/** 存活 / alive */
-	Alive = 0,
-	/** 死亡 / dead */
-	Dead = 1,
-	/** 中毒（CurePoison 判定所用狀態）/ poisoned (state checked by CurePoison) */
-	Poison = 2,
-	/** 二階中毒（目前無任何使用點）/ secondary poison (currently unused anywhere) */
-	Poison2 = 3,
-	/** 一般狀態（未中毒也未死亡）/ normal (neither poisoned nor dead) */
-	Normal = 4,
-}
-
-/**
- * 隊伍位置列舉 / Formation position enumeration
- */
-export enum EnumPosition
-{
-	/** 前衛（可守護後衛）/ front row (can guard the back row) */
-	Front = 'front',
-	/** 後衛（受前衛守護）/ back row (protected by front-row guard) */
-	Back = 'back',
-}
-
-/**
- * 預期行為列舉
- */
-export enum EnumExpect
-{
-	/** 蓄力預期 */
-	Charge = 'charge',
-	/** 詠唱預期 */
-	Cast = 'cast',
-}
+export { EnumTeamSide, EnumState, EnumPosition, EnumExpect } from '#/lib/types/battle-enum';
