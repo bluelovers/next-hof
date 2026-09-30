@@ -1,12 +1,11 @@
 /**
  * YAML 資源倉庫建置 / YAML-backed repository builder
- * 串接 yaml-load（讀取）→ yaml-convert（轉換）→ InMemoryRepository（註冊）。
- * Chains yaml-load (read) → yaml-convert (convert) → InMemoryRepository (register).
  *
- * 箱入 Skill/Item/Job/Char/Mon 五類（對應 IDataRepository 的 getter）；
- * Guard/Judge/Land/Skilltree/Union 為純資料層，僅提供 raw 讀取（未註冊）。
- * Seeds Skill/Item/Job/Char/Mon (matching the IDataRepository getters);
- * Guard/Judge/Land/Skilltree/Union are data-layer only and stay raw (not registered).
+ * 只把 Skill/Item/Job/Char/Mon 灌入 IDataRepository（對應其五個 getter）；
+ * Guard/Judge/Land/Skilltree/Union 沒有定義型別，維持 raw 讀取、不註冊。
+ * Only Skill / Item / Job / Char / Mon are seeded into IDataRepository (matching its five
+ * getters); Guard / Judge / Land / Skilltree / Union have no definition types and stay raw,
+ * unregistered.
  */
 
 import { InMemoryRepository, type IDataRepository } from './repository';
@@ -17,8 +16,8 @@ import {
 	loadAllItems,
 	loadAllJobs,
 	loadAllResourceYaml,
-	EnumResourceKind,
 } from './yaml-load';
+import { EnumResourceKind } from './yaml-resource-kind';
 import { convertCharYaml, convertMonYaml, convertSkillYaml, convertItemYaml, convertJobYaml } from './yaml-convert';
 import type { ICharDef } from '#/lib/types/char-types';
 import type { IItemDef } from '#/lib/types/item-types';
@@ -58,34 +57,38 @@ export function createYamlRepository(root: string): IYamlRepositoryResult
 	const mons = loadAllMons(root).map(convertMonYaml);
 
 	const repo = new InMemoryRepository();
-	for (const s of skills) repo.addSkill(s);
-	for (const i of items) repo.addItem(i);
-	for (const j of jobs) repo.addJob(j);
-	for (const c of chars) repo.addChar(c);
-	for (const m of mons) repo.addMon(m);
+	repo.addAll({ skills, items, jobs, chars, mons });
 
 	return { repo, skills, items, jobs, chars, mons };
 }
 
 /**
+ * 種類 → 已轉換定義的 id 取值器 / kind → id extractor over the converted defs
+ * 五類已定義轉換器，直接取用定義上的 `no`；其餘種類（Guard/Judge/Land/Skilltree/Union）
+ * 為純資料層、無轉換器，落回 `loadAllResourceIds` 從 raw 物件取 `no`。
+ * The five kinds with converters read `no` off the converted defs; the remaining data-layer
+ * kinds have no converter and fall back to `loadAllResourceIds`, which reads `no` off raw.
+ */
+const RESOURCE_ID_READERS: Partial<Record<EnumResourceKind, (root: string) => IResourceId[]>> = {
+	[EnumResourceKind.Char]: (root) => loadAllChars(root).map((r) => r.no),
+	[EnumResourceKind.Mon]: (root) => loadAllMons(root).map((r) => r.no),
+	[EnumResourceKind.Item]: (root) => loadAllItems(root).map((r) => r.no),
+	[EnumResourceKind.Job]: (root) => loadAllJobs(root).map((r) => r.no),
+	[EnumResourceKind.Skill]: (root) => loadAllSkills(root).map((r) => r.no),
+};
+
+/**
  * 依資源種類列出已存在的 id / List the existing ids of a kind
  * （檔案層級探勘用；不會讀取內容）/ lists the file-level ids (no content read)
  */
-export function listResourceIds(kind: EnumResourceKind, root: string): (IResourceId)[]
+export function listResourceIds(kind: EnumResourceKind, root: string): IResourceId[]
 {
-	switch (kind)
-	{
-		case EnumResourceKind.Char: return loadAllChars(root).map((r) => r.no);
-		case EnumResourceKind.Mon: return loadAllMons(root).map((r) => r.no);
-		case EnumResourceKind.Item: return loadAllItems(root).map((r) => r.no);
-		case EnumResourceKind.Job: return loadAllJobs(root).map((r) => r.no).filter((v): v is number => v !== undefined);
-		case EnumResourceKind.Skill: return loadAllSkills(root).map((r) => r.no);
-		default: return loadAllResourceIds(kind, root);
-	}
+	const read = RESOURCE_ID_READERS[kind];
+	return read ? read(root) : loadAllResourceIds(kind, root);
 }
 
 /** 讀取某種類全部 id（不轉換）/ load all ids of a kind (no conversion) */
-function loadAllResourceIds(kind: EnumResourceKind, root: string): (IResourceId)[]
+function loadAllResourceIds(kind: EnumResourceKind, root: string): IResourceId[]
 {
 	// 以 raw 物件上的 no 欄位取值（Guard/Land 等文字 id 亦統一為 no）
 	return (loadAllResourceYaml(kind, root) as Array<{ no?: IResourceId }>).map((r) => r.no).filter(

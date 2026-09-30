@@ -1,11 +1,4 @@
 /**
- * 技能相關 enum / Skill-related enums
- * 單一事實來源：目標選取、傷害影響能力、優先條件與傷害類型（atk 槽位索引）集中於本檔。
- * Single source of truth: target selection, influencing stat, priority condition and damage
- * type (the atk slot index) are grouped here.
- */
-
-/**
  * 技能目標類型 / Skill target type
  *
  *

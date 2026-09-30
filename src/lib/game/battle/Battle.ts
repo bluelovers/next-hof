@@ -27,7 +27,7 @@ import type { IBattleEvent, IBattleSnapshot } from '#/lib/types/battle-types';
 import {
 	EnumInfoText,
 	EnumBattleEventType,
-} from '#/lib/types/battle-enum';
+} from '#/lib/types/battle-event-enum';
 import {
 	EnumTargetType,
 	EnumTargetMethod,

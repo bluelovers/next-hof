@@ -19,7 +19,7 @@ import {
 import type { IStatusUpKey, IStatusDownKey, IStatusPlusKey } from '#/lib/types/status-attr-types';
 import type { IBattleEvent } from '#/lib/types/battle-types';
 import type { ISkillDef } from '#/lib/types/skill-types';
-import { EnumBattleEventType, EnumMoveText } from '#/lib/types/battle-enum';
+import { EnumBattleEventType, EnumMoveText } from '#/lib/types/battle-event-enum';
 import { EnumSkillDamageType } from '#/lib/types/skill-enum';
 import { EnumDamageVariant, computeBasicDamage } from './effect.core';
 import type { IDamageOption, IDamageSkillSource } from './effect.core';

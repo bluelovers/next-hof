@@ -73,7 +73,7 @@ import {
 	EnumMoveText,
 	EnumResource,
 	EnumValueWho,
-} from '#/lib/types/battle-enum';
+} from '#/lib/types/battle-event-enum';
 import { EnumSkillPriority } from '#/lib/types/skill-enum';
 import type { IDamageOption } from './effect.core';
 import type { ISkillResult } from './effect';

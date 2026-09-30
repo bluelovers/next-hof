@@ -13,16 +13,14 @@ import { EnumGuardKind } from '#/lib/types/battle-enum';
 import { EnumPosition } from '#/lib/types/battle-enum';
 import { TEST_FIXTURES_ROOT } from '#/yaml-paths';
 import { loadAllChars, loadAllMons, loadCharYaml, loadMonYaml } from './yaml-load';
+import { convertCharYaml, convertMonYaml } from './yaml-convert';
 import {
-	convertCharYaml,
-	convertMonYaml,
 	toNumber,
 	toOptionalNumber,
 	toNumberArray,
 	toNumberRecord,
-	convertEquipYaml,
-	convertBehaviorYaml,
-} from './yaml-convert';
+} from './yaml-numeric';
+import { convertEquipYaml, convertBehaviorYaml } from './yaml-convert-blocks';
 import type { IRawCharYaml, IRawMonYaml } from '#/lib/types/raw/yaml-types';
 
 /**

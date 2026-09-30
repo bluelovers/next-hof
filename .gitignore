@@ -12,3 +12,4 @@ debug-storybook.log
 .kiro
 .opencode
 storybook-static
+.*/

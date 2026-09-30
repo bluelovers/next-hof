@@ -1,9 +1,3 @@
-/**
- * 角色型別 / Character type definitions
- * AI 行為、特殊能力、已習得技能、擴充欄位與 ICharCore／ICharDef 集中於本檔。
- * AI behavior, special abilities, learned skills, extra fields and ICharCore / ICharDef live here.
- */
-
 import type { IAtkDefFields, IAtkTuple, ICombatStats, IEquipTable, INamedIconDef } from './base-types';
 import type { EnumGuardKind, EnumPosition } from './battle-enum';
 import type { ICorpsePolicyField } from '#/lib/game/battle/corpse-policy';
@@ -11,7 +5,6 @@ import type { IDataEx } from './data-ex-types';
 
 /**
  * 模式項目 / Pattern item
- * 介面 / interface
  *
  * AI 行為規則列：buildPattern() 組裝（逃跑／特殊前置 + 角色自身 + 預設收尾），
  * AI behavior rule row: assembled by buildPattern() (flee/special prelude + own rules + default tail),
@@ -37,7 +30,6 @@ export interface IPatternItem
 
 /**
  * 行為定義 / Behavior definition
- * 介面 / interface
  *
  * 角色／職業的 AI 行為設定（ICharDef.behavior 與 IJobDef.pattern 皆使用本型別）。
  * AI behavior settings for chars/jobs (used by both ICharDef.behavior and IJobDef.pattern).
@@ -54,7 +46,6 @@ export interface IBehavior
 
 /**
  * 特殊能力定義 / Special ability definition
- * 介面 / interface
  *
  * Character.SPECIAL 的結構；各欄位可經 getSpecial/addSpecial/setSpecial 以字串鍵存取
  * （數值鍵以數字累加，Pierce（IAtkTuple）逐槽累加）。
@@ -158,7 +149,6 @@ export interface ICharExtraFields
 
 /**
  * 戰鬥單位基礎定義（角色/怪物共用）/ Combatant base definition (shared by char & mon)
- * 介面 / interface
  *
  * 六維與 HP/SP 由 ICombatStats 提供、`atk`／`def` 由 IAtkDefFields、`skill` 由
  * ILearnedSkillsField、`behavior` 由 IBehaviorField、`SPECIAL` 由 ISpecialField 提供；
@@ -186,7 +176,6 @@ export interface ICharCore extends ICorpsePolicyField, ICombatStats, IAtkDefFiel
 
 /**
  * 角色定義 / Character definition
- * 介面 / interface
  */
 export interface ICharDef extends ICharCore, ICharExtraFields
 {

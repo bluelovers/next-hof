@@ -1,9 +1,3 @@
-/**
- * 擴充資料型別 / Extra-data (data_ex) type definitions
- * char／job／union 三種資源各自的 data_ex 切面與組合介面 IDataEx 集中於本檔。
- * The per-kind data_ex slices (char / job / union) and the aggregate IDataEx live here.
- */
-
 import type { IResourceId } from './seg-types';
 
 /**

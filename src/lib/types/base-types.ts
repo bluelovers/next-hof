@@ -1,12 +1,3 @@
-/**
- * 基底型別 / Base type definitions
- * hp / sp / str 等基礎數值、二元組／四元組、數值表與共用欄位塊集中於本檔（本檔唯一致
- * 提及「單一事實來源」之處）；上級定義（ISkillDef / ICharDef / IMonDef 等）分置於各域檔案。
- * Base values (hp / sp / str), tuples, number tables and shared field blocks are grouped in this
- * file (the only place in this file that mentions "single source of truth"); upper definitions
- * such as ISkillDef / ICharDef / IMonDef live in their own domain files.
- */
-
 import type { EnumEquipSlot } from './char-enum';
 import type { IResourceId } from './seg-types';
 

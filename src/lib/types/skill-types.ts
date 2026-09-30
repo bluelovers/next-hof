@@ -1,11 +1,3 @@
-/**
- * 技能型別 / Skill type definitions
- * 目標規格、補正／Up*／Down* 欄位與 ISkillSharedFields／ISkillDef 集中於本檔；
- * 魔方陣欄位見 skill-magic-circle-fields、Plus* 欄位見 skill-plus-fields。
- * Target spec, compensation / Up* / Down* fields and ISkillSharedFields / ISkillDef live here;
- * magic-circle fields are in skill-magic-circle-fields and Plus* fields in skill-plus-fields.
- */
-
 import type { INamedIconDef } from './base-types';
 import type { EnumPosition } from './battle-enum';
 import type { EnumWeaponType } from './item-enum';
@@ -22,7 +14,6 @@ import type { ICompField, IStatusDownKey, IStatusUpKey } from './status-attr-typ
 
 /**
  * 技能目標規格 / Skill target specification
- * 型別別名 / type alias
  *
  * 三元組 [目標類型, 選取方式, 數量]，直接對應 YAML skill.target 欄位；
  * Tuple [target type, selection method, count], mapping directly to the YAML skill.target field;
@@ -40,7 +31,6 @@ export type ITargetSpec = [
 
 /**
  * 補正欄位型別（P_* / M_*，由 COMP_FIELDS 衍生）/ Compensation bonus type
- * 型別別名 / type alias
  *
  * Partial 表示技能／道具只需宣告實際擁有的補正欄位；
  * Partial means skills/items only declare the compensation fields they actually have;
@@ -51,7 +41,6 @@ export type ICompBonuses = Partial<Record<ICompField, number>>;
 
 /**
  * 技能 Up* 臨時增益欄位 / Skill Up* temporary buff fields
- * 型別別名 / type alias
  *
  * 由 EnumStatusAttr 衍生（IStatusUpKey，共 11 鍵），鍵名對應 status-attrs.ts 的
  * STATUS_UP_KEY_NAME 與 UPMAP；新增狀態屬性時本型別自動跟隨，
@@ -67,7 +56,6 @@ export type ISkillUpFields = Partial<Record<IStatusUpKey, number>>;
 
 /**
  * 技能 Down* 臨時減益欄位 / Skill Down* temporary debuff fields
- * 型別別名 / type alias
  *
  * 由 EnumStatusAttr 衍生（IStatusDownKey，共 11 鍵），鍵名對應 status-attrs.ts 的
  * STATUS_DOWN_KEY_NAME 與 DOWNMAP（型別追溯）。
@@ -180,7 +168,6 @@ export interface ISkillSharedFields extends ISkillMagicCircleFields
 
 /**
  * 技能定義 / Skill definition
- * 介面 / interface
  *
  * 對應 YAML skill 資料結構；extends ICompBonuses 共用 P_* / M_* 補正欄位，
  * 並 extends ISkillUpFields／ISkillDownFields 衍生 Up* / Down* 能力變化欄位、

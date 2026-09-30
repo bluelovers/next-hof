@@ -1,10 +1,9 @@
 /**
  * 狀態屬性型別 / Status attribute types
- * 單一事實來源：Up* / Down* / Plus* 操作鍵、補正欄位與屬性項目型別集中於本檔。
+ *
  * 鍵名由 prefix-enum + status-enum 以樣板字面靜態衍生，呼叫處不再以字串聯合重寫。
- * Single source of truth: the Up* / Down* / Plus* operation keys, compensation fields and
- * attribute-entry types live here. Keys are derived as template literals from prefix-enum +
- * status-enum, so call sites never rebuild them via string concatenation.
+ * Keys are derived as template literals from prefix-enum + status-enum, so call sites never
+ * rebuild them via string concatenation.
  */
 
 import type { Character } from '#/lib/game/character/Character';
@@ -14,7 +13,6 @@ import type { EnumStatusAttr } from './status-enum';
 
 /**
  * 屬性函式 / Attribute function
- * 型別別名 / type alias
  *
  * 接收角色與數值 n（% 或點數，依公式而定），直接對角色套用變化。
  * Receives the character and a number n (% or flat, depending on the formula)
@@ -24,7 +22,6 @@ export type IAttrFn = (c: Character, n: number) => void;
 
 /**
  * 狀態屬性項目 / Status attribute entry
- * 介面 / interface
  */
 export interface IStatusAttrEntry
 {
@@ -70,7 +67,6 @@ export type IPrimaryStat = keyof typeof PRIMARY_STAT_MAP;
 
 /**
  * 基礎屬性 → 戰鬥屬性 + 補正欄位 對照 / Base stat to battle/compensation mapping
- * 介面 / interface
  */
 export interface IBaseStatComp
 {

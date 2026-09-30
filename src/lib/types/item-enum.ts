@@ -1,10 +1,4 @@
 /**
- * 道具／裝備 enum / Item & equipment enums
- * 單一事實來源：武器類型與道具類別細分集中於本檔。
- * Single source of truth: weapon types and item sub-categories are grouped here.
- */
-
-/**
  * 武器類型 / Weapon type
  *
  *

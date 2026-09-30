@@ -1,10 +1,4 @@
 /**
- * 角色相關 enum / Character-related enums
- * 單一事實來源：角色類型、裝備欄位與性別列舉集中於本檔。
- * Single source of truth: character type, equipment slot and gender enums are grouped here.
- */
-
-/**
  * 角色類型 / Character type
  *
  *

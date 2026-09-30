@@ -1,15 +1,5 @@
 /**
  * 技能魔方陣欄位 / Skill magic-circle fields
- * 魔方陣增減欄位（MagicCircleAdd / Delete / DeleteTeam / DeleteEnemy）；
- * raw（IRawSkillYaml）與 target（ISkillDef）兩層經 ISkillSharedFields 繼承同一組宣告。
- * Magic-circle add/remove fields (MagicCircleAdd / Delete / DeleteTeam / DeleteEnemy);
- * the raw (IRawSkillYaml) and target (ISkillDef) layers both inherit this one declaration
- * via ISkillSharedFields.
- */
-
-/**
- * 技能魔方陣欄位 / Skill magic-circle fields
- * 介面 / interface
  */
 export interface ISkillMagicCircleFields
 {

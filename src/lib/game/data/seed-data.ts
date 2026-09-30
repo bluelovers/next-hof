@@ -24,13 +24,12 @@ import {
 	EnumEquipSlot,
 	EnumGender,
 } from '#/lib/types/char-enum';
-import { EnumGuardKind } from '#/lib/types/battle-enum';
+import { EnumGuardKind, EnumPosition } from '#/lib/types/battle-enum';
 import type { ISkillDef } from '#/lib/types/skill-types';
 import type { IItemDef } from '#/lib/types/item-types';
 import type { IJobDef } from '#/lib/types/job-types';
 import type { ICharDef } from '#/lib/types/char-types';
 import type { IMonDef } from '#/lib/types/mon-types';
-import { EnumPosition } from '#/lib/types/battle-enum';
 import { EnumJudgeCode } from '../battle/judge-codes';
 import { InMemoryRepository, type IDataRepository } from './repository';
 
@@ -286,24 +285,22 @@ const mon1002: IMonDef = {
 	},
 };
 
+/**
+ * 職業／角色／怪物集合（registry 與 SEED 共用同一份陣列）
+ * Job / char / monster collections, shared by the repository builder and SEED so the
+ * roster is declared exactly once instead of being listed twice.
+ */
+const jobs: IJobDef[] = [job100, job200, job300];
+/** 可選角色集合（展示頁名冊，6 名）/ selectable chars (the showcase roster, 6) */
+const chars: ICharDef[] = [char100, char101, char102, char103, char104, char105];
+/** 怪物集合 / monster collection */
+const mons: IMonDef[] = [mon1000, mon1001, mon1002];
+
 /** 建立並填入範例資料的倉庫 / Build an in-memory repository seeded with sample data */
 export function createSeedRepository(): IDataRepository
 {
 	const repo = new InMemoryRepository();
-	repo.addJob(job100);
-	repo.addJob(job200);
-	repo.addJob(job300);
-	for (const s of skills) repo.addSkill(s);
-	for (const it of items) repo.addItem(it);
-	repo.addChar(char100);
-	repo.addChar(char101);
-	repo.addChar(char102);
-	repo.addChar(char103);
-	repo.addChar(char104);
-	repo.addChar(char105);
-	repo.addMon(mon1000);
-	repo.addMon(mon1001);
-	repo.addMon(mon1002);
+	repo.addAll({ jobs, skills, items, chars, mons });
 	return repo;
 }
 
@@ -318,7 +315,7 @@ export const SEED = {
 	char100, char101, char102, char103, char104, char105,
 	mon1000, mon1001, mon1002,
 	/** 可選角色集合（展示頁名冊）/ selectable chars (showcase roster) */
-	chars: [char100, char101, char102, char103, char104, char105] satisfies ICharDef[],
+	chars,
 	/** 怪物集合 / monster collection */
-	mons: [mon1000, mon1001, mon1002] satisfies IMonDef[],
+	mons,
 };

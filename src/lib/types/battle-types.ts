@@ -1,21 +1,14 @@
-/**
- * 戰鬥事件與快照型別 / Battle event & snapshot type definitions
- * 戰鬥事件、數值變化與戰場快照的結構化型別集中於本檔。
- * Structured types for battle events, value changes and battlefield snapshots live here.
- */
-
 import type { IStatsHpSpAll } from './base-types';
+import type { EnumTeamSide } from './battle-enum';
 import type {
 	EnumBattleEventType,
 	EnumResource,
-	EnumTeamSide,
 	EnumValueWho,
-} from './battle-enum';
+} from './battle-event-enum';
 import type { ICorpsePolicy, ICorpsePolicyField } from '#/lib/game/battle/corpse-policy';
 
 /**
  * 結構化數值變化 / Structured value change
- * 介面 / interface
  *
  * 單一單位／單一資源的前後值；`who` 決定「這段變化是誰的」（Drain 的雙方、Delay 的自身），
  * `unit` 決定資源維度（hp／sp／delay）。展示層將其組成 valueChange（單筆）或 valueChanges（多筆）。
@@ -41,7 +34,6 @@ export interface IBattleValueChange
 
 /**
  * 戰鬥事件 / Battle event
- * 介面 / interface
  */
 export interface IBattleEvent
 {

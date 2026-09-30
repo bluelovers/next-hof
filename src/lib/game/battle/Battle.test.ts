@@ -10,7 +10,7 @@ import { Battle } from './Battle';
 import { EnumCharType } from '#/lib/types/char-enum';
 import { EnumSkillDamageType, EnumTargetMethod, EnumTargetType } from '#/lib/types/skill-enum';
 import { EnumOutcome } from './BattleResult';
-import { EnumBattleEventType } from '#/lib/types/battle-enum';
+import { EnumBattleEventType } from '#/lib/types/battle-event-enum';
 
 const repo = createSeedRepository();
 

@@ -1,15 +1,8 @@
-/**
- * 怪物型別 / Monster type definitions
- * 獎勵、怪物附加欄位與 IMonDef 集中於本檔。
- * Rewards, monster extra fields and IMonDef live here.
- */
-
 import type { IDescInfo, IEncounterTable, INamedIconDef, INumberTable } from './base-types';
 import type { ICharCore } from './char-types';
 
 /**
  * 怪物/召喚/獨特怪物獎勵 / Monster / summon / union reward
- * 介面 / interface
  */
 export interface IMonReward
 {
@@ -66,7 +59,6 @@ export interface IMonExtraFieldsServant
 
 /**
  * 怪物定義 / Monster definition
- * 介面 / interface
  */
 export interface IMonDef extends ICharCore, IMonExtraFields, IMonExtraFieldsServant, INamedIconDef
 {

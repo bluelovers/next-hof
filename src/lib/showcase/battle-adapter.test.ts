@@ -5,7 +5,7 @@ import { EnumState } from '#/lib/types/battle-enum';
 import { RNG } from '#/lib/game/core/rng';
 import { createSeedRepository, SEED } from '#/lib/game/data/seed-data';
 import { newChar, newMon } from '#/lib/game/character/factory';
-import { EnumBattleEventType } from '#/lib/types/battle-enum';
+import { EnumBattleEventType } from '#/lib/types/battle-event-enum';
 import { EnumSkillDamageType } from '#/lib/types/skill-enum';
 import type { IBattleEvent } from '#/lib/types/battle-types';
 import type { ISkillDef } from '#/lib/types/skill-types';

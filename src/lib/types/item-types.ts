@@ -1,16 +1,9 @@
-/**
- * 道具型別 / Item type definitions
- * 武器／裝備道具定義 IItemDef 集中於本檔。
- * The weapon / equipment item definition IItemDef lives here.
- */
-
 import type { IAtkDefFields, IAtkTuple, INamedIconDef, INumberTable } from './base-types';
 import type { ICompBonuses } from './skill-types';
 import type { EnumItemCategory, EnumWeaponType } from './item-enum';
 
 /**
  * 道具定義 / Item definition
- * 介面 / interface
  */
 export interface IItemDef extends ICompBonuses, IAtkDefFields, INamedIconDef
 {

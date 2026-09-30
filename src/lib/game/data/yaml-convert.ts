@@ -1,242 +1,63 @@
 /**
  * YAML → 現有型別轉換器 / YAML → existing-type converters
- * 將 Resource/Char、Resource/Mon 的原始 YAML 轉為現有實作使用的 ICharDef / IMonDef。
- * Converts raw Char/Mon YAML into the ICharDef / IMonDef consumed by the existing implementation.
+ * 原始 YAML 進入現有型別系統的唯一入口：既有實作只消費轉換後的定義型別，
+ * 不直接接觸 YAML 欄位。
+ * The single entry point from raw YAML into the existing type system: the existing
+ * implementation consumes only converted definitions and never touches YAML fields directly.
  *
- * 數值字串／null／guard 筆誤／空物件等正規化於 yaml-load 讀取時完成，本層直接承接：
- * Numeric strings, nulls, guard typos and empty objects are normalized at load (yaml-load);
- * this layer consumes the clean values directly:
- * - `special`（小寫）／`SPECIAL` 合併，Undead: true → 1
+ * 數值字串／null／guard 筆誤／空物件等正規化已於讀取時完成（yaml-coerce），本層只承接乾淨值。
+ * Numeric strings, nulls, guard typos and empty objects are already resolved at read time
+ * (yaml-coerce), so this layer only ever sees clean values.
  */
 
 import {
-	EnumEquipSlot,
 	EnumGender,
 } from '#/lib/types/char-enum';
+import { EnumSkillDamageType } from '#/lib/types/skill-enum';
 import {
-	EnumInfluence,
-	EnumSkillDamageType,
-	EnumSkillPriority,
-	EnumTargetMethod,
-	EnumTargetType,
-} from '#/lib/types/skill-enum';
-import {
-	EnumItemCategory,
 	EnumWeaponType,
 } from '#/lib/types/item-enum';
 import {
 	IJobDefCore,
-	type IGenderOverride,
+	type IJobNamedIcon,
 	type IGrowthCoefficients,
 	type IJobDef,
 } from '#/lib/types/job-types';
-import {
-	type IAtkTuple,
-	type IDefTuple,
-	type IEncounterTable,
-	type IEquipTable,
-} from '#/lib/types/base-types';
-import {
-	type IBehavior,
-	type ICharCore,
-	type ICharDef,
-	type IPatternItem,
-	type ISpecial,
-} from '#/lib/types/char-types';
-import {
-	type ICompBonuses,
-	type ISkillDef,
-	type ITargetSpec,
-} from '#/lib/types/skill-types';
+import type { ISkillDef } from '#/lib/types/skill-types';
+import type { ICharDef } from '#/lib/types/char-types';
 import type { IItemDef } from '#/lib/types/item-types';
-import {
-	type IMonDef,
-	type IMonReward,
-} from '#/lib/types/mon-types';
-import { EnumPosition } from '#/lib/types/battle-enum';
-import { COMP_FIELDS } from '#/lib/game/character/status-attrs';
-import { SKILL_EXTRA_NUMERIC_KEYS } from './yaml-skill-keys';
+import type { IMonDef } from '#/lib/types/mon-types';
 import type {
 	IRawCharYaml,
-	IRawCombatCoreYaml,
 	IRawMonYaml,
 	IRawSkillYaml,
 } from '#/lib/types/raw/yaml-types';
-
-/**
- * 數值正規化 / Numeric coercion
- * 字串／數字／布林／null → number；無法解析時回 fallback（預設 0）。
- * Coerce string / number / boolean / null to number; NaN falls back (default 0).
- */
-export function toNumber(value: string | number | boolean | undefined, fallback = 0): number
-{
-	if (value === undefined || value === '') return fallback;
-	const n = Number(value);
-	return Number.isFinite(n) ? n : fallback;
-}
-
-/** 陣列數值正規化（字串陣列 → number 陣列）/ coerce a numeric array (strings → numbers) */
-export function toNumberArray(value: readonly (string | number)[] | undefined, fallback = 0): number[]
-{
-	if (!Array.isArray(value)) return [];
-	return value.map((v) => toNumber(v, fallback));
-}
-
-/** 可選數值正規化：無法解析或省略時回 undefined / optional numeric coercion (NaN/absent → undefined) */
-export function toOptionalNumber(value: string | number | undefined): number | undefined
-{
-	if (value === undefined || value === '') return undefined;
-	const n = Number(value);
-	return Number.isFinite(n) ? n : undefined;
-}
-
-/**
- * 字串鍵紀錄 → number 鍵紀錄 / string-keyed record → number-keyed record
- * 用於 reward.itemtable（{ '6000': '1000' } → { 6000: 1000 }）。
- * Used for reward.itemtable ({ '6000': '1000' } → { 6000: 1000 }).
- */
-export function toNumberRecord(
-	value: Record<string, string | number> | undefined,
-): Record<number, number>
-{
-	const out: Record<number, number> = {};
-	if (!value) return out;
-	for (const [k, v] of Object.entries(value))
-	{
-		const key = Number(k);
-		const num = toNumber(v);
-		if (Number.isFinite(key)) out[key] = num;
-	}
-	return out;
-}
-
-/**
- * position 字串 → EnumPosition / position string → EnumPosition
- * 未提供或無法辨識時回 undefined（開戰時 setBattleVariable 隨機決定）。
- * Returns undefined when absent/unknown (setBattleVariable randomizes at battle start anyway).
- */
-export function convertPosition(value: string | undefined): EnumPosition | undefined
-{
-	if (value === EnumPosition.Front || value === EnumPosition.Back) return value as EnumPosition;
-	return undefined;
-}
-
-/**
- * 行為規則列轉換 / Convert one pattern row
- * quantity 的 null 已於載入收斂為 0、缺省保持 undefined；judge／action 缺省時略過該列。
- * null quantity is normalized to 0 at load and omission stays undefined;
- * rows with a missing judge/action are dropped.
- */
-export function convertPatternItem(raw: IPatternItem | undefined): IPatternItem | undefined
-{
-	if (!raw) return undefined;
-	const judge = raw.judge ?? Number.NaN;
-	const action = raw.action ?? Number.NaN;
-	if (!Number.isFinite(judge) || !Number.isFinite(action)) return undefined;
-	return { judge, quantity: raw.quantity, action };
-}
-
-/**
- * 行為定義轉換 / Convert a raw behavior block
- * 空物件（pattern: { }）→ undefined（引擎會以預設收尾補普攻）。
- * Empty block (pattern: { }) → undefined (the engine's default tail supplies the basic attack).
- */
-export function convertBehaviorYaml(raw: IBehavior | undefined): IBehavior | undefined
-{
-	if (!raw) return undefined;
-	const behavior: IBehavior = {};
-
-	const position = convertPosition(raw.position);
-	if (position !== undefined) behavior.position = position;
-
-	/**
-	 * 前排守護條件（已由載入正規化為 EnumGuardKind；來源筆誤 pro50/prpb50 已修正）
-	 * guard condition (already normalized to EnumGuardKind at load; typos fixed)
-	 */
-	if (raw.guard !== undefined) behavior.guard = raw.guard;
-
-	const pattern = Array.isArray(raw.pattern)
-		? raw.pattern.map(convertPatternItem).filter((p): p is IPatternItem => p !== undefined)
-		: undefined;
-	if (pattern && pattern.length > 0) behavior.pattern = pattern;
-
-	return Object.keys(behavior).length > 0 ? behavior : undefined;
-}
-
-/**
- * 獎勵轉換 / Convert a raw reward block
- * raw reward 即 IMonReward（單一事實來源）——僅處理「空物件 → undefined」。
- * The raw reward IS IMonReward (SSOT); this only maps an empty object to undefined.
- */
-export function convertRewardYaml(raw: IMonReward | undefined): IMonReward | undefined
-{
-	if (!raw || Object.keys(raw).length === 0) return undefined;
-	const reward: IMonReward = { ...raw };
-	/** 空掉落表 = 無掉落，移除 itemtable 鍵 */
-	if (raw.itemtable && Object.keys(raw.itemtable).length === 0)
-	{
-		delete reward.itemtable;
-	}
-	return reward;
-}
-
-/**
- * 裝備欄位轉換 / Convert a raw equip block
- * main_hand/off_hand/armor → EnumEquipSlot 鍵；未知欄位忽略。
- * main_hand/off_hand/armor → EnumEquipSlot keys; unknown keys are ignored.
- */
-export function convertEquipYaml(raw: IEquipTable | undefined): ICharDef['equip']
-{
-	if (!raw) return undefined;
-	const out: NonNullable<ICharDef['equip']> = {};
-	const slotValues = Object.values(EnumEquipSlot) as string[];
-	for (const [slot, itemNo] of Object.entries(raw))
-	{
-		if (!slotValues.includes(slot)) continue;
-		out[slot as EnumEquipSlot] = itemNo;
-	}
-	return Object.keys(out).length > 0 ? out : undefined;
-}
-
-/**
- * SPECIAL 轉換 / Convert a raw SPECIAL block
- *
- * 只讀大寫 `SPECIAL`（小寫 `special` 為來源錯字，不處理）。值已於載入收斂為 ISpecial 形狀
- * （boolean → 1/0、Pierce 為 [n, n]）。
- * Only the uppercase `SPECIAL` is read (the lowercase `special` is a source typo and ignored).
- * Values are already ISpecial-shaped (booleans → 1/0, Pierce as [n, n]) from load-time normalization.
- */
-export function convertSpecialYaml(raw: IRawMonYaml): Partial<ISpecial> | undefined
-{
-	const merged: Partial<ISpecial> = { ...(raw as any).special, ...raw.SPECIAL };
-	return Object.keys(merged).length > 0 ? merged : undefined;
-}
-
-/**
- * 核心欄位轉換 / Shared conversion of the combat-core fields
- * 角色與怪物共用的 no/name/六維/HP/SP（單一事實來源：ICombatStats）。
- * Single source of truth for the fields shared by chars and mons (ICombatStats).
- *
- * 缺省數值**不補 0**——保持 undefined，由實例化（Character 建構）解析。
- * Missing stats stay undefined here (no 0 invention); instantiation resolves them.
- */
-function convertCombatCoreYaml(raw: IRawCombatCoreYaml): ICharCore
-{
-	return {
-		no: raw.no,
-		name: raw.name,
-		level: raw.level,
-		maxhp: raw.maxhp,
-		hp: raw.hp,
-		maxsp: raw.maxsp,
-		sp: raw.sp,
-		str: raw.str,
-		int: raw.int,
-		dex: raw.dex,
-		spd: raw.spd,
-		luk: raw.luk,
-	};
-}
+import { SKILL_EXTRA_NUMERIC_KEYS } from './yaml-skill-keys';
+import { COMP_FIELDS } from '#/lib/game/character/status-attrs';
+import { toNumberRecord } from './yaml-numeric';
+import {
+	INF_LOOKUP,
+	ITEM_TYPE2_ALIASES,
+	ITEM_TYPE_ALIASES,
+	JOB_GENDER_ALIASES,
+	SKILL_PRIORITY_LOOKUP,
+	WEAPON_TYPE_LOOKUP,
+} from './yaml-lookup';
+import {
+	convertBehaviorYaml,
+	convertBonuses,
+	convertCharge,
+	convertCombatCoreYaml,
+	convertEquipYaml,
+	convertLimit,
+	convertPosition,
+	convertRewardYaml,
+	convertServantYaml,
+	convertSpecialYaml,
+	convertTarget,
+	copyNumericKeys,
+	emptyToUndefined,
+} from './yaml-convert-blocks';
 
 /**
  * 角色轉換 / Convert a raw char YAML into ICharDef
@@ -277,150 +98,6 @@ export function convertMonYaml(raw: IRawMonYaml): IMonDef
 	};
 }
 
-/** 隨行雜魚表轉換 / Convert the raw servant table (IEncounterTable) */
-function convertServantYaml(
-	raw: IRawMonYaml['servant'],
-): IEncounterTable | undefined
-{
-	if (!raw) return undefined;
-	const out: IEncounterTable = {};
-	for (const [k, pair] of Object.entries(raw))
-	{
-		const key = Number(k);
-		if (Number.isFinite(key)) out[key] = pair;
-	}
-	return Object.keys(out).length > 0 ? out : undefined;
-}
-
-/* ------------------------------------------------------------------ */
-/* Item / Job / Skill 轉換 / Item, Job, Skill converters              */
-/* ------------------------------------------------------------------ */
-
-/**
- * enum 值 → 自我對照表 / Build a value-to-value lookup from an enum
- * 以列舉成員值為單一事實來源（新增成員自動涵蓋）。
- * Built from the enum member values (a new member auto-covers itself).
- */
-function enumValueLookup<T extends string>(values: readonly T[]): Record<string, T>
-{
-	return Object.fromEntries(values.map((v) => [v, v])) as Record<string, T>;
-}
-
-/** 武器型別對照（EnumWeaponType 成員值）/ weapon-type lookup from EnumWeaponType */
-const WEAPON_TYPE_LOOKUP: Record<string, EnumWeaponType> = enumValueLookup(Object.values(EnumWeaponType));
-
-/** 技能優先條件對照 / skill-priority lookup from EnumSkillPriority */
-const SKILL_PRIORITY_LOOKUP: Record<string, EnumSkillPriority> = enumValueLookup(Object.values(EnumSkillPriority));
-
-/** 傷害參照能力對照 / influencing-stat lookup from EnumInfluence */
-const INF_LOOKUP: Record<string, EnumInfluence> = enumValueLookup(Object.values(EnumInfluence));
-
-/**
- * item type 對照 / item-type lookup
- * Key/Map/Special 無對應 EnumWeaponType 成員 → 收斂為 Other（保留道具本體資料）。
- * Key/Map/Special have no EnumWeaponType member, so they collapse to Other (the item body is kept).
- */
-const ITEM_TYPE_ALIASES: Record<string, EnumWeaponType> = enumValueLookup(Object.values(EnumWeaponType));
-ITEM_TYPE_ALIASES.Key = EnumWeaponType.Other;
-ITEM_TYPE_ALIASES.Map = EnumWeaponType.Other;
-ITEM_TYPE_ALIASES.Special = EnumWeaponType.Other;
-
-/**
- * item type2 對照 / item type2 lookup
- * GUARD（防具類別）無對應 EnumItemCategory 成員 → 映射至 Armor。
- * GUARD (defensive equipment) has no member, so it maps to Armor.
- */
-const ITEM_TYPE2_ALIASES: Record<string, EnumItemCategory> = enumValueLookup(Object.values(EnumItemCategory));
-ITEM_TYPE2_ALIASES.GUARD = EnumItemCategory.Armor;
-
-/**
- * job gender 鍵對照 / job gender-key lookup
- * 原始檔鍵 1=男、2=女；EnumGender.Male=0、Female=1。
- * Source keys are 1 = male, 2 = female; EnumGender.Male = 0, Female = 1.
- */
-const JOB_GENDER_ALIASES: Record<string, EnumGender> = {
-	'1': EnumGender.Male,
-	'2': EnumGender.Female,
-};
-
-/**
- * 目標規格轉換 / Convert a raw [type, method, count] spec into ITargetSpec
- * raw 三元組的形狀由本類別的來源定案：前兩格為目標／選取方式字串、末格經載入收斂為 number。
- * The raw 3-tuple's shape is fixed by this class's source: the first two entries are
- * target/method strings, the last one is a number after load-time coercion.
- */
-export function convertTarget(
-	raw: [type: string, method: string, count: number] | undefined,
-): ITargetSpec | undefined
-{
-	if (!Array.isArray(raw) || raw.length < 3) return undefined;
-	const type = String(raw[0]);
-	const method = String(raw[1]);
-	if (!(Object.values(EnumTargetType) as string[]).includes(type)) return undefined;
-	if (!(Object.values(EnumTargetMethod) as string[]).includes(method)) return undefined;
-	return [type as EnumTargetType, method as EnumTargetMethod, toNumber(raw[2])];
-}
-
-/** 詠唱/蓄力轉換（[a] 或 [a, b] → [a, b ?? 0]）/ Convert a raw charge into the [cast, stiff] tuple */
-export function convertCharge(raw: number[] | undefined): [cast: number, stiff: number] | undefined
-{
-	if (!Array.isArray(raw) || raw.length < 1) return undefined;
-	return [toNumber(raw[0]), toNumber(raw[1], 0)];
-}
-
-/** 召喚轉換（單一編號或編號陣列）/ Convert a raw summon (single number or array) into number | number[] */
-export function convertSummon(
-	raw: number | number[] | undefined,
-): number | number[] | undefined
-{
-	if (raw === undefined) return undefined;
-	if (Array.isArray(raw)) return toNumberArray(raw);
-	return toOptionalNumber(raw);
-}
-
-/**
- * 武器限制轉換 / Convert a raw weapon-limit object into Partial<Record<EnumWeaponType, boolean>>
- * 來源值全為布林（`Whip: true`），不是資源編號，故 raw 形狀為 `Record<string, boolean>`。
- * Source values are all booleans (`Whip: true`), never resource ids, so the raw shape is
- * `Record<string, boolean>`.
- */
-export function convertLimit(
-	raw: Record<string, boolean> | undefined,
-): Partial<Record<EnumWeaponType, boolean>> | undefined
-{
-	if (!raw) return undefined;
-	const out: Partial<Record<EnumWeaponType, boolean>> = {};
-	for (const [k, v] of Object.entries(raw))
-	{
-		if (!(k in WEAPON_TYPE_LOOKUP)) continue;
-		out[k as EnumWeaponType] = v;
-	}
-	return Object.keys(out).length > 0 ? out : undefined;
-}
-
-/** 補正欄位鍵（ICompBonuses 9 鍵，單一事實來源：COMP_FIELDS）/ the 9 compensation keys (SSOT: COMP_FIELDS) */
-const BONUS_KEYS = COMP_FIELDS;
-
-/**
- * 補正欄位複製 / Copy the 9 compensation keys from a raw record
- * 補正欄位在載入時已收斂為 number（Item／Skill 的 COERCE_SPECS 含 COMP_BONUS_FIELDS），
- * 故參數形狀就是 `ICompBonuses`——不再是鬆散的 `string | number` 錄型別，
- * 呼叫端也無需 `as unknown as` 轉型。
- * Raw compensation fields are numbers after load (the Item/Skill COERCE_SPECS include
- * COMP_BONUS_FIELDS), so the parameter shape is `ICompBonuses` itself — no loose
- * `string | number` record and no `as unknown as` cast at the call sites.
- */
-export function convertBonuses(raw: ICompBonuses): ICompBonuses
-{
-	const out: ICompBonuses = {};
-	for (const k of BONUS_KEYS)
-	{
-		const v = raw[k];
-		if (v !== undefined) out[k] = toNumber(v);
-	}
-	return out;
-}
-
 /**
  * 道具轉換 / Convert a raw item YAML into IItemDef
  */
@@ -456,7 +133,7 @@ export function convertJobYaml(raw: IJobDefCore): IJobDef
 {
 	const coe: IGrowthCoefficients = { ...raw.coe };
 
-	const gender: Record<EnumGender, IGenderOverride> = {} as any;
+	const gender: Partial<Record<EnumGender, IJobNamedIcon>> = {};
 	for (const [k, v] of Object.entries(raw.gender ?? {}))
 	{
 		const g = JOB_GENDER_ALIASES[k];
@@ -465,14 +142,15 @@ export function convertJobYaml(raw: IJobDefCore): IJobDef
 	}
 
 	return {
+		/** 來源檔案漏寫 `no` 時以 0 兜底，確保倉庫鍵恆為 number（IJobDef.no） */
 		no: raw.no ?? 0,
 		job_name: raw.job_name,
 		equip: raw.equip
 			?.map((e) => WEAPON_TYPE_LOOKUP[String(e)])
 			.filter((v): v is EnumWeaponType => v !== undefined),
-		coe: Object.keys(coe).length > 0 ? coe : undefined,
+		coe: emptyToUndefined(coe),
 		img: raw.img,
-		gender: Object.keys(gender).length > 0 ? gender : undefined,
+		gender: emptyToUndefined(gender),
 		info: raw.info && typeof raw.info.desc === 'string' ? { desc: raw.info.desc } : undefined,
 	};
 }
@@ -526,18 +204,17 @@ export function convertSkillYaml(raw: IRawSkillYaml): ISkillDef
 	};
 
 	/**
-	 * Plus*／Up*／Down* 29 鍵：raw 端 IRawSkillExtraNumerics 已定型為 `number`（載入時收斂），
-	 * 直接取用即可，無需鬆散錄型別（`string | number | boolean`）轉型。
-	 * The 29 Plus* / Up* / Down* keys: raw's IRawSkillExtraNumerics is already typed `number`
-	 * (coerced at load), so they are read directly — no loose-record cast.
+	 * Plus*／Up*／Down* 29 鍵與補正 P_* / M_* 9 鍵：兩端同為 `Partial<Record<K, number>>`（raw 端
+	 * 已於載入收斂為 number），逐鍵搬移、略過未定義者，**完全不需斷言**。
+	 * 取代原先的 `(skill as unknown as Record<string, number>)[k] = v` 與 `Object.assign`。
+	 * The 29 Plus*／Up*／Down* keys and the 9 P_* / M_* comps: both ends are
+	 * `Partial<Record<K, number>>` (raw is already numbers after load), so they are copied key
+	 * by key with absent keys skipped — **no assertion at all**. This replaces the former
+	 * `(skill as unknown as Record<string, number>)[k] = v` loop and the `Object.assign`.
 	 */
-	for (const k of SKILL_EXTRA_NUMERIC_KEYS)
-	{
-		const v = raw[k];
-		if (v !== undefined) (skill as unknown as Record<string, number>)[k] = v;
-	}
+	copyNumericKeys(skill, raw, SKILL_EXTRA_NUMERIC_KEYS);
+	copyNumericKeys(skill, raw, COMP_FIELDS);
 
-	Object.assign(skill, convertBonuses(raw));
 	if (raw.p_maxhp !== undefined) skill.P_MAXHP = raw.p_maxhp;
 
 	return skill;

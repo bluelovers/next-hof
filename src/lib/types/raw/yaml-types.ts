@@ -2,8 +2,6 @@
  * 原始 YAML 資源型別 / Raw YAML resource types
  * 對應 HOF Resource 下各資源目錄的 `*.yml` 結構。
  * Mirrors the `*.yml` files under the HOF Resource directories.
- * 本檔（src/lib/types/raw）收集「yaml 讀取層」的原始型別，與上層定義型別分開放置。
- * This directory collects the raw yaml-reading-layer types, kept apart from the upper definitions.
  *
  * **數值正規化 / Numeric normalization：**
  * 由 yaml-load 在讀取後統一將「數值字串」收斂為 number（`'1'` → 1），
@@ -29,6 +27,7 @@ import type {
 	IBehaviorField,
 	ICharExtraFields,
 	ILearnedSkillsField,
+	ISpecial,
 	ISpecialField,
 } from '#/lib/types/char-types';
 import type { IDataEx } from '#/lib/types/data-ex-types';
@@ -83,6 +82,16 @@ export interface IRawCharYaml extends IRawCombatCoreYaml, ICharExtraFields, ILea
  */
 export interface IRawMonYaml extends IRawCombatCoreYaml, IAtkDefFields, IMonExtraFields, IMonExtraFieldsServant, ISpecialField, INamedIconDef
 {
+	/**
+	 * 來源錯字的小寫 `special` / the source-typo lowercase `special`
+	 * 僅 mon.1000 出現且恆為空物件 `{ }`——正規鍵只有大寫 `SPECIAL`。
+	 * 明確宣告此錯字鍵，讓 convertSpecialYaml 得以零 cast 讀出並與 `SPECIAL` 合併；
+	 * 除該轉換器外請勿新增使用點。
+	 * Appears only in mon.1000 and is always the empty object `{ }`; the canonical key is
+	 * uppercase `SPECIAL`. Declaring the typo key explicitly lets convertSpecialYaml read it
+	 * and merge it with `SPECIAL` without a cast — no new consumers beyond that converter.
+	 */
+	special?: Partial<ISpecial>;
 }
 
 /**

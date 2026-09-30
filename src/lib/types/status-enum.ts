@@ -1,6 +1,5 @@
 /**
  * 狀態屬性 enum / Status attribute enums
- * 單一事實來源：EnumStatusAttr / EnumVital / EnumDefSlot 集中於本檔。
  *
  * 獨立於實作模組 #/lib/game/character/status-attrs 之外，避免 value 層級的循環依賴：
  * status-attrs 在模組求值時便需要本 enum 作為對照表鍵型別（STATUS_ATTR_KEYS /

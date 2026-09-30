@@ -90,7 +90,8 @@ import {
 	EnumLogCopy,
 	getEnterBattlefieldText,
 } from '#/components/battle/battleUtils';
-import { EnumPosition, EnumValueWho } from '#/lib/types/battle-enum';
+import { EnumPosition } from '#/lib/types/battle-enum';
+import { EnumValueWho } from '#/lib/types/battle-event-enum';
 import { EnumStatusAttr } from '#/lib/types/status-enum';
 import { computeTeamHpStats, type ITeamHpUnit } from '#/lib/showcase/battle-adapter';
 

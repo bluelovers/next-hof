@@ -15,8 +15,6 @@ import {
 	EnumTargetMethod,
 	EnumTargetType,
 } from '#/lib/types/skill-enum';
-import type { IItemDef } from '#/lib/types/item-types';
-import type { IJobDefCore } from '#/lib/types/job-types';
 import { TEST_FIXTURES_ROOT } from '#/yaml-paths';
 import {
 	loadGuardYaml,
@@ -29,7 +27,6 @@ import {
 	loadAllUnions,
 } from './yaml-load';
 import { convertItemYaml, convertJobYaml, convertSkillYaml } from './yaml-convert';
-import type { IRawSkillYaml } from '#/lib/types/raw/yaml-types';
 
 /** 載入 fixture 的通用 helper（缺檔拋出具體路徑）/ shared fixture loader (throws with the missing path) */
 function mustLoad<T>(load: () => T | undefined, file: string): T

@@ -1,12 +1,5 @@
 /**
  * 技能 Plus* 永久加算欄位 / Skill Plus* permanent flat-bonus fields
- * PlusSTR…PlusMAXSP 欄位組（六維＋MAXHP/MAXSP）。
- * The PlusSTR…PlusMAXSP field group (six base stats + MAXHP/MAXSP).
- */
-
-/**
- * 技能 Plus* 永久加算欄位 / Skill Plus* permanent flat-bonus fields
- * 介面 / interface
  *
  * 永久加算 Plus*（無 %）：作用於目標（對齊原始 StatusChanges 全部作用在 $target），僅 PLUSMAP
  * 已註冊屬性生效。statusChanges 依鍵名前綴分派至 UPMAP/DOWNMAP/PLUSMAP，本組欄位承載 PLUSMAP 分支。

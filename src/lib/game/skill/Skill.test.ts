@@ -7,7 +7,7 @@ import { InMemoryRepository } from '../data/repository';
 import { getSkill } from './Skill';
 import { skillPassive } from './passive';
 import { calcBasicDamage, calcRecoveryValue, applySkill } from './effect';
-import { EnumBattleEventType } from '#/lib/types/battle-enum';
+import { EnumBattleEventType } from '#/lib/types/battle-event-enum';
 import { EnumCharType } from '#/lib/types/char-enum';
 import {
 	EnumTargetType,

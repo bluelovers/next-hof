@@ -8,7 +8,7 @@
  * effect detection, dispatch and follow-ups are all decided by the upper event engine
  * (runEventEngine) — the fixture derives none of them by hand.
  *
- * 紀錄內容對齊生產點契約（見 #/lib/types/battle-enum 的 EnumBattleEventType）：
+ * 紀錄內容對齊生產點契約（見 #/lib/types/battle-event-enum 的 EnumBattleEventType）：
  * - Act → Battle.UseSkill（同一筆技能執行的起點）
  * - Damage / Heal → skill/effect 的 applySkill（帶 skill、value、hpBefore/hpAfter）
  * - Debuff / Poison（施毒）→ skill/effect 的 statusChanges（帶 skill）
@@ -18,7 +18,7 @@
  * - Death → Battle.UseSkill（不帶 skill → 一般事件）
  * - SpDamage / SpHeal / Drain / Revive / Move / Delay / Quick / CastShort / BarrierGain /
  *   PoisonResist / Regen / StatChange / EnergyExchange → skill/effect 的 SkillEffect（13 種新事件）
- * Records follow the producer contracts (see EnumBattleEventType in #/lib/types/battle-enum):
+ * Records follow the producer contracts (see EnumBattleEventType in #/lib/types/battle-event-enum):
  * Act → Battle.UseSkill (start of one skill execution); Damage / Heal → applySkill (skill,
  * value, hpBefore / hpAfter); Debuff / poison-apply → statusChanges (skill); MagicCircle →
  * Battle.UseSkill (skill only; the display derives the amount from the definition); Summon →
@@ -42,7 +42,7 @@ import {
 	EnumMoveText,
 	EnumResource,
 	EnumValueWho,
-} from '#/lib/types/battle-enum';
+} from '#/lib/types/battle-event-enum';
 import {
 	EnumSkillDamageType,
 	EnumTargetMethod,

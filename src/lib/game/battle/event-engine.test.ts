@@ -7,7 +7,7 @@ import {
 	detectSkillEffects,
 	runEventEngine,
 } from './event-engine';
-import { EnumBattleEventType } from '#/lib/types/battle-enum';
+import { EnumBattleEventType } from '#/lib/types/battle-event-enum';
 import { EnumSkillDamageType, EnumTargetMethod, EnumTargetType } from '#/lib/types/skill-enum';
 import type { IBattleEvent } from '#/lib/types/battle-types';
 import type { ISkillDef } from '#/lib/types/skill-types';

@@ -1,10 +1,9 @@
 /**
  * 前綴 enum / Prefix enums
- * 單一事實來源：Up / Down / Plus 狀態操作前綴與 P_ / M_ 補正前綴集中於本檔，
+ *
  * 衍生鍵名時一律引用此處 enum，不在呼叫處拼接裸字串。
- * Single source of truth: the Up / Down / Plus operation prefixes and the P_ / M_
- * compensation prefixes live here; key names are derived from these enums, never
- * assembled from bare strings at call sites.
+ * Key names are always derived from these enums, never assembled from bare strings at call
+ * sites.
  */
 
 /**
