@@ -45,6 +45,14 @@ import {
 	type IUnitRef,
 } from './battle-adapter';
 
+/**
+ * 事件型別 → 顯示動作型別 對照案例 / Event type → display action type mapping case
+ *
+ * 索引 0＝引擎事件型別、索引 1＝該事件應對應的顯示動作型別。
+ * Index 0 = engine event type, index 1 = the display action type it must map to.
+ */
+type IEventActionCase = [event: EnumBattleEventType, action: EnumActionType];
+
 // ==================== 3.1 固定種子跑完整場 ====================
 /**
  * Task 3.1: run a complete battle with a fixed seed
@@ -252,7 +260,7 @@ describe('3.3 mapBattleEvent', () =>
 
 	it('every engine event type maps to a dedicated action type', () =>
 	{
-		const cases: Array<[EnumBattleEventType, EnumActionType]> = [
+		const cases: IEventActionCase[] = [
 			[EnumBattleEventType.Act, EnumActionType.Skill],
 			[EnumBattleEventType.Cast, EnumActionType.Casting],
 			[EnumBattleEventType.Charge, EnumActionType.Casting],

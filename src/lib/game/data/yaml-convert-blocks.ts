@@ -23,6 +23,7 @@ import {
 	type ISpecial,
 } from '#/lib/types/char-types';
 import {
+	type IChargeTuple,
 	type ICompBonuses,
 	type ITargetSpec,
 } from '#/lib/types/skill-types';
@@ -30,6 +31,7 @@ import type { IMonReward } from '#/lib/types/mon-types';
 import type {
 	IRawCombatCoreYaml,
 	IRawMonYaml,
+	IRawTargetSpec,
 } from '#/lib/types/raw/yaml-types';
 import { COMP_FIELDS } from '#/lib/game/character/status-attrs';
 import { toNumber } from './yaml-numeric';
@@ -210,9 +212,7 @@ export function convertServantYaml(
  * 目標規格轉換 / Convert a raw [type, method, count] spec into ITargetSpec
  * raw 三元組的形狀由本類別的來源定案：前兩格為目標／選取方式字串、末格經載入收斂為 number。
  */
-export function convertTarget(
-	raw: [type: string, method: string, count: number] | undefined,
-): ITargetSpec | undefined
+export function convertTarget(raw: IRawTargetSpec | undefined): ITargetSpec | undefined
 {
 	if (!Array.isArray(raw) || raw.length < 3) return undefined;
 	const type = String(raw[0]);
@@ -222,8 +222,8 @@ export function convertTarget(
 	return [type, method, toNumber(raw[2])];
 }
 
-/** 詠唱/蓄力轉換（[a] 或 [a, b] → [a, b ?? 0]）/ Convert a raw charge into the [cast, stiff] tuple */
-export function convertCharge(raw: number[] | undefined): [cast: number, stiff: number] | undefined
+/** 詠唱/蓄力轉換（[a] 或 [a, b] → [a, b ?? 0]）/ Convert a raw charge into the charge tuple */
+export function convertCharge(raw: number[] | undefined): IChargeTuple | undefined
 {
 	if (!Array.isArray(raw) || raw.length < 1) return undefined;
 	return [toNumber(raw[0]), toNumber(raw[1], 0)];

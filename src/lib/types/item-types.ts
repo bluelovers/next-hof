@@ -28,3 +28,14 @@ export interface IItemDef extends ICompBonuses, IAtkDefFields, INamedIconDef
 	/** 附加的貫穿效果值（P_PIERCE = [物理, 魔法]）/ attached pierce bonus (P_PIERCE = [phys, mag]) */
 	P_PIERCE?: IAtkTuple;
 }
+
+/**
+ * 裝備結果二元組 [是否拒絕, 被卸下的道具編號] / Equip result [rejected, removed item numbers]
+ *
+ * 索引 0＝true 表示裝備未成立（道具不存在，或裝上後總負荷超標）；索引 1＝因雙手互斥而卸下的
+ * 道具編號清單（與成功與否無關）。setEquip 與其測試共用本型別。
+ * Index 0 is true when the equip did not take effect (item missing, or total weight would
+ * exceed the cap); index 1 lists item numbers unequipped due to two-handed exclusivity
+ * (independent of success). Shared by setEquip and its tests.
+ */
+export type IEquipResult = [rejected: boolean, removed: number[]];

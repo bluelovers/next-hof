@@ -11,9 +11,17 @@ import { newMon } from '../character/factory';
 import { levelFix } from '../character/level-fix';
 
 /**
- * party size → [min, max] 敵人數（top_level>5 時取區間隨機）
+ * 敵人數區間 [下限, 上限] / Enemy-count range [min, max]
+ *
+ * 索引 0＝最少敵人數、索引 1＝最多敵人數；top_level > 5 時在此區間內隨機。
+ * Index 0 = minimum enemy count, index 1 = maximum; rolled inside this range when top_level > 5.
  */
-const ENEMY_TABLE: Record<number, [number, number]> = {
+type IEnemyCountRange = [min: number, max: number];
+
+/**
+ * party size → 敵人數區間（top_level>5 時取區間隨機）
+ */
+const ENEMY_TABLE: Record<number, IEnemyCountRange> = {
 	1: [1, 3],
 	2: [2, 4],
 	3: [3, 6],

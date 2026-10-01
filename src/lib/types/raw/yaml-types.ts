@@ -83,14 +83,23 @@ export interface IRawMonYaml extends IRawCombatCoreYaml, IAtkDefFields, IMonExtr
  *
  * `limit` 的值在來源即為布林（`Whip: true`），且載入不經數值收斂 → `Record<string, boolean>`。
  */
+/**
+ * 原始目標規格三元組 [目標類型, 選取方式, 數量] / Raw target 3-tuple
+ *
+ * 三格皆為來源字串（enum 成員值），經 convertTarget 驗證後才收窄為 ITargetSpec。
+ * All three entries are source strings (enum member values); convertTarget validates them
+ * before narrowing to ITargetSpec.
+ */
+export type IRawTargetSpec = [type: string, method: string, count: number];
+
 export interface IRawSkillYaml extends ICompBonuses, IRawSkillExtraNumerics, ISkillSharedFields, INamedIconDef
 {
 	/** SP 消耗 / SP cost */
 	sp?: number;
 	/** 傷害類型（0=物理、1=魔法）/ damage type (0 = physical, 1 = magic) */
 	type?: number;
-	/** 目標規格三元組 [目標類型, 選取方式, 數量] / target 3-tuple [target type, selection method, count] */
-	target?: [type: string, method: string, count: number];
+	/** 目標規格（未經驗證的字串形）/ target spec (unvalidated string form) */
+	target?: IRawTargetSpec;
 	/** 目標優先條件 / target priority */
 	priority?: string;
 	/** 詠唱/蓄力 [詠唱時間, 硬直] / charge [cast time, stiff] */

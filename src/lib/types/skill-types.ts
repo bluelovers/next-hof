@@ -28,6 +28,13 @@ export type ITargetSpec = [
 ];
 
 /**
+ * 詠唱/蓄力二元組 [詠唱時間, 硬直] / Charge tuple [cast time, stiff]
+ *
+ * 索引 0＝詠唱時間（回合數）、索引 1＝行動後硬直；ISkillDef.charge 與 convertCharge 共用本型別。
+ */
+export type IChargeTuple = [castTime: number, stiff: number];
+
+/**
  * 補正欄位型別（P_* / M_*，由 COMP_FIELDS 衍生）/ Compensation bonus type
  *
  * Partial 表示技能／道具只需宣告實際擁有的補正欄位；
@@ -173,7 +180,7 @@ export interface ISkillDef extends ICompBonuses, ISkillSharedFields, ISkillUpFie
 	 * 只要存在本欄位（陣列恆為真），首回合即設定 expect 進入詠唱、次回合才施放；
 	 * 期間施放其他技能會被中斷（expect 不符即 return）。
 	 */
-	charge?: [castTime: number, stiff: number];
+	charge?: IChargeTuple;
 	/** 傷害參照能力（省略＝物理 STR／魔法 INT）/ influencing stat (omitted = physical STR / magic INT) */
 	inf?: EnumInfluence;
 	/** 施放後自身移動方向（引擎已讀取：statusChanges 將目標移至指定站位）/ self movement direction after casting (engine reads: statusChanges moves the target to the specified row) */

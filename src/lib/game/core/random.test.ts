@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { RNG } from './rng';
-import { weightedPick } from './random';
+import { weightedPick, type IWeightedEntry } from './random';
 
 describe('weightedPick', () =>
 {
 	it('matches documented weights over many draws (fixed seed)', () =>
 	{
 		const rng = new RNG(2024);
-		const entries: Array<[number, number]> = [
+		const entries: IWeightedEntry<number>[] = [
 			[1000, 4],
 			[1001, 3],
 			[1002, 2],
