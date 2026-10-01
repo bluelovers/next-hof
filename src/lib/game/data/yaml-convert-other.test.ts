@@ -15,7 +15,6 @@ import {
 	EnumTargetMethod,
 	EnumTargetType,
 } from '#/lib/types/skill-enum';
-import { TEST_FIXTURES_ROOT } from '#/yaml-paths';
 import {
 	loadGuardYaml,
 	loadItemYaml,
@@ -27,6 +26,7 @@ import {
 	loadAllUnions,
 } from './yaml-load';
 import { convertItemYaml, convertJobYaml, convertSkillYaml } from './yaml-convert';
+import { __TEST_FIXTURES_RESOURCE } from '../../../../test/lib/data-paths.ts';
 
 /** 載入 fixture 的通用 helper（缺檔拋出具體路徑）/ shared fixture loader (throws with the missing path) */
 function mustLoad<T>(load: () => T | undefined, file: string): T
@@ -36,29 +36,29 @@ function mustLoad<T>(load: () => T | undefined, file: string): T
 	return raw;
 }
 
-const mustLoadItem = (no: number) => mustLoad(() => loadItemYaml(no, TEST_FIXTURES_ROOT), `Item/item.${no}.yml`);
-const mustLoadJob = (no: number) => mustLoad(() => loadJobYaml(no, TEST_FIXTURES_ROOT), `Job/job.${no}.yml`);
-const mustLoadSkill = (no: number) => mustLoad(() => loadSkillYaml(no, TEST_FIXTURES_ROOT), `Skill/skill.${no}.yml`);
+const mustLoadItem = (no: number) => mustLoad(() => loadItemYaml(no, __TEST_FIXTURES_RESOURCE), `Item/item.${no}.yml`);
+const mustLoadJob = (no: number) => mustLoad(() => loadJobYaml(no, __TEST_FIXTURES_RESOURCE), `Job/job.${no}.yml`);
+const mustLoadSkill = (no: number) => mustLoad(() => loadSkillYaml(no, __TEST_FIXTURES_RESOURCE), `Skill/skill.${no}.yml`);
 
 describe('yaml-load (string-id kinds)', () =>
 {
 	it('loads Guard/Land/Union by textual id', () =>
 	{
-		expect(loadGuardYaml('always', TEST_FIXTURES_ROOT)?.no).toBe('always');
-		expect(loadLandYaml('ac0', TEST_FIXTURES_ROOT)?.no).toBe('ac0');
-		expect(loadUnionYaml('0000', TEST_FIXTURES_ROOT)?.no).toBe('0000');
+		expect(loadGuardYaml('always', __TEST_FIXTURES_RESOURCE)?.no).toBe('always');
+		expect(loadLandYaml('ac0', __TEST_FIXTURES_RESOURCE)?.no).toBe('ac0');
+		expect(loadUnionYaml('0000', __TEST_FIXTURES_RESOURCE)?.no).toBe('0000');
 	});
 
 	it('returns undefined for a missing id', () =>
 	{
-		expect(loadGuardYaml('never', TEST_FIXTURES_ROOT)).toBeUndefined();
-		expect(loadLandYaml('zzz', TEST_FIXTURES_ROOT)).toBeUndefined();
+		expect(loadGuardYaml('never', __TEST_FIXTURES_RESOURCE)).toBeUndefined();
+		expect(loadLandYaml('zzz', __TEST_FIXTURES_RESOURCE)).toBeUndefined();
 	});
 
 	it('lists textual-id kinds sorted lexicographically', () =>
 	{
-		expect(loadAllGuards(TEST_FIXTURES_ROOT).map((g) => g.no)).toEqual(['always']);
-		expect(loadAllUnions(TEST_FIXTURES_ROOT).map((u) => u.no)).toEqual(['0000']);
+		expect(loadAllGuards(__TEST_FIXTURES_RESOURCE).map((g) => g.no)).toEqual(['always']);
+		expect(loadAllUnions(__TEST_FIXTURES_RESOURCE).map((u) => u.no)).toEqual(['0000']);
 	});
 });
 
@@ -179,7 +179,7 @@ describe('createYamlRepository (fixtures, all kinds)', () =>
 	it('registers skill/item/job/char/mon from the fixture root', async () =>
 	{
 		const { createYamlRepository } = await import('./yaml-repository');
-		const { repo } = createYamlRepository(TEST_FIXTURES_ROOT);
+		const { repo } = createYamlRepository(__TEST_FIXTURES_RESOURCE);
 
 		expect(repo.getSkill(1000)?.name).toBe('Attack');
 		expect(repo.getSkill(1220)?.name).toBe('AntiPoisoning');

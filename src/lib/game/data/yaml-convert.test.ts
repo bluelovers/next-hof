@@ -8,7 +8,6 @@ import { describe, it, expect } from 'vitest';
 import { EnumEquipSlot } from '#/lib/types/char-enum';
 import { EnumGuardKind } from '#/lib/types/battle-enum';
 import { EnumPosition } from '#/lib/types/battle-enum';
-import { TEST_FIXTURES_ROOT } from '#/yaml-paths';
 import { loadAllChars, loadAllMons, loadCharYaml, loadMonYaml } from './yaml-load';
 import { convertCharYaml, convertMonYaml } from './yaml-convert';
 import {
@@ -19,13 +18,14 @@ import {
 } from './yaml-numeric';
 import { convertEquipYaml, convertBehaviorYaml } from './yaml-convert-blocks';
 import type { IRawCharYaml, IRawMonYaml } from '#/lib/types/raw/yaml-types';
+import { __TEST_FIXTURES_RESOURCE } from '../../../../test/lib/data-paths.ts';
 
 /**
  * 載入角色 fixture；缺檔時拋出具體路徑的錯誤（避免 non-null assertion 產生無意義訊息）。
  */
 function mustLoadChar(no: number): IRawCharYaml
 {
-	return mustLoad(() => loadCharYaml(no, TEST_FIXTURES_ROOT), 'Char', no);
+	return mustLoad(() => loadCharYaml(no, __TEST_FIXTURES_RESOURCE), 'Char', no);
 }
 
 /**
@@ -33,7 +33,7 @@ function mustLoadChar(no: number): IRawCharYaml
  */
 function mustLoadMon(no: number): IRawMonYaml
 {
-	return mustLoad(() => loadMonYaml(no, TEST_FIXTURES_ROOT), 'Mon', no);
+	return mustLoad(() => loadMonYaml(no, __TEST_FIXTURES_RESOURCE), 'Mon', no);
 }
 
 /** 缺檔錯誤的共通收斂 / shared failure path for missing fixtures */
@@ -61,14 +61,14 @@ describe('yaml-load (fixtures)', () =>
 
 	it('returns undefined for a missing file', () =>
 	{
-		expect(loadMonYaml(9999, TEST_FIXTURES_ROOT)).toBeUndefined();
-		expect(loadCharYaml(9999, TEST_FIXTURES_ROOT)).toBeUndefined();
+		expect(loadMonYaml(9999, __TEST_FIXTURES_RESOURCE)).toBeUndefined();
+		expect(loadCharYaml(9999, __TEST_FIXTURES_RESOURCE)).toBeUndefined();
 	});
 
 	it('lists every fixture of a kind sorted by number', () =>
 	{
-		expect(loadAllChars(TEST_FIXTURES_ROOT).map((c) => c.no)).toEqual([100, 400]);
-		expect(loadAllMons(TEST_FIXTURES_ROOT).map((m) => m.no)).toEqual([1000, 1010, 1055, 2000, 5006]);
+		expect(loadAllChars(__TEST_FIXTURES_RESOURCE).map((c) => c.no)).toEqual([100, 400]);
+		expect(loadAllMons(__TEST_FIXTURES_RESOURCE).map((m) => m.no)).toEqual([1000, 1010, 1055, 2000, 5006]);
 	});
 
 	it('normalizes numeric strings to numbers on load', () =>
