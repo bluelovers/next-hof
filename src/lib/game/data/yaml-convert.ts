@@ -25,7 +25,6 @@ import type { IMonDef } from '#/lib/types/mon-types';
 import type {
 	IRawCharYaml,
 	IRawMonYaml,
-	IRawSkillYaml,
 } from '#/lib/types/raw/yaml-types';
 import { SKILL_EXTRA_NUMERIC_KEYS } from './yaml-skill-keys';
 import { COMP_FIELDS } from '#/lib/game/character/status-attrs';
@@ -155,7 +154,12 @@ export function convertJobYaml(raw: IJobDefCore): IJobDef
  * type '0'/'1' → EnumSkillDamageType；target/move/umove/inf/priority 以 enum 值直接對應。
  * type '0'/'1' → EnumSkillDamageType; target/move/umove/inf/priority map by enum values directly.
  */
-export function convertSkillYaml(raw: IRawSkillYaml): ISkillDef
+export function convertSkillYaml(raw: ISkillDef & {
+	/**
+	 * @deprecated 錯字 實為 P_MAXHP
+	 */
+	p_maxhp?: number;
+}): ISkillDef
 {
 	const skill: ISkillDef = {
 		no: raw.no,
@@ -205,7 +209,7 @@ export function convertSkillYaml(raw: IRawSkillYaml): ISkillDef
 	copyNumericKeys(skill, raw, SKILL_EXTRA_NUMERIC_KEYS);
 	copyNumericKeys(skill, raw, COMP_FIELDS);
 
-	if (raw.p_maxhp !== undefined) skill.P_MAXHP = raw.p_maxhp;
+	if (raw.p_maxhp !== undefined) skill.P_MAXHP ??= raw.p_maxhp;
 
 	return skill;
 }

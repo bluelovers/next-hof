@@ -24,18 +24,10 @@ import type {
 	ISpecialField,
 } from '#/lib/types/char-types';
 import type { IDataEx } from '#/lib/types/data-ex-types';
-import type { IMonExtraFields, IMonExtraFieldsServant } from '#/lib/types/mon-types';
-import type { ICompBonuses, ISkillSharedFields } from '#/lib/types/skill-types';
+import type { IMonDefCore, IMonExtraFields, IMonExtraFieldsServant } from '#/lib/types/mon-types';
+import type { ICompBonuses, ISkillSharedFields, ITargetSpec } from '#/lib/types/skill-types';
 import type { IResourceId } from '#/lib/types/seg-types';
 import { SKILL_EXTRA_NUMERIC_KEYS } from '#/lib/game/data/yaml-skill-keys';
-
-/**
- * 技能擴充數值欄位（Plus*／Up*／Down*）/ skill extra numeric fields
- * 鍵為 SKILL_EXTRA_NUMERIC_KEYS 的字面聯集（29 鍵），具名屬性、非 index signature。
- */
-export type IRawSkillExtraNumerics = Partial<
-	Record<(typeof SKILL_EXTRA_NUMERIC_KEYS)[number], number>
->;
 
 /**
  * 原始戰鬥核心欄位（角色與怪物共用）/ Raw combat-core fields (shared by char & mon)
@@ -64,56 +56,15 @@ export interface IRawCharYaml extends IRawCombatCoreYaml, ICharExtraFields, ILea
  *
  * 小寫 `special` 與大寫 `SPECIAL` 的處理見 IRawMonYaml.special 欄位。
  */
-export interface IRawMonYaml extends IRawCombatCoreYaml, IAtkDefFields, IMonExtraFields, IMonExtraFieldsServant, ISpecialField, INamedIconDef
+export interface IRawMonYaml extends IMonDefCore
 {
 	/**
 	 * 來源錯字的小寫 `special`（僅 mon.1000 出現且恆為空物件；正規鍵只有大寫 `SPECIAL`）
 	 * 除 convertSpecialYaml 讀取並與 `SPECIAL` 合併外，請勿新增使用點。
+	 *
+	 * @deprecated 錯字，請使用 `SPECIAL` 欄位
 	 */
 	special?: Partial<ISpecial>;
-}
-
-/**
- * 原始技能定義（Skill/skill.*.yml）/ Raw skill definition (Skill/skill.*.yml)
- * 補正欄位（P_* / M_*）由 ICompBonuses 提供；source 內尚有 name2 等未收錄鍵。
- *
- * 旗標欄位（invalid／support／passive／quick／pierce／CurePoison／revive）繼承
- * ISkillSharedFields：來源寫 `true`／`'1'`／`1`，載入時（Skill 的 COERCE_SPECS）已統一收斂為
- * `number`（1／0），故**不是** `number | boolean`。
- *
- * `limit` 的值在來源即為布林（`Whip: true`），且載入不經數值收斂 → `Record<string, boolean>`。
- */
-/**
- * 原始目標規格三元組 [目標類型, 選取方式, 數量] / Raw target 3-tuple
- *
- * 三格皆為來源字串（enum 成員值），經 convertTarget 驗證後才收窄為 ITargetSpec。
- * All three entries are source strings (enum member values); convertTarget validates them
- * before narrowing to ITargetSpec.
- */
-export type IRawTargetSpec = [type: string, method: string, count: number];
-
-export interface IRawSkillYaml extends ICompBonuses, IRawSkillExtraNumerics, ISkillSharedFields, INamedIconDef
-{
-	/** SP 消耗 / SP cost */
-	sp?: number;
-	/** 傷害類型（0=物理、1=魔法）/ damage type (0 = physical, 1 = magic) */
-	type?: number;
-	/** 目標規格（未經驗證的字串形）/ target spec (unvalidated string form) */
-	target?: IRawTargetSpec;
-	/** 目標優先條件 / target priority */
-	priority?: string;
-	/** 詠唱/蓄力 [詠唱時間, 硬直] / charge [cast time, stiff] */
-	charge?: number[];
-	/** 傷害參照能力 / influencing stat */
-	inf?: string;
-	/** 施放後自身移動 / self movement after casting */
-	move?: string;
-	/** 使用後移動方向 / post-use movement */
-	umove?: string;
-	/** 武器限制 { 武器型別: 是否可使用 } / weapon restriction { weapon type: allowed } */
-	limit?: Record<string, boolean>;
-	/** 補正欄位的小寫變體（source 的 p_maxhp）/ lowercase compensation variant from the source */
-	p_maxhp?: number;
 }
 
 /**

@@ -56,7 +56,12 @@ export interface IMonExtraFieldsServant
 /**
  * 怪物定義 / Monster definition
  */
-export interface IMonDef extends ICharCore, IMonExtraFields, IMonExtraFieldsServant, INamedIconDef
+export interface IMonDefCore extends ICharCore, IMonExtraFields, IMonExtraFieldsServant, INamedIconDef
+{
+
+}
+
+export interface IMonDef extends IMonDefCore
 {
 	/**
 	 * 獨特怪物標記 / union-monster flag

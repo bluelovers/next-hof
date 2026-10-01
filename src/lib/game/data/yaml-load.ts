@@ -17,12 +17,12 @@ import type {
 	IRawJudgeYaml,
 	IRawLandYaml,
 	IRawMonYaml,
-	IRawSkillYaml,
 	IRawSkilltreeYaml,
 	IRawUnionYaml,
 } from '#/lib/types/raw/yaml-types';
 import { EnumResourceKind } from './yaml-resource-kind';
 import { normalizeResource } from './yaml-coerce';
+import { ISkillDef } from '#/lib/types/skill-types';
 
 /**
  * 資源檔名模式：`{kind}.{id}.yml` / resource file name pattern: `{kind}.{id}.yml`
@@ -155,7 +155,7 @@ export const loadItemYaml = idLoader<IItemDef>(EnumResourceKind.Item);
 export const loadJobYaml = idLoader<IJobDefCore>(EnumResourceKind.Job);
 
 /** 依編號讀取技能 / Load a skill resource by number */
-export const loadSkillYaml = idLoader<IRawSkillYaml>(EnumResourceKind.Skill);
+export const loadSkillYaml = idLoader<ISkillDef>(EnumResourceKind.Skill);
 
 /** 依守護種類讀取守護 / Load a guard setting by kind string (guard.always → 'always') */
 export const loadGuardYaml = textLoader<IRawGuardYaml>(EnumResourceKind.Guard);
@@ -189,7 +189,7 @@ export const loadAllItems = allLoader<IItemDef>(EnumResourceKind.Item);
 export const loadAllJobs = allLoader<IJobDefCore>(EnumResourceKind.Job);
 
 /** 讀取全部技能資源 / Load all skill resources */
-export const loadAllSkills = allLoader<IRawSkillYaml>(EnumResourceKind.Skill);
+export const loadAllSkills = allLoader<ISkillDef>(EnumResourceKind.Skill);
 
 /** 讀取全部守護資源 / Load all guard settings */
 export const loadAllGuards = allLoader<IRawGuardYaml>(EnumResourceKind.Guard);

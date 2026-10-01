@@ -64,21 +64,7 @@ export type ISkillUpFields = Partial<Record<IStatusUpKey, number>>;
 export type ISkillDownFields = Partial<Record<IStatusDownKey, number>>;
 
 /**
- * 技能共用欄位（raw 與 target 宣告完全同形者）
- *
- * 本組欄位在 raw `IRawSkillYaml` 與 `ISkillDef` 的名稱、選取性、型別三者完全一致，
- * 於此定義一次、兩側皆以 `extends` 繼承，不再各自重覆宣告。
- * 兩層宣告有差異者（`sp`／`type`／`target`／`priority`／`charge`／`inf`／`move`／`umove`／
- * `limit` 與 raw 獨有的 `p_maxhp`）不納入本組，仍由各層自行宣告。
- *
- * 魔方陣欄位（MagicCircle*）見 ISkillMagicCircleFields（經本介面繼承）。
- *
- * **旗標欄位恆為 `number` / flag fields are always `number`：**
- * `invalid`／`support`／`passive`／`quick`／`pierce`／`CurePoison`／`revive` 在來源寫
- * `true`／`'1'`／`1` 三種形態，但 yaml-load 的 Skill 規格（COERCE_SPECS）於載入時統一收斂為
- * `1`／`0`，故本層（載入後）型別是 `number`，**不是** `number | boolean`。
- *
- * 使用方 / Consumers: `ISkillDef`（target）與 raw `IRawSkillYaml`
+ * 技能共用欄位
  */
 export interface ISkillSharedFields extends ISkillMagicCircleFields
 {

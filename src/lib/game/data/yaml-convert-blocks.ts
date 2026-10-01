@@ -23,15 +23,14 @@ import {
 	type ISpecial,
 } from '#/lib/types/char-types';
 import {
+	ITargetSpec,
 	type IChargeTuple,
 	type ICompBonuses,
-	type ITargetSpec,
 } from '#/lib/types/skill-types';
 import type { IMonReward } from '#/lib/types/mon-types';
 import type {
 	IRawCombatCoreYaml,
 	IRawMonYaml,
-	IRawTargetSpec,
 } from '#/lib/types/raw/yaml-types';
 import { COMP_FIELDS } from '#/lib/game/character/status-attrs';
 import { toNumber } from './yaml-numeric';
@@ -212,7 +211,7 @@ export function convertServantYaml(
  * 目標規格轉換 / Convert a raw [type, method, count] spec into ITargetSpec
  * raw 三元組的形狀由本類別的來源定案：前兩格為目標／選取方式字串、末格經載入收斂為 number。
  */
-export function convertTarget(raw: IRawTargetSpec | undefined): ITargetSpec | undefined
+export function convertTarget(raw: ITargetSpec | undefined): ITargetSpec | undefined
 {
 	if (!Array.isArray(raw) || raw.length < 3) return undefined;
 	const type = String(raw[0]);
