@@ -1,6 +1,8 @@
 allowBuilds:
   '@parcel/watcher': true
+  core-js: true
   esbuild: true
+  lib-r-math.js: true
   sharp: true
 
 minimumReleaseAgeExclude:
@@ -8,15 +10,28 @@ minimumReleaseAgeExclude:
   - ts-type-object-entries
   - ts-type
   - ts-type-predicates
-  - '@vitest/browser-playwright@5.0.2'
-  - '@vitest/browser@5.0.2'
-  - '@vitest/coverage-v8@5.0.2'
-  - '@vitest/mocker@5.0.2'
-  - '@vitest/pretty-format@5.0.2'
-  - '@vitest/spy@5.0.2'
-  - '@vitest/ui@5.0.2'
-  - '@vitest/utils@5.0.2'
-  - vitest@5.0.2
+  - '@vitest/browser-playwright'
+  - '@vitest/browser'
+  - '@vitest/coverage-v8'
+  - '@vitest/mocker'
+  - '@vitest/pretty-format'
+  - '@vitest/spy'
+  - '@vitest/ui'
+  - '@vitest/utils'
+  - vitest
   - fake-timer
-  - ts-type
+  - '@next/env@16.4.1'
+  - '@next/swc-darwin-arm64@16.4.1'
+  - '@next/swc-darwin-x64@16.4.1'
+  - '@next/swc-linux-arm64-gnu@16.4.1'
+  - '@next/swc-linux-arm64-musl@16.4.1'
+  - '@next/swc-linux-x64-gnu@16.4.1'
+  - '@next/swc-linux-x64-musl@16.4.1'
+  - '@next/swc-win32-arm64-msvc@16.4.1'
+  - '@next/swc-win32-x64-msvc@16.4.1'
+  - next@16.4.1
+  - playwright-core@1.64.1
+  - playwright@1.64.1
+  - react-dom@19.3.1
+  - react@19.3.1
 
