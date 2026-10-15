@@ -20,6 +20,7 @@ import { BattleFieldLayersDarkDecorator } from '../decorators';
 import { BattleFieldLayers } from '../../src/components/battle/BattleFieldLayers';
 import { sampleSprites, createSampleConfig, sampleFieldSize } from './sampleData';
 import { makeBattleFieldEditModeDecorator } from './editModePanel';
+import { makeBackgroundPickerDecorator } from './backgroundPicker';
 import { EnumBattleFieldVAlign } from '../../src/components/battle/enums';
 import { EnumBattleFieldBgScale } from '../../src/components/battle/enums';
 import type {
@@ -63,7 +64,7 @@ const meta: Meta<typeof BattleFieldLayers> = {
 	 * 外層舞台，方便觀察背景尺寸與角色框的相對位置
 	 * Outer stage to visualize the relationship between background size and sprite frame
 	 */
-	decorators: [BattleFieldLayersDarkDecorator],
+	decorators: [BattleFieldLayersDarkDecorator, makeBackgroundPickerDecorator()],
 };
 
 export default meta;

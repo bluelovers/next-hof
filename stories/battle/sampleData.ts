@@ -83,6 +83,87 @@ export const sampleBackgroundUrls = {
 	egypt: '/image/land/bg_egypt_001.png',
 } as const;
 
+/** 背景選擇項目（story 背景面板用） / Background choice entry (for the story background panel) */
+export interface IBackgroundChoice
+{
+	/** 圖檔 URL（public 根路徑） / Image URL (public root path) */
+	url: string;
+	/** 選單顯示名稱（去副檔名與 bg_ 前綴） / Display name (extension and bg_ prefix stripped) */
+	label: string;
+}
+
+/** 由 URL 清單建立選擇項目（檔名去副檔名與 bg_ 前綴作為標籤） / Build choices from URLs (filename minus extension and bg_ prefix as the label) */
+function toBackgroundChoices(urls: readonly string[]): IBackgroundChoice[]
+{
+	return urls.map((url) => ({
+		url,
+		label: url
+			.slice(url.lastIndexOf('/') + 1)
+			.replace(/\.[^.]+$/, '')
+			.replace(/^bg_/, ''),
+	}));
+}
+
+/** 標準背景（public/image/land 下 bg_* 圖檔，實際尺寸 480×200） / Standard backgrounds (bg_* images under public/image/land, actual size 480×200) */
+export const standardBackgroundChoices: IBackgroundChoice[] = toBackgroundChoices([
+	sampleBackgroundUrls.grass,
+	sampleBackgroundUrls.grass01,
+	sampleBackgroundUrls.cave,
+	sampleBackgroundUrls.snow,
+	sampleBackgroundUrls.sand,
+	sampleBackgroundUrls.egypt,
+	'/image/land/bg_aband.png',
+	'/image/land/bg_build01.png',
+	'/image/land/bg_colosseum.png',
+	'/image/land/bg_jungle.png',
+	'/image/land/bg_lava.png',
+	'/image/land/bg_mount.png',
+	'/image/land/bg_nest.png',
+	'/image/land/bg_noimage.png',
+	'/image/land/bg_ocean0.png',
+	'/image/land/bg_ocean1.jpg',
+	'/image/land/bg_pavement01.png',
+	'/image/land/bg_sand1.png',
+	'/image/land/bg_sea.png',
+	'/image/land/bg_swamp.png',
+	'/image/land/bg_swamp1.png',
+	'/image/land/bg_swamp2.png',
+]);
+
+/** 大圖背景（public/image/land/768x320 下所有圖檔，實際尺寸 768×320） / Large backgrounds (all images under public/image/land/768x320, actual size 768×320) */
+export const largeBackgroundChoices: IBackgroundChoice[] = toBackgroundChoices([
+	'/image/land/768x320/bg_city_001.png',
+	'/image/land/768x320/bg_medieval_001.png',
+	'/image/land/768x320/bg_medieval_002.png',
+	'/image/land/768x320/bg_medieval_003.png',
+	'/image/land/768x320/00050-img-768x320-001808-krea2turboPrismoria_v10-a1b351fc.png',
+	'/image/land/768x320/00114-img-768x320-045615-krea2turboPrismoria_v10-b353bbef.png',
+	'/image/land/768x320/00115-img-768x320-045620-krea2turboPrismoria_v10-b353bbef.png',
+	'/image/land/768x320/00121-img-768x320-045750-krea2turboPrismoria_v10-d5de9033.png',
+	'/image/land/768x320/00124-img-768x320-073914-krea2turboPrismoria_v10-a78b0f17.png',
+	'/image/land/768x320/00155-img-768x320-050935-krea2turboPrismoria_v10-51641e8a.png',
+	'/image/land/768x320/00177-img-768x320-052226-krea2turboPrismoria_v10-60385f18.png',
+	'/image/land/768x320/00182-img-768x320-052711-krea2turboPrismoria_v10-fcd26bc3.png',
+	'/image/land/768x320/00184-img-768x320-052909-krea2turboPrismoria_v10-4be859c3.png',
+	'/image/land/768x320/00194-img-768x320-040559-darkEast5CSALEH3_beast5COCTSALEK2T_int8-298b864f.png',
+	'/image/land/768x320/00434-img-768x320-235815-krea2turboPrismoria_v10-11880a13.png',
+	'/image/land/768x320/00436-img-768x320-235824-krea2turboPrismoria_v10-11880a13.png',
+]);
+
+/**
+ * 背景選擇分組（story 背景面板的下拉選單來源）
+ * Background choice groups (source of the story background panel's dropdown)
+ */
+export const sampleBackgroundChoiceGroups: ReadonlyArray<{
+	/** 分組名稱 / Group label */
+	label: string;
+	/** 該分組的背景項目 / Background entries of this group */
+	choices: IBackgroundChoice[];
+}> = [
+	{ label: '標準背景', choices: standardBackgroundChoices },
+	{ label: '768×320 背景', choices: largeBackgroundChoices },
+];
+
 /**
  * 共用魔方陣（魔法陣）展示資料（單一事實來源）
  * Shared magic-circle (魔法陣) showcase data (single source of truth)
