@@ -1,0 +1,60 @@
+/**
+ * BattleFieldEditGuides 元件樣式
+ * BattleFieldEditGuides component styles
+ *
+ * 參考線疊加圖層：置中於父層座標空間、不攔截指標事件（pointer-events: none），
+ * 因此開啟參考線時拖曳行為完全不變。
+ * Guide-line overlay: centered over the parent's coordinate space and fully click-through
+ * (pointer-events: none), so dragging behaves exactly the same with guides on.
+ */
+
+/* ==================== 參考線容器 / Guide Container ==================== */
+
+.battle-edit-guides
+{
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 6;
+	pointer-events: none;
+	user-select: none;
+}
+
+/* ==================== 單條參考線 / Single Guide Line ==================== */
+
+.battle-edit-guide
+{
+	position: absolute;
+	display: block;
+}
+
+/* 垂直線：固定 x、貫穿高度 / Vertical line: fixed x, spans the height */
+.battle-edit-guide--vertical
+{
+	top: 0;
+	bottom: 0;
+	width: 0;
+	border-left: 1px solid rgba(198, 149, 0, 0.35);
+}
+
+/* 水平線：固定 y、貫穿寬度 / Horizontal line: fixed y, spans the width */
+.battle-edit-guide--horizontal
+{
+	left: 0;
+	right: 0;
+	height: 0;
+	border-top: 1px solid rgba(198, 149, 0, 0.35);
+}
+
+/* 6 等分線比 5 等分線更淡，兩組同時顯示時仍能分辨 / The 6-division lines are fainter so both sets stay distinguishable */
+.battle-edit-guide--division6
+{
+	border-color: rgba(140, 160, 190, 0.25);
+}
+
+/* 十字中心線：亮金色虛線，明顯區別於等分線 / Center cross: bright gold dashed, clearly distinct from the division lines */
+.battle-edit-guide--cross
+{
+	border-color: rgba(255, 204, 51, 0.7);
+	border-style: dashed;
+}

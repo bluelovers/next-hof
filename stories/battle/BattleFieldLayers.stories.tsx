@@ -7,14 +7,25 @@
  *
  * 重點預覽 bgSize（背景獨立放大）與 valign（垂直對齊）功能
  * Highlights the bgSize (independent enlarged background) and valign (vertical alignment) features.
+ *
+ * 另附雙框模式（戰場大於排版框）：敵我雙方各佔一個 BattleFieldSpriteFrame，
+ * 可分別指定初始位置或開啟 editable 直接在畫面上拖曳。
+ * Also covers dual-frame mode (scene larger than the frame): each side owns a BattleFieldSpriteFrame
+ * that can be given its own initial position, or dragged on the canvas via `editable`.
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { useArgs } from 'storybook/preview-api';
 import { BattleFieldLayersDarkDecorator } from '../decorators';
 import { BattleFieldLayers } from '../../src/components/battle/BattleFieldLayers';
 import { sampleSprites, createSampleConfig, sampleFieldSize } from './sampleData';
+import { makeBattleFieldEditModeDecorator } from './editModePanel';
 import { EnumBattleFieldVAlign } from '../../src/components/battle/enums';
 import { EnumBattleFieldBgScale } from '../../src/components/battle/enums';
+import type {
+	IBattleFieldFrameOffset,
+	IBattleSidePair,
+} from '../../src/components/battle/types';
 
 const meta: Meta<typeof BattleFieldLayers> = {
 	title: 'BattleField/BattleFieldLayers',
@@ -28,10 +39,15 @@ const meta: Meta<typeof BattleFieldLayers> = {
 					'支援 bgSize 讓背景獨立放大而不影響角色排版；valign 控制角色框垂直位置（預設 bottom）。\n' +
 					'背景圖預設水平置中 + 垂直置底，可由 config.bgScale 設定縮放模式（natural/cover/contain/stretch/repeat），\n' +
 					'因此 bgSize 大於或小於實際圖檔尺寸時都能正確排版。\n' +
+					'戰場大於排版框時自動切換雙框模式：敵我雙方各佔一個排版框（依 sprite.side 分組），\n' +
+					'frameOffsets 指定各自初始位置，editable 開啟後可直接在畫面上拖曳，框上徽章顯示隊伍與座標。\n' +
 					'Battlefield layers: outermost background + sprite layout frame + nested sprite layers.\n' +
 					'bgSize enlarges the background independently; valign controls the sprite frame vertical position (default bottom).\n' +
 					'Background image is centered + bottom-aligned by default; config.bgScale sets the scale mode\n' +
-					'(natural/cover/contain/stretch/repeat) so layout stays correct whether bgSize is larger or smaller than the image.',
+					'(natural/cover/contain/stretch/repeat) so layout stays correct whether bgSize is larger or smaller than the image.\n' +
+					'When the scene is larger than the frame it switches to dual-frame mode: each side owns a frame (grouped by\n' +
+					'sprite.side), frameOffsets sets the initial positions, and editable makes them draggable on the canvas with\n' +
+					'the team and coordinates shown on each frame\'s badge.',
 			},
 		},
 	},
@@ -164,4 +180,84 @@ export const BgEgyptCover: Story = {
 	args: {
 		config: { ...createSampleConfig('egypt'), bgScale: EnumBattleFieldBgScale.Cover },
 	},
+};
+
+/**
+ * 雙框模式：戰場（768×320）大於排版框（480×200），敵我雙方各佔一個排版框
+ * Dual-frame mode: the scene (768×320) is larger than the frame (480×200), so each side owns a frame
+ *
+ * 未指定 frameOffsets 時兩個框依 valign 疊在同一位置，視覺與單框模式完全一致；
+ * 分組依 sprite.side（左半場敵方＝左隊、右半場我方＝右隊）。
+ * Without frameOffsets both frames stack on the same spot via valign, looking exactly like
+ * single-frame mode; grouping follows sprite.side (left-half enemies = left team, right-half
+ * allies = right team).
+ */
+export const DualFrameSplit: Story = {
+	args: {
+		bgSize: { width: 768, height: 320 },
+	},
+};
+
+/**
+ * 雙框編輯模式的初始位置（同時是編輯面板「重置」的還原目標）
+ * Initial dual-frame offsets (also the edit panel's reset target)
+ */
+const dualFrameInitialOffsets: IBattleSidePair<IBattleFieldFrameOffset> = {
+	left: { x: 24, y: 40 },
+	right: { x: 264, y: 40 },
+};
+
+/**
+ * 雙框編輯模式：分別指定初始位置，並可直接在畫面上拖曳敵我雙方的排版框
+ * Dual-frame edit mode: initial positions per side, and both frames are draggable on the canvas
+ *
+ * 拖曳時框收斂在戰場範圍內（x∈[0,288]、y∈[0,120]），徽章顯示所屬隊伍、座標與相對百分比；
+ * onFrameOffsetChange 於每次移動把新位置寫回 args.frameOffsets，讓編輯面板的
+ * 對齊按鈕與座標 % 讀值永遠以「目前實際位置」為準。
+ * 編輯面板提供：重置、5/6 等分對齊、十字對齊、左右隊對齊高度、參考線與吸附開關、座標相對 % 讀值。
+ * While dragging, a frame clamps inside the scene (x∈[0,288], y∈[0,120]) and the badge shows
+ * the team, coordinates and relative percentage; onFrameOffsetChange writes the new position
+ * back into args.frameOffsets on every move, so the panel's alignment buttons and the % readout
+ * always operate on the actual current positions. The panel offers reset, 5/6-division
+ * alignment, cross alignment, team height alignment, the guides and snap toggles, and the
+ * relative-% readout.
+ */
+export const DualFrameEditable: Story = {
+	args: {
+		bgSize: { width: 768, height: 320 },
+		editable: true,
+		showEditGuides: true,
+		snapToGuides: true,
+		frameOffsets: dualFrameInitialOffsets,
+	},
+	/**
+	 * 拖曳即時寫回 args.frameOffsets（useArgs 在故事 render 內可安全使用）
+	 * Write drags straight back into args.frameOffsets (useArgs is safe inside a story render)
+	 */
+	render: (args) =>
+	{
+		const [, updateArgs] = useArgs();
+		return (
+			<BattleFieldLayers
+				{...args}
+				onFrameOffsetChange={({ side, offset }) =>
+				{
+					const current = (args.frameOffsets ?? dualFrameInitialOffsets) as IBattleSidePair<IBattleFieldFrameOffset>;
+					updateArgs({
+						frameOffsets: {
+							...current,
+							[side]: offset,
+						} as IBattleSidePair<IBattleFieldFrameOffset>,
+					});
+				}}
+			/>
+		);
+	},
+	decorators: [
+		makeBattleFieldEditModeDecorator({
+			sceneSize: { width: 768, height: 320 },
+			frameOps: true,
+			initialFrameOffsets: dualFrameInitialOffsets,
+		}),
+	],
 };

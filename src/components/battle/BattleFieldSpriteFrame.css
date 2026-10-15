@@ -41,3 +41,40 @@
 	bottom: 0;
 	top: auto;
 }
+
+/* ==================== 編輯模式 / Edit Mode ==================== */
+
+/* 可拖曳提示：抓手游標、禁止選取與捲動、虛線框標示可調範圍
+   Draggable hint: grab cursor, no text selection/scrolling, dashed outline marks the adjustable box */
+.battle-sprite-frame--editable
+{
+	cursor: grab;
+	user-select: none;
+	touch-action: none;
+	outline: 1px dashed rgba(189, 200, 215, 0.45);
+}
+
+.battle-sprite-frame--editable:active
+{
+	cursor: grabbing;
+}
+
+/* 座標徽章：貼齊排版框左上角，僅供讀值（不攔截指標，拖曳仍由框接手）
+   Coordinate badge: anchored at the frame's top-left, read-only (never intercepts the pointer, dragging stays with the frame) */
+.battle-sprite-frame__edit-badge
+{
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 5;
+	padding: 1px 4px;
+	font-size: 10px;
+	line-height: 1.4;
+	white-space: nowrap;
+	pointer-events: none;
+	color: var(--color-text-primary);
+	background: var(--color-bg-page);
+	border: 1px solid var(--color-border-mid);
+	border-radius: 2px;
+	opacity: 0.9;
+}

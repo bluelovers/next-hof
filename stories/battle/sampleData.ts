@@ -26,11 +26,20 @@ import {
 import { EnumTeamSideUI, EnumSpriteImageDir } from '../../src/components/battle/enums';
 import { EnumPosition } from '../../src/lib/types/battle-enum';
 
-/** 共用敵方精靈樣本 / Shared enemy sprite samples */
+/**
+ * 共用敵方精靈樣本（敵方在左半場，side 標為左隊）
+ * Shared enemy sprite samples (enemies occupy the left half, so side is the left team)
+ *
+ * side 決定兩件事：標籤防重疊只避開「同側」標籤，以及戰場大於排版框時的雙框分組
+ * （BattleFieldLayers 依此把敵我分進各自的 BattleFieldSpriteFrame）。
+ * side decides two things: label anti-overlap only avoids same-side labels, and the
+ * dual-frame grouping used when the scene is larger than the frame (BattleFieldLayers puts
+ * each side into its own BattleFieldSpriteFrame based on it).
+ */
 export const sampleEnemySprites: IBattleSprite[] = [
-	{ unitUuid: 'mon_052', ...monsterOf('goblinWarriorA'), x: 164, y: 16, flipped: false },
-	{ unitUuid: 'mon_052', ...monsterOf('goblinWarriorB'), x: 148, y: 56, flipped: false },
-	{ unitUuid: 'mon_053', ...monsterOf('goblinAxe'), x: 124, y: 96, flipped: false },
+	{ unitUuid: 'mon_052', ...monsterOf('goblinWarriorA'), x: 164, y: 16, flipped: false, side: EnumTeamSideUI.Left },
+	{ unitUuid: 'mon_052', ...monsterOf('goblinWarriorB'), x: 148, y: 56, flipped: false, side: EnumTeamSideUI.Left },
+	{ unitUuid: 'mon_053', ...monsterOf('goblinAxe'), x: 124, y: 96, flipped: false, side: EnumTeamSideUI.Left },
 ];
 
 /**
@@ -49,9 +58,9 @@ export const sampleEnemySprites: IBattleSprite[] = [
  * combined with the old nested layering, split a single team across sides.
  */
 export const sampleAllySprites: IBattleSprite[] = [
-	{ unitUuid: 'mon_079', ...charRevOf('hero'), x: 352, y: 14, flipped: false },
-	{ unitUuid: 'mon_018', ...charRevOf('mage'), x: 388, y: 64, flipped: false },
-	{ unitUuid: 'mon_214', ...charRevOf('priest'), x: 300, y: 110, flipped: false },
+	{ unitUuid: 'mon_079', ...charRevOf('hero'), x: 352, y: 14, flipped: false, side: EnumTeamSideUI.Right },
+	{ unitUuid: 'mon_018', ...charRevOf('mage'), x: 388, y: 64, flipped: false, side: EnumTeamSideUI.Right },
+	{ unitUuid: 'mon_214', ...charRevOf('priest'), x: 300, y: 110, flipped: false, side: EnumTeamSideUI.Right },
 ];
 
 /** 共用完整戰場精靈樣本（敵方 + 友方） / Shared full battlefield sprite samples (enemies + allies) */
@@ -448,6 +457,7 @@ export const sampleStyleOverrideSprites: IBattleSprite[] = [
 		x: 164,
 		y: 16,
 		flipped: false,
+		side: EnumTeamSideUI.Left,
 		...monsterOf('goblinWarriorA'),
 		/** 單體精靈樣式覆寫（最優先） / Per-sprite style override (highest priority) */
 		style: { opacity: 0.7 },
@@ -459,6 +469,7 @@ export const sampleStyleOverrideSprites: IBattleSprite[] = [
 		x: 352,
 		y: 14,
 		flipped: true,
+		side: EnumTeamSideUI.Right,
 		...charRevOf('hero'),
 	},
 ];

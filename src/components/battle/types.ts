@@ -140,6 +140,68 @@ export type IBattleFieldVAlign = EnumBattleFieldVAlign;
 /** 背景圖縮放模式 / Background image scale mode */
 export type IBattleFieldBgScale = EnumBattleFieldBgScale;
 
+/**
+ * 戰場像素座標點（單一事實來源：框位置與精靈位置共用同一形狀）
+ * Battlefield px coordinate point (single source of truth shared by frame offsets and sprite positions)
+ */
+export interface IBattleFieldPoint
+{
+	/** X 軸座標（px） / X coordinate (px) */
+	x: number;
+	/** Y 軸座標（px） / Y coordinate (px) */
+	y: number;
+}
+
+/**
+ * 戰場排版框位置（相對戰場左上角的像素座標）
+ * Sprite-frame offset (px relative to the scene's top-left corner)
+ *
+ * 僅在「戰場大於排版框」時有意義：提供後排版框改為絕對定位，
+ * 不再套用水平置中與 valign 對齊。
+ * Only meaningful when the scene is larger than the frame: once provided, the frame is
+ * absolutely positioned and no longer uses horizontal centering or valign alignment.
+ */
+export type IBattleFieldFrameOffset = IBattleFieldPoint;
+
+/**
+ * 戰場精靈位置（background-position 的像素座標）
+ * Battlefield sprite position (px used for background-position)
+ */
+export type IBattleSpritePosition = IBattleFieldPoint;
+
+/** 敵我雙方排版框位置對（左隊 / 右隊）/ Per-side sprite-frame offset pair (left / right) */
+export type IBattleFieldSideOffsets = IBattleSidePair<IBattleFieldFrameOffset>;
+
+/**
+ * 排版框拖曳移動事件（編輯模式）
+ * Sprite-frame drag-move event (edit mode)
+ *
+ * 雙框模式（戰場大於排版框）下敵我各佔一個排版框，以 side 指明移動的是哪一個。
+ * In dual-frame mode (scene larger than the frame) each side owns one frame, so `side`
+ * tells the receiver which frame moved.
+ */
+export interface IBattleFieldFrameMoveEvent
+{
+	/** 被移動的隊伍側 / Which side's frame moved */
+	side: EnumTeamSideUI;
+	/** 移動後的框位置（已收斂在戰場範圍內） / Frame offset after the move (clamped inside the scene) */
+	offset: IBattleFieldFrameOffset;
+}
+
+/**
+ * 精靈拖曳移動事件（編輯模式）
+ * Sprite drag-move event (edit mode)
+ */
+export interface IBattleSpriteMoveEvent
+{
+	/** sprites 陣列索引（無 unitUuid 或 uuid 重複時的穩定識別） / Index into sprites (stable id when unitUuid is absent or duplicated) */
+	index: number;
+	/** 被移動的精靈原始資料（座標請以 pos 為準） / Raw data of the moved sprite (use pos for coordinates) */
+	sprite: IBattleSprite;
+	/** 移動後的位置（四捨五入後的整數座標） / Position after the move (rounded to integers) */
+	pos: IBattleSpritePosition;
+}
+
 /** 魔方陣（魔法陣）圖層 / Magic circle layer */
 export interface IBattleMagicCircle
 {
@@ -513,6 +575,50 @@ export interface IBattleSpriteToggleOptions
 	showTeamSprite?: boolean;
 	/** 是否顯示單位精靈 / Whether to show unit sprites */
 	showUnitSprites?: boolean;
+}
+
+/**
+ * 戰場編輯模式開關（共用組 D：BattleField* 圖層鏈的畫面拖曳編輯）
+ * Battlefield edit-mode toggle (group D: on-canvas drag editing across the BattleField* chain)
+ *
+ * 僅供 story 預覽或版面微調等場景開啟；正式戰鬥畫面維持關閉（預設 false）。
+ * 各層語意：
+ * - BattleFieldSpriteLayers：拖曳「單一精靈」調整 background-position
+ * - BattleFieldSpriteFrame：拖曳「整個排版框」（限戰場大於排版框時可移動）
+ * - BattleFieldLayers / BattleFieldScene：雙框模式下拖曳敵我雙方各自的排版框
+ *
+ * Only for story preview or layout tweaking; the real battle view keeps it off (default false).
+ * Meaning per layer:
+ * - BattleFieldSpriteLayers: drag a single sprite to adjust its background-position
+ * - BattleFieldSpriteFrame: drag the whole frame (only movable when the scene is larger)
+ * - BattleFieldLayers / BattleFieldScene: in dual-frame mode, drag each side's frame.
+ */
+export interface IBattleFieldEditModeOptions
+{
+	/** 編輯模式：開啟後可直接在畫面上拖曳調整位置 / Edit mode: drag to adjust positions directly on the canvas */
+	editable?: boolean;
+	/**
+	 * 拖曳時吸附到參考線（等分線 + 十字中心線，見 editModeUtils）
+	 * Snap to the guide lines while dragging (division lines + center cross; see editModeUtils)
+	 *
+	 * 三個編輯層級皆支援：SpriteLayers 吸精靈、SpriteFrame 吸整個框、雙框模式吸兩個框。
+	 * Supported by all three edit levels: SpriteLayers snaps sprites, SpriteFrame snaps the
+	 * whole frame, and dual-frame mode snaps both frames.
+	 */
+	snapToGuides?: boolean;
+	/**
+	 * 重置令牌：數值改變時把編輯中的位置重置為初始值（編輯成果保留，關閉編輯模式不會重置）
+	 * Reset token: when the value changes, the edited positions return to their initial values
+	 * (the edit result is kept — turning edit mode OFF never resets)
+	 *
+	 * - BattleFieldSpriteLayers：清除位置覆寫，精靈回到 sprites 原始座標
+	 * - BattleFieldSpriteFrame：框回到初始 offset（未提供則交回 CSS 對齊）
+	 * - BattleFieldLayers / BattleFieldScene：兩個框回到 frameOffsets
+	 * - BattleFieldSpriteLayers: clear the overrides so sprites return to their own coordinates
+	 * - BattleFieldSpriteFrame: the frame returns to its initial offset (or CSS alignment)
+	 * - BattleFieldLayers / BattleFieldScene: both frames return to frameOffsets.
+	 */
+	resetToken?: number;
 }
 
 /**

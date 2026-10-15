@@ -11,19 +11,54 @@
  * 分頁導覽改由父層（BattleDisplay 的分段）負責。
  * NOTE: this component now renders a responsive div block (no table cell);
  * paging navigation is owned by the parent (BattleDisplay segments).
+ *
+ * 編輯模式（editable）：當戰場（config.bgSize）大於角色排版框時，
+ * 敵我雙方各佔一個排版框，可分別指定初始位置（frameOffsets）或直接在畫面上拖曳。
+ * Edit mode (editable): when the scene (config.bgSize) is larger than the sprite layout
+ * frame, each side owns its own frame and can be given an initial position (frameOffsets)
+ * or dragged directly on the canvas.
  */
 import React from 'react';
-import type { IBattleSprite, IBattleFieldConfig, IBattleSpriteLabelOptions } from './types';
+import type {
+	IBattleSprite,
+	IBattleFieldConfig,
+	IBattleSpriteLabelOptions,
+	IBattleFieldEditModeOptions,
+	IBattleFieldSideOffsets,
+	IBattleFieldFrameMoveEvent,
+} from './types';
 import { BattleFieldLayers } from './BattleFieldLayers';
 import './BattleFieldScene.css';
 
-/** 戰場畫面屬性（標籤開關共用 IBattleSpriteLabelOptions）/ Battlefield scene props (label toggle from the shared IBattleSpriteLabelOptions) */
-export interface IBattleFieldSceneProps extends IBattleSpriteLabelOptions
+/**
+ * 戰場畫面屬性
+ * Battlefield scene props
+ *
+ * 標籤開關共用 IBattleSpriteLabelOptions、編輯開關共用 IBattleFieldEditModeOptions
+ * Label toggle comes from the shared IBattleSpriteLabelOptions; edit toggle from the
+ * shared IBattleFieldEditModeOptions.
+ */
+export interface IBattleFieldSceneProps extends IBattleSpriteLabelOptions, IBattleFieldEditModeOptions
 {
 	/** 精靈列表 / Sprite list */
 	sprites: IBattleSprite[];
 	/** 戰場配置 / Battlefield config */
 	config: IBattleFieldConfig;
+	/**
+	 * 敵我雙方排版框的初始位置（戰場大於排版框的雙框模式下生效）
+	 * Initial offsets of the two side frames (dual-frame mode: scene larger than the frame)
+	 */
+	frameOffsets?: IBattleFieldSideOffsets;
+	/**
+	 * 排版框被拖曳移動時回報（編輯模式；拖曳過程逐次回報）
+	 * Reports when a frame is dragged (edit mode; reported on every move)
+	 */
+	onFrameOffsetChange?: (event: IBattleFieldFrameMoveEvent) => void;
+	/**
+	 * 顯示參考線疊加圖層（座標空間＝戰場尺寸）
+	 * Show the guide-line overlay (its coordinate space is the scene size)
+	 */
+	showEditGuides?: boolean;
 }
 
 /**
@@ -41,6 +76,12 @@ export const BattleFieldScene: React.FC<IBattleFieldSceneProps> = ({
 	sprites,
 	config,
 	showSpriteLabels,
+	editable,
+	frameOffsets,
+	onFrameOffsetChange,
+	showEditGuides,
+	snapToGuides,
+	resetToken,
 }) =>
 {
 	return (
@@ -54,6 +95,12 @@ export const BattleFieldScene: React.FC<IBattleFieldSceneProps> = ({
 					height={config.height}
 					showSpriteLabels={showSpriteLabels}
 					bgSize={config.bgSize}
+					editable={editable}
+					frameOffsets={frameOffsets}
+					onFrameOffsetChange={onFrameOffsetChange}
+					showEditGuides={showEditGuides}
+					snapToGuides={snapToGuides}
+					resetToken={resetToken}
 				/>
 			</div>
 		</div>

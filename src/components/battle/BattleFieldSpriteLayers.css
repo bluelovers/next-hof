@@ -24,3 +24,54 @@
 	/* filter: FlipH;
 	-ms-filter: "FlipH"; */
 }
+
+/* ==================== 編輯模式 / Edit Mode ==================== */
+
+/* 編輯模式：整層點擊穿透（把手自動恢復互動），
+   否則堆疊在最上層的空白圖層會吃掉所有點擊，底下的精靈永遠抓不到
+   Edit mode: the whole layer becomes click-through (its handle restores interaction);
+   otherwise the topmost blank layer would swallow every click and sprites below could
+   never be grabbed */
+.battle-sprite--editable
+{
+	pointer-events: none;
+	user-select: none;
+}
+
+/* 精靈拖曳把手：與圖片顯示區同大小，錨定在圖片左上角座標
+   Sprite drag handle: same box as the displayed image, anchored at the image top-left coords */
+.battle-sprite__drag-handle
+{
+	position: absolute;
+	pointer-events: auto;
+	cursor: grab;
+	touch-action: none;
+}
+
+.battle-sprite__drag-handle:active
+{
+	cursor: grabbing;
+}
+
+/* 座標徽章：貼齊圖片頂部，與把手同寬（鏡像後仍佔同一位置）
+   Coordinate badge: sits on top of the image, same width as the handle (so it lands on the
+   same box after mirroring) */
+.battle-sprite__edit-badge
+{
+	position: absolute;
+	left: 0;
+	top: 0;
+	display: block;
+	width: 100%;
+	padding: 0 2px;
+	font-size: 10px;
+	line-height: 1.4;
+	text-align: center;
+	white-space: nowrap;
+	overflow: hidden;
+	pointer-events: none;
+	color: var(--color-text-primary);
+	background: var(--color-bg-page);
+	border-bottom: 1px solid var(--color-border-mid);
+	opacity: 0.85;
+}
