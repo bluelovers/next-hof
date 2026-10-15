@@ -16,3 +16,5 @@ storybook-static
 docs/mcp/Kapture-MCP-vs-Chrome-DevTools-MCP-比較表.md
 test/temp*
 
+!.storybook/preview.js
+!.storybook/main.js
