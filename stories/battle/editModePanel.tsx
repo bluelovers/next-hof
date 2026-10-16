@@ -29,7 +29,15 @@
  * re-renders while a frame is dragged).
  */
 import React from 'react';
-import { useArgs } from 'storybook/preview-api';
+/**
+ * Hook 一律取自 storybook/preview-api：裝飾器 render 內已使用 useArgs，
+ * 框架 hook（useState / useEffect / useRef…）若再從 React 混用，
+ * 可能與 Storybook 渲染器的 hook 來源不一致；preview-api 提供同名等價 hook 供同處使用。
+ * All hooks come from storybook/preview-api: this decorator's render already calls useArgs, and
+ * mixing framework hooks (useState / useEffect / useRef…) from React with it may diverge from the
+ * Storybook renderer's hook source; preview-api re-exports equivalent hooks for use in the same place.
+ */
+import { useArgs, useEffect, useRef, useState } from 'storybook/preview-api';
 import type { Decorator } from '../decorators';
 import { GAME_FONT } from '../decorators';
 import type { ISpriteImageSize } from '../../src/components/battle/spriteImageSizes';
@@ -42,6 +50,11 @@ import type {
 } from '../../src/components/battle/types';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '../../src/components/battle/types';
 import { EnumBattleFieldBgScale, EnumTeamSideUI } from '../../src/components/battle/enums';
+import {
+	BG_SCALE_OPTIONS,
+	BG_H_ALIGN_OPTIONS,
+	BG_V_ALIGN_OPTIONS,
+} from './bgControlOptions';
 import { frameOffsetLiveStore } from '../../src/components/battle/frameOffsetLiveStore';
 import {
 	alignFrameToSceneEdge,
@@ -61,28 +74,7 @@ import {
 /** 強制對齊的套用對象（僅套用到單側時，避免兩框被對到同一條線重疊） / Which frames a forced alignment applies to (per-side so two frames are never forced onto one line) */
 export type IEditModeAlignTarget = 'left' | 'right' | 'both';
 
-/** 背景縮放模式選項（與 config.bgScale 同值域） / Background scale-mode options (same value domain as config.bgScale) */
-const BG_SCALE_OPTIONS: { value: EnumBattleFieldBgScale; label: string }[] = [
-	{ value: EnumBattleFieldBgScale.Natural, label: '原始 natural' },
-	{ value: EnumBattleFieldBgScale.Cover, label: '覆蓋 cover' },
-	{ value: EnumBattleFieldBgScale.Contain, label: '完整 contain' },
-	{ value: EnumBattleFieldBgScale.Stretch, label: '拉伸 stretch' },
-	{ value: EnumBattleFieldBgScale.Repeat, label: '平鋪 repeat' },
-];
-
-/** 背景水平對齊選項 / Background horizontal alignment options */
-const BG_H_ALIGN_OPTIONS: { value: IBattleFieldBgHAlign; label: string }[] = [
-	{ value: 'left', label: '靠左' },
-	{ value: 'center', label: '置中' },
-	{ value: 'right', label: '靠右' },
-];
-
-/** 背景垂直對齊選項（repeat 平鋪不受影響） / Background vertical alignment options (repeat mode unaffected) */
-const BG_V_ALIGN_OPTIONS: { value: IBattleFieldBgVAlign; label: string }[] = [
-	{ value: 'top', label: '置頂' },
-	{ value: 'middle', label: '置中' },
-	{ value: 'bottom', label: '置底' },
-];
+/** 背景縮放／對齊選項：共用 bgControlOptions（與背景選擇面板同一份） / Background scale/alignment options: shared via bgControlOptions (same copy as the background picker panel) */
 
 /** 面板選項 / Panel options */
 export interface IBattleEditModePanelOptions
@@ -208,9 +200,9 @@ export const makeBattleFieldEditModeDecorator = (
 		const guidesOn = current.showEditGuides === true;
 		const snapOn = current.snapToGuides === true;
 		/** 強制對齊的套用對象 / Which frames a forced alignment applies to */
-		const [alignTarget, setAlignTarget] = React.useState<IEditModeAlignTarget>('both');
+		const [alignTarget, setAlignTarget] = useState<IEditModeAlignTarget>('both');
 		/** 左右隊對齊高度的基準 / Reference used by team height alignment */
-		const [heightAlign, setHeightAlign] = React.useState<EnumEditModePairHeightAlign>(
+		const [heightAlign, setHeightAlign] = useState<EnumEditModePairHeightAlign>(
 			EnumEditModePairHeightAlign.Left,
 		);
 		/** 目前戰場配置（背景控制項讀寫來源） / Current battlefield config (read/write source for the background controls) */
@@ -300,8 +292,8 @@ export const makeBattleFieldEditModeDecorator = (
 		 * re-render of the whole story tree was the main cause of drag stutter, and its lagging
 		 * echoes kept the frame moving after release.
 		 */
-		const readoutRef = React.useRef<HTMLSpanElement>(null);
-		React.useEffect(() =>
+		const readoutRef = useRef<HTMLSpanElement | null>(null);
+		useEffect(() =>
 		{
 			if (!frameOps)
 			{

@@ -13,9 +13,16 @@
  * Also covers dual-frame mode (scene larger than the frame): each side owns a BattleFieldSpriteFrame
  * that can be given its own initial position, or dragged on the canvas via `editable`.
  */
-import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { useArgs } from 'storybook/preview-api';
+/**
+ * Hook 一律取自 storybook/preview-api：故事 render 內已使用 useArgs，
+ * 框架 hook（useRef 等）若再從 React 混用，可能與 Storybook 渲染器的 hook 來源不一致；
+ * preview-api 提供同名等價 hook 供同處使用。
+ * All hooks come from storybook/preview-api: this story's render already calls useArgs, and mixing
+ * framework hooks (useRef etc.) from React with it may diverge from the Storybook renderer's hook
+ * source; preview-api re-exports equivalent hooks for use in the same place.
+ */
+import { useArgs, useRef } from 'storybook/preview-api';
 import { BattleFieldLayersDarkDecorator } from '../decorators';
 import { BattleFieldLayers } from '../../src/components/battle/BattleFieldLayers';
 import { sampleSprites, createSampleConfig, sampleFieldSize } from './sampleData';
@@ -234,15 +241,6 @@ const dualFrameInitialOffsets: IBattleSidePair<IBattleFieldFrameOffset> = {
  * 即時座標改由 frameOffsetLiveStore 直通編輯面板的座標 % 讀值（零 story 重繪），
  * onFrameOffsetChange 僅在放開時單次寫回最終座標，讓對齊按鈕以「目前實際位置」為準。
  * 編輯面板提供：重置、5/6 等分對齊、十字對齊、左右隊對齊高度、參考線與吸附開關、座標相對 % 讀值。
- * While dragging, a frame clamps inside the scene (x∈[0,288], y∈[0,120]) and the badge shows
- * the team, coordinates and relative percentage. Nothing is written back to args.frameOffsets
- * during the drag (per-drag write-backs re-rendered the whole story tree and caused stutter,
- * and their lagging mid-drag echoes arrived after release and kept the frame moving); the live
- * position goes straight to the edit panel's % readout via frameOffsetLiveStore (zero story
- * re-renders), while onFrameOffsetChange writes the final coordinate back once on release so
- * the alignment buttons always operate on the actual current positions.
- * The panel offers reset, 5/6-division alignment, cross alignment, team height alignment, the
- * guides and snap toggles, and the relative-% readout.
  */
 export const DualFrameEditable: Story = {
 	args: {
@@ -269,7 +267,7 @@ export const DualFrameEditable: Story = {
 		 * stale value for the OTHER side (cross-side regression); the ref makes every write
 		 * spread the freshest pair.
 		 */
-		const latestArgsRef = React.useRef(args);
+		const latestArgsRef = useRef(args);
 		latestArgsRef.current = args;
 		return (
 			<BattleFieldLayers
