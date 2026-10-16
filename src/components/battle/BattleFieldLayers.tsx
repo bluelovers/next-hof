@@ -111,6 +111,23 @@ export interface IBattleFieldLayersProps extends IBattleSpriteLabelOptions, IBat
  * config.bgHAlign / bgVAlign override the horizontal and vertical anchors (the repeat
  * mode always tiles from the top-left corner).
  */
+/**
+ * 垂直對齊值 → CSS background-position 垂直關鍵字
+ * Vertical alignment value → CSS background-position vertical keyword
+ *
+ * 值域的 'middle' 在 CSS 沒有對應關鍵字（CSS 只有 top / center / bottom），
+ * 直接拼進 background-position 會產生無效宣告、整條被瀏覽器捨棄（畫面無反應），
+ * 故在此統一對映到 'center'；其餘值可直接使用。
+ * CSS has no 'middle' keyword for background-position (only top / center / bottom); splicing it
+ * straight into the value produces an invalid declaration that the browser discards entirely
+ * (the canvas appears not to react), so it is mapped to 'center' here; the other values pass through.
+ */
+const BG_V_ALIGN_CSS_KEYWORD: Record<IBattleFieldBgVAlign, 'top' | 'center' | 'bottom'> = {
+	top: 'top',
+	middle: 'center',
+	bottom: 'bottom',
+};
+
 function resolveBgImageLayout(
 	scale: IBattleFieldBgScale,
 	bgSize: ISpriteImageSize,
@@ -119,10 +136,13 @@ function resolveBgImageLayout(
 ): React.CSSProperties
 {
 	/**
-	 * CSS background-position 關鍵字組合（如 "left top" / "center bottom"）
-	 * CSS background-position keyword pair (e.g. "left top" / "center bottom")
+	 * CSS background-position 關鍵字組合（如 "left top" / "center bottom"）；
+	 * 垂直軸需將值域 'middle' 對映為 CSS 的 'center'，否則宣告無效被捨棄。
+	 * CSS background-position keyword pair (e.g. "left top" / "center bottom");
+	 * the vertical axis maps the value-domain 'middle' to CSS 'center', otherwise
+	 * the declaration is invalid and gets discarded.
 	 */
-	const position = `${hAlign} ${vAlign}`;
+	const position = `${hAlign} ${BG_V_ALIGN_CSS_KEYWORD[vAlign]}`;
 	switch (scale)
 	{
 		case 'cover':

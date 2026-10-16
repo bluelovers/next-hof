@@ -99,14 +99,14 @@ export const Default: Story = {
 /** 背景放大（720×320）：角色框水平置中、垂直貼底 / Enlarged background (720×320): frame centered horizontally, bottom-aligned */
 export const LargeBackground: Story = {
 	args: {
-		bgSize: { width: 720, height: 320 },
+		bgSize: { width: 768, height: 320 },
 	},
 };
 
 /** 僅放大背景寬度 / Only enlarge background width */
 export const LargeWidthOnly: Story = {
 	args: {
-		bgSize: { width: 720 },
+		bgSize: { width: 768 },
 	},
 };
 
@@ -120,7 +120,7 @@ export const LargeHeightOnly: Story = {
 /** 垂直置底（預設） / Vertical bottom (default) */
 export const AlignBottom: Story = {
 	args: {
-		bgSize: { width: 720, height: 320 },
+		bgSize: { width: 768, height: 320 },
 		valign: EnumBattleFieldVAlign.Bottom,
 	},
 };
@@ -128,7 +128,7 @@ export const AlignBottom: Story = {
 /** 垂直置中 / Vertical middle */
 export const AlignMiddle: Story = {
 	args: {
-		bgSize: { width: 720, height: 320 },
+		bgSize: { width: 768, height: 320 },
 		valign: EnumBattleFieldVAlign.Middle,
 	},
 };
@@ -136,7 +136,7 @@ export const AlignMiddle: Story = {
 /** 垂直置頂 / Vertical top */
 export const AlignTop: Story = {
 	args: {
-		bgSize: { width: 720, height: 320 },
+		bgSize: { width: 768, height: 320 },
 		valign: EnumBattleFieldVAlign.Top,
 	},
 };
@@ -144,14 +144,14 @@ export const AlignTop: Story = {
 /** 背景圖：原始尺寸，水平置中 + 垂直置底（預設） / Natural size, centered + bottom (default) */
 export const BgScaleNatural: Story = {
 	args: {
-		bgSize: { width: 720, height: 320 },
+		bgSize: { width: 768, height: 320 },
 	},
 };
 
 /** 背景圖：cover 縮放覆蓋整個背景框 / Scale mode cover */
 export const BgScaleCover: Story = {
 	args: {
-		bgSize: { width: 720, height: 320 },
+		bgSize: { width: 768, height: 320 },
 		config: { ...createSampleConfig('grass'), bgScale: EnumBattleFieldBgScale.Cover },
 	},
 };
@@ -159,7 +159,7 @@ export const BgScaleCover: Story = {
 /** 背景圖：contain 完整放入背景框（可能留白） / Scale mode contain (may letterbox) */
 export const BgScaleContain: Story = {
 	args: {
-		bgSize: { width: 720, height: 320 },
+		bgSize: { width: 768, height: 320 },
 		config: { ...createSampleConfig('grass'), bgScale: EnumBattleFieldBgScale.Contain },
 	},
 };
@@ -167,7 +167,7 @@ export const BgScaleContain: Story = {
 /** 背景圖：stretch 拉伸至背景框確切尺寸 / Scale mode stretch */
 export const BgScaleStretch: Story = {
 	args: {
-		bgSize: { width: 720, height: 320 },
+		bgSize: { width: 768, height: 320 },
 		config: { ...createSampleConfig('grass'), bgScale: EnumBattleFieldBgScale.Stretch },
 	},
 };
@@ -175,7 +175,7 @@ export const BgScaleStretch: Story = {
 /** 背景圖：repeat 依原始尺寸平鋪 / Scale mode repeat */
 export const BgScaleRepeat: Story = {
 	args: {
-		bgSize: { width: 720, height: 320 },
+		bgSize: { width: 768, height: 320 },
 		config: { ...createSampleConfig('grass'), bgScale: EnumBattleFieldBgScale.Repeat },
 	},
 };

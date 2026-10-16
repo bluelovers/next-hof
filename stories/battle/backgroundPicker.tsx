@@ -49,7 +49,6 @@ const choiceUrlSet = new Set(allChoices.map((choice) => choice.url));
 /** 背景尺寸預設（寬×高；點擊直接賦值 bgSize） / Background size presets (width×height; click assigns bgSize directly) */
 const BG_SIZE_PRESETS: { label: string; width: number; height: number }[] = [
 	{ label: `角色排版 ${SPRITE_LAYOUT_WIDTH}×${SPRITE_LAYOUT_HEIGHT}`, width: SPRITE_LAYOUT_WIDTH, height: SPRITE_LAYOUT_HEIGHT },
-	{ label: '大圖 720×320', width: 720, height: 320 },
 	{ label: '大圖 768×320', width: 768, height: 320 },
 ];
 
