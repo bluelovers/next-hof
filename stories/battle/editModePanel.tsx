@@ -13,6 +13,7 @@
  * - 吸附開關：切換 args.snapToGuides（拖曳時是否貼齊參考線）
  * - 背景縮放模式 / 背景對齊：寫回 args.config.bgScale / bgHAlign / bgVAlign
  * - 座標相對 %：以戰場尺寸為基準，即時顯示左右框座標的相對百分比
+ *   （讀值走 frameOffsetLiveStore 直接更新 DOM，拖曳期間面板零重繪）
  *
  * All helpers from editModeUtils are exposed as clickable buttons so stories can be operated
  * directly on the canvas: reset (restore initial positions + bump resetToken), forced
@@ -24,7 +25,8 @@
  * alignment (reference selectable: left, right, or average), the guides and snap toggles
  * (via args.showEditGuides / args.snapToGuides), background scale/alignment controls
  * (writing args.config.bgScale / bgHAlign / bgVAlign), and a live relative-% readout of both
- * frame coordinates.
+ * frame coordinates (fed by frameOffsetLiveStore straight into the DOM, so the panel never
+ * re-renders while a frame is dragged).
  */
 import React from 'react';
 import { useArgs } from 'storybook/preview-api';
@@ -39,7 +41,8 @@ import type {
 	IBattleFieldBgVAlign,
 } from '../../src/components/battle/types';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '../../src/components/battle/types';
-import { EnumBattleFieldBgScale } from '../../src/components/battle/enums';
+import { EnumBattleFieldBgScale, EnumTeamSideUI } from '../../src/components/battle/enums';
+import { frameOffsetLiveStore } from '../../src/components/battle/frameOffsetLiveStore';
 import {
 	alignFrameToSceneEdge,
 	alignPairHeights,
@@ -48,6 +51,7 @@ import {
 	computeDivisionGuideLines,
 	computeRelativePercent,
 	forceSnapToGuideLines,
+	formatFrameCoordinate,
 	formatRelativePercent,
 	EnumEditModeEdgeAlign,
 	EnumEditModePairHeightAlign,
@@ -212,9 +216,22 @@ export const makeBattleFieldEditModeDecorator = (
 		/** 目前戰場配置（背景控制項讀寫來源） / Current battlefield config (read/write source for the background controls) */
 		const config = (current.config ?? {}) as IBattleFieldConfig;
 
-		/** 對齊運算的基準位置：優先用目前的 frameOffsets，沒有才退回初始值 / Alignment base: current frameOffsets first, initial values as fallback */
+		/**
+		 * 對齊運算與讀值的基準位置：優先取 live store 的「目前實際位置」
+		 * （拖曳中座標不經過 args 管線，args 可能滯後），
+		 * 沒有才退回 args.frameOffsets，最後退回初始值。
+		 * Alignment/readout base: prefer the live store's "actual current position" (drag
+		 * coordinates bypass the args pipeline, so args may lag), then args.frameOffsets,
+		 * then the initial values.
+		 */
 		const resolveOffsets = (): IBattleSidePair<IBattleFieldFrameOffset> =>
-			offsets ?? initialFrameOffsets ?? { left: { x: 0, y: 0 }, right: { x: 0, y: 0 } };
+		{
+			const fallback = offsets ?? initialFrameOffsets ?? { left: { x: 0, y: 0 }, right: { x: 0, y: 0 } };
+			return {
+				left: frameOffsetLiveStore.getSnapshot(EnumTeamSideUI.Left) ?? fallback.left,
+				right: frameOffsetLiveStore.getSnapshot(EnumTeamSideUI.Right) ?? fallback.right,
+			};
+		};
 
 		/** 重置：還原初始位置（若有）並遞增 resetToken 讓元件清掉內部拖曳狀態 / Reset: restore the initial positions (if any) and bump resetToken so the component clears its internal drag state */
 		const handleReset = () =>
@@ -272,9 +289,49 @@ export const makeBattleFieldEditModeDecorator = (
 			updateArgs({ config: { ...config, ...patch } });
 		};
 
-		const base = resolveOffsets();
-		const leftPercent = computeRelativePercent(base.left, sceneSize);
-		const rightPercent = computeRelativePercent(base.right, sceneSize);
+		/**
+		 * 座標 % 讀值：以 ref 直接更新 DOM 文字（不走 React 狀態），
+		 * 訂閱 live store（元件每幀發布座標、store 約 10Hz 通知一次）。
+		 * 拖曳期間面板零重繪——舊版透過 args 逐次重繪整棵 story 樹，
+		 * 既是拖曳卡頓的主因，其滯後回聲又會讓框在放開後繼續移動。
+		 * Relative-% readout: the span text is written straight into the DOM (no React state),
+		 * subscribing to the live store (the component publishes per frame; the store notifies
+		 * about every 100ms). Zero panel re-renders during the drag — the old args-driven
+		 * re-render of the whole story tree was the main cause of drag stutter, and its lagging
+		 * echoes kept the frame moving after release.
+		 */
+		const readoutRef = React.useRef<HTMLSpanElement>(null);
+		React.useEffect(() =>
+		{
+			if (!frameOps)
+			{
+				return;
+			}
+			const renderReadout = () =>
+			{
+				const el = readoutRef.current;
+				if (!el)
+				{
+					return;
+				}
+				const pair = resolveOffsets();
+				el.textContent =
+					`左隊 ${formatFrameCoordinate(pair.left.x)},${formatFrameCoordinate(pair.left.y)}（${formatRelativePercent(computeRelativePercent(pair.left, sceneSize))}）｜`
+					+ ` 右隊 ${formatFrameCoordinate(pair.right.x)},${formatFrameCoordinate(pair.right.y)}（${formatRelativePercent(computeRelativePercent(pair.right, sceneSize))}）`;
+			};
+			renderReadout();
+			const unsubscribes = [
+				frameOffsetLiveStore.subscribe(EnumTeamSideUI.Left, renderReadout),
+				frameOffsetLiveStore.subscribe(EnumTeamSideUI.Right, renderReadout),
+			];
+			return () =>
+			{
+				unsubscribes.forEach((unsubscribe) =>
+				{
+					unsubscribe();
+				});
+			};
+		}, [frameOps]);
 
 		return (
 			<>
@@ -312,19 +369,19 @@ export const makeBattleFieldEditModeDecorator = (
 							<button style={buttonStyle} onClick={() => applyEdgeAlign(EnumEditModeEdgeAlign.Right)}>靠右</button>
 							<button
 								style={heightAlign === EnumEditModePairHeightAlign.Left ? activeButtonStyle : buttonStyle}
-								onClick={() => { setHeightAlign(EnumEditModePairHeightAlign.Left); updateArgs({ frameOffsets: alignPairHeights(base, EnumEditModePairHeightAlign.Left) }); }}
+								onClick={() => { setHeightAlign(EnumEditModePairHeightAlign.Left); updateArgs({ frameOffsets: alignPairHeights(resolveOffsets(), EnumEditModePairHeightAlign.Left) }); }}
 							>
 								隊高以左
 							</button>
 							<button
 								style={heightAlign === EnumEditModePairHeightAlign.Right ? activeButtonStyle : buttonStyle}
-								onClick={() => { setHeightAlign(EnumEditModePairHeightAlign.Right); updateArgs({ frameOffsets: alignPairHeights(base, EnumEditModePairHeightAlign.Right) }); }}
+								onClick={() => { setHeightAlign(EnumEditModePairHeightAlign.Right); updateArgs({ frameOffsets: alignPairHeights(resolveOffsets(), EnumEditModePairHeightAlign.Right) }); }}
 							>
 								隊高以右
 							</button>
 							<button
 								style={heightAlign === EnumEditModePairHeightAlign.Average ? activeButtonStyle : buttonStyle}
-								onClick={() => { setHeightAlign(EnumEditModePairHeightAlign.Average); updateArgs({ frameOffsets: alignPairHeights(base, EnumEditModePairHeightAlign.Average) }); }}
+								onClick={() => { setHeightAlign(EnumEditModePairHeightAlign.Average); updateArgs({ frameOffsets: alignPairHeights(resolveOffsets(), EnumEditModePairHeightAlign.Average) }); }}
 							>
 								隊高平均
 							</button>
@@ -379,10 +436,7 @@ export const makeBattleFieldEditModeDecorator = (
 						</>
 					)}
 					{frameOps && (
-						<span style={readoutStyle}>
-							左隊 {base.left.x},{base.left.y}（{formatRelativePercent(leftPercent)}）｜
-							右隊 {base.right.x},{base.right.y}（{formatRelativePercent(rightPercent)}）
-						</span>
+						<span ref={readoutRef} style={readoutStyle} />
 					)}
 				</div>
 				<Story />

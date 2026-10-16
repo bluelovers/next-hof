@@ -344,10 +344,44 @@ export function computeRelativePercent(
 	};
 }
 
-/** 格式化百分比字串（如 `12.5%, 40%`；整數不帶小數點） / Format a percentage pair as a string (e.g. `12.5%, 40%`; integers print without decimals) */
+/** 填充百分比到固定格式（整數部分補 0 至 2 位、固定 1 位小數；如 `3.1` → `03.1`、`40` → `40.0`、`100` → `100.0`） / Pad a percentage into the fixed format (integer part zero-padded to 2 digits, always one decimal; e.g. `3.1` → `03.1`, `40` → `40.0`, `100` → `100.0`) */
+function padPercent1(value: number): string
+{
+	const negative = value < 0;
+	const [intPart, fracPart] = Math.abs(value).toFixed(1).split('.');
+	const padded = `${intPart.padStart(2, '0')}.${fracPart}`;
+	return negative ? `-${padded}` : padded;
+}
+
+/**
+ * 格式化百分比字串（固定 `00.0%` 格式；如 `03.1%, 12.5%`、`40.0%, 00.0%`）
+ * Format a percentage pair as a fixed `00.0%` string (e.g. `03.1%, 12.5%`, `40.0%, 00.0%`)
+ *
+ * 整數部分補 0 至 2 位、固定 1 位小數，讓讀值欄位寬度穩定、易於掃描比對。
+ * The integer part is zero-padded to 2 digits with one decimal, keeping the readout column
+ * width stable and easy to scan.
+ */
 export function formatRelativePercent(percent: IEditModeRelativePercent): string
 {
-	return `${percent.x}%, ${percent.y}%`;
+	return `${padPercent1(percent.x)}%, ${padPercent1(percent.y)}%`;
+}
+
+/**
+ * 格式化框座標（前補 0 至 4 位；如 `24` → `0024`、`264` → `0264`、`0` → `0000`）
+ * Format a frame coordinate with leading zeros up to 4 digits (e.g. `24` → `0024`,
+ * `264` → `0264`, `0` → `0000`)
+ *
+ * 座標顯示在編輯徽章與面板讀值上，固定寬度讓拖曳中的數值跳動不改變欄寬；
+ * 負值防禦性保留負號（正常情況下座標已收斂在戰場範圍內、不會為負）。
+ * Coordinates appear on the edit badge and the panel readout; the fixed width keeps the
+ * column from re-flowing while the numbers jump during a drag. A defensive negative sign is
+ * preserved (coordinates are normally clamped inside the scene and never negative).
+ */
+export function formatFrameCoordinate(value: number): string
+{
+	const negative = value < 0;
+	const padded = Math.abs(Math.round(value)).toString().padStart(4, '0');
+	return negative ? `-${padded}` : padded;
 }
 
 /** 左右隊高度對齊的基準 / Reference used when aligning the two sides' heights */

@@ -38,6 +38,7 @@ import type { ISpriteImageSize } from './spriteImageSizes';
 import { BattleFieldSpriteFrame } from './BattleFieldSpriteFrame';
 import { BattleFieldMagicCircle } from './BattleFieldMagicCircle';
 import { BattleFieldEditGuides } from './BattleFieldEditGuides';
+import { frameOffsetLiveStore } from './frameOffsetLiveStore';
 import { EnumBattleFieldBgScale, EnumBattleFieldVAlign, EnumTeamSideUI } from '#/components/battle/enums';
 import type { IStyleProps } from '#/components/shared/types';
 
@@ -73,9 +74,9 @@ export interface IBattleFieldLayersProps extends IBattleSpriteLabelOptions, IBat
 	 */
 	frameOffsets?: IBattleFieldSideOffsets;
 	/**
-	 * 排版框被拖曳移動時回報（編輯模式；拖曳過程由元件端節流回報、放開時回報最終座標）
-	 * Reports when a frame is dragged (edit mode; throttled by the component during the drag,
-	 * with the final coordinate reported on release)
+	 * 排版框拖曳結束時回報最終座標（編輯模式；拖曳過程不回報，放開時單次寫回）
+	 * Reports the final offset when a frame drag ends (edit mode; nothing is reported during
+	 * the drag — a single write-back fires on release)
 	 */
 	onFrameOffsetChange?: (event: IBattleFieldFrameMoveEvent) => void;
 	/**
@@ -341,6 +342,7 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
 								snapToGuides={snapToGuides}
 								resetToken={resetToken}
 								onOffsetChange={(offset) => onFrameOffsetChange?.({ side, offset })}
+							onLiveOffsetChange={(live) => frameOffsetLiveStore.publish(side, live)}
 							/>
 						))}
 					</>

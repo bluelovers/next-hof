@@ -228,16 +228,19 @@ const dualFrameInitialOffsets: IBattleSidePair<IBattleFieldFrameOffset> = {
  * 雙框編輯模式：分別指定初始位置，並可直接在畫面上拖曳敵我雙方的排版框
  * Dual-frame edit mode: initial positions per side, and both frames are draggable on the canvas
  *
- * 拖曳時框收斂在戰場範圍內（x∈[0,288]、y∈[0,120]），徽章顯示所屬隊伍、座標與相對百分比；
- * onFrameOffsetChange 於拖曳過程節流寫回 args.frameOffsets（約每 100ms 一次）、
- * 放開時補寫最終座標，讓編輯面板的對齊按鈕與座標 % 讀值以「目前實際位置」為準，
- * 同時避免逐幀回寫整棵 story 樹重繪造成的拖曳卡頓。
+ * 拖曳時框收斂在戰場範圍內（x∈[0,288]、y∈[0,120]），徽章顯示所屬隊伍、座標與相對百分比。
+ * 拖曳過程「不」寫回 args.frameOffsets（逐次回寫會重繪整棵 story 樹造成卡頓，
+ * 且滯後的中間值會在放開後回送成回聲、讓框繼續移動）；
+ * 即時座標改由 frameOffsetLiveStore 直通編輯面板的座標 % 讀值（零 story 重繪），
+ * onFrameOffsetChange 僅在放開時單次寫回最終座標，讓對齊按鈕以「目前實際位置」為準。
  * 編輯面板提供：重置、5/6 等分對齊、十字對齊、左右隊對齊高度、參考線與吸附開關、座標相對 % 讀值。
  * While dragging, a frame clamps inside the scene (x∈[0,288], y∈[0,120]) and the badge shows
- * the team, coordinates and relative percentage; onFrameOffsetChange writes the new position
- * back into args.frameOffsets throttled during the drag (about every 100ms) and flushes the
- * final coordinate on release, so the panel's alignment buttons and the % readout operate on
- * the actual current positions without the stutter caused by per-frame full-tree re-renders.
+ * the team, coordinates and relative percentage. Nothing is written back to args.frameOffsets
+ * during the drag (per-drag write-backs re-rendered the whole story tree and caused stutter,
+ * and their lagging mid-drag echoes arrived after release and kept the frame moving); the live
+ * position goes straight to the edit panel's % readout via frameOffsetLiveStore (zero story
+ * re-renders), while onFrameOffsetChange writes the final coordinate back once on release so
+ * the alignment buttons always operate on the actual current positions.
  * The panel offers reset, 5/6-division alignment, cross alignment, team height alignment, the
  * guides and snap toggles, and the relative-% readout.
  */
@@ -250,18 +253,30 @@ export const DualFrameEditable: Story = {
 		frameOffsets: dualFrameInitialOffsets,
 	},
 	/**
-	 * 拖曳即時寫回 args.frameOffsets（useArgs 在故事 render 內可安全使用）
-	 * Write drags straight back into args.frameOffsets (useArgs is safe inside a story render)
+	 * 放開時單次寫回 args.frameOffsets（useArgs 在故事 render 內可安全使用）
+	 * Write the final position back into args.frameOffsets once on release (useArgs is safe
+	 * inside a story render)
 	 */
 	render: (args) =>
 	{
 		const [, updateArgs] = useArgs();
+		/**
+		 * 以 ref 保存「最新」args：updateArgs 是物件合併且故事 rerender 有延遲，
+		 * 若直接閉包 args.frameOffsets，快速連續拖兩框時後一次回寫會把
+		 * 另一側的座標覆寫成舊值（跨框回歸）；ref 讓每次寫入都以最新值為底。
+		 * Keep the "latest" args in a ref: updateArgs merges plain objects and story rerenders
+		 * lag, so closing over args.frameOffsets would let a second quick drag write back a
+		 * stale value for the OTHER side (cross-side regression); the ref makes every write
+		 * spread the freshest pair.
+		 */
+		const latestArgsRef = React.useRef(args);
+		latestArgsRef.current = args;
 		return (
 			<BattleFieldLayers
 				{...args}
 				onFrameOffsetChange={({ side, offset }) =>
 				{
-					const current = (args.frameOffsets ?? dualFrameInitialOffsets) as IBattleSidePair<IBattleFieldFrameOffset>;
+					const current = (latestArgsRef.current.frameOffsets ?? dualFrameInitialOffsets) as IBattleSidePair<IBattleFieldFrameOffset>;
 					updateArgs({
 						frameOffsets: {
 							...current,
