@@ -225,6 +225,12 @@ export const MAGIC_CIRCLE_DEFAULT_X = 280;
 /** 魔方陣預設 Y 位置 / Default magic-circle Y position */
 export const MAGIC_CIRCLE_DEFAULT_Y = 0;
 
+/** 背景圖水平對齊（預設 center）/ Background image horizontal alignment (default center) */
+export type IBattleFieldBgHAlign = 'left' | 'center' | 'right';
+
+/** 背景圖垂直對齊（預設 bottom）/ Background image vertical alignment (default bottom) */
+export type IBattleFieldBgVAlign = 'top' | 'middle' | 'bottom';
+
 /** 戰場背景 / Battlefield background */
 export interface IBattleFieldConfig
 {
@@ -240,6 +246,24 @@ export interface IBattleFieldConfig
 	bgSize?: IBattleFieldBgSize;
 	/** 背景圖縮放模式（預設 natural）/ Background image scale mode (default natural) */
 	bgScale?: EnumBattleFieldBgScale;
+	/**
+	 * 背景圖水平對齊（預設 center）
+	 * Background image horizontal alignment (default center)
+	 *
+	 * 決定背景圖在 bgSize 框內的水平錨點（cover / contain / stretch / natural 皆適用）。
+	 * Sets the background image's horizontal anchor inside the bgSize box
+	 * (applies to cover / contain / stretch / natural alike).
+	 */
+	bgHAlign?: IBattleFieldBgHAlign;
+	/**
+	 * 背景圖垂直對齊（預設 bottom）
+	 * Background image vertical alignment (default bottom)
+	 *
+	 * 決定背景圖在 bgSize 框內的垂直錨點；repeat 平鋪模式固定由左上角開始，不受此欄位影響。
+	 * Sets the background image's vertical anchor inside the bgSize box; the repeat mode always
+	 * tiles from the top-left corner and ignores this field.
+	 */
+	bgVAlign?: IBattleFieldBgVAlign;
 	/** 魔方陣圖層（選填，繪製於角色精靈之下）/ Magic-circle layers */
 	magicCircles?: IBattleMagicCircle[];
 }

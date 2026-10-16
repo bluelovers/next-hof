@@ -274,8 +274,16 @@ function buildSpriteLayers(
  * In edit mode a keyed override table stores drag results: only coordinates change on
  * override while every other field (styles / label options) keeps the original data, and
  * the label anti-overlap pass recomputes from the overridden coordinates.
+ *
+ * 以 React.memo 包裹：外層排版框在拖曳時每幀重繪，但本組件的 props
+ * （sprites 陣列、尺寸、標籤開關）在拖曳期間完全不變，
+ * memo 可略過整棵精靈子樹（圖層 div＋標籤）的重建，顯著降低拖曳成本。
+ * Wrapped in React.memo: the parent layout frame re-renders every frame while dragging, but
+ * this component's props (sprites array, size, label toggle) never change during the drag, so
+ * the memo skips rebuilding the whole sprite subtree (layer divs + labels) and makes dragging
+ * much cheaper.
  */
-export const BattleFieldSpriteLayers: React.FC<IBattleFieldSpriteLayersProps> = (props) =>
+export const BattleFieldSpriteLayers: React.FC<IBattleFieldSpriteLayersProps> = React.memo<IBattleFieldSpriteLayersProps>((props) =>
 {
 	const { sprites, width, height, editable, onSpriteMove, snapToGuides, showEditGuides, resetToken } = props;
 
@@ -456,4 +464,4 @@ export const BattleFieldSpriteLayers: React.FC<IBattleFieldSpriteLayersProps> = 
 			{showEditGuides && <BattleFieldEditGuides size={{ width, height }} />}
 		</>
 	);
-};
+});

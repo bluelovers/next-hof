@@ -5,8 +5,11 @@
  * 全部是「不依賴 DOM / 不呼叫 IO」的純函式，供編輯模式的元件與 story 面板共用：
  * - 參考線：等分線（5 / 6 等分）與十字中心線的座標計算，以及顯示／隱藏的資料來源
  * - 吸附：拖曳時把座標吸到容差內最近的參考線
+ * - 強制對齊：按鈕觸發時「無容差」直接吸到最近的參考線（等分／十字）
+ * - 邊緣對齊：把排版框貼齊戰場的四邊與中心（水平左/中/右、垂直上/中/下）
  * - 相對座標：把像素座標換算為相對戰場的百分比
- * - 對齊：左右隊對齊高度（同高＝同一 y）
+ * - 對齊：左右隊對齊高度（可選擇以左隊、右隊或兩者平均為基準）
+ * - 收斂：把框座標收斂在戰場可動範圍內（與元件端 clamp 同一套規則）
  * - 重置：定義「重置」代表回到什麼狀態（框＝初始值或 CSS 對齊、精靈＝清除覆寫）
  *
  * All helpers are pure (no DOM access, no IO) and shared by the edit-mode components and the
@@ -14,8 +17,15 @@
  * - Guides: coordinate math for division lines (5 / 6 divisions) and the center cross, which
  *   also backs the show/hide toggle.
  * - Snapping: pull a position to the nearest guide line within a tolerance while dragging.
+ * - Force alignment: button-triggered, tolerance-free snap to the nearest guide line
+ *   (division / cross).
+ * - Edge alignment: flush the frame against the scene's edges and center (horizontal
+ *   left/center/right, vertical top/middle/bottom).
  * - Relative position: convert pixel coordinates into percentages of the scene.
- * - Alignment: align the two sides' heights (same height = same y).
+ * - Alignment: align the two sides' heights (pick the left, the right, or the average as the
+ *   reference).
+ * - Clamping: clamp a frame offset inside the scene's movable range (same rules as the
+ *   component-side clamp).
  * - Reset: defines what "reset" means (frame = initial value or CSS alignment; sprites =
  *   clear the overrides).
  */
@@ -200,6 +210,106 @@ export function snapToGuideLines(
 	return { pos: next, snappedX, snappedY };
 }
 
+/**
+ * 強制對齊：無容差，直接把座標吸到「最近」的參考線（按鈕觸發用）
+ * Force alignment: tolerance-free, snap straight to the NEAREST guide line (button-triggered)
+ *
+ * 拖曳時用 snapToGuideLines（容差內才吸），按鈕對齊則用本函式：
+ * 框即使遠離所有參考線，也會被拉到最近的一條，不會「完全不動」。
+ * Dragging uses snapToGuideLines (only within tolerance); button alignment uses this helper:
+ * even when the frame is far from every guide it is pulled to the nearest one, instead of
+ * staying put.
+ */
+export function forceSnapToGuideLines(
+	pos: IBattleFieldPoint,
+	size: ISpriteImageSize,
+	options?: ISnapToGuideLinesOptions,
+): ISnapToGuideLinesResult
+{
+	return snapToGuideLines(pos, size, { ...options, tolerance: Number.POSITIVE_INFINITY });
+}
+
+/**
+ * 把框座標收斂在戰場可動範圍內（與元件端 clampFrameOffset 同一套規則）
+ * Clamp a frame offset inside the scene's movable range (same rules as the component-side clamp)
+ *
+ * 戰場與排版框等大時可動範圍為 0；戰場較大時框可貼齊四邊而不超出畫面。
+ * When the scene and frame share a size the movable range is 0; with a larger scene the frame
+ * can sit flush against any edge without overflowing.
+ */
+export function clampFrameOffsetToScene(
+	pos: IBattleFieldFrameOffset,
+	frameSize: ISpriteImageSize,
+	sceneSize: ISpriteImageSize,
+): IBattleFieldFrameOffset
+{
+	const minX = Math.min(0, sceneSize.width - frameSize.width);
+	const maxX = Math.max(0, sceneSize.width - frameSize.width);
+	const minY = Math.min(0, sceneSize.height - frameSize.height);
+	const maxY = Math.max(0, sceneSize.height - frameSize.height);
+	return {
+		x: Math.min(maxX, Math.max(minX, Math.round(pos.x))),
+		y: Math.min(maxY, Math.max(minY, Math.round(pos.y))),
+	};
+}
+
+/** 邊緣對齊目標（戰場的邊與中心；水平用 Left/Center/Right、垂直用 Top/Middle/Bottom） / Edge-alignment targets (the scene's edges and center; horizontal uses Left/Center/Right, vertical Top/Middle/Bottom) */
+export enum EnumEditModeEdgeAlign
+{
+	/** 水平靠左 / Horizontal left */
+	Left = 'left',
+	/** 水平置中 / Horizontal center */
+	Center = 'center',
+	/** 水平靠右 / Horizontal right */
+	Right = 'right',
+	/** 垂直置頂（向上） / Vertical top */
+	Top = 'top',
+	/** 垂直置中 / Vertical middle */
+	Middle = 'middle',
+	/** 垂直置底（向下） / Vertical bottom */
+	Bottom = 'bottom',
+}
+
+/**
+ * 邊緣對齊：把框貼齊戰場的指定邊或中心，另一軸維持不變
+ * Edge alignment: flush the frame against the scene's given edge or center, keeping the other axis
+ *
+ * 目標軸直接以「戰場尺寸 - 框尺寸」計算（置中則取半），再收斂在可動範圍內。
+ * The target axis is computed directly from (scene size - frame size), centered when asked,
+ * and then clamped inside the movable range.
+ */
+export function alignFrameToSceneEdge(
+	pos: IBattleFieldFrameOffset,
+	frameSize: ISpriteImageSize,
+	sceneSize: ISpriteImageSize,
+	edge: EnumEditModeEdgeAlign,
+): IBattleFieldFrameOffset
+{
+	const next: IBattleFieldFrameOffset = { ...pos };
+	switch (edge)
+	{
+		case EnumEditModeEdgeAlign.Left:
+			next.x = 0;
+			break;
+		case EnumEditModeEdgeAlign.Center:
+			next.x = Math.round((sceneSize.width - frameSize.width) / 2);
+			break;
+		case EnumEditModeEdgeAlign.Right:
+			next.x = sceneSize.width - frameSize.width;
+			break;
+		case EnumEditModeEdgeAlign.Top:
+			next.y = 0;
+			break;
+		case EnumEditModeEdgeAlign.Middle:
+			next.y = Math.round((sceneSize.height - frameSize.height) / 2);
+			break;
+		case EnumEditModeEdgeAlign.Bottom:
+			next.y = sceneSize.height - frameSize.height;
+			break;
+	}
+	return clampFrameOffsetToScene(next, frameSize, sceneSize);
+}
+
 /** 相對座標（百分比，相對戰場左上角） / Relative coordinates (percentage measured from the scene's top-left) */
 export interface IEditModeRelativePercent
 {
@@ -240,20 +350,36 @@ export function formatRelativePercent(percent: IEditModeRelativePercent): string
 	return `${percent.x}%, ${percent.y}%`;
 }
 
+/** 左右隊高度對齊的基準 / Reference used when aligning the two sides' heights */
+export enum EnumEditModePairHeightAlign
+{
+	/** 以左隊高度為基準（右隊跟隨） / Use the left team as the reference (right follows) */
+	Left = 'left',
+	/** 以右隊高度為基準（左隊跟隨） / Use the right team as the reference (left follows) */
+	Right = 'right',
+	/** 兩者平均（四捨五入） / Average of both (rounded) */
+	Average = 'average',
+}
+
 /**
  * 左右隊對齊高度：兩個排版框同尺寸，故「對齊高度」＝把兩者的 y 收斂到同一值
  * Align the two sides' heights: the frames share a size, so aligning heights means bringing
  * both y values to one value
  *
- * 以「最上方」為基準（等同編輯器常見的置上對齊）；只回傳新值，不修改輸入。
- * The topmost value is the reference (like the usual "align top" in editors); a new pair is
- * returned and the input is never mutated.
+ * 基準可選：以左隊、以右隊，或兩者平均（預設以左隊）；只回傳新值，不修改輸入。
+ * The reference is selectable: the left team, the right team, or the average of both
+ * (default: left); a new pair is returned and the input is never mutated.
  */
 export function alignPairHeights(
 	pair: IBattleSidePair<IBattleFieldFrameOffset>,
+	align: EnumEditModePairHeightAlign = EnumEditModePairHeightAlign.Left,
 ): IBattleSidePair<IBattleFieldFrameOffset>
 {
-	const y = Math.min(pair.left.y, pair.right.y);
+	const y = align === EnumEditModePairHeightAlign.Right
+		? pair.right.y
+		: align === EnumEditModePairHeightAlign.Average
+			? Math.round((pair.left.y + pair.right.y) / 2)
+			: pair.left.y;
 	return {
 		left: { ...pair.left, y },
 		right: { ...pair.right, y },

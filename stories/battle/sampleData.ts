@@ -27,47 +27,17 @@ import { EnumTeamSideUI, EnumSpriteImageDir } from '../../src/components/battle/
 import { EnumPosition } from '../../src/lib/types/battle-enum';
 
 /**
- * 共用敵方精靈樣本（敵方在左半場，side 標為左隊）
- * Shared enemy sprite samples (enemies occupy the left half, so side is the left team)
+ * 敵方／友方／完整戰場精靈樣本（sampleEnemySprites / sampleAllySprites / sampleSprites）
+ * 已改為「經共通邏輯 computeBattleSpritePositions 修正定位」的資料，
+ * 定義於本檔下方名冊輔助函式之後（見 enemyRoster / allyRoster）。
+ * 避免手寫座標與共通定位邏輯不一致而汙染後續測試與展示。
  *
- * side 決定兩件事：標籤防重疊只避開「同側」標籤，以及戰場大於排版框時的雙框分組
- * （BattleFieldLayers 依此把敵我分進各自的 BattleFieldSpriteFrame）。
- * side decides two things: label anti-overlap only avoids same-side labels, and the
- * dual-frame grouping used when the scene is larger than the frame (BattleFieldLayers puts
- * each side into its own BattleFieldSpriteFrame based on it).
+ * The enemy / ally / full battlefield sprite samples (sampleEnemySprites / sampleAllySprites /
+ * sampleSprites) are now POSITION-CORRECTED by the shared computeBattleSpritePositions logic;
+ * they are defined further below, after the roster helpers (see demoEnemyRoster / demoAllyRoster).
+ * This prevents hand-written coordinates from drifting out of sync with the shared positioning
+ * logic and polluting later tests and showcases.
  */
-export const sampleEnemySprites: IBattleSprite[] = [
-	{ unitUuid: 'mon_052', ...monsterOf('goblinWarriorA'), x: 164, y: 16, flipped: false, side: EnumTeamSideUI.Left },
-	{ unitUuid: 'mon_052', ...monsterOf('goblinWarriorB'), x: 148, y: 56, flipped: false, side: EnumTeamSideUI.Left },
-	{ unitUuid: 'mon_053', ...monsterOf('goblinAxe'), x: 124, y: 96, flipped: false, side: EnumTeamSideUI.Left },
-];
-
-/**
- * 共用友方精靈樣本 / Shared ally sprite samples
- *
- * 友方為「右隊」，使用 char_rev（已預先鏡像、面向左）圖，
- * flipped:false 直接置於右側，因此全員都在同一側、朝向一致
- * Allies are the "right team": use char_rev (pre-mirrored, facing left) images
- * with flipped:false placed directly on the right side, so all sprites share the
- * same side and the same facing direction.
- *
- * 注意：不可在 char_rev 上再加 flipped:true —— 那會造成「雙重鏡像」，
- * 且因 BattleFieldSpriteLayers 舊版巢狀結構會累積翻轉，導致同隊出現
- * 「左 2 右 1」等位置/朝向錯亂（見 BattleFieldSpriteLayers 修正說明）
- * Note: do NOT add flipped:true on top of char_rev — that double-mirrors and,
- * combined with the old nested layering, split a single team across sides.
- */
-export const sampleAllySprites: IBattleSprite[] = [
-	{ unitUuid: 'mon_079', ...charRevOf('hero'), x: 352, y: 14, flipped: false, side: EnumTeamSideUI.Right },
-	{ unitUuid: 'mon_018', ...charRevOf('mage'), x: 388, y: 64, flipped: false, side: EnumTeamSideUI.Right },
-	{ unitUuid: 'mon_214', ...charRevOf('priest'), x: 300, y: 110, flipped: false, side: EnumTeamSideUI.Right },
-];
-
-/** 共用完整戰場精靈樣本（敵方 + 友方） / Shared full battlefield sprite samples (enemies + allies) */
-export const sampleSprites: IBattleSprite[] = [
-	...sampleEnemySprites,
-	...sampleAllySprites,
-];
 
 /** 共用戰場尺寸（角色排版尺寸，預設 480×200） / Shared battlefield size (default 480×200) */
 export const sampleFieldSize = { width: 480, height: 200 };
@@ -170,10 +140,16 @@ export const sampleBackgroundChoiceGroups: ReadonlyArray<{
  *
  * 對應 PHP exec_css 中的魔方陣渲染（固定位置背景圖層，繪製於角色精靈之下）
  * Mirrors the magic-circle rendering in PHP exec_css (fixed-position background
- * layer drawn beneath the sprites); position defaults to (280, 0) per PHP.
+ * layer drawn beneath the sprites).
+ *
+ * 刻意不寫 x / y，交由元件沿用共用常數 MAGIC_CIRCLE_DEFAULT_X / Y（280, 0，對應 PHP），
+ * 避免展示資料重複硬編碼座標、日後與共用預設脫節
+ * x / y are intentionally omitted so the component falls back to the shared
+ * MAGIC_CIRCLE_DEFAULT_X / Y constants (280, 0, matching PHP), preventing duplicated
+ * hard-coded coordinates in showcase data from drifting out of sync with the shared default.
  */
 export const sampleMagicCircles: IBattleMagicCircle[] = [
-	{ imageUrl: '/image/other/mc0_1.png', x: 280, y: 0 },
+	{ imageUrl: '/image/other/mc0_1.png' },
 ];
 
 /**
@@ -502,6 +478,122 @@ export const sampleSpritesAuto: IBattleSprite[] = createAutoSampleSprites();
 
 // ============================================================================
 /**
+ * 共用敵／友精靈樣本（經共通邏輯修正定位）
+ * SHARED enemy/ally sprite samples (POSITION-CORRECTED by the shared logic)
+ *
+ * 舊版 sampleEnemySprites / sampleAllySprites / sampleSprites 為手寫座標，
+ * 與 computeBattleSpritePositions 的定位不一致（易與共通邏輯脫節、汙染後續測試）。
+ * 現改為以名冊（roster）餵給 computeBattleSpritePositions 自動計算，
+ * 確保展示座標與遊戲共通定位邏輯完全一致。
+ * The old sampleEnemySprites / sampleAllySprites / sampleSprites used hand-written
+ * coordinates that drifted from computeBattleSpritePositions (they could fall out of sync
+ * with the shared logic and pollute later tests). They are now built from rosters fed
+ * through computeBattleSpritePositions so the showcase coordinates exactly match the
+ * game's shared positioning logic.
+ *
+ * side 決定兩件事：標籤防重疊只避開「同側」標籤，以及戰場大於排版框時的雙框分組
+ * （BattleFieldLayers 依此把敵我分進各自的 BattleFieldSpriteFrame）。
+ * side decides two things: label anti-overlap only avoids same-side labels, and the
+ * dual-frame grouping when the scene is larger than the frame (BattleFieldLayers puts each
+ * side into its own BattleFieldSpriteFrame based on it).
+ */
+// ============================================================================
+
+/**
+ * 敵方名冊（左隊；char 圖由邏輯推導「不翻轉＋左側定位」）
+ * Enemy roster (left team; char images auto-derived to "no flip + left-side positioning")
+ */
+const enemyRoster: IRosterTeam = {
+	back: [
+		{
+			unitUuid: 'mon_052a',
+			...monsterOf('goblinWarriorA'),
+			position: EnumPosition.Back,
+			side: EnumTeamSideUI.Left,
+		},
+	],
+	front: [
+		{
+			unitUuid: 'mon_052b',
+			...monsterOf('goblinWarriorB'),
+			position: EnumPosition.Front,
+			side: EnumTeamSideUI.Left,
+		},
+		{
+			unitUuid: 'mon_053',
+			...monsterOf('goblinAxe'),
+			position: EnumPosition.Front,
+			side: EnumTeamSideUI.Left,
+		},
+	],
+};
+
+/**
+ * 友方名冊（右隊；char_rev 圖由邏輯推導「不翻轉＋右側直接定位」）
+ * Ally roster (right team; char_rev images auto-derived to "no flip + direct right-side positioning")
+ */
+const allyRoster: IRosterTeam = {
+	back: [
+		{
+			unitUuid: 'mon_079',
+			...charRevOf('hero'),
+			position: EnumPosition.Back,
+			side: EnumTeamSideUI.Right,
+		},
+	],
+	front: [
+		{
+			unitUuid: 'mon_018',
+			...charRevOf('mage'),
+			position: EnumPosition.Front,
+			side: EnumTeamSideUI.Right,
+		},
+		{
+			unitUuid: 'mon_214',
+			...charRevOf('priest'),
+			position: EnumPosition.Front,
+			side: EnumTeamSideUI.Right,
+		},
+	],
+};
+
+/**
+ * 完整戰場精靈樣本（敵方左隊 + 友方右隊；經共通邏輯修正定位）
+ * Full battlefield sprite samples (enemy left team + ally right team; position-corrected)
+ *
+ * 一次計算整場（左隊只依左隊角色定位、右隊只依右隊角色定位，故與分開計算結果一致）。
+ * Computed once for the whole field (the left team's positions depend only on left chars and
+ * vice versa, so this matches computing each side separately).
+ */
+const sharedSampleSprites: IBattleSprite[] = computeBattleSpritePositions(
+	{
+		left: toPositionChars(enemyRoster),
+		right: toPositionChars(allyRoster),
+	},
+	sampleFieldSize,
+);
+
+/**
+ * 敵方精靈樣本（左隊；從 sharedSampleSprites 依 side 拆出，與完整戰場同源）
+ * Enemy sprite samples (left team; split from sharedSampleSprites by side, same source)
+ */
+export const sampleEnemySprites: IBattleSprite[] = sharedSampleSprites.filter(
+	(s) => s.side === EnumTeamSideUI.Left,
+);
+
+/**
+ * 友方精靈樣本（右隊；從 sharedSampleSprites 依 side 拆出，與完整戰場同源）
+ * Ally sprite samples (right team; split from sharedSampleSprites by side, same source)
+ */
+export const sampleAllySprites: IBattleSprite[] = sharedSampleSprites.filter(
+	(s) => s.side === EnumTeamSideUI.Right,
+);
+
+/** 共用完整戰場精靈樣本（敵方 + 友方；經共通邏輯修正定位） / Shared full battlefield sprite samples (enemies + allies; position-corrected) */
+export const sampleSprites: IBattleSprite[] = sharedSampleSprites;
+
+// ============================================================================
+/**
  * 名稱標籤展示用名冊角色（單一角色，位置交由計算邏輯得出）
  * Name-label showcase roster characters (single char; position from the compute logic)
  */
@@ -531,26 +623,57 @@ export const sampleLabelGoblinRight: IRosterChar = {
 	side: EnumTeamSideUI.Right,
 };
 
-/** 樣式覆寫展示用精靈（含單體 style／labelStyle 覆寫） / Style-override showcase sprites (with per-sprite style / labelStyle) */
-export const sampleStyleOverrideSprites: IBattleSprite[] = [
-	{
-		unitUuid: 'mon_052',
-		x: 164,
-		y: 16,
-		flipped: false,
-		side: EnumTeamSideUI.Left,
-		...monsterOf('goblinWarriorA'),
-		/** 單體精靈樣式覆寫（最優先） / Per-sprite style override (highest priority) */
-		style: { opacity: 0.7 },
-		/** 單體標籤樣式覆寫 / Per-sprite label style override */
-		labelStyle: { color: '#ffd166', fontSize: 13 },
+/**
+ * 樣式覆寫展示用精靈（含單體 style／labelStyle 覆寫）
+ * Style-override showcase sprites (with per-sprite style / labelStyle overrides)
+ *
+ * 本筆展示的是「樣式可手動自訂」的能力（style / labelStyle 覆寫），故保留覆寫；
+ * 但座標仍交由共通邏輯 computeBattleSpritePositions 修正定位，
+ * 避免手寫座標與遊戲定位脫節而汙染後續測試。
+ * This showcase demonstrates the manual style-customization capability (style / labelStyle
+ * overrides), so the overrides are kept; however the coordinates are still POSITION-CORRECTED
+ * by the shared computeBattleSpritePositions logic so hand-written positions never drift from
+ * the game's positioning and pollute later tests.
+ */
+const styleOverrideRoster: { left: IRosterTeam; right: IRosterTeam } = {
+	left: {
+		back: [
+			{
+				unitUuid: 'mon_052',
+				...monsterOf('goblinWarriorA'),
+				position: EnumPosition.Back,
+				side: EnumTeamSideUI.Left,
+			},
+		],
+		front: [],
 	},
-	{
-		unitUuid: 'mon_079',
-		x: 352,
-		y: 14,
-		flipped: true,
-		side: EnumTeamSideUI.Right,
-		...charRevOf('hero'),
+	right: {
+		back: [],
+		front: [
+			{
+				unitUuid: 'mon_079',
+				...charRevOf('hero'),
+				position: EnumPosition.Front,
+				side: EnumTeamSideUI.Right,
+			},
+		],
 	},
-];
+};
+
+export const sampleStyleOverrideSprites: IBattleSprite[] = computeBattleSpritePositions(
+	{
+		left: toPositionChars(styleOverrideRoster.left),
+		right: toPositionChars(styleOverrideRoster.right),
+	},
+	sampleFieldSize,
+).map((sprite): IBattleSprite =>
+	sprite.unitUuid === 'mon_052'
+		? {
+			...sprite,
+			/** 單體精靈樣式覆寫（最優先） / Per-sprite style override (highest priority) */
+			style: { opacity: 0.7 },
+			/** 單體標籤樣式覆寫 / Per-sprite label style override */
+			labelStyle: { color: '#ffd166', fontSize: 13 },
+		}
+		: sprite,
+);

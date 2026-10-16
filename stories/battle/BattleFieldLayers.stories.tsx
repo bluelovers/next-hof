@@ -70,8 +70,24 @@ const meta: Meta<typeof BattleFieldLayers> = {
 export default meta;
 type Story = StoryObj<typeof BattleFieldLayers>;
 
-/** 預設：背景與角色框尺寸統一（未使用 bgSize） / Default: unified background and sprite frame size (no bgSize) */
-export const Default: Story = {};
+/**
+ * 預設：背景與角色框尺寸統一（未使用 bgSize）
+ * Default: unified background and sprite frame size (no bgSize)
+ *
+ * 單框模式（戰場＝排版框）：接上輔助面板，可切換參考線、吸附，
+ * 並直接調整背景縮放模式與水平／垂直對齊（寫回 config.bgScale / bgHAlign / bgVAlign）。
+ * Single-frame mode (scene == frame): the helper panel is attached so the guides and snap
+ * toggles work and the background scale mode plus horizontal/vertical alignment can be
+ * adjusted directly (written back to config.bgScale / bgHAlign / bgVAlign).
+ */
+export const Default: Story = {
+	decorators: [
+		makeBattleFieldEditModeDecorator({
+			sceneSize: sampleFieldSize,
+			showBgControls: true,
+		}),
+	],
+};
 
 /** 背景放大（720×320）：角色框水平置中、垂直貼底 / Enlarged background (720×320): frame centered horizontally, bottom-aligned */
 export const LargeBackground: Story = {
@@ -213,15 +229,17 @@ const dualFrameInitialOffsets: IBattleSidePair<IBattleFieldFrameOffset> = {
  * Dual-frame edit mode: initial positions per side, and both frames are draggable on the canvas
  *
  * 拖曳時框收斂在戰場範圍內（x∈[0,288]、y∈[0,120]），徽章顯示所屬隊伍、座標與相對百分比；
- * onFrameOffsetChange 於每次移動把新位置寫回 args.frameOffsets，讓編輯面板的
- * 對齊按鈕與座標 % 讀值永遠以「目前實際位置」為準。
+ * onFrameOffsetChange 於拖曳過程節流寫回 args.frameOffsets（約每 100ms 一次）、
+ * 放開時補寫最終座標，讓編輯面板的對齊按鈕與座標 % 讀值以「目前實際位置」為準，
+ * 同時避免逐幀回寫整棵 story 樹重繪造成的拖曳卡頓。
  * 編輯面板提供：重置、5/6 等分對齊、十字對齊、左右隊對齊高度、參考線與吸附開關、座標相對 % 讀值。
  * While dragging, a frame clamps inside the scene (x∈[0,288], y∈[0,120]) and the badge shows
  * the team, coordinates and relative percentage; onFrameOffsetChange writes the new position
- * back into args.frameOffsets on every move, so the panel's alignment buttons and the % readout
- * always operate on the actual current positions. The panel offers reset, 5/6-division
- * alignment, cross alignment, team height alignment, the guides and snap toggles, and the
- * relative-% readout.
+ * back into args.frameOffsets throttled during the drag (about every 100ms) and flushes the
+ * final coordinate on release, so the panel's alignment buttons and the % readout operate on
+ * the actual current positions without the stutter caused by per-frame full-tree re-renders.
+ * The panel offers reset, 5/6-division alignment, cross alignment, team height alignment, the
+ * guides and snap toggles, and the relative-% readout.
  */
 export const DualFrameEditable: Story = {
 	args: {
@@ -258,6 +276,7 @@ export const DualFrameEditable: Story = {
 		makeBattleFieldEditModeDecorator({
 			sceneSize: { width: 768, height: 320 },
 			frameOps: true,
+			showBgControls: true,
 			initialFrameOffsets: dualFrameInitialOffsets,
 		}),
 	],

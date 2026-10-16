@@ -30,6 +30,8 @@ import type {
 	IBattleFieldSideOffsets,
 	IBattleFieldFrameMoveEvent,
 	IBattleSidePair,
+	IBattleFieldBgHAlign,
+	IBattleFieldBgVAlign,
 } from './types';
 import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from './types';
 import type { ISpriteImageSize } from './spriteImageSizes';
@@ -71,8 +73,9 @@ export interface IBattleFieldLayersProps extends IBattleSpriteLabelOptions, IBat
 	 */
 	frameOffsets?: IBattleFieldSideOffsets;
 	/**
-	 * 排版框被拖曳移動時回報（編輯模式；拖曳過程逐次回報）
-	 * Reports when a frame is dragged (edit mode; reported on every move)
+	 * 排版框被拖曳移動時回報（編輯模式；拖曳過程由元件端節流回報、放開時回報最終座標）
+	 * Reports when a frame is dragged (edit mode; throttled by the component during the drag,
+	 * with the final coordinate reported on release)
 	 */
 	onFrameOffsetChange?: (event: IBattleFieldFrameMoveEvent) => void;
 	/**
@@ -96,21 +99,29 @@ export interface IBattleFieldLayersProps extends IBattleSpriteLabelOptions, IBat
  * character sprites are fixed inside a width x height frame, so enlarging
  * the background never affects the sprite layout coordinates.
  */
-/**
- * 背景圖縮放模式 → CSS 背景屬性
+/** 背景圖縮放模式 → CSS 背景屬性
  * Background scale mode → CSS background properties
  *
  * 預設對齊為「水平置中 + 垂直置底」，確保背景圖在 bgSize 大於或小於
- * 實際圖檔尺寸時都能正確排版而不會偏移或異常裁切
+ * 實際圖檔尺寸時都能正確排版而不會偏移或異常裁切；
+ * 可由 config.bgHAlign / bgVAlign 覆寫水平與垂直錨點（repeat 平鋪固定由左上角開始）。
  * Default alignment is horizontally centered + bottom-aligned, so the background
- * image stays correctly placed whether bgSize is larger or smaller than the file.
+ * image stays correctly placed whether bgSize is larger or smaller than the file;
+ * config.bgHAlign / bgVAlign override the horizontal and vertical anchors (the repeat
+ * mode always tiles from the top-left corner).
  */
 function resolveBgImageLayout(
 	scale: IBattleFieldBgScale,
 	bgSize: ISpriteImageSize,
+	hAlign: IBattleFieldBgHAlign = 'center',
+	vAlign: IBattleFieldBgVAlign = 'bottom',
 ): React.CSSProperties
 {
-	const position = 'center bottom';
+	/**
+	 * CSS background-position 關鍵字組合（如 "left top" / "center bottom"）
+	 * CSS background-position keyword pair (e.g. "left top" / "center bottom")
+	 */
+	const position = `${hAlign} ${vAlign}`;
 	switch (scale)
 	{
 		case 'cover':
@@ -134,13 +145,14 @@ function resolveBgImageLayout(
 			};
 		case 'repeat':
 			/**
-			 * 平鋪（依原始尺寸重複）/ Repeat (tile at natural size)
+			 * 平鋪（依原始尺寸重複，固定由左上角開始）/ Repeat (tile at natural size, always from the top-left)
 			 */
 			return { backgroundSize: 'auto', backgroundRepeat: 'repeat', backgroundPosition: '0 0' };
 		case 'natural':
 		default:
 			/**
-			 * 原始尺寸，水平置中 + 垂直置底 / Natural size, horizontally centered + bottom-aligned
+			 * 原始尺寸；對齊由 hAlign / vAlign 決定（預設水平置中 + 垂直置底）
+			 * Natural size; alignment comes from hAlign / vAlign (default: centered + bottom)
 			 */
 			return { backgroundSize: 'auto', backgroundRepeat: 'no-repeat', backgroundPosition: position };
 	}
@@ -272,11 +284,18 @@ export const BattleFieldLayers: React.FC<IBattleFieldLayersProps> = ({
 	);
 
 	/**
-	 * 背景圖排版：預設自然尺寸 + 水平置中垂直置底，縮放模式由 config.bgScale 控制
-	 * Background image layout: default natural size + centered/bottom; scale mode from config.bgScale
+	 * 背景圖排版：預設自然尺寸 + 水平置中垂直置底，
+	 * 縮放模式由 config.bgScale 控制，對齊錨點由 config.bgHAlign / bgVAlign 覆寫
+	 * Background image layout: default natural size + centered/bottom; scale mode from
+	 * config.bgScale, anchor overrides from config.bgHAlign / config.bgVAlign
 	 */
 	const bgScaleMode = config.bgScale ?? EnumBattleFieldBgScale.Natural;
-	const bgImageLayout = resolveBgImageLayout(bgScaleMode, resolvedBgSize);
+	const bgImageLayout = resolveBgImageLayout(
+		bgScaleMode,
+		resolvedBgSize,
+		config.bgHAlign ?? 'center',
+		config.bgVAlign ?? 'bottom',
+	);
 
 	/** 背景樣式 / Background style */
 	const bgStyle: React.CSSProperties = {

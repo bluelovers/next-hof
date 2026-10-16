@@ -10,6 +10,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { BattleStageDarkDecorator } from '../decorators';
 import { BattleFieldScene } from '../../src/components/battle/BattleFieldScene';
 import { makeBackgroundPickerDecorator } from './backgroundPicker';
+import { makeBattleFieldEditModeDecorator } from './editModePanel';
+import { sampleFieldSize } from './sampleData';
 import {
 	sampleSprites,
 	sampleEnemySprites,
@@ -36,13 +38,27 @@ const meta: Meta<typeof BattleFieldScene> = {
 export default meta;
 type Story = StoryObj<typeof BattleFieldScene>;
 
-/** 預設戰場—ゴブリン vs TestTeam / Default battlefield — Goblins vs TestTeam */
+/**
+ * 預設戰場—ゴブリン vs TestTeam / Default battlefield — Goblins vs TestTeam
+ *
+ * 一般展示（單框模式）：接上輔助面板，可切換參考線與吸附，
+ * 並直接調整背景縮放模式與水平／垂直對齊。
+ * General display (single-frame mode): the helper panel is attached so the guides and snap
+ * toggles work and the background scale mode plus horizontal/vertical alignment can be
+ * adjusted directly.
+ */
 export const DefaultBattle: Story = {
 	args: {
 		sprites: sampleSprites,
 		config: createSampleConfig('grass'),
 		showSpriteLabels: true,
 	},
+	decorators: [
+		makeBattleFieldEditModeDecorator({
+			sceneSize: sampleFieldSize,
+			showBgControls: true,
+		}),
+	],
 };
 
 /** 僅有敵人 / Enemies only */
