@@ -331,6 +331,8 @@ export const makeBattleFieldEditModeDecorator = (
 					<button style={buttonStyle} onClick={handleReset}>重置</button>
 					{frameOps && (
 						<>
+
+					<div>
 							<span style={groupLabelStyle}>對象</span>
 							<button
 								style={alignTarget === 'left' ? activeButtonStyle : buttonStyle}
@@ -350,6 +352,8 @@ export const makeBattleFieldEditModeDecorator = (
 							>
 								兩者
 							</button>
+							</div>
+					<div>
 							<button style={buttonStyle} onClick={() => applyForceSnap(computeDivisionGuideLines(sceneSize, [5]))}>5 等分對齊</button>
 							<button style={buttonStyle} onClick={() => applyForceSnap(computeDivisionGuideLines(sceneSize, [6]))}>6 等分對齊</button>
 							<button style={buttonStyle} onClick={() => applyForceSnap(computeCrossGuideLines(sceneSize))}>十字對齊</button>
@@ -359,6 +363,8 @@ export const makeBattleFieldEditModeDecorator = (
 							<button style={buttonStyle} onClick={() => applyEdgeAlign(EnumEditModeEdgeAlign.Left)}>靠左</button>
 							<button style={buttonStyle} onClick={() => applyEdgeAlign(EnumEditModeEdgeAlign.Center)}>水平置中</button>
 							<button style={buttonStyle} onClick={() => applyEdgeAlign(EnumEditModeEdgeAlign.Right)}>靠右</button>
+							</div>
+					<div>
 							<button
 								style={heightAlign === EnumEditModePairHeightAlign.Left ? activeButtonStyle : buttonStyle}
 								onClick={() => { setHeightAlign(EnumEditModePairHeightAlign.Left); updateArgs({ frameOffsets: alignPairHeights(resolveOffsets(), EnumEditModePairHeightAlign.Left) }); }}
@@ -377,8 +383,10 @@ export const makeBattleFieldEditModeDecorator = (
 							>
 								隊高平均
 							</button>
+							</div>
 						</>
 					)}
+					<div>
 					{showGuidesToggle && (
 						<button
 							style={guidesOn ? activeButtonStyle : buttonStyle}
@@ -395,6 +403,7 @@ export const makeBattleFieldEditModeDecorator = (
 							吸附 {snapOn ? '開' : '關'}
 						</button>
 					)}
+					</div>
 					{showBgControls && (
 						<>
 							<span style={groupLabelStyle}>背景</span>

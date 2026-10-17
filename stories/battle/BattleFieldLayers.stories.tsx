@@ -91,7 +91,7 @@ export const Default: Story = {
 	decorators: [
 		makeBattleFieldEditModeDecorator({
 			sceneSize: sampleFieldSize,
-			showBgControls: true,
+			// showBgControls: true,
 		}),
 	],
 };
@@ -289,7 +289,7 @@ export const DualFrameEditable: Story = {
 		makeBattleFieldEditModeDecorator({
 			sceneSize: { width: 768, height: 320 },
 			frameOps: true,
-			showBgControls: true,
+			// showBgControls: true,
 			initialFrameOffsets: dualFrameInitialOffsets,
 		}),
 	],

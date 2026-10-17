@@ -56,7 +56,7 @@ export const DefaultBattle: Story = {
 	decorators: [
 		makeBattleFieldEditModeDecorator({
 			sceneSize: sampleFieldSize,
-			showBgControls: true,
+			// showBgControls: true,
 		}),
 	],
 };

@@ -266,6 +266,7 @@ export const makeBackgroundPickerDecorator = (): Decorator =>
 		return (
 			<>
 				<div style={panelStyle}>
+					<div>
 					<span>背景：</span>
 					<select style={controlStyle} value={choiceUrlSet.has(current) ? current : ''} onChange={handleSelect}>
 						<option value="" disabled>
@@ -290,6 +291,8 @@ export const makeBackgroundPickerDecorator = (): Decorator =>
 						}}
 					/>
 					<button style={buttonStyle} onClick={handleApply}>套用</button>
+					</div>
+					<div>
 					<span style={groupLabelStyle}>縮放</span>
 					<select
 						style={controlStyle}
@@ -300,6 +303,8 @@ export const makeBackgroundPickerDecorator = (): Decorator =>
 							<option key={option.value} value={option.value}>{option.label}</option>
 						))}
 					</select>
+					</div>
+					<div>
 					<span style={groupLabelStyle}>對齊</span>
 					{BG_H_ALIGN_OPTIONS.map((option) => (
 						<button
@@ -320,6 +325,8 @@ export const makeBackgroundPickerDecorator = (): Decorator =>
 							{option.label}
 						</button>
 					))}
+					</div>
+					<div>
 					<span style={groupLabelStyle}>尺寸</span>
 					<input
 						style={numberInputStyle}
@@ -357,6 +364,7 @@ export const makeBackgroundPickerDecorator = (): Decorator =>
 						</button>
 					))}
 					<button style={buttonStyle} onClick={() => { setSizeDraft({ width: '', height: '' }); setBgSizeOverride(null); }}>清除尺寸</button>
+					</div>
 				</div>
 				<StoryWithArgs args={mergedArgs} />
 			</>
