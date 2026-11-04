@@ -2,10 +2,10 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { useShop, useShopConfig } from '#/features/shop/state/useShop';
-import { useInventory } from '#/features/inventory/state/useInventory';
-import { queryCatalog } from '#/features/shop/domain/catalog';
-import { ShopItemCard } from '#/features/shop/components/ShopItemCard/ShopItemCard';
+import { useShop, useShopConfig } from '#/src/features/shop/state/useShop';
+import { useInventory } from '#/src/features/inventory/state/useInventory';
+import { queryCatalog } from '#/src/features/shop/domain/catalog';
+import { ShopItemCard } from '#/src/features/shop/components/ShopItemCard/ShopItemCard';
 import './CatalogGrid.css';
 
 /** 商品列表 / Catalog grid */

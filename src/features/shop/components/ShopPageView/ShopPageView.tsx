@@ -2,14 +2,14 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import type { IItemDef } from '#/lib/types/item-types';
-import { createItemCatalog } from '#/features/shared/domain/item-catalog';
-import { DEFAULT_SHOP_CONFIG } from '#/features/shop/composition/default-shop-config';
-import { ShopConfigProvider } from '#/features/shop/state/ShopConfigProvider';
-import { ShopProvider } from '#/features/shop/state/ShopProvider';
-import { InventoryProvider } from '#/features/inventory/state/InventoryProvider';
-import { ShopContent } from '#/features/shop/components/ShopContent/ShopContent';
-import type { IShopConfig } from '#/features/shop/domain/types';
+import type { IItemDef } from '#/src/lib/types/item-types';
+import { createItemCatalog } from '#/src/features/shared/domain/item-catalog';
+import { DEFAULT_SHOP_CONFIG } from '#/src/features/shop/composition/default-shop-config';
+import { ShopConfigProvider } from '#/src/features/shop/state/ShopConfigProvider';
+import { ShopProvider } from '#/src/features/shop/state/ShopProvider';
+import { InventoryProvider } from '#/src/features/inventory/state/InventoryProvider';
+import { ShopContent } from '#/src/features/shop/components/ShopContent/ShopContent';
+import type { IShopConfig } from '#/src/features/shop/domain/types';
 import './ShopPageView.css';
 
 /** 頁面 props / Page props */

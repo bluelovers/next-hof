@@ -7,7 +7,7 @@
   "author": "",
   "type": "module",
   "imports": {
-    "#/*": "./src/*"
+    "#/*": "./*"
   },
   "main": "index.js",
   "scripts": {

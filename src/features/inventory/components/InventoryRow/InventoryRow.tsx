@@ -1,7 +1,7 @@
 /** 道具箱單列：呈現持有數並觸發售出、拋棄，所有文案與圖示由外部注入。 */
 import React from 'react';
-import { ItemIcon } from '#/features/shared/components/ItemIcon/ItemIcon';
-import type { IInventoryEntry } from '#/features/inventory/domain/types';
+import { ItemIcon } from '#/src/features/shared/components/ItemIcon/ItemIcon';
+import type { IInventoryEntry } from '#/src/features/inventory/domain/types';
 import './InventoryRow.css';
 
 /** 單列文案 / Row copy */

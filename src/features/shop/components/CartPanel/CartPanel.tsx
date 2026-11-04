@@ -2,10 +2,10 @@
 'use client';
 
 import React from 'react';
-import { ItemIcon } from '#/features/shared/components/ItemIcon/ItemIcon';
-import { useShop, useShopConfig, usePriceResolvers, useTradeErrorLabel } from '#/features/shop/state/useShop';
-import { useInventory } from '#/features/inventory/state/useInventory';
-import { cartSubtotal } from '#/features/shop/domain/cart';
+import { ItemIcon } from '#/src/features/shared/components/ItemIcon/ItemIcon';
+import { useShop, useShopConfig, usePriceResolvers, useTradeErrorLabel } from '#/src/features/shop/state/useShop';
+import { useInventory } from '#/src/features/inventory/state/useInventory';
+import { cartSubtotal } from '#/src/features/shop/domain/cart';
 import './CartPanel.css';
 
 /** 暫存購物車面板 / Temporary cart panel */

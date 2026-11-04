@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, type ReactNode } from 'react';
-import type { IShopConfig } from '#/features/shop/domain/types';
+import type { IShopConfig } from '#/src/features/shop/domain/types';
 
 export const ShopConfigContext = createContext<IShopConfig | null>(null);
 

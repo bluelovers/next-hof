@@ -2,11 +2,11 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import type { EnumTradeError, ICommandResult } from '#/features/inventory/domain/types';
-import { useInventory } from '#/features/inventory/state/useInventory';
-import { buildDiscard, buildSell } from '#/features/inventory/domain/commands';
-import { listOwned } from '#/features/inventory/domain/inventory';
-import { InventoryRow } from '#/features/inventory/components/InventoryRow/InventoryRow';
+import type { EnumTradeError, ICommandResult } from '#/src/features/inventory/domain/types';
+import { useInventory } from '#/src/features/inventory/state/useInventory';
+import { buildDiscard, buildSell } from '#/src/features/inventory/domain/commands';
+import { listOwned } from '#/src/features/inventory/domain/inventory';
+import { InventoryRow } from '#/src/features/inventory/components/InventoryRow/InventoryRow';
 import './InventoryPanel.css';
 
 /** 面板文案 / Panel copy */

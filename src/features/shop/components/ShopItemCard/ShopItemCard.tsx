@@ -2,11 +2,11 @@
 'use client';
 
 import React from 'react';
-import type { IItemDef } from '#/lib/types/item-types';
-import { ItemIcon } from '#/features/shared/components/ItemIcon/ItemIcon';
-import { useShop, useShopConfig, usePriceResolvers } from '#/features/shop/state/useShop';
-import { useInventory } from '#/features/inventory/state/useInventory';
-import { countOf } from '#/features/inventory/domain/inventory';
+import type { IItemDef } from '#/src/lib/types/item-types';
+import { ItemIcon } from '#/src/features/shared/components/ItemIcon/ItemIcon';
+import { useShop, useShopConfig, usePriceResolvers } from '#/src/features/shop/state/useShop';
+import { useInventory } from '#/src/features/inventory/state/useInventory';
+import { countOf } from '#/src/features/inventory/domain/inventory';
 import './ShopItemCard.css';
 
 /** 商品卡 props / Item card props */

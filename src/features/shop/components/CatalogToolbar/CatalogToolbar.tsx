@@ -2,8 +2,8 @@
 'use client';
 
 import React from 'react';
-import { useShop, useShopConfig } from '#/features/shop/state/useShop';
-import { CATEGORY_ALL, EnumShopSortKey } from '#/features/shop/domain/types';
+import { useShop, useShopConfig } from '#/src/features/shop/state/useShop';
+import { CATEGORY_ALL, EnumShopSortKey } from '#/src/features/shop/domain/types';
 import './CatalogToolbar.css';
 
 /** 商品工具列 / Catalog toolbar */

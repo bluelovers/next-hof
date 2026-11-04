@@ -2,12 +2,12 @@
 'use client';
 
 import React from 'react';
-import { CharacterSprite } from '#/components/characters/CharacterSprite';
-import { EnumSpriteSize, EnumSpriteVariant } from '#/components/battle/enums';
-import { BattleFieldScene } from '#/components/battle/BattleFieldScene';
-import type { IBattleFieldConfig, IBattleSprite } from '#/components/battle/types';
-import { useShopConfig } from '#/features/shop/state/useShop';
-import { useInventory } from '#/features/inventory/state/useInventory';
+import { CharacterSprite } from '#/src/components/characters/CharacterSprite';
+import { EnumSpriteSize, EnumSpriteVariant } from '#/src/components/battle/enums';
+import { BattleFieldScene } from '#/src/components/battle/BattleFieldScene';
+import type { IBattleFieldConfig, IBattleSprite } from '#/src/components/battle/types';
+import { useShopConfig } from '#/src/features/shop/state/useShop';
+import { useInventory } from '#/src/features/inventory/state/useInventory';
 import './ShopHeader.css';
 
 /** 無角色場景的精靈列表，模組層級常數避免每次 render 產生新陣列 / Shared empty sprite list */

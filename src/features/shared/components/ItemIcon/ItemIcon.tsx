@@ -1,6 +1,6 @@
 /** 通用道具圖示：接受 URL，缺圖時以名稱首字佔位，不依賴任何資料來源。 */
 import React from 'react';
-import type { IStyleProps } from '#/components/shared/types';
+import type { IStyleProps } from '#/src/components/shared/types';
 import './ItemIcon.css';
 
 /** 圖示元件 props / Icon props */

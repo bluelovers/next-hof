@@ -2,13 +2,13 @@
 'use client';
 
 import React from 'react';
-import { useShopConfig, usePriceResolvers, useTradeErrorLabel } from '#/features/shop/state/useShop';
-import { useInventory } from '#/features/inventory/state/useInventory';
-import { InventoryPanel } from '#/features/inventory/components/InventoryPanel/InventoryPanel';
-import { ShopHeader } from '#/features/shop/components/ShopHeader/ShopHeader';
-import { CatalogToolbar } from '#/features/shop/components/CatalogToolbar/CatalogToolbar';
-import { CatalogGrid } from '#/features/shop/components/CatalogGrid/CatalogGrid';
-import { CartPanel } from '#/features/shop/components/CartPanel/CartPanel';
+import { useShopConfig, usePriceResolvers, useTradeErrorLabel } from '#/src/features/shop/state/useShop';
+import { useInventory } from '#/src/features/inventory/state/useInventory';
+import { InventoryPanel } from '#/src/features/inventory/components/InventoryPanel/InventoryPanel';
+import { ShopHeader } from '#/src/features/shop/components/ShopHeader/ShopHeader';
+import { CatalogToolbar } from '#/src/features/shop/components/CatalogToolbar/CatalogToolbar';
+import { CatalogGrid } from '#/src/features/shop/components/CatalogGrid/CatalogGrid';
+import { CartPanel } from '#/src/features/shop/components/CartPanel/CartPanel';
 import './ShopContent.css';
 
 /** 商店內容 / Shop content */
