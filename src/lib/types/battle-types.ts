@@ -5,7 +5,7 @@ import type {
 	EnumResource,
 	EnumValueWho,
 } from './battle-event-enum';
-import type { ICorpsePolicy, ICorpsePolicyField } from '#/lib/game/battle/corpse-policy';
+import type { ICorpsePolicy, ICorpsePolicyField } from '#/src/lib/game/battle/corpse-policy';
 
 /**
  * 結構化數值變化 / Structured value change

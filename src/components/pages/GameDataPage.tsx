@@ -7,11 +7,11 @@
  * Replicates the Hall of Rumor game data page with job tree and job detail tables
  */
 import React from 'react';
-import type { IGameDataPageData } from '#/components/game-data/GameDataTypes';
-import { JobDetailCard } from '#/components/game-data/JobDetailCard';
-import { GDSubNav } from '#/components/navigation/GDSubNav';
-import { JobTree } from '#/components/game-data/JobTree';
-import { JobDetailTable } from '#/components/game-data/JobDetailTable';
+import type { IGameDataPageData } from '#/src/components/game-data/GameDataTypes';
+import { JobDetailCard } from '#/src/components/game-data/JobDetailCard';
+import { GDSubNav } from '#/src/components/navigation/GDSubNav';
+import { JobTree } from '#/src/components/game-data/JobTree';
+import { JobDetailTable } from '#/src/components/game-data/JobDetailTable';
 import './GameDataPage.css';
 
 /** GameDataPage 屬性 / GameDataPage props */

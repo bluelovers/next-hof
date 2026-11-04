@@ -4,8 +4,8 @@
  * 鍵名由 prefix-enum + status-enum 以樣板字面靜態衍生，呼叫處一律引用衍生型別。
  */
 
-import type { Character } from '#/lib/game/character/Character';
-import { COMP_FLAT_ATTRS, COMP_PERCENT_ATTRS, PRIMARY_STAT_MAP } from '#/lib/game/character/status-attrs';
+import type { Character } from '#/src/lib/game/character/Character';
+import { COMP_FLAT_ATTRS, COMP_PERCENT_ATTRS, PRIMARY_STAT_MAP } from '#/src/lib/game/character/status-attrs';
 import { EnumCompPrefix, EnumStatusPrefix } from './prefix-enum';
 import type { EnumStatusAttr } from './status-enum';
 

@@ -9,9 +9,9 @@ import { levelFix } from './level-fix';
 import { PRIMARY_STATS } from './status-attrs';
 import type { IDataRepository } from '../data/repository';
 import type { RNG } from '../core/rng';
-import type { ICharDef } from '#/lib/types/char-types';
-import type { IMonDef } from '#/lib/types/mon-types';
-import { EnumCharType } from '#/lib/types/char-enum';
+import type { ICharDef } from '#/src/lib/types/char-types';
+import type { IMonDef } from '#/src/lib/types/mon-types';
+import { EnumCharType } from '#/src/lib/types/char-enum';
 
 /**
  * 建立玩家角色 / Create a player character

@@ -45,7 +45,7 @@ import {
 	type ISpriteLabelComputeInput,
 } from './useSpriteLabelRegistry';
 import './BattleFieldSpriteLayers.css';
-import type { IStyleProps } from '#/components/shared/types';
+import type { IStyleProps } from '#/src/components/shared/types';
 
 /** 戰場精靈圖層屬性（標籤開關共用 IBattleSpriteLabelOptions、編輯開關共用 IBattleFieldEditModeOptions）/ Battlefield sprite layers props (label toggle from the shared IBattleSpriteLabelOptions, edit toggle from the shared IBattleFieldEditModeOptions) */
 export interface IBattleFieldSpriteLayersProps extends IBattleSpriteLabelOptions, IBattleFieldEditModeOptions, IStyleProps

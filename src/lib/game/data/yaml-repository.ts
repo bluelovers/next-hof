@@ -16,12 +16,12 @@ import {
 } from './yaml-load';
 import { EnumResourceKind } from './yaml-resource-kind';
 import { convertCharYaml, convertMonYaml, convertSkillYaml, convertItemYaml, convertJobYaml } from './yaml-convert';
-import type { ICharDef } from '#/lib/types/char-types';
-import type { IItemDef } from '#/lib/types/item-types';
-import type { IJobDef } from '#/lib/types/job-types';
-import type { IMonDef } from '#/lib/types/mon-types';
-import type { ISkillDef } from '#/lib/types/skill-types';
-import type { IResourceId } from '#/lib/types/seg-types';
+import type { ICharDef } from '#/src/lib/types/char-types';
+import type { IItemDef } from '#/src/lib/types/item-types';
+import type { IJobDef } from '#/src/lib/types/job-types';
+import type { IMonDef } from '#/src/lib/types/mon-types';
+import type { ISkillDef } from '#/src/lib/types/skill-types';
+import type { IResourceId } from '#/src/lib/types/seg-types';
 
 /** YAML 倉庫建置結果 / Results of building a YAML-backed repository */
 export interface IYamlRepositoryResult

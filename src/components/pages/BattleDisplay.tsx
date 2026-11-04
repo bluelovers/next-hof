@@ -21,16 +21,16 @@
  * degrades to a single segment.
  */
 import React from 'react';
-import type { IBattleDisplayData, IBattleDisplayOptions } from '#/components/battle/types';
-import { BattleDisplayHeader } from '#/components/battle/BattleDisplayHeader';
-import { BattleTeamRow } from '#/components/battle/BattleTeamRow';
-import { BattleUnitEntrance } from '#/components/battle/BattleUnitEntrance';
-import { BattleSegment } from '#/components/battle/BattleSegment';
-import { BattleResult } from '#/components/battle/BattleResult';
-import { splitActionsBySnapshots, segmentUnitsForSide } from '#/components/battle/battleUtils';
-import { EnumTeamSideUI } from '#/components/battle/enums';
+import type { IBattleDisplayData, IBattleDisplayOptions } from '#/src/components/battle/types';
+import { BattleDisplayHeader } from '#/src/components/battle/BattleDisplayHeader';
+import { BattleTeamRow } from '#/src/components/battle/BattleTeamRow';
+import { BattleUnitEntrance } from '#/src/components/battle/BattleUnitEntrance';
+import { BattleSegment } from '#/src/components/battle/BattleSegment';
+import { BattleResult } from '#/src/components/battle/BattleResult';
+import { splitActionsBySnapshots, segmentUnitsForSide } from '#/src/components/battle/battleUtils';
+import { EnumTeamSideUI } from '#/src/components/battle/enums';
 import './BattleDisplay.css';
-import '#/components/shared/SharedBase.css';
+import '#/src/components/shared/SharedBase.css';
 
 /** 戰鬥顯示屬性（顯示開關共用 IBattleDisplayOptions，單一事實來源）/ Battle display props (toggles come from the shared IBattleDisplayOptions) */
 export interface IBattleDisplayProps extends IBattleDisplayOptions

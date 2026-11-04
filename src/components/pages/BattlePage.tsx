@@ -6,20 +6,20 @@
  * Battle formation screen — select party members and review monster info
  *
  * 原始網頁對照 / Original page reference:
- * - 對應 BASE_URL 下的 /battle/common?land=gb0（見 #/components/config/AppConfig）
+ * - 對應 BASE_URL 下的 /battle/common?land=gb0（見 #/src/components/config/AppConfig）
  * - 結構：地區標題 → Teams → 角色列表(checkbox) → 按鈕 → SaveParty → hr → 怪物列表
  */
 import React, { useState } from 'react';
 import { GameLayout } from './GameLayout';
-import { CharacterCard } from '#/components/characters/CharacterCard';
-import type { IBattleCharacterData } from '#/components/characters/CharacterTypes';
-import { MonsterCard } from '#/components/monsters/MonsterCard';
-import type { IMonsterData } from '#/components/monsters/MonsterTypes';
-import { buildCharacterImageUrl, buildCharacterUrl } from '#/components/characters/characterUtils';
+import { CharacterCard } from '#/src/components/characters/CharacterCard';
+import type { IBattleCharacterData } from '#/src/components/characters/CharacterTypes';
+import { MonsterCard } from '#/src/components/monsters/MonsterCard';
+import type { IMonsterData } from '#/src/components/monsters/MonsterTypes';
+import { buildCharacterImageUrl, buildCharacterUrl } from '#/src/components/characters/characterUtils';
 
 /** SharedBase.css 提供 clearfix 等工具類 */
 /** SharedBase.css provides utility classes like clearfix */
-import '#/components/shared/SharedBase.css';
+import '#/src/components/shared/SharedBase.css';
 import './BattlePage.css';
 
 /** BattlePage 屬性 / BattlePage props */

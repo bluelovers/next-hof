@@ -9,9 +9,9 @@
  * from them (same source as the engine).
  */
 import type { IBattleAction } from '../../src/components/battle/types';
-import { EnumActionType, EnumAttributeType, EnumStatDirection } from '#/components/battle/enums';
-import { EnumValueWho } from '#/lib/types/battle-event-enum';
-import { EnumStatusAttr } from '#/lib/types/status-enum';
+import { EnumActionType, EnumAttributeType, EnumStatDirection } from '#/src/components/battle/enums';
+import { EnumValueWho } from '#/src/lib/types/battle-event-enum';
+import { EnumStatusAttr } from '#/src/lib/types/status-enum';
 import {
 	buildActionMessage,
 	buildDamageCountMessage,
@@ -28,7 +28,7 @@ import {
 	buildStatToText,
 	buildValueChangeFromDelay,
 	EnumLogCopy,
-} from '#/components/battle/battleUtils';
+} from '#/src/components/battle/battleUtils';
 import { characterSprites, monsterSprites, monsterOf } from './spriteCast';
 
 /** 角色名稱別名（由 spriteCast 派生，避免字面重複） / Character name aliases (derived from spriteCast) */

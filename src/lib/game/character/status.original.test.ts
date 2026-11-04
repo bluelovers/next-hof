@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { Character } from './Character';
-import { EnumState } from '#/lib/types/battle-enum';
-import { EnumCharType } from '#/lib/types/char-enum';
+import { EnumState } from '#/src/lib/types/battle-enum';
+import { EnumCharType } from '#/src/lib/types/char-enum';
 import type { RNG } from '../core/rng';
 import { getPoison } from './status';
 import { getPoisonOriginal } from './status.original';

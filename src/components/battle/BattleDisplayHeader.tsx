@@ -11,7 +11,7 @@
 import React from 'react';
 import type { IDisplayTimeString } from './types';
 import './BattleDisplayHeader.css';
-import '#/components/shared/SharedBase.css';
+import '#/src/components/shared/SharedBase.css';
 
 /** 戰鬥標題列屬性 / Battle display header props */
 export interface IBattleDisplayHeaderProps

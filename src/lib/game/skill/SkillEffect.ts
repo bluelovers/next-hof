@@ -48,7 +48,7 @@
 import type { Battle } from '../battle/Battle';
 import type { Character } from '../character/Character';
 import { charIdToString } from '../character/Character';
-import { EnumExpect, EnumPosition, EnumState } from '#/lib/types/battle-enum';
+import { EnumExpect, EnumPosition, EnumState } from '#/src/lib/types/battle-enum';
 import type { BattleTeam } from '../team/BattleTeam';
 import { newMonSummon } from '../character/factory';
 import {
@@ -65,16 +65,16 @@ import {
 } from '../character/status';
 import { DOWNMAP, UPMAP } from '../character/status-attrs';
 import { minusPercent, takePercent } from '../core/percent';
-import type { IBattleEvent } from '#/lib/types/battle-types';
-import type { ISkillDef } from '#/lib/types/skill-types';
+import type { IBattleEvent } from '#/src/lib/types/battle-types';
+import type { ISkillDef } from '#/src/lib/types/skill-types';
 import {
 	EnumBattleEventType,
 	EnumInfoText,
 	EnumMoveText,
 	EnumResource,
 	EnumValueWho,
-} from '#/lib/types/battle-event-enum';
-import { EnumSkillPriority } from '#/lib/types/skill-enum';
+} from '#/src/lib/types/battle-event-enum';
+import { EnumSkillPriority } from '#/src/lib/types/skill-enum';
 import type { IDamageOption } from './effect.core';
 import type { ISkillResult } from './effect';
 import { applyDamage, applySkill, barrierGuard, calcBasicDamage, calcRecoveryValue, statusChanges } from './effect';

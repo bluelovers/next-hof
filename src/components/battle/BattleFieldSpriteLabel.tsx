@@ -29,8 +29,8 @@ import {
 	type ISpriteLabelPositionResult,
 } from './labelPosition';
 import './BattleFieldSpriteLabel.css';
-import { EnumSpriteLabelPlacement } from '#/components/battle/enums';
-import type { IStyleProps } from '#/components/shared/types';
+import { EnumSpriteLabelPlacement } from '#/src/components/battle/enums';
+import type { IStyleProps } from '#/src/components/shared/types';
 
 /** 戰場精靈名稱標籤屬性 / Battlefield sprite name label props */
 export interface IBattleFieldSpriteLabelProps extends IStyleProps

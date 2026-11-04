@@ -5,9 +5,9 @@
  * 來源特有的值（`Key`→`Other`、`GUARD`→`Armor`、性別 `1`/`2`）以 `aliases` 參數登記收斂規則。
  */
 
-import { EnumGender } from '#/lib/types/char-enum';
-import { EnumItemCategory, EnumWeaponType } from '#/lib/types/item-enum';
-import { EnumInfluence, EnumSkillPriority } from '#/lib/types/skill-enum';
+import { EnumGender } from '#/src/lib/types/char-enum';
+import { EnumItemCategory, EnumWeaponType } from '#/src/lib/types/item-enum';
+import { EnumInfluence, EnumSkillPriority } from '#/src/lib/types/skill-enum';
 
 /**
  * 值是否為該列舉的成員 / Whether a value is a member of the enum

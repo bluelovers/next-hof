@@ -1,7 +1,7 @@
 /**
  * 狀態屬性 enum
  *
- * 獨立於實作模組 #/lib/game/character/status-attrs 之外，避免 value 層級的循環依賴：
+ * 獨立於實作模組 #/src/lib/game/character/status-attrs 之外，避免 value 層級的循環依賴：
  * status-attrs 在模組求值時便需要本 enum 作為對照表鍵型別（STATUS_ATTR_KEYS /
  * STATUS_ATTR_TABLE / 鍵名衍生），若 enum 定義在 status-attrs 內側會造成自身 value
  * 層級的循環匯入（列舉在模組求值時處於 TDZ 而崩潰）。

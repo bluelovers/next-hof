@@ -13,29 +13,29 @@
  */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { BattleDisplay } from '#/components/pages/BattleDisplay';
+import { BattleDisplay } from '#/src/components/pages/BattleDisplay';
 import type {
 	IBattleDisplayData,
 	IBattleSnapshotDisplayUnit,
 	IBattleUnit,
-} from '#/components/battle/types';
-import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
-import { EnumTeamSideUI, EnumUnitStatus } from '#/components/battle/enums';
-import { EnumPosition } from '#/lib/types/battle-enum';
+} from '#/src/components/battle/types';
+import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/src/components/battle/types';
+import { EnumTeamSideUI, EnumUnitStatus } from '#/src/components/battle/enums';
+import { EnumPosition } from '#/src/lib/types/battle-enum';
 import {
 	resolveCorpsePolicy,
 	type ICorpsePolicy,
 	type ICorpseSpec,
-} from '#/lib/game/battle/corpse-policy';
+} from '#/src/lib/game/battle/corpse-policy';
 import type { CSSProperties } from 'react';
 import {
 	groupBattleChars,
 	computeBattleSpritePositions,
 	type IBattlePositionChar,
-} from '#/components/battle/computeSpritePositions';
-import { getSpriteImageSize } from '#/components/battle/spriteImageSizes';
-import { SPRITE_CORPSE_URL } from '#/components/battle/battleUtils';
-import type { IStylePropsRequired } from '#/components/shared/types';
+} from '#/src/components/battle/computeSpritePositions';
+import { getSpriteImageSize } from '#/src/components/battle/spriteImageSizes';
+import { SPRITE_CORPSE_URL } from '#/src/components/battle/battleUtils';
+import type { IStylePropsRequired } from '#/src/components/shared/types';
 import './BattleCorpsePolicy.css';
 
 /**

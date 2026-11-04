@@ -7,7 +7,7 @@
  * chosen option, so switching options switches the enemy composition.
  */
 
-import { SEED } from '#/lib/game/data/seed-data';
+import { SEED } from '#/src/lib/game/data/seed-data';
 
 /**
  * 敵方編選項目 / Enemy encounter option

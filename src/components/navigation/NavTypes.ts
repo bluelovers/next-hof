@@ -7,7 +7,7 @@
  * Shared by every nav-style component so the { label; href; active? } shape is
  * defined once instead of being re-declared in each file.
  */
-import { buildAppUrl } from '#/components/config/AppConfig';
+import { buildAppUrl } from '#/src/components/config/AppConfig';
 
 /** 導航連結 / Nav link */
 export interface INavLink

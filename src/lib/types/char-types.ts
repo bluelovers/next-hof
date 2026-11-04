@@ -1,6 +1,6 @@
 import type { IAtkDefFields, IAtkTuple, ICombatStats, IEquipTable, INamedIconDef } from './base-types';
 import type { EnumGuardKind, EnumPosition } from './battle-enum';
-import type { ICorpsePolicyField } from '#/lib/game/battle/corpse-policy';
+import type { ICorpsePolicyField } from '#/src/lib/game/battle/corpse-policy';
 import type { IDataEx } from './data-ex-types';
 
 /**

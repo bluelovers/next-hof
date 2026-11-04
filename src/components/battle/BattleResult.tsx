@@ -13,7 +13,7 @@ import { EnumTeamSideUI } from './enums';
 import { getSideClass } from './battleUtils';
 import { BattleSidePanel } from './BattleSidePanel';
 import './BattleResult.css';
-import '#/components/shared/SharedBase.css';
+import '#/src/components/shared/SharedBase.css';
 
 /** 戰鬥結果屬性 / Battle result props */
 export interface IBattleResultProps

@@ -7,10 +7,10 @@
  */
 import React from 'react';
 import './HuntPage.css';
-import type { INavLink } from '#/components/navigation/NavTypes';
-import { HuntSubNav } from '#/components/navigation/HuntSubNav';
-import type { IHuntAreaData } from '#/components/areas/HuntAreaLink';
-import { HuntAreaLink } from '#/components/areas/HuntAreaLink';
+import type { INavLink } from '#/src/components/navigation/NavTypes';
+import { HuntSubNav } from '#/src/components/navigation/HuntSubNav';
+import type { IHuntAreaData } from '#/src/components/areas/HuntAreaLink';
+import { HuntAreaLink } from '#/src/components/areas/HuntAreaLink';
 
 /** HuntPage 屬性 / HuntPage props */
 export interface IHuntPageProps

@@ -9,7 +9,7 @@
  * logic in BattleAction.tsx and SkillCard.tsx.
  */
 import React from 'react';
-import type { IStyleProps } from '#/components/shared/types';
+import type { IStyleProps } from '#/src/components/shared/types';
 
 /** SkillIcon 屬性 / SkillIcon props */
 export interface ISkillIconProps extends IStyleProps

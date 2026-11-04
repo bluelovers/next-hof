@@ -7,7 +7,7 @@
  */
 import React, { useState } from 'react';
 import './LoginForm.css';
-import { buildAppUrl } from '#/components/config/AppConfig';
+import { buildAppUrl } from '#/src/components/config/AppConfig';
 
 /** LoginForm 屬性 / LoginForm props */
 export interface ILoginFormProps

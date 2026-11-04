@@ -9,11 +9,11 @@
  * button is disabled by ShowcasePage under the same condition).
  */
 import React from 'react';
-import { MAX_CHAR } from '#/lib/game/constants';
-import { SHOWCASE_ROSTER } from '#/lib/showcase/roster';
-import type { IRosterEntry } from '#/lib/showcase/roster';
+import { MAX_CHAR } from '#/src/lib/game/constants';
+import { SHOWCASE_ROSTER } from '#/src/lib/showcase/roster';
+import type { IRosterEntry } from '#/src/lib/showcase/roster';
 import './PartySelect.css';
-import '#/components/shared/SharedBase.css';
+import '#/src/components/shared/SharedBase.css';
 
 /** PartySelect 屬性 / PartySelect props */
 export interface IPartySelectProps

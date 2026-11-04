@@ -18,7 +18,7 @@ import './CharacterCardBase.css';
 import type { ICharacterBase, ICharacterData, IBattleCharacterData } from './CharacterTypes';
 import { CharacterSprite } from './CharacterSprite';
 import { getCarpetClass } from './characterUtils';
-import { EnumSpriteVariant } from '#/components/battle/enums';
+import { EnumSpriteVariant } from '#/src/components/battle/enums';
 
 // ==================== 共用型別 / Shared types ====================
 

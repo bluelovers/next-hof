@@ -3,12 +3,12 @@
  * 對應 docs/log/battle/02 §4（Defending）：後排單體/群體攻擊被前排守護者攔截。
  */
 
-import { EnumState, EnumPosition } from '#/lib/types/battle-enum';
+import { EnumState, EnumPosition } from '#/src/lib/types/battle-enum';
 import type { Character } from '../character/Character';
 import type { BattleTeam } from '../team/BattleTeam';
-import type { ISkillDef } from '#/lib/types/skill-types';
-import { EnumGuardKind } from '#/lib/types/battle-enum';
-import { EnumTargetType } from '#/lib/types/skill-enum';
+import type { ISkillDef } from '#/src/lib/types/skill-types';
+import { EnumGuardKind } from '#/src/lib/types/battle-enum';
+import { EnumTargetType } from '#/src/lib/types/skill-enum';
 import { GUARD_KIND_PROBABILITY, GUARD_KIND_HP_THRESHOLD } from '../types';
 
 /**

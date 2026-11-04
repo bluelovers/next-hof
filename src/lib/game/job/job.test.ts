@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createSeedRepository } from '../data/seed-data';
 import { coeMaxHp, equipAllowed } from './job';
-import { EnumWeaponType } from '#/lib/types/item-enum';
+import { EnumWeaponType } from '#/src/lib/types/item-enum';
 
 describe('job system (5.1)', () =>
 {

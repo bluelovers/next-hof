@@ -5,9 +5,9 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { EnumEquipSlot } from '#/lib/types/char-enum';
-import { EnumGuardKind } from '#/lib/types/battle-enum';
-import { EnumPosition } from '#/lib/types/battle-enum';
+import { EnumEquipSlot } from '#/src/lib/types/char-enum';
+import { EnumGuardKind } from '#/src/lib/types/battle-enum';
+import { EnumPosition } from '#/src/lib/types/battle-enum';
 import { loadAllChars, loadAllMons, loadCharYaml, loadMonYaml } from './yaml-load';
 import { convertCharYaml, convertMonYaml } from './yaml-convert';
 import {
@@ -17,7 +17,7 @@ import {
 	toNumberRecord,
 } from './yaml-numeric';
 import { convertEquipYaml, convertBehaviorYaml } from './yaml-convert-blocks';
-import type { IRawCharYaml, IRawMonYaml } from '#/lib/types/raw/yaml-types';
+import type { IRawCharYaml, IRawMonYaml } from '#/src/lib/types/raw/yaml-types';
 import { __TEST_FIXTURES_RESOURCE } from '../../../../test/lib/data-paths.ts';
 
 /**

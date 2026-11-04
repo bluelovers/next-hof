@@ -7,27 +7,27 @@
 
 import {
 	EnumGender,
-} from '#/lib/types/char-enum';
-import { EnumSkillDamageType } from '#/lib/types/skill-enum';
+} from '#/src/lib/types/char-enum';
+import { EnumSkillDamageType } from '#/src/lib/types/skill-enum';
 import {
 	EnumWeaponType,
-} from '#/lib/types/item-enum';
+} from '#/src/lib/types/item-enum';
 import {
 	IJobDefCore,
 	type IJobNamedIcon,
 	type IGrowthCoefficients,
 	type IJobDef,
-} from '#/lib/types/job-types';
-import type { ISkillDef } from '#/lib/types/skill-types';
-import type { ICharDef } from '#/lib/types/char-types';
-import type { IItemDef } from '#/lib/types/item-types';
-import type { IMonDef } from '#/lib/types/mon-types';
+} from '#/src/lib/types/job-types';
+import type { ISkillDef } from '#/src/lib/types/skill-types';
+import type { ICharDef } from '#/src/lib/types/char-types';
+import type { IItemDef } from '#/src/lib/types/item-types';
+import type { IMonDef } from '#/src/lib/types/mon-types';
 import type {
 	IRawCharYaml,
 	IRawMonYaml,
-} from '#/lib/types/raw/yaml-types';
+} from '#/src/lib/types/raw/yaml-types';
 import { SKILL_EXTRA_NUMERIC_KEYS } from './yaml-skill-keys';
-import { COMP_FIELDS } from '#/lib/game/character/status-attrs';
+import { COMP_FIELDS } from '#/src/lib/game/character/status-attrs';
 import { toNumberRecord } from './yaml-numeric';
 import {
 	INF_LOOKUP,

@@ -2,7 +2,7 @@
  * 事件分派檢視組件
  * Event dispatch view component
  *
- * 直接渲染上級事件引擎（#/lib/game/battle/event-engine）的輸出：
+ * 直接渲染上級事件引擎（#/src/lib/game/battle/event-engine）的輸出：
  * - 技能事件：一張卡片＝一次技能執行，列出「誰 使用了 哪個技能」、由技能定義偵測到的效果，
  *   以及各效果系統實際處理到的紀錄；召喚系統處理後衍生的後續事件（入場）也掛在該系統下。
  * - 一般事件：不依附技能的紀錄（死亡、每回合毒傷、Info…）單獨成列。
@@ -20,18 +20,18 @@
  * by the engine (single source of truth); no actor / target / skill field logic is stitched here.
  */
 import React from 'react';
-import type { IBattleEvent } from '#/lib/types/battle-types';
+import type { IBattleEvent } from '#/src/lib/types/battle-types';
 import {
 	EnumEventClass,
 	EnumFollowUpType,
 	EnumSkillEffect,
 	EVENT_TYPE_LABEL,
-} from '#/lib/game/battle/event-engine';
+} from '#/src/lib/game/battle/event-engine';
 import type {
 	IBattleEventRecord,
 	ISkillDispatch,
 	ISkillEvent,
-} from '#/lib/game/battle/event-engine';
+} from '#/src/lib/game/battle/event-engine';
 import './BattleEventDispatch.css';
 
 /** 事件分派檢視屬性 / Event dispatch view props */

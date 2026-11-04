@@ -8,9 +8,9 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse } from 'yaml';
-import type { IItemDef } from '#/lib/types/item-types';
-import type { IJobDefCore } from '#/lib/types/job-types';
-import type { IResourceId } from '#/lib/types/seg-types';
+import type { IItemDef } from '#/src/lib/types/item-types';
+import type { IJobDefCore } from '#/src/lib/types/job-types';
+import type { IResourceId } from '#/src/lib/types/seg-types';
 import type {
 	IRawCharYaml,
 	IRawGuardYaml,
@@ -19,10 +19,10 @@ import type {
 	IRawMonYaml,
 	IRawSkilltreeYaml,
 	IRawUnionYaml,
-} from '#/lib/types/raw/yaml-types';
+} from '#/src/lib/types/raw/yaml-types';
 import { EnumResourceKind } from './yaml-resource-kind';
 import { normalizeResource } from './yaml-coerce';
-import { ISkillDef } from '#/lib/types/skill-types';
+import { ISkillDef } from '#/src/lib/types/skill-types';
 
 /**
  * 資源檔名模式：`{kind}.{id}.yml` / resource file name pattern: `{kind}.{id}.yml`

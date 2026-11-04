@@ -1,20 +1,20 @@
 import { describe, it, expect } from 'vitest';
 import { RNG } from '../core/rng';
-import { EnumState } from '#/lib/types/battle-enum';
+import { EnumState } from '#/src/lib/types/battle-enum';
 import { Character } from '../character/Character';
 import { createSeedRepository } from '../data/seed-data';
 import { InMemoryRepository } from '../data/repository';
 import { getSkill } from './Skill';
 import { skillPassive } from './passive';
 import { calcBasicDamage, calcRecoveryValue, applySkill } from './effect';
-import { EnumBattleEventType } from '#/lib/types/battle-event-enum';
-import { EnumCharType } from '#/lib/types/char-enum';
+import { EnumBattleEventType } from '#/src/lib/types/battle-event-enum';
+import { EnumCharType } from '#/src/lib/types/char-enum';
 import {
 	EnumTargetType,
 	EnumTargetMethod,
 	EnumSkillDamageType,
-} from '#/lib/types/skill-enum';
-import type { ISkillDef } from '#/lib/types/skill-types';
+} from '#/src/lib/types/skill-enum';
+import type { ISkillDef } from '#/src/lib/types/skill-types';
 
 const repo = createSeedRepository();
 

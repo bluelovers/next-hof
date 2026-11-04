@@ -4,7 +4,7 @@
  * docs/data/skill.md（Up* /Down* /Plus* /Poison/CurePoison/HpRegen/SpRegen ...）。
  */
 
-import { EnumPosition } from '#/lib/types/battle-enum';
+import { EnumPosition } from '#/src/lib/types/battle-enum';
 import type { Character } from '../character/Character';
 import { charIdToString } from '../character/Character';
 import { hpDamage, hpRecover, getPoison, getPoisonResist } from '../character/status';
@@ -16,11 +16,11 @@ import {
 	STATUS_DOWN_KEYS,
 	STATUS_PLUS_KEYS,
 } from '../character/status-attrs';
-import type { IStatusUpKey, IStatusDownKey, IStatusPlusKey } from '#/lib/types/status-attr-types';
-import type { IBattleEvent } from '#/lib/types/battle-types';
-import type { ISkillDef } from '#/lib/types/skill-types';
-import { EnumBattleEventType, EnumMoveText } from '#/lib/types/battle-event-enum';
-import { EnumSkillDamageType } from '#/lib/types/skill-enum';
+import type { IStatusUpKey, IStatusDownKey, IStatusPlusKey } from '#/src/lib/types/status-attr-types';
+import type { IBattleEvent } from '#/src/lib/types/battle-types';
+import type { ISkillDef } from '#/src/lib/types/skill-types';
+import { EnumBattleEventType, EnumMoveText } from '#/src/lib/types/battle-event-enum';
+import { EnumSkillDamageType } from '#/src/lib/types/skill-enum';
 import { EnumDamageVariant, computeBasicDamage } from './effect.core';
 import type { IDamageOption, IDamageSkillSource } from './effect.core';
 import { takePercent } from '../core/percent';

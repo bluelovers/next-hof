@@ -9,9 +9,9 @@
  * - avatar：純圖片（無 frame），供外層自行包裝連結/底座
  */
 import React from 'react';
-import { EnumSpriteVariant, EnumSpriteSize } from '#/components/battle/enums';
+import { EnumSpriteVariant, EnumSpriteSize } from '#/src/components/battle/enums';
 import './CharacterSprite.css';
-import type { IStyleProps } from '#/components/shared/types';
+import type { IStyleProps } from '#/src/components/shared/types';
 
 /** 顯示模式 / Display variant */
 export type ISpriteVariant = EnumSpriteVariant;

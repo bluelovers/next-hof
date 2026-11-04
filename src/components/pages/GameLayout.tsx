@@ -7,10 +7,10 @@
  */
 import React from 'react';
 import './GameLayout.css';
-import type { INavLink } from '#/components/navigation/NavTypes';
-import { DEFAULT_FOOTER_LINKS, COPYRIGHT_TEXT } from '#/components/navigation/NavTypes';
-import { NavList } from '#/components/navigation/NavList';
-import { buildAppUrl } from '#/components/config/AppConfig';
+import type { INavLink } from '#/src/components/navigation/NavTypes';
+import { DEFAULT_FOOTER_LINKS, COPYRIGHT_TEXT } from '#/src/components/navigation/NavTypes';
+import { NavList } from '#/src/components/navigation/NavList';
+import { buildAppUrl } from '#/src/components/config/AppConfig';
 
 /** GameLayout 屬性 / GameLayout props */
 export interface IGameLayoutProps

@@ -1,15 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { EnumOutcome } from '#/lib/game/battle/BattleResult';
-import { MAX_CHAR } from '#/lib/game/constants';
-import { EnumState } from '#/lib/types/battle-enum';
-import { RNG } from '#/lib/game/core/rng';
-import { createSeedRepository, SEED } from '#/lib/game/data/seed-data';
-import { newChar, newMon } from '#/lib/game/character/factory';
-import { EnumBattleEventType } from '#/lib/types/battle-event-enum';
-import { EnumSkillDamageType } from '#/lib/types/skill-enum';
-import type { IBattleEvent } from '#/lib/types/battle-types';
-import type { ISkillDef } from '#/lib/types/skill-types';
-import type { IDataRepository } from '#/lib/game/data/repository';
+import { EnumOutcome } from '#/src/lib/game/battle/BattleResult';
+import { MAX_CHAR } from '#/src/lib/game/constants';
+import { EnumState } from '#/src/lib/types/battle-enum';
+import { RNG } from '#/src/lib/game/core/rng';
+import { createSeedRepository, SEED } from '#/src/lib/game/data/seed-data';
+import { newChar, newMon } from '#/src/lib/game/character/factory';
+import { EnumBattleEventType } from '#/src/lib/types/battle-event-enum';
+import { EnumSkillDamageType } from '#/src/lib/types/skill-enum';
+import type { IBattleEvent } from '#/src/lib/types/battle-types';
+import type { ISkillDef } from '#/src/lib/types/skill-types';
+import type { IDataRepository } from '#/src/lib/game/data/repository';
 import { SPRITE_PLACEHOLDER_URL } from './sprite-map';
 import {
 	EnumTeamSideUI,
@@ -18,8 +18,8 @@ import {
 	EnumAttributeType,
 	EnumMagicCircleKind,
 	EnumChargeKind,
-} from '#/components/battle/enums';
-import { EnumPosition } from '#/lib/types/battle-enum';
+} from '#/src/components/battle/enums';
+import { EnumPosition } from '#/src/lib/types/battle-enum';
 import {
 	DEFAULT_ALLY_TEAM_NAME,
 	DEFAULT_ENEMY_TEAM_NAME,

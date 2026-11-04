@@ -5,7 +5,7 @@
  * 將怪物領域的型別集中於此，避免定義散落於元件檔案內。
  * Centralizes monster-domain types instead of defining them inside a component file.
  */
-import type { ILandType } from '#/components/areas/landTypes';
+import type { ILandType } from '#/src/components/areas/landTypes';
 
 /** 怪物資料 / Monster data */
 export interface IMonsterData

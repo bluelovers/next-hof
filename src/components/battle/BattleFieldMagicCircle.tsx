@@ -12,7 +12,7 @@ import type { CSSProperties } from 'react';
 import type { IBattleMagicCircle } from './types';
 import { MAGIC_CIRCLE_DEFAULT_X, MAGIC_CIRCLE_DEFAULT_Y } from './types';
 import './BattleFieldMagicCircle.css';
-import type { IStyleProps } from '#/components/shared/types';
+import type { IStyleProps } from '#/src/components/shared/types';
 
 /** 魔方陣圖層屬性 / Magic-circle layer props */
 export interface IBattleMagicCircleProps extends IStyleProps

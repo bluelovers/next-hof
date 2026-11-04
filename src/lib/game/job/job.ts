@@ -4,8 +4,8 @@
  */
 
 import { MAX_STATUS } from '../constants';
-import type { IJobDef } from '#/lib/types/job-types';
-import type { EnumWeaponType } from '#/lib/types/item-enum';
+import type { IJobDef } from '#/src/lib/types/job-types';
+import type { EnumWeaponType } from '#/src/lib/types/item-enum';
 
 /**
  * 判斷職業是否可裝備某武器/防具型別

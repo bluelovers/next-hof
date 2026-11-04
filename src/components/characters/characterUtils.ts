@@ -7,7 +7,7 @@
  * Centralizes the alternating carpet-pedestal logic and character-page URL builder
  * for CharacterCard.
  */
-import { BASE_URL } from '#/components/config/AppConfig';
+import { BASE_URL } from '#/src/components/config/AppConfig';
 
 /** carpet 底座交替類別（偶數 carpet0 / 奇數 carpet1） / Alternating carpet class */
 export function getCarpetClass(index = 0): string

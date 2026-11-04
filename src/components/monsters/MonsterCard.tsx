@@ -9,15 +9,15 @@ import React from 'react';
 
 /** 共享 carpet_frame 底座樣式 */
 /** Shared carpet_frame pedestal styles */
-import '#/components/characters/CharacterCardBase.css';
+import '#/src/components/characters/CharacterCardBase.css';
 /** MonsterCard 專用樣式（地形背景） */
 /** MonsterCard specific styles (land backgrounds) */
 import './MonsterCard.css';
-import type { ILandType } from '#/components/areas/landTypes';
-import { buildLandClass } from '#/components/areas/landTypes';
+import type { ILandType } from '#/src/components/areas/landTypes';
+import { buildLandClass } from '#/src/components/areas/landTypes';
 import type { IMonsterData } from './MonsterTypes';
-import { CharacterSprite } from '#/components/characters/CharacterSprite';
-import { EnumSpriteVariant } from '#/components/battle/enums';
+import { CharacterSprite } from '#/src/components/characters/CharacterSprite';
+import { EnumSpriteVariant } from '#/src/components/battle/enums';
 
 /** MonsterCard 屬性 / MonsterCard props */
 export interface IMonsterCardProps

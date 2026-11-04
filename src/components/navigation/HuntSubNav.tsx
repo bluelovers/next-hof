@@ -8,7 +8,7 @@
 import React from 'react';
 import type { INavLink } from './NavTypes';
 import { NavList } from './NavList';
-import { buildAppUrl } from '#/components/config/AppConfig';
+import { buildAppUrl } from '#/src/components/config/AppConfig';
 import './HuntSubNav.css';
 
 /** HuntSubNav 屬性 / HuntSubNav props */

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { EnumPosition, EnumTeamSide } from '#/lib/types/battle-enum';
-import { EnumCharType } from '#/lib/types/char-enum';
-import { EnumGuardKind } from '#/lib/types/battle-enum';
+import { EnumPosition, EnumTeamSide } from '#/src/lib/types/battle-enum';
+import { EnumCharType } from '#/src/lib/types/char-enum';
+import { EnumGuardKind } from '#/src/lib/types/battle-enum';
 import { Character } from '../character/Character';
 import { createSeedRepository } from '../data/seed-data';
 import { BattleTeam } from '../team/BattleTeam';

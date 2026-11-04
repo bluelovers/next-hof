@@ -39,8 +39,8 @@ import { BattleFieldSpriteFrame } from './BattleFieldSpriteFrame';
 import { BattleFieldMagicCircle } from './BattleFieldMagicCircle';
 import { BattleFieldEditGuides } from './BattleFieldEditGuides';
 import { frameOffsetLiveStore } from './frameOffsetLiveStore';
-import { EnumBattleFieldBgScale, EnumBattleFieldVAlign, EnumTeamSideUI } from '#/components/battle/enums';
-import type { IStyleProps } from '#/components/shared/types';
+import { EnumBattleFieldBgScale, EnumBattleFieldVAlign, EnumTeamSideUI } from '#/src/components/battle/enums';
+import type { IStyleProps } from '#/src/components/shared/types';
 
 /**
  * 戰場圖層屬性

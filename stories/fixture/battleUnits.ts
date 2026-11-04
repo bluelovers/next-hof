@@ -6,8 +6,8 @@
  * Individual battle unit / team / result data for story showcases, centralized to avoid duplication.
  */
 import type { IBattleUnit, IBattleResult } from '../../src/components/battle/types';
-import { EnumTeamSideUI, EnumUnitStatus } from '#/components/battle/enums';
-import { getCharSpriteUrl, getMonSpriteUrl } from '#/lib/showcase/sprite-map';
+import { EnumTeamSideUI, EnumUnitStatus } from '#/src/components/battle/enums';
+import { getCharSpriteUrl, getMonSpriteUrl } from '#/src/lib/showcase/sprite-map';
 import { characterSprites, monsterSprites } from './spriteCast';
 
 /** 角色名稱別名（由 spriteCast 派生） / Character name aliases (derived from spriteCast) */

@@ -9,16 +9,16 @@
  */
 import React, { useState } from 'react';
 import './DashboardPage.css';
-import '#/components/shared/SharedBase.css';
-import { NavigationBar } from '#/components/navigation/NavigationBar';
-import type { INavLink } from '#/components/navigation/NavTypes';
-import { DEFAULT_FOOTER_LINKS, COPYRIGHT_TEXT } from '#/components/navigation/NavTypes';
-import { NavList } from '#/components/navigation/NavList';
-import { TeamStatus } from '#/components/info/TeamStatus';
-import type { ITeamStatusProps } from '#/components/info/TeamStatus';
-import { CharacterList } from '#/components/characters/CharacterList';
-import type { ICharacterData } from '#/components/characters/CharacterTypes';
-import { buildCharacterImageUrl } from '#/components/characters/characterUtils';
+import '#/src/components/shared/SharedBase.css';
+import { NavigationBar } from '#/src/components/navigation/NavigationBar';
+import type { INavLink } from '#/src/components/navigation/NavTypes';
+import { DEFAULT_FOOTER_LINKS, COPYRIGHT_TEXT } from '#/src/components/navigation/NavTypes';
+import { NavList } from '#/src/components/navigation/NavList';
+import { TeamStatus } from '#/src/components/info/TeamStatus';
+import type { ITeamStatusProps } from '#/src/components/info/TeamStatus';
+import { CharacterList } from '#/src/components/characters/CharacterList';
+import type { ICharacterData } from '#/src/components/characters/CharacterTypes';
+import { buildCharacterImageUrl } from '#/src/components/characters/characterUtils';
 
 /** DashboardPage 屬性 / DashboardPage props */
 export interface IDashboardPageProps

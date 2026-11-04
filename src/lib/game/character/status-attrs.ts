@@ -19,10 +19,10 @@
 
 import { MAX_STATUS_MAXIMUM } from '../constants';
 import { minusPercent, plusPercent, takePercent } from '../core/percent';
-import { EnumSkillDamageType } from '#/lib/types/skill-enum';
+import { EnumSkillDamageType } from '#/src/lib/types/skill-enum';
 import type { Character } from './Character';
-import { EnumDefSlot, EnumStatusAttr, EnumVital } from '#/lib/types/status-enum';
-import { EnumCompPrefix, EnumStatusPrefix } from '#/lib/types/prefix-enum';
+import { EnumDefSlot, EnumStatusAttr, EnumVital } from '#/src/lib/types/status-enum';
+import { EnumCompPrefix, EnumStatusPrefix } from '#/src/lib/types/prefix-enum';
 import type {
 	IAttrFn,
 	IBaseStatComp,
@@ -32,7 +32,7 @@ import type {
 	IStatusDownKey,
 	IStatusPlusKey,
 	IStatusUpKey,
-} from '#/lib/types/status-attr-types';
+} from '#/src/lib/types/status-attr-types';
 import {
 	ITSTemplateLiteralAllowedType,
 	ITSStringLiteralPrefixed,

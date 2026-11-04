@@ -8,10 +8,10 @@
 import React, { Fragment } from 'react';
 import type { IBattleAction, IValueChangeRecord } from './types';
 import './BattleAction.css';
-import '#/components/shared/SharedBase.css';
-import { SkillIcon } from '#/components/shared/SkillIcon';
-import type { IStyleProps, IStylePropsRequired, ITSRequiredWith2 } from '#/components/shared/types';
-import { CharacterSprite } from '#/components/characters/CharacterSprite';
+import '#/src/components/shared/SharedBase.css';
+import { SkillIcon } from '#/src/components/shared/SkillIcon';
+import type { IStyleProps, IStylePropsRequired, ITSRequiredWith2 } from '#/src/components/shared/types';
+import { CharacterSprite } from '#/src/components/characters/CharacterSprite';
 import { EnumActionType, EnumMagicCircleKind, EnumSpriteVariant } from './enums';
 import {
 	getAttrClass,

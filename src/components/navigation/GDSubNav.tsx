@@ -9,7 +9,7 @@ import React from 'react';
 import './GDSubNav.css';
 import type { INavLink } from './NavTypes';
 import { NavList } from './NavList';
-import { buildAppUrl } from '#/components/config/AppConfig';
+import { buildAppUrl } from '#/src/components/config/AppConfig';
 
 /** 預設子頁面連結 / Default sub-page links */
 export const DEFAULT_SUB_LINKS: INavLink[] = [

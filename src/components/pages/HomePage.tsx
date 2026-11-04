@@ -9,12 +9,12 @@
  */
 import React, { useState } from 'react';
 import './HomePage.css';
-import { LoginForm } from '#/components/auth/LoginForm';
-import { RankingTable } from '#/components/info/RankingTable';
-import type { IRankingEntry } from '#/components/info/RankingTable';
-import { GameDescription } from '#/components/info/GameDescription';
-import { InfoSection } from '#/components/info/InfoSection';
-import { buildAppUrl } from '#/components/config/AppConfig';
+import { LoginForm } from '#/src/components/auth/LoginForm';
+import { RankingTable } from '#/src/components/info/RankingTable';
+import type { IRankingEntry } from '#/src/components/info/RankingTable';
+import { GameDescription } from '#/src/components/info/GameDescription';
+import { InfoSection } from '#/src/components/info/InfoSection';
+import { buildAppUrl } from '#/src/components/config/AppConfig';
 
 /** HomePage 屬性 / HomePage props */
 export interface IHomePageProps

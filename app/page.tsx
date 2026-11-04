@@ -4,7 +4,7 @@
 
 'use client';
 
-import { ShowcasePage } from '#/components/showcase/ShowcasePage';
+import { ShowcasePage } from '#/src/components/showcase/ShowcasePage';
 
 export default function HomePage()
 {

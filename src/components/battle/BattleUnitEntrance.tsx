@@ -16,7 +16,7 @@ import type { IBattleUnit } from './types';
 import { EnumTeamSideUI } from './enums';
 import { getSideClass, getEnterBattlefieldText } from './battleUtils';
 import './BattleUnitEntrance.css';
-import '#/components/shared/SharedBase.css';
+import '#/src/components/shared/SharedBase.css';
 
 /** 單位入場列屬性 / Unit entrance props */
 export interface IBattleUnitEntranceProps

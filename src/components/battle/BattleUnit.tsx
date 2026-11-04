@@ -8,7 +8,7 @@
 import React from 'react';
 import type { IBattleUnit } from './types';
 import './BattleUnit.css';
-import '#/components/shared/SharedBase.css';
+import '#/src/components/shared/SharedBase.css';
 import {
 	getStatusClass,
 	clampPercent,
@@ -16,7 +16,7 @@ import {
 	getSpBarColor,
 	getStateTextClass,
 } from './battleUtils';
-import { EnumAttributeType } from '#/components/battle/enums';
+import { EnumAttributeType } from '#/src/components/battle/enums';
 
 /** 戰鬥單位屬性 / Battle unit props */
 export interface IBattleUnitProps

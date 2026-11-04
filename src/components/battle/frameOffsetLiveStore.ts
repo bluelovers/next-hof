@@ -23,7 +23,7 @@
  * timer that guarantees the final value is always delivered.
  */
 import type { IBattleFieldFrameOffset } from './types';
-import { EnumTeamSideUI } from '#/components/battle/enums';
+import { EnumTeamSideUI } from '#/src/components/battle/enums';
 
 /**
  * 通知節流間隔（ms）

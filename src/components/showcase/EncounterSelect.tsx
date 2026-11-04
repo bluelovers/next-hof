@@ -8,12 +8,12 @@
  * lib/showcase/encounters), each showing the enemy team name and composition.
  */
 import React from 'react';
-import { SHOWCASE_ENCOUNTERS } from '#/lib/showcase/encounters';
-import type { IEncounter } from '#/lib/showcase/encounters';
-import { SEED } from '#/lib/game/data/seed-data';
-import { getMonSpriteUrl } from '#/lib/showcase/sprite-map';
+import { SHOWCASE_ENCOUNTERS } from '#/src/lib/showcase/encounters';
+import type { IEncounter } from '#/src/lib/showcase/encounters';
+import { SEED } from '#/src/lib/game/data/seed-data';
+import { getMonSpriteUrl } from '#/src/lib/showcase/sprite-map';
 import './EncounterSelect.css';
-import '#/components/shared/SharedBase.css';
+import '#/src/components/shared/SharedBase.css';
 
 /** EncounterSelect 屬性 / EncounterSelect props */
 export interface IEncounterSelectProps

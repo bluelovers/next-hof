@@ -5,7 +5,7 @@
  * 數值正規化：由 yaml-load 在讀取後統一將「數值字串」收斂為 number（`'1'` → 1），
  * 故本層的數值欄位直接以 `number` 定型；文字欄位（名稱、圖示、desc）維持 string。
  *
- * 與 #/lib/types 形狀相同的區塊（戰鬥數值、pattern、reward、補正欄位）
+ * 與 #/src/lib/types 形狀相同的區塊（戰鬥數值、pattern、reward、補正欄位）
  * 直接引用既有介面。
  */
 
@@ -15,19 +15,19 @@ import type {
 	IDescInfo,
 	IEncounterTable,
 	INamedIconDef,
-} from '#/lib/types/base-types';
+} from '#/src/lib/types/base-types';
 import type {
 	IBehaviorField,
 	ICharExtraFields,
 	ILearnedSkillsField,
 	ISpecial,
 	ISpecialField,
-} from '#/lib/types/char-types';
-import type { IDataEx } from '#/lib/types/data-ex-types';
-import type { IMonDefCore, IMonExtraFields, IMonExtraFieldsServant } from '#/lib/types/mon-types';
-import type { ICompBonuses, ISkillSharedFields, ITargetSpec } from '#/lib/types/skill-types';
-import type { IResourceId } from '#/lib/types/seg-types';
-import { SKILL_EXTRA_NUMERIC_KEYS } from '#/lib/game/data/yaml-skill-keys';
+} from '#/src/lib/types/char-types';
+import type { IDataEx } from '#/src/lib/types/data-ex-types';
+import type { IMonDefCore, IMonExtraFields, IMonExtraFieldsServant } from '#/src/lib/types/mon-types';
+import type { ICompBonuses, ISkillSharedFields, ITargetSpec } from '#/src/lib/types/skill-types';
+import type { IResourceId } from '#/src/lib/types/seg-types';
+import { SKILL_EXTRA_NUMERIC_KEYS } from '#/src/lib/game/data/yaml-skill-keys';
 
 /**
  * 原始戰鬥核心欄位（角色與怪物共用）/ Raw combat-core fields (shared by char & mon)

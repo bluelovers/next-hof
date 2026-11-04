@@ -9,11 +9,11 @@
  */
 import React from 'react';
 import './TownPage.css';
-import { FacilityGroup } from '#/components/facilities/FacilityGroup';
-import type { IFacilityData } from '#/components/facilities/TownFacility';
-import { MessageBoard } from '#/components/facilities/MessageBoard';
-import type { IMessageBoardProps } from '#/components/facilities/MessageBoard';
-import { buildAppUrl } from '#/components/config/AppConfig';
+import { FacilityGroup } from '#/src/components/facilities/FacilityGroup';
+import type { IFacilityData } from '#/src/components/facilities/TownFacility';
+import { MessageBoard } from '#/src/components/facilities/MessageBoard';
+import type { IMessageBoardProps } from '#/src/components/facilities/MessageBoard';
+import { buildAppUrl } from '#/src/components/config/AppConfig';
 
 /** TownPage 屬性 / TownPage props */
 export interface ITownPageProps

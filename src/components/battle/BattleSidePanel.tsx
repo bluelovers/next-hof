@@ -12,8 +12,8 @@
 import React from 'react';
 import type { EnumTeamSideClass } from './enums';
 import './BattleSidePanel.css';
-import '#/components/shared/SharedBase.css';
-import type { IStyleProps } from '#/components/shared/types';
+import '#/src/components/shared/SharedBase.css';
+import type { IStyleProps } from '#/src/components/shared/types';
 
 /** 隊伍側邊面板屬性 / Team side panel props */
 export interface IBattleSidePanelProps extends IStyleProps

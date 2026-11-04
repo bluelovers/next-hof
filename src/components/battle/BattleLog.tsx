@@ -18,7 +18,7 @@ import type { IBattleAction } from './types';
 import { BattleAction } from './BattleAction';
 import { getSideClass } from './battleUtils';
 import './BattleLog.css';
-import '#/components/shared/SharedBase.css';
+import '#/src/components/shared/SharedBase.css';
 
 /** 戰鬥日誌屬性 / Battle log props */
 export interface IBattleLogProps

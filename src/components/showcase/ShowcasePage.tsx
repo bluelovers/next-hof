@@ -20,19 +20,19 @@
 'use client';
 
 import React, { useState } from 'react';
-import { MAX_CHAR } from '#/lib/game/constants';
-import { BattleDisplay } from '#/components/pages/BattleDisplay';
-import { PartySelect } from '#/components/showcase/PartySelect';
-import { EncounterSelect } from '#/components/showcase/EncounterSelect';
+import { MAX_CHAR } from '#/src/lib/game/constants';
+import { BattleDisplay } from '#/src/components/pages/BattleDisplay';
+import { PartySelect } from '#/src/components/showcase/PartySelect';
+import { EncounterSelect } from '#/src/components/showcase/EncounterSelect';
 import {
 	runShowcaseBattle,
 	DEFAULT_SHOWCASE_SEED,
-} from '#/lib/showcase/battle-adapter';
-import type { IShowcaseBattleOutcome } from '#/lib/showcase/battle-adapter';
-import { DEFAULT_ENCOUNTER, getEncounter } from '#/lib/showcase/encounters';
-import { EnumShowcasePhase } from '#/components/battle/enums';
+} from '#/src/lib/showcase/battle-adapter';
+import type { IShowcaseBattleOutcome } from '#/src/lib/showcase/battle-adapter';
+import { DEFAULT_ENCOUNTER, getEncounter } from '#/src/lib/showcase/encounters';
+import { EnumShowcasePhase } from '#/src/components/battle/enums';
 import './ShowcasePage.css';
-import '#/components/shared/SharedBase.css';
+import '#/src/components/shared/SharedBase.css';
 
 /** 頁面流程階段 / Page flow phase */
 export type IShowcasePhase = EnumShowcasePhase;

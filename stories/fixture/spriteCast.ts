@@ -9,7 +9,7 @@
  * and units all resolve "name" and "image path" from here, so the same character never
  * drifts across fixtures.
  */
-import { EnumSpriteImageDir } from '#/components/battle/enums';
+import { EnumSpriteImageDir } from '#/src/components/battle/enums';
 
 /** 精靈圖根路徑 / Sprite image root path */
 const SPRITE_IMAGE_ROOT = '/image';

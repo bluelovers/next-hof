@@ -4,8 +4,8 @@
  * 數值字串、null、guard 筆誤、空物件等皆於**讀取時**定案
  */
 
-import { EnumGuardKind } from '#/lib/types/battle-enum';
-import { COMP_FIELDS } from '#/lib/game/character/status-attrs';
+import { EnumGuardKind } from '#/src/lib/types/battle-enum';
+import { COMP_FIELDS } from '#/src/lib/game/character/status-attrs';
 import { SKILL_EXTRA_NUMERIC_KEYS } from './yaml-skill-keys';
 import { EnumResourceKind } from './yaml-resource-kind';
 import { enumValueLookup } from './yaml-lookup';

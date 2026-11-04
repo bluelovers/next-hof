@@ -9,7 +9,7 @@
  * no battle logic.
  */
 
-import { SEED } from '#/lib/game/data/seed-data';
+import { SEED } from '#/src/lib/game/data/seed-data';
 import { getCharSpriteUrl } from './sprite-map';
 
 /**

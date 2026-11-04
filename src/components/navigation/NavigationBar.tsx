@@ -8,7 +8,7 @@
 import React from 'react';
 import './NavigationBar.css';
 import type { INavLink } from './NavTypes';
-import { buildAppUrl } from '#/components/config/AppConfig';
+import { buildAppUrl } from '#/src/components/config/AppConfig';
 
 /** NavigationBar 屬性 / NavigationBar props */
 export interface INavigationBarProps

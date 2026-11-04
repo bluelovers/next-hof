@@ -21,13 +21,13 @@
  */
 import React from 'react';
 import type { IBattleUnit, IBattleBarToggleOptions, IBattleSpriteToggleOptions } from './types';
-import type { ICharacterSpriteProps } from '#/components/characters/CharacterSprite';
-import { CharacterSprite } from '#/components/characters/CharacterSprite';
+import type { ICharacterSpriteProps } from '#/src/components/characters/CharacterSprite';
+import { CharacterSprite } from '#/src/components/characters/CharacterSprite';
 import { BattleUnit } from './BattleUnit';
 import { EnumTeamSideUI, EnumSpriteSize } from './enums';
 import { getSideClass } from './battleUtils';
 import './BattleSegmentStatus.css';
-import '#/components/shared/SharedBase.css';
+import '#/src/components/shared/SharedBase.css';
 
 /** 分段 HP/SP 狀態屬性（開關共用 IBattleBarToggleOptions ＋ IBattleSpriteToggleOptions）/ Per-segment HP/SP status props (toggles come from the shared IBattleBarToggleOptions + IBattleSpriteToggleOptions) */
 export interface IBattleSegmentStatusProps

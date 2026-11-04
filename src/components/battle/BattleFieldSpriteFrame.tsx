@@ -58,8 +58,8 @@ import {
 	snapToGuideLines,
 } from './editModeUtils';
 import './BattleFieldSpriteFrame.css';
-import type { IStyleProps } from '#/components/shared/types';
-import { EnumBattleFieldVAlign } from '#/components/battle/enums';
+import type { IStyleProps } from '#/src/components/shared/types';
+import { EnumBattleFieldVAlign } from '#/src/components/battle/enums';
 
 /**
  * 戰場精靈排版框屬性

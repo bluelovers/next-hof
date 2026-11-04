@@ -9,7 +9,7 @@
  * toggles and the description text.
  */
 import type { Meta, StoryObj } from '@storybook/react';
-import { BattleDisplay } from '#/components/pages/BattleDisplay';
+import { BattleDisplay } from '#/src/components/pages/BattleDisplay';
 import {
 	battleOverData,
 	casualtyData,

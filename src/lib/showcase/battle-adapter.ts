@@ -8,23 +8,23 @@
  * Side convention (matches the original page): enemies = left team 'left', allies = right team 'right'.
  */
 
-import { MAX_CHAR } from '#/lib/game/constants';
-import { EnumState, EnumPosition, EnumTeamSide } from '#/lib/types/battle-enum';
-import { Battle } from '#/lib/game/battle/Battle';
-import { EnumOutcome } from '#/lib/game/battle/BattleResult';
-import { percentOf } from '#/lib/game/core/percent';
-import { newChar, newMon } from '#/lib/game/character/factory';
-import type { Character } from '#/lib/game/character/Character';
-import { RNG } from '#/lib/game/core/rng';
-import { createSeedRepository } from '#/lib/game/data/seed-data';
-import type { IDataRepository } from '#/lib/game/data/repository';
-import { EnumBattleEventType, EnumInfoText, EnumResource, EnumValueWho } from '#/lib/types/battle-event-enum';
-import { EnumSkillDamageType } from '#/lib/types/skill-enum';
-import type { IBattleEvent, IBattleSnapshot } from '#/lib/types/battle-types';
-import type { ISkillDef } from '#/lib/types/skill-types';
-import type { IStatsHpSpAll, IStatsHpSpMax } from '#/lib/types/base-types';
-import { EnumStatusAttr } from '#/lib/types/status-enum';
-import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
+import { MAX_CHAR } from '#/src/lib/game/constants';
+import { EnumState, EnumPosition, EnumTeamSide } from '#/src/lib/types/battle-enum';
+import { Battle } from '#/src/lib/game/battle/Battle';
+import { EnumOutcome } from '#/src/lib/game/battle/BattleResult';
+import { percentOf } from '#/src/lib/game/core/percent';
+import { newChar, newMon } from '#/src/lib/game/character/factory';
+import type { Character } from '#/src/lib/game/character/Character';
+import { RNG } from '#/src/lib/game/core/rng';
+import { createSeedRepository } from '#/src/lib/game/data/seed-data';
+import type { IDataRepository } from '#/src/lib/game/data/repository';
+import { EnumBattleEventType, EnumInfoText, EnumResource, EnumValueWho } from '#/src/lib/types/battle-event-enum';
+import { EnumSkillDamageType } from '#/src/lib/types/skill-enum';
+import type { IBattleEvent, IBattleSnapshot } from '#/src/lib/types/battle-types';
+import type { ISkillDef } from '#/src/lib/types/skill-types';
+import type { IStatsHpSpAll, IStatsHpSpMax } from '#/src/lib/types/base-types';
+import { EnumStatusAttr } from '#/src/lib/types/status-enum';
+import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/src/components/battle/types';
 import {
 	EnumTeamSideUI,
 	EnumChargeKind,
@@ -33,7 +33,7 @@ import {
 	EnumAttributeType,
 	EnumMagicCircleKind,
 	EnumStatDirection,
-} from '#/components/battle/enums';
+} from '#/src/components/battle/enums';
 import type {
 	IBattleAction,
 	IBattleDisplayData,
@@ -47,7 +47,7 @@ import type {
 	ISummonedUnit,
 	ITeamFinalStats,
 	ITeamSide,
-} from '#/components/battle/types';
+} from '#/src/components/battle/types';
 import {
 	buildActMessage,
 	buildActionMessage,
@@ -70,13 +70,13 @@ import {
 	buildSummonMessage,
 	buildValueChangeFromDelay,
 	EnumLogCopy,
-} from '#/components/battle/battleUtils';
+} from '#/src/components/battle/battleUtils';
 import {
 	computeBattleSpritePositions,
 	groupBattleChars,
-} from '#/components/battle/computeSpritePositions';
-import type { IBattlePositionChar } from '#/components/battle/computeSpritePositions';
-import { getSpriteImageSize } from '#/components/battle/spriteImageSizes';
+} from '#/src/components/battle/computeSpritePositions';
+import type { IBattlePositionChar } from '#/src/components/battle/computeSpritePositions';
+import { getSpriteImageSize } from '#/src/components/battle/spriteImageSizes';
 import { getCharSpriteUrl, getMonSpriteUrl } from './sprite-map';
 import { ITSRequiredPick } from 'ts-type';
 
@@ -615,10 +615,10 @@ const mapDeath: IEventMapper = (_ev, ctx) =>
 const mapSummon: IEventMapper = (ev, ctx) =>
 {
 	/**
-	 * 召喚事件契約（生產點：SkillEffect.default 的召喚分支，見 #/lib/types/battle-event-enum 的 EnumBattleEventType.Summon）：
+	 * 召喚事件契約（生產點：SkillEffect.default 的召喚分支，見 #/src/lib/types/battle-event-enum 的 EnumBattleEventType.Summon）：
 	 * target＝被召喚單位的 def no、value＝其等級；圖片依 def no 查 sprite-map 怪物表。
 	 * Summon event contract (producer: SkillEffect.default's summon branch; see
-	 * EnumBattleEventType.Summon in #/lib/types/battle-event-enum): target = the summoned unit's def no,
+	 * EnumBattleEventType.Summon in #/src/lib/types/battle-event-enum): target = the summoned unit's def no,
 	 * value = its level; the image comes from sprite-map's monster table by that def no.
 	 */
 	const summonedNo = parseDefNo(ev.target);
@@ -644,12 +644,12 @@ const mapSummon: IEventMapper = (ev, ctx) =>
  * MagicCircle → 魔方陣紀錄（種類由技能定義判定、數量優先取 event.value）
  * MagicCircle → magic-circle record (kind from the skill definition, amount prefers event.value)
  *
- * 魔方陣事件契約（生產點：Battle.UseSkill，見 #/lib/types/battle-event-enum 的 EnumBattleEventType.MagicCircle）：
+ * 魔方陣事件契約（生產點：Battle.UseSkill，見 #/src/lib/types/battle-event-enum 的 EnumBattleEventType.MagicCircle）：
  *   skill＝施放的技能編號，用以判定是哪一種 MagicCircle* 效果（同 PHP 依 $skill[...] 分支）；
  *   value＝變更數量，缺省時取技能定義的對應欄位值。
  * 配色不經 attribute：由紀錄種類經 getMagicCircleClass 決定（單一事實來源）。
  * Magic-circle event contract (producer: Battle.UseSkill; see
- * EnumBattleEventType.MagicCircle in #/lib/types/battle-event-enum): skill = the cast skill no, used to decide
+ * EnumBattleEventType.MagicCircle in #/src/lib/types/battle-event-enum): skill = the cast skill no, used to decide
  * which MagicCircle* effect fired (PHP branches on $skill[...] the same way); value = the amount,
  * falling back to the matching skill-definition field. The colour does not travel on `attribute`:
  * it comes from the record kind via getMagicCircleClass (single source of truth).

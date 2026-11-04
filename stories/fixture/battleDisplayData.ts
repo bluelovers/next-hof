@@ -31,8 +31,8 @@ import type {
 	IBattleUnit,
 	IMagicCircleRecord,
 	ISkillIcon,
-} from '#/components/battle/types';
-import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/components/battle/types';
+} from '#/src/components/battle/types';
+import { SPRITE_LAYOUT_WIDTH, SPRITE_LAYOUT_HEIGHT } from '#/src/components/battle/types';
 import { characterSprites, monsterSprites, spriteUrlByFile } from './spriteCast';
 
 /** 角色名稱別名（由 spriteCast 派生） / Character name aliases (derived from spriteCast) */
@@ -47,9 +47,9 @@ const GoblinWarriorC = monsterSprites.goblinWarriorC.name;
 const GoblinAxe = monsterSprites.goblinAxe.name;
 const Mummy = monsterSprites.mummy.name;
 const MummyPrisoner = monsterSprites.mummyPrisoner.name;
-import type { IBattlePositionChar } from '#/components/battle/computeSpritePositions';
-import { computeBattleSpritePositions, groupBattleChars } from '#/components/battle/computeSpritePositions';
-import { getSpriteImageSize } from '#/components/battle/spriteImageSizes';
+import type { IBattlePositionChar } from '#/src/components/battle/computeSpritePositions';
+import { computeBattleSpritePositions, groupBattleChars } from '#/src/components/battle/computeSpritePositions';
+import { getSpriteImageSize } from '#/src/components/battle/spriteImageSizes';
 import {
 	EnumActionType,
 	EnumAttributeType,
@@ -59,7 +59,7 @@ import {
 	EnumSpriteImageDir,
 	EnumTeamSideUI,
 	EnumUnitStatus,
-} from '#/components/battle/enums';
+} from '#/src/components/battle/enums';
 import {
 	buildActionMessage,
 	buildActMessage,
@@ -89,11 +89,11 @@ import {
 	buildValueChangeFromDelay,
 	EnumLogCopy,
 	getEnterBattlefieldText,
-} from '#/components/battle/battleUtils';
-import { EnumPosition } from '#/lib/types/battle-enum';
-import { EnumValueWho } from '#/lib/types/battle-event-enum';
-import { EnumStatusAttr } from '#/lib/types/status-enum';
-import { computeTeamHpStats, type ITeamHpUnit } from '#/lib/showcase/battle-adapter';
+} from '#/src/components/battle/battleUtils';
+import { EnumPosition } from '#/src/lib/types/battle-enum';
+import { EnumValueWho } from '#/src/lib/types/battle-event-enum';
+import { EnumStatusAttr } from '#/src/lib/types/status-enum';
+import { computeTeamHpStats, type ITeamHpUnit } from '#/src/lib/showcase/battle-adapter';
 
 // ==================== 常數 / Constants ====================
 

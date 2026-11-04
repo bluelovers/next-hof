@@ -8,9 +8,9 @@
 import React from 'react';
 import type { IJobData } from '../game-data/GameDataTypes';
 import { SkillCard } from '../game-data/SkillCard';
-import { CharacterSprite } from '#/components/characters/CharacterSprite';
+import { CharacterSprite } from '#/src/components/characters/CharacterSprite';
 import './JobDetailCard.css';
-import { EnumSpriteVariant } from '#/components/battle/enums';
+import { EnumSpriteVariant } from '#/src/components/battle/enums';
 
 /** 職業詳細卡片屬性 / Job detail card props */
 export interface IJobDetailCardProps

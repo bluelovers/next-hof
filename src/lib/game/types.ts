@@ -4,7 +4,7 @@
  * Guard probability percentages and HP% thresholds, referenced by guard checks.
  */
 
-import { EnumGuardKind } from '#/lib/types/battle-enum';
+import { EnumGuardKind } from '#/src/lib/types/battle-enum';
 
 /**
  * 守護種類對應的機率值 / Guard kind probability values

@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import './GameDescription.css';
-import { buildAppUrl } from '#/components/config/AppConfig';
+import { buildAppUrl } from '#/src/components/config/AppConfig';
 
 /**
  * GameDescription 遊戲簡介元件

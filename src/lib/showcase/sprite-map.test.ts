@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { SEED } from '#/lib/game/data/seed-data';
+import { SEED } from '#/src/lib/game/data/seed-data';
 import {
 	CHAR_SPRITE_URLS,
 	MON_SPRITE_URLS,

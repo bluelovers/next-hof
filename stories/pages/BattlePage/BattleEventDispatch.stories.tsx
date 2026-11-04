@@ -11,7 +11,7 @@
  * seven BattleDisplay stories) is untouched; this is an added, higher-level view.
  */
 import type { Meta, StoryObj } from '@storybook/react';
-import { BattleEventDispatch } from '#/components/BattleEventDispatch/BattleEventDispatch';
+import { BattleEventDispatch } from '#/src/components/BattleEventDispatch/BattleEventDispatch';
 import {
 	dispatchUnitNames,
 	mixedLogRecords,

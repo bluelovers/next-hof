@@ -4,8 +4,8 @@ import { createSeedRepository } from '../data/seed-data';
 import { InMemoryRepository } from '../data/repository';
 import { getItem } from './Item';
 import { setEquip, CalcEquips, getHandleMax } from './equip';
-import { EnumCharType, EnumEquipSlot } from '#/lib/types/char-enum';
-import { EnumWeaponType, EnumItemCategory } from '#/lib/types/item-enum';
+import { EnumCharType, EnumEquipSlot } from '#/src/lib/types/char-enum';
+import { EnumWeaponType, EnumItemCategory } from '#/src/lib/types/item-enum';
 
 describe('Item definition (7.1)', () =>
 {

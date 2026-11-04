@@ -4,35 +4,35 @@
  * 數值字串／null／guard 筆誤／空物件等正規化已於讀取時（yaml-coerce）完成，本層只承接乾淨值。
  */
 
-import { EnumEquipSlot } from '#/lib/types/char-enum';
+import { EnumEquipSlot } from '#/src/lib/types/char-enum';
 import {
 	EnumTargetMethod,
 	EnumTargetType,
-} from '#/lib/types/skill-enum';
-import { EnumWeaponType } from '#/lib/types/item-enum';
-import { EnumPosition } from '#/lib/types/battle-enum';
+} from '#/src/lib/types/skill-enum';
+import { EnumWeaponType } from '#/src/lib/types/item-enum';
+import { EnumPosition } from '#/src/lib/types/battle-enum';
 import {
 	type IEncounterTable,
 	type IEquipTable,
-} from '#/lib/types/base-types';
+} from '#/src/lib/types/base-types';
 import {
 	type IBehavior,
 	type ICharCore,
 	type ICharDef,
 	type IPatternItem,
 	type ISpecial,
-} from '#/lib/types/char-types';
+} from '#/src/lib/types/char-types';
 import {
 	ITargetSpec,
 	type IChargeTuple,
 	type ICompBonuses,
-} from '#/lib/types/skill-types';
-import type { IMonReward } from '#/lib/types/mon-types';
+} from '#/src/lib/types/skill-types';
+import type { IMonReward } from '#/src/lib/types/mon-types';
 import type {
 	IRawCombatCoreYaml,
 	IRawMonYaml,
-} from '#/lib/types/raw/yaml-types';
-import { COMP_FIELDS } from '#/lib/game/character/status-attrs';
+} from '#/src/lib/types/raw/yaml-types';
+import { COMP_FIELDS } from '#/src/lib/game/character/status-attrs';
 import { toNumber } from './yaml-numeric';
 import { isEnumValue } from './yaml-lookup';
 

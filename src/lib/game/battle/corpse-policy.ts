@@ -8,7 +8,7 @@
  * specific level wins as a whole (fields are NOT merged across levels).
  */
 
-import type { IStyleProps } from '#/components/shared/types';
+import type { IStyleProps } from '#/src/components/shared/types';
 
 /**
  * 屍體呈現規格（`corpse` 寫成物件時的進階設定）

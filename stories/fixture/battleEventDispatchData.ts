@@ -8,7 +8,7 @@
  * effect detection, dispatch and follow-ups are all decided by the upper event engine
  * (runEventEngine) — the fixture derives none of them by hand.
  *
- * 紀錄內容對齊生產點契約（見 #/lib/types/battle-event-enum 的 EnumBattleEventType）：
+ * 紀錄內容對齊生產點契約（見 #/src/lib/types/battle-event-enum 的 EnumBattleEventType）：
  * - Act → Battle.UseSkill（同一筆技能執行的起點）
  * - Damage / Heal → skill/effect 的 applySkill（帶 skill、value、hpBefore/hpAfter）
  * - Debuff / Poison（施毒）→ skill/effect 的 statusChanges（帶 skill）
@@ -18,7 +18,7 @@
  * - Death → Battle.UseSkill（不帶 skill → 一般事件）
  * - SpDamage / SpHeal / Drain / Revive / Move / Delay / Quick / CastShort / BarrierGain /
  *   PoisonResist / Regen / StatChange / EnergyExchange → skill/effect 的 SkillEffect（13 種新事件）
- * Records follow the producer contracts (see EnumBattleEventType in #/lib/types/battle-event-enum):
+ * Records follow the producer contracts (see EnumBattleEventType in #/src/lib/types/battle-event-enum):
  * Act → Battle.UseSkill (start of one skill execution); Damage / Heal → applySkill (skill,
  * value, hpBefore / hpAfter); Debuff / poison-apply → statusChanges (skill); MagicCircle →
  * Battle.UseSkill (skill only; the display derives the amount from the definition); Summon →
@@ -34,22 +34,22 @@
  * debuff, heal + cure) and the summon skill are not in seed-data, so the engine's dispatch logic and
  * the data source stay independent of each other.
  */
-import { runEventEngine } from '#/lib/game/battle/event-engine';
+import { runEventEngine } from '#/src/lib/game/battle/event-engine';
 import { characterSprites, monsterSprites } from './spriteCast';
-import type { IBattleEventRecord } from '#/lib/game/battle/event-engine';
+import type { IBattleEventRecord } from '#/src/lib/game/battle/event-engine';
 import {
 	EnumBattleEventType,
 	EnumMoveText,
 	EnumResource,
 	EnumValueWho,
-} from '#/lib/types/battle-event-enum';
+} from '#/src/lib/types/battle-event-enum';
 import {
 	EnumSkillDamageType,
 	EnumTargetMethod,
 	EnumTargetType,
-} from '#/lib/types/skill-enum';
-import type { IBattleEvent } from '#/lib/types/battle-types';
-import type { ISkillDef } from '#/lib/types/skill-types';
+} from '#/src/lib/types/skill-enum';
+import type { IBattleEvent } from '#/src/lib/types/battle-types';
+import type { ISkillDef } from '#/src/lib/types/skill-types';
 
 /** 複合效果技能：傷害＋施毒＋減益 / Multi-effect skill: damage + poison + debuff */
 const plagueHex: ISkillDef = {
@@ -234,12 +234,12 @@ export const mixedLogRecords: IBattleEventRecord[] = runEventEngine(mixedEvents,
  * 4. The 13 new event types brought by the SkillEffect port: one record per type, to verify the
  * type label and the effect-system routing of each
  *
- * 歸屬規則（見 #/lib/game/battle/event-engine 的 EVENT_EFFECT）：
+ * 歸屬規則（見 #/src/lib/game/battle/event-engine 的 EVENT_EFFECT）：
  * - SpDamage / Drain → 傷害系統、SpHeal / Regen / Revive → 恢復系統
  * - Quick / CastShort / BarrierGain / StatChange / EnergyExchange → 增益系統
  * - PoisonResist → 毒系統
  * - Move / Delay / Info 刻意不入表：即使帶著 skill 也歸一般事件（無法歸因到單一效果系統）
- * Routing (see EVENT_EFFECT in #/lib/game/battle/event-engine): SpDamage / Drain → damage,
+ * Routing (see EVENT_EFFECT in #/src/lib/game/battle/event-engine): SpDamage / Drain → damage,
  * SpHeal / Regen / Revive → heal, Quick / CastShort / BarrierGain / StatChange / EnergyExchange →
  * buff, PoisonResist → poison; Move / Delay / Info deliberately stay out of the table, so they are
  * general events even when they carry a skill number (they cannot be attributed to one system).

@@ -5,16 +5,16 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { EnumGender } from '#/lib/types/char-enum';
+import { EnumGender } from '#/src/lib/types/char-enum';
 import {
 	EnumItemCategory,
 	EnumWeaponType,
-} from '#/lib/types/item-enum';
+} from '#/src/lib/types/item-enum';
 import {
 	EnumSkillDamageType,
 	EnumTargetMethod,
 	EnumTargetType,
-} from '#/lib/types/skill-enum';
+} from '#/src/lib/types/skill-enum';
 import {
 	loadGuardYaml,
 	loadItemYaml,
