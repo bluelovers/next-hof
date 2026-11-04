@@ -1,0 +1,45 @@
+/** 商店頁面 client 入口：建立目錄與設定，疊合三層 Provider 後交給內容層。 */
+'use client';
+
+import React, { useMemo } from 'react';
+import type { IItemDef } from '#/lib/types/item-types';
+import { createItemCatalog } from '#/features/shared/domain/item-catalog';
+import { DEFAULT_SHOP_CONFIG } from '#/features/shop/composition/default-shop-config';
+import { ShopConfigProvider } from '#/features/shop/state/ShopConfigProvider';
+import { ShopProvider } from '#/features/shop/state/ShopProvider';
+import { InventoryProvider } from '#/features/inventory/state/InventoryProvider';
+import { ShopContent } from '#/features/shop/components/ShopContent/ShopContent';
+import type { IShopConfig } from '#/features/shop/domain/types';
+import './ShopPageView.css';
+
+/** 頁面 props / Page props */
+export interface IShopPageViewProps
+{
+	/** 由 Server Component 載入的商品定義 / Item definitions loaded by the server component */
+	items: readonly IItemDef[];
+	/** 可替換的商店設定 / Replaceable shop configuration */
+	config?: IShopConfig;
+}
+
+/** 商店頁面 / Shop page view */
+export const ShopPageView: React.FC<IShopPageViewProps> = ({ items, config = DEFAULT_SHOP_CONFIG }) =>
+{
+	/** 目錄只建立一次，圖示基底路徑來自設定而非寫死在元件 */
+	const catalog = useMemo(
+		() => createItemCatalog(items, { imageBaseUrl: config.pricing.itemImageBaseUrl }),
+		[items, config.pricing.itemImageBaseUrl],
+	);
+
+	return (
+		<ShopConfigProvider config={config}>
+			<InventoryProvider catalog={catalog} initialGold={config.initialMoney}>
+				<ShopProvider>
+					<div className="shop-page">
+						<h1 className="shop-page__title">{config.labels.title}</h1>
+						<ShopContent />
+					</div>
+				</ShopProvider>
+			</InventoryProvider>
+		</ShopConfigProvider>
+	);
+};

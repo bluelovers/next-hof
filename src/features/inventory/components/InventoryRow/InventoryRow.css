@@ -1,0 +1,54 @@
+/**
+ * 道具箱單列版面；色彩取自共用 Design Token 並提供 fallback。
+ */
+.inventory-row
+{
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 8px;
+	border-bottom: 1px solid var(--color-border-mid, #304052);
+	font-family: var(--font-primary, 'メイリオ', Meiryo, 'MS PGothic', sans-serif);
+	color: var(--color-text-primary, #bdc8d7);
+}
+
+.inventory-row__name
+{
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.inventory-row__qty,
+.inventory-row__price
+{
+	flex: none;
+	font-size: 0.85em;
+	color: var(--color-text-secondary, #8a9cb7);
+}
+
+.inventory-row__actions
+{
+	display: inline-flex;
+	gap: 4px;
+	flex: none;
+}
+
+.inventory-row__btn
+{
+	padding: 2px 8px;
+	border: 1px solid var(--color-border-mid, #304052);
+	background: var(--color-bg-mid, #304052);
+	color: var(--color-text-primary, #bdc8d7);
+	font-family: inherit;
+	font-size: 0.85em;
+	cursor: pointer;
+}
+
+.inventory-row__btn:hover
+{
+	color: var(--color-accent-gold-bright, #ffcc33);
+	border-color: var(--color-accent-gold, #c69500);
+}

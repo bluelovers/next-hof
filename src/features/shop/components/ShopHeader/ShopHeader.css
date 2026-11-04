@@ -1,0 +1,51 @@
+/**
+ * 商店頁首版面。只定義自身容器，不覆寫 BattleFieldScene／CharacterSprite 的內部樣式。
+ */
+.shop-header
+{
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 16px;
+	padding: 12px;
+	border: 1px solid var(--color-border-mid, #304052);
+	background: var(--color-bg-surface, #1b222c);
+	font-family: var(--font-primary, 'メイリオ', Meiryo, 'MS PGothic', sans-serif);
+	color: var(--color-text-primary, #bdc8d7);
+}
+
+.shop-header__owner
+{
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex: none;
+}
+
+.shop-header__greeting h2
+{
+	margin: 0 0 4px;
+	font-size: 1.1em;
+	color: var(--color-accent-gold-bright, #ffcc33);
+}
+
+.shop-header__greeting p
+{
+	margin: 0;
+	font-size: 0.9em;
+	color: var(--color-text-secondary, #8a9cb7);
+}
+
+.shop-header__scene
+{
+	flex: 1 1 320px;
+	max-width: 480px;
+	overflow: hidden;
+}
+
+.shop-header__wallet
+{
+	flex: none;
+	font-size: 0.95em;
+	color: var(--color-accent-gold, #c69500);
+}

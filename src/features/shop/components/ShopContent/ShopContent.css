@@ -1,0 +1,32 @@
+/**
+ * 商店內容區塊的頁面級排布，僅定義欄位與間距。
+ */
+.shop-content
+{
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.shop-content__columns
+{
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 12px;
+}
+
+.shop-content__catalog
+{
+	flex: 2 1 420px;
+	min-width: 0;
+}
+
+.shop-content__side
+{
+	display: flex;
+	flex: 1 1 280px;
+	flex-direction: column;
+	gap: 12px;
+	min-width: 0;
+}
