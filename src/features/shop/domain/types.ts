@@ -2,87 +2,77 @@
  * 商店系統的注入設定、查詢條件與購物車型別。
  * 文案、圖片、排序選項與價格係數全由 IShopConfig 提供，元件本身不內建環境常數。
  */
-import type { ISpriteSize, ISpriteVariant } from '#/src/components/characters/CharacterSprite';
+import type { ICharacterSpriteProps } from '#/src/components/characters/CharacterSprite';
 import type { IBattleFieldConfig } from '#/src/components/battle/types';
 import type { EnumWeaponType } from '#/src/lib/types/item-enum';
+import type { ITSPickExtra } from 'ts-type';
 
-/** 商店主人設定 / Shop owner configuration */
+/** 商店主人設定 */
 export interface IShopOwner
 {
-	/** 顯示名稱 / Display name */
+	/** 顯示名稱，同時作為精靈的 alt 文字 */
 	name: string;
-	/** 角色精靈 URL / Character sprite URL */
-	spriteUrl: string;
-	/** 招呼語 / Greeting line */
+	/** 招呼語 */
 	greeting: string;
-	/** 精靈顯示模式 / Sprite display variant */
-	spriteVariant?: ISpriteVariant;
-	/** 精靈尺寸 / Sprite size */
-	spriteSize?: ISpriteSize;
+	/** 角色精靈設定，整份沿用 ICharacterSpriteProps，欄位與來源保持一致 */
+	sprite: ICharacterSpriteProps;
 }
 
-/** 商店場景圖設定，轉成無角色的 BattleFieldScene / Scene config mapped to an empty BattleFieldScene */
-export interface IShopSceneConfig
+/** 商店場景圖設定，轉成無角色的 BattleFieldScene */
+export interface IShopSceneConfig extends ITSPickExtra<IBattleFieldConfig, 'backgroundImageUrl'>
 {
-	/** 背景圖 URL / Background image URL */
-	backgroundImageUrl: string;
-	/** 場景寬度 / Scene width */
-	width: number;
-	/** 場景高度 / Scene height */
-	height: number;
-	/** 背景尺寸，沿用戰場元件型別以確保可直接傳入 / Background size, reusing the battlefield type so it passes through directly */
-	bgSize?: IBattleFieldConfig['bgSize'];
+
 }
 
-/** 價格與幣值設定 / Pricing and currency configuration */
+/** 價格與幣值設定 */
 export interface IShopPricingConfig
 {
-	/** 售出價係數，道具未定義 sell 時由 buy 乘上此值 / Fallback sell rate when IItemDef.sell is absent */
+	/** 售出價係數，道具未定義 sell 時由 buy 乘上此值 */
 	sellRate: number;
-	/** 幣值標籤 / Currency label */
+	/** 幣值標籤 */
 	currencyLabel: string;
-	/** 道具圖示基底路徑 / Item icon base URL */
+	/** 道具圖示基底路徑 */
 	itemImageBaseUrl: string;
 }
 
-/** 排序鍵 / Sort keys */
+/** 排序鍵 */
 export enum EnumShopSortKey
 {
-	/** 目錄原順序 / Catalog order */
+	/** 目錄原順序 */
 	Default = 'default',
-	/** 名稱遞增 / Name ascending */
+	/** 名稱遞增 */
 	NameAsc = 'nameAsc',
-	/** 名稱遞減 / Name descending */
+	/** 名稱遞減 */
 	NameDesc = 'nameDesc',
-	/** 價格遞增 / Price ascending */
+	/** 價格遞增 */
 	PriceAsc = 'priceAsc',
-	/** 價格遞減 / Price descending */
+	/** 價格遞減 */
 	PriceDesc = 'priceDesc',
-	/** 類型遞增 / Type ascending */
+	/** 類型遞增 */
 	TypeAsc = 'typeAsc',
 }
 
-/** 一個排序選項 / One selectable sort option */
+/** 一個排序選項 */
 export interface IShopSortOption
 {
-	/** 排序鍵 / Sort key */
+	/** 排序鍵 */
 	key: EnumShopSortKey;
-	/** 顯示標籤 / Display label */
+	/** 顯示標籤 */
 	label: string;
 }
 
-/** 一個分類篩選，以符合的道具類型判定 / One category filter matched against IItemDef.type */
+/** 一個分類篩選，以 IItemDef.type 判定是否命中 */
 export interface IShopCategoryFilter
 {
-	/** 識別值 / Identifier */
+	/** 識別值 */
 	id: string;
-	/** 顯示標籤 / Display label */
+	/** 顯示標籤 */
 	label: string;
-	/** 納入此分類的道具類型 / Item types included in this category */
+	/** 納入此分類的道具類型 */
 	types: readonly EnumWeaponType[];
 }
 
-/** 全部 UI 文案，替換語系不需改動元件 / All UI copy, replaceable without touching components */
+/** 全部 UI 文案，替換語系不需改動元件 */
 export interface IShopLabels
 {
 	title: string;
@@ -115,51 +105,51 @@ export interface IShopLabels
 	emptyCart: string;
 }
 
-/** 商店對外注入設定 / Injected shop configuration */
+/** 商店對外注入設定 */
 export interface IShopConfig
 {
-	/** 商店主人 / Shop owner */
+	/** 商店主人 */
 	owner: IShopOwner;
-	/** 場景圖 / Scene */
+	/** 場景圖 */
 	scene: IShopSceneConfig;
-	/** 價格與幣值 / Pricing */
+	/** 價格與幣值 */
 	pricing: IShopPricingConfig;
-	/** UI 文案 / UI labels */
+	/** UI 文案 */
 	labels: IShopLabels;
-	/** 可選排序 / Available sorts */
+	/** 可選排序 */
 	sortOptions: readonly IShopSortOption[];
-	/** 可選分類 / Available category filters */
+	/** 可選分類 */
 	categories: readonly IShopCategoryFilter[];
-	/** 起始持有金 / Starting gold */
+	/** 起始持有金 */
 	initialMoney: number;
 }
 
-/** 目錄查詢條件 / Catalog query state */
+/** 目錄查詢條件 */
 export interface ICatalogQuery
 {
-	/** 搜尋字串 / Search text */
+	/** 搜尋字串 */
 	search: string;
-	/** 排序鍵 / Sort key */
+	/** 排序鍵 */
 	sort: EnumShopSortKey;
-	/** 分類 id，'all' 表示不篩選 / Category id; 'all' disables filtering */
+	/** 分類 id，'all' 表示不篩選 */
 	categoryId: string;
 }
 
-/** 全部商品分類的識別值 / Identifier for the unfiltered category */
+/** 全部商品分類共用的識別值，代表不篩選 */
 export const CATEGORY_ALL = 'all';
 
-/** 購物車單筆 / One cart line */
+/** 購物車單筆 */
 export interface ICartLine
 {
-	/** 道具編號 / Item number */
+	/** 道具編號 */
 	no: number;
-	/** 數量 / Quantity */
+	/** 數量 */
 	quantity: number;
 }
 
-/** 購物車狀態 / Cart state */
+/** 購物車狀態 */
 export interface ICartState
 {
-	/** 明細 / Lines */
+	/** 明細 */
 	lines: readonly ICartLine[];
 }

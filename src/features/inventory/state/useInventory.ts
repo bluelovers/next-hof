@@ -4,7 +4,7 @@
 import { useContext } from 'react';
 import { InventoryContext, type IInventoryContextValue } from './InventoryProvider';
 
-/** 取得道具箱狀態與操作，未掛 Provider 時丟出明確錯誤 / Access inventory context; throws when the provider is missing */
+/** 取得道具箱狀態與操作，未掛 Provider 時丟出明確錯誤 */
 export function useInventory(): IInventoryContextValue
 {
 	const value = useContext(InventoryContext);

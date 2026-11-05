@@ -9,28 +9,27 @@ import { getCharSpriteUrl } from '#/src/lib/showcase/sprite-map';
 import { DEFAULT_ITEM_IMAGE_BASE_URL } from '#/src/features/shared/domain/item-catalog';
 import { EnumShopSortKey, type IShopConfig } from '#/src/features/shop/domain/types';
 
-/** 商店場景背景圖，取用專案既有資源 / Shop scene background from an existing project asset */
+/** 商店場景背景圖，取用專案既有資源 */
 export const SHOP_SCENE_BACKGROUND_URL = '/image/land/768x320/00050-img-768x320-001808-krea2turboPrismoria_v10-a1b351fc.png';
 
-/** 預設商店主人的角色編號，精靈圖由既有對應表解析 / Default owner char number resolved via the existing sprite map */
+/** 預設商店主人的角色編號，精靈圖由既有對應表解析 */
 export const SHOP_OWNER_CHAR_NO = 101;
 
-/** 建立預設組態，可覆寫最上層欄位 / Build the default config with top-level overrides */
+/** 建立預設組態，可覆寫最上層欄位 */
 export function createShopConfig(overrides: Partial<IShopConfig> = {}): IShopConfig
 {
 	const base: IShopConfig = {
 		owner: {
 			name: '店主',
-			spriteUrl: getCharSpriteUrl(SHOP_OWNER_CHAR_NO),
 			greeting: '歡迎光臨，隨便看看。',
-			spriteVariant: EnumSpriteVariant.Boxed,
-			spriteSize: EnumSpriteSize.Large,
+			sprite: {
+				url: getCharSpriteUrl(SHOP_OWNER_CHAR_NO),
+				variant: EnumSpriteVariant.Boxed,
+				size: EnumSpriteSize.Large,
+			},
 		},
 		scene: {
 			backgroundImageUrl: SHOP_SCENE_BACKGROUND_URL,
-			width: 480,
-			height: 200,
-			bgSize: { width: 480, height: 200 },
 		},
 		pricing: {
 			sellRate: SELLING_PRICE,
@@ -107,5 +106,5 @@ export function createShopConfig(overrides: Partial<IShopConfig> = {}): IShopCon
 	return { ...base, ...overrides };
 }
 
-/** 預設組態實例 / Default config instance */
+/** 預設組態實例 */
 export const DEFAULT_SHOP_CONFIG: IShopConfig = createShopConfig();

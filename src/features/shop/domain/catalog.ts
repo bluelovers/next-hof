@@ -3,21 +3,21 @@ import type { IItemDef } from '#/src/lib/types/item-types';
 import { CATEGORY_ALL, EnumShopSortKey, type ICatalogQuery, type IShopConfig } from './types';
 import { getBuyPrice } from './pricing';
 
-/** 判斷道具是否命中搜尋字串，比對名稱、編號與類型 / Match search text against name, number and type */
+/** 判斷道具是否命中搜尋字串，比對名稱、編號與類型 */
 function matchesSearch(item: IItemDef, needle: string): boolean
 {
 	if (!needle) return true;
 	return `${item.name} ${item.no} ${item.type}`.toLowerCase().includes(needle);
 }
 
-/** 找出目前分類允許的類型，'all' 回 undefined 表示不篩選 / Resolve allowed types; undefined means no filtering */
+/** 找出目前分類允許的類型，'all' 回 undefined 表示不篩選 */
 function allowedTypes(config: IShopConfig, categoryId: string): readonly string[] | undefined
 {
 	if (categoryId === CATEGORY_ALL) return undefined;
 	return config.categories.find((category) => category.id === categoryId)?.types;
 }
 
-/** 依排序鍵比較兩筆道具 / Compare two items under a sort key */
+/** 依排序鍵比較兩筆道具 */
 function compareItems(a: IItemDef, b: IItemDef, sort: EnumShopSortKey): number
 {
 	switch (sort)

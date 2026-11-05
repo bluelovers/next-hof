@@ -9,7 +9,7 @@ import { ShopContext, type IShopContextValue } from './ShopProvider';
 import type { IShopConfig } from '#/src/features/shop/domain/types';
 import { getBuyPrice, getSellPrice } from '#/src/features/shop/domain/pricing';
 
-/** 取得商店設定 / Access the injected shop configuration */
+/** 取得商店設定 */
 export function useShopConfig(): IShopConfig
 {
 	const config = useContext(ShopConfigContext);
@@ -22,7 +22,7 @@ export function useShopConfig(): IShopConfig
 	return config;
 }
 
-/** 取得商店作用域狀態與動作 / Access shop-scoped state and actions */
+/** 取得商店作用域狀態與動作 */
 export function useShop(): IShopContextValue
 {
 	const value = useContext(ShopContext);
@@ -35,7 +35,7 @@ export function useShop(): IShopContextValue
 	return value;
 }
 
-/** 買價與賣價解析器，賣出係數來自設定 / Buy and sell price resolvers; the sell rate comes from config */
+/** 買價與賣價解析器，賣出係數來自設定 */
 export function usePriceResolvers(): {
 	buyPriceOf: (item: IItemDef) => number;
 	sellPriceOf: (item: IItemDef) => number;
@@ -49,7 +49,7 @@ export function usePriceResolvers(): {
 	}), [config.pricing.sellRate]);
 }
 
-/** 把交易錯誤轉成設定中的文案 / Map a trade error to the configured label */
+/** 把交易錯誤轉成設定中的文案 */
 export function useTradeErrorLabel(): (error?: EnumTradeError) => string | undefined
 {
 	const config = useShopConfig();

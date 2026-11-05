@@ -1,0 +1,23 @@
+/**
+ * 商品列表版面；色彩取自共用 Design Token 並提供備援值 (Fallback)。
+ */
+@use '../../../shared/styles/mixins' as *;
+
+.catalog-grid
+{
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: 8px;
+	@include list-reset;
+	margin: 10px 0 0;
+}
+
+.catalog-grid__empty
+{
+	margin: 10px 0;
+	padding: 16px;
+	@include panel-surface;
+	@include panel-typography;
+	color: var(--color-text-dim, #{$color-text-dim});
+	text-align: center;
+}

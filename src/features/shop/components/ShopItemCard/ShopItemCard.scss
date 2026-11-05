@@ -1,0 +1,56 @@
+/**
+ * 商品卡版面；色彩取自共用 Design Token 並提供備援值 (Fallback)。
+ */
+@use '../../../shared/styles/mixins' as *;
+
+.shop-item-card
+{
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 8px;
+	@include panel-chrome;
+}
+
+.shop-item-card__body
+{
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.shop-item-card__name
+{
+	@include text-ellipsis;
+}
+
+.shop-item-card__type,
+.shop-item-card__owned
+{
+	font-size: 0.8em;
+	color: var(--color-text-secondary, #{$color-text-secondary});
+}
+
+.shop-item-card__price
+{
+	font-size: 0.9em;
+	color: var(--color-accent-gold-bright, #{$color-accent-gold-bright});
+}
+
+.shop-item-card__add
+{
+	flex: none;
+	@include control(
+		6px 10px,
+		var(--color-accent-gold, #{$color-accent-gold}),
+		var(--color-accent-gold-bright, #{$color-accent-gold-bright})
+	);
+}
+
+.shop-item-card__add:hover
+{
+	background: var(--color-accent-gold, #{$color-accent-gold});
+	color: var(--color-bg-page, #{$color-bg-page});
+}

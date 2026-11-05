@@ -5,10 +5,10 @@ import React from 'react';
 import { ItemIcon } from '#/src/features/shared/components/ItemIcon/ItemIcon';
 import { useShop, useShopConfig, usePriceResolvers, useTradeErrorLabel } from '#/src/features/shop/state/useShop';
 import { useInventory } from '#/src/features/inventory/state/useInventory';
-import { cartSubtotal } from '#/src/features/shop/domain/cart';
-import './CartPanel.css';
+import { cartLineTotal, cartSubtotal } from '#/src/features/shop/domain/cart';
+import './CartPanel.scss';
 
-/** 暫存購物車面板 / Temporary cart panel */
+/** 暫存購物車面板 */
 export const CartPanel: React.FC = () =>
 {
 	const { cart, setQuantity, remove, clear, checkout, lastError } = useShop();
@@ -39,7 +39,7 @@ export const CartPanel: React.FC = () =>
 						{
 							const item = resolveItem(line.no);
 							const name = item?.name ?? `#${line.no}`;
-							const lineTotal = item ? buyPriceOf(item) * line.quantity : 0;
+							const lineTotal = cartLineTotal(line, item, buyPriceOf);
 
 							return (
 								<li key={line.no} className="cart-line">

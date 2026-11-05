@@ -19,32 +19,32 @@ import {
 import { buildPurchase } from '#/src/features/shop/domain/transactions';
 import { getBuyPrice } from '#/src/features/shop/domain/pricing';
 
-/** Provider 對外值 / Public context value */
+/** Provider 對外值 */
 export interface IShopContextValue
 {
-	/** 暫存購物車 / Temporary cart */
+	/** 暫存購物車 */
 	cart: ICartState;
-	/** 目錄查詢條件 / Catalog query */
+	/** 目錄查詢條件 */
 	query: ICatalogQuery;
-	/** 最近一次失敗原因 / Latest trade failure */
+	/** 最近一次失敗原因 */
 	lastError?: EnumTradeError;
-	/** 更新查詢 / Update the query */
+	/** 更新查詢 */
 	setQuery(next: ICatalogQuery): void;
-	/** 加入購物車 / Add to cart */
+	/** 加入購物車 */
 	add(no: number, quantity?: number): void;
-	/** 設定數量 / Set a line quantity */
+	/** 設定數量 */
 	setQuantity(no: number, quantity: number): void;
-	/** 移除單筆 / Remove a line */
+	/** 移除單筆 */
 	remove(no: number): void;
-	/** 清空購物車 / Clear the cart */
+	/** 清空購物車 */
 	clear(): void;
-	/** 結帳並回傳命令結果 / Checkout; returns the command result */
+	/** 結帳並回傳命令結果 */
 	checkout(): ICommandResult;
 }
 
 export const ShopContext = createContext<IShopContextValue | null>(null);
 
-/** 商店作用域狀態容器 / Shop-scoped state provider */
+/** 商店作用域狀態容器 */
 export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 {
 	/** 購物車與查詢條件隨此 Provider 卸載而消失，不需額外清理邏輯 */

@@ -1,0 +1,34 @@
+/**
+ * Design Token 的 SCSS 備援值 (Fallback)。
+ * 與 src/components/shared/SharedBase.css 的 :root 定義保持一致（SCSS 編譯期無法讀取
+ * CSS Custom Property，故此處各值即為 var() 備援值，兩者需同步維護）。
+ * 元件一律以 var(--token, <此處值>) 引用：執行期已定義 Custom Property 時以其為準。
+ */
+
+/* ---- 字型 ---- */
+$font-primary: 'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif;
+
+/* ---- 背景 ---- */
+$color-bg-page: #10151b;
+$color-bg-surface: #1b222c;
+$color-bg-mid: #304052;
+
+/* ---- 文字 ---- */
+$color-text-primary: #bdc8d7;
+$color-text-secondary: #8a9cb7;
+$color-text-dim: #5a708f;
+
+/* ---- 邊框 ---- */
+$color-border-mid: #334357;
+$color-border-heading: #cad3df;
+
+/* ---- 強調 ---- */
+$color-accent-gold: #c69500;
+$color-accent-gold-bright: #ffcc33;
+
+/* ---- 屬性色 ---- */
+$color-dmg: #cc3300;
+
+/* ---- 頁面容器 ---- */
+$page-max-width: 780px;
+$page-min-width: 505px;

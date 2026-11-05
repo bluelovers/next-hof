@@ -5,17 +5,17 @@
 import type { IItemDef } from '#/src/lib/types/item-types';
 import type { IResourceId } from '#/src/lib/types/seg-types';
 
-/** 單筆道具讀取器合約，與 loadItemYaml 簽章一致 / Single-item loader contract matching loadItemYaml */
+/** 單筆道具讀取器合約，與 loadItemYaml 簽章一致 */
 export type IShopItemLoader = (id: IResourceId, root: string) => IItemDef | undefined;
 
-/** 轉接層輸入 / Adapter input */
+/** 轉接層輸入 */
 export interface ILoadShopCatalogInput
 {
-	/** 道具讀取器 / Item loader */
+	/** 道具讀取器 */
 	loadItem: IShopItemLoader;
-	/** 資源根目錄 / Resource root */
+	/** 資源根目錄 */
 	root: string;
-	/** 上架道具編號 / Item numbers to load */
+	/** 上架道具編號 */
 	ids: readonly IResourceId[];
 }
 

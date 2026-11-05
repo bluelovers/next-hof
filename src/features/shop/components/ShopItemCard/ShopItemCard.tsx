@@ -7,18 +7,18 @@ import { ItemIcon } from '#/src/features/shared/components/ItemIcon/ItemIcon';
 import { useShop, useShopConfig, usePriceResolvers } from '#/src/features/shop/state/useShop';
 import { useInventory } from '#/src/features/inventory/state/useInventory';
 import { countOf } from '#/src/features/inventory/domain/inventory';
-import './ShopItemCard.css';
+import './ShopItemCard.scss';
 
-/** 商品卡 props / Item card props */
+/** 商品卡 props */
 export interface IShopItemCardProps
 {
-	/** 商品定義 / Item definition */
+	/** 商品定義 */
 	item: IItemDef;
-	/** 圖示 URL / Icon URL */
+	/** 圖示 URL */
 	iconUrl?: string;
 }
 
-/** 商品卡 / Item card */
+/** 商品卡 */
 export const ShopItemCard: React.FC<IShopItemCardProps> = ({ item, iconUrl }) =>
 {
 	const { add } = useShop();

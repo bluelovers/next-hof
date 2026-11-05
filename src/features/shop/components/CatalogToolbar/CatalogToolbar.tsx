@@ -4,9 +4,9 @@
 import React from 'react';
 import { useShop, useShopConfig } from '#/src/features/shop/state/useShop';
 import { CATEGORY_ALL, EnumShopSortKey } from '#/src/features/shop/domain/types';
-import './CatalogToolbar.css';
+import './CatalogToolbar.scss';
 
-/** 商品工具列 / Catalog toolbar */
+/** 商品工具列 */
 export const CatalogToolbar: React.FC = () =>
 {
 	const { query, setQuery } = useShop();

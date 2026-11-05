@@ -1,16 +1,17 @@
 /** 交易命令結果的建構與套用，是道具箱系統唯一會改變狀態的地方。 */
 import type { ICommandResult, IInventoryMutation, IInventorySnapshot, EnumTradeError } from './types';
+import { createWallet } from './wallet';
 
-/** 空異動，失敗結果與無動作共用 / Shared no-op mutation for failed results */
+/** 空異動，失敗結果與無動作共用 */
 export const EMPTY_MUTATION: IInventoryMutation = { goldDelta: 0, itemDeltas: [] };
 
-/** 建立成功結果 / Build a successful command result */
+/** 建立成功結果 */
 export function commandOk(mutation: IInventoryMutation): ICommandResult
 {
 	return { ok: true, mutation };
 }
 
-/** 建立失敗結果，固定攜帶空異動 / Build a failed command result carrying the no-op mutation */
+/** 建立失敗結果，固定攜帶空異動 */
 export function commandFail(reason: EnumTradeError): ICommandResult
 {
 	return { ok: false, reason, mutation: EMPTY_MUTATION };
@@ -18,7 +19,7 @@ export function commandFail(reason: EnumTradeError): ICommandResult
 
 /**
  * 把異動套用到快照並回傳新快照。
- * 數量收斂為正數後才保留，避免 0 或負數持有列殘留；持有金同樣不為負。
+ * 數量收斂為正數後才保留，避免 0 或負數持有列殘留；持有金收斂為非負整數。
  */
 export function applyMutation(snapshot: IInventorySnapshot, mutation: IInventoryMutation): IInventorySnapshot
 {
@@ -39,7 +40,7 @@ export function applyMutation(snapshot: IInventorySnapshot, mutation: IInventory
 	}
 
 	return {
-		wallet: { gold: Math.max(0, snapshot.wallet.gold + mutation.goldDelta) },
+		wallet: createWallet(snapshot.wallet.gold + mutation.goldDelta),
 		inventory: { quantities },
 	};
 }

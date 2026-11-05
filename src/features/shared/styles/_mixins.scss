@@ -1,0 +1,95 @@
+/**
+ * features 元件共用的樣式 (Mixin)。
+ * 只收斂重複的規則結構；色值一律經 tokens 的 var(--token, 備援值) 取得，
+ * 不在此寫死任何顏色。
+ * 同時 @forward tokens，讓呼叫端只需一行 @use 即可取得 mixin 與其依賴的色票變數。
+ */
+@forward 'tokens';
+@use 'tokens' as *;
+
+/* 面板字型與前景色 (Panel typography) */
+@mixin panel-typography
+{
+	font-family: var(--font-primary, #{$font-primary});
+	color: var(--color-text-primary, #{$color-text-primary});
+}
+
+/* 面板外框與底色 (Panel surface) */
+@mixin panel-surface
+{
+	border: 1px solid var(--color-border-mid, #{$color-border-mid});
+	background: var(--color-bg-surface, #{$color-bg-surface});
+}
+
+/* 面板完整外觀：外框＋底色＋字型＋前景色 (Panel chrome) */
+@mixin panel-chrome
+{
+	@include panel-surface;
+	@include panel-typography;
+}
+
+/* 面板標題列 (Panel heading) */
+@mixin panel-heading
+{
+	margin: 0;
+	font-size: 1em;
+	color: var(--color-accent-gold-bright, #{$color-accent-gold-bright});
+}
+
+/* 面板訊息列，空態與錯誤共用 (Panel message) */
+@mixin panel-message
+{
+	margin: 0;
+	padding: 10px;
+	font-size: 0.9em;
+}
+
+/* 清單重置 (List reset) */
+@mixin list-reset
+{
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* 可捲動清單 (Scrollable list) */
+@mixin scrollable-list($max-height)
+{
+	@include list-reset;
+	max-height: $max-height;
+	overflow-y: auto;
+}
+
+/* 清單列：購物車行與道具箱列共用，間距因列而異 (List row) */
+@mixin list-row($gap)
+{
+	display: flex;
+	align-items: center;
+	gap: $gap;
+	padding: 6px 8px;
+	border-bottom: 1px solid var(--color-border-mid, #{$color-border-mid});
+}
+
+/* 單行省略 (Single-line ellipsis) */
+@mixin text-ellipsis
+{
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* 控制按鈕：預設外框與文字色，各呼叫端只覆寫相異部分 (Control button) */
+@mixin control(
+	$padding,
+	$border-color: var(--color-border-mid, #{$color-border-mid}),
+	$color: var(--color-text-primary, #{$color-text-primary})
+)
+{
+	padding: $padding;
+	border: 1px solid $border-color;
+	background: var(--color-bg-mid, #{$color-bg-mid});
+	color: $color;
+	font-family: inherit;
+	font-size: 0.85em;
+	cursor: pointer;
+}

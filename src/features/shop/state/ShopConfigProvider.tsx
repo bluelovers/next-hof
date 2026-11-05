@@ -6,15 +6,15 @@ import type { IShopConfig } from '#/src/features/shop/domain/types';
 
 export const ShopConfigContext = createContext<IShopConfig | null>(null);
 
-/** Provider props */
+/** Provider 的注入 props */
 export interface IShopConfigProviderProps
 {
-	/** 商店設定 / Shop configuration */
+	/** 商店設定 */
 	config: IShopConfig;
-	/** 子樹 / Children */
+	/** 子樹 */
 	children: ReactNode;
 }
 
-/** 商店設定容器 / Shop configuration provider */
+/** 商店設定容器 */
 export const ShopConfigProvider: React.FC<IShopConfigProviderProps> = ({ config, children }) =>
 	<ShopConfigContext.Provider value={config}>{children}</ShopConfigContext.Provider>;

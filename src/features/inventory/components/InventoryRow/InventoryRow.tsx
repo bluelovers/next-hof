@@ -2,9 +2,9 @@
 import React from 'react';
 import { ItemIcon } from '#/src/features/shared/components/ItemIcon/ItemIcon';
 import type { IInventoryEntry } from '#/src/features/inventory/domain/types';
-import './InventoryRow.css';
+import './InventoryRow.scss';
 
-/** 單列文案 / Row copy */
+/** 單列文案 */
 export interface IInventoryRowLabels
 {
 	owned: string;
@@ -13,26 +13,26 @@ export interface IInventoryRowLabels
 	discard: string;
 }
 
-/** 單列 props / Row props */
+/** 單列 props */
 export interface IInventoryRowProps
 {
-	/** 該列資料 / Row data */
+	/** 該列資料 */
 	entry: IInventoryEntry;
-	/** 圖示 URL / Icon URL */
+	/** 圖示 URL */
 	iconUrl?: string;
-	/** 售出單價 / Unit sell price */
+	/** 售出單價 */
 	sellPrice: number;
-	/** 幣值標籤 / Currency label */
+	/** 幣值標籤 */
 	currencyLabel: string;
-	/** 文案 / Copy */
+	/** 文案 */
 	labels: IInventoryRowLabels;
-	/** 售出回呼 / Sell callback */
+	/** 售出回呼 */
 	onSell(): void;
-	/** 拋棄回呼 / Discard callback */
+	/** 拋棄回呼 */
 	onDiscard(): void;
 }
 
-/** 道具箱單列 / Inventory row */
+/** 道具箱單列 */
 export const InventoryRow: React.FC<IInventoryRowProps> = ({
 	entry,
 	iconUrl,

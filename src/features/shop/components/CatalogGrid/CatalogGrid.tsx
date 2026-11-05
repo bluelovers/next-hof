@@ -6,9 +6,9 @@ import { useShop, useShopConfig } from '#/src/features/shop/state/useShop';
 import { useInventory } from '#/src/features/inventory/state/useInventory';
 import { queryCatalog } from '#/src/features/shop/domain/catalog';
 import { ShopItemCard } from '#/src/features/shop/components/ShopItemCard/ShopItemCard';
-import './CatalogGrid.css';
+import './CatalogGrid.scss';
 
-/** 商品列表 / Catalog grid */
+/** 商品列表 */
 export const CatalogGrid: React.FC = () =>
 {
 	const { query } = useShop();

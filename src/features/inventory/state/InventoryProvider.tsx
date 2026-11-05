@@ -10,44 +10,44 @@ import { createWallet } from '#/src/features/inventory/domain/wallet';
 import { createInventory } from '#/src/features/inventory/domain/inventory';
 import type { ICommandResult, IInventorySnapshot } from '#/src/features/inventory/domain/types';
 
-/** Provider 對外值 / Public context value */
+/** Provider 對外值 */
 export interface IInventoryContextValue
 {
-	/** 目前快照 / Current snapshot */
+	/** 目前快照 */
 	snapshot: IInventorySnapshot;
-	/** 道具目錄 / Item catalog */
+	/** 道具目錄 */
 	catalog: IItemCatalog;
-	/** 依編號解析定義 / Resolve an item definition */
+	/** 依編號解析定義 */
 	resolveItem(no: number): IItemDef | undefined;
-	/** 套用交易命令，回傳是否成立 / Apply a command result; returns whether it succeeded */
+	/** 套用交易命令，回傳是否成立 */
 	apply(result: ICommandResult): boolean;
 }
 
 export const InventoryContext = createContext<IInventoryContextValue | null>(null);
 
-/** Provider props */
+/** Provider 的注入 props */
 export interface IInventoryProviderProps
 {
-	/** 道具目錄 / Item catalog */
+	/** 道具目錄 */
 	catalog?: IItemCatalog;
-	/** 起始持有金 / Starting gold */
+	/** 起始持有金 */
 	initialGold?: number;
-	/** 起始持有道具 / Starting items */
+	/** 起始持有道具 */
 	initialItems?: Readonly<Record<number, number>>;
-	/** 子樹 / Children */
+	/** 子樹 */
 	children: ReactNode;
 }
 
-/** reducer 動作 / Reducer action */
+/** reducer 動作 */
 type IInventoryAction = { type: 'apply'; mutation: ICommandResult['mutation'] };
 
-/** 狀態轉換：唯一的可變點 / The single mutable transition */
+/** 狀態轉換：唯一的可變點 */
 function reducer(state: IInventorySnapshot, action: IInventoryAction): IInventorySnapshot
 {
 	return applyMutation(state, action.mutation);
 }
 
-/** 建立初始快照 / Build the initial snapshot */
+/** 建立初始快照 */
 function createInitialSnapshot(initialGold: number, initialItems: Readonly<Record<number, number>>): IInventorySnapshot
 {
 	return {
@@ -56,7 +56,7 @@ function createInitialSnapshot(initialGold: number, initialItems: Readonly<Recor
 	};
 }
 
-/** 道具箱狀態容器 / Inventory state provider */
+/** 道具箱狀態容器 */
 export const InventoryProvider: React.FC<IInventoryProviderProps> = ({
 	catalog = EMPTY_ITEM_CATALOG,
 	initialGold = START_MONEY,

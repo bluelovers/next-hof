@@ -1,0 +1,53 @@
+/**
+ * 道具箱面板版面；色彩取自共用 Design Token 並提供備援值 (Fallback)。
+ */
+@use '../../../shared/styles/mixins' as *;
+
+.inventory-panel
+{
+	display: flex;
+	flex-direction: column;
+	@include panel-chrome;
+}
+
+.inventory-panel__header
+{
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 8px 10px;
+	border-bottom: 1px solid var(--color-border-heading, #{$color-border-heading});
+}
+
+.inventory-panel__header h3
+{
+	@include panel-heading;
+}
+
+.inventory-panel__gold
+{
+	font-size: 0.9em;
+	color: var(--color-accent-gold, #{$color-accent-gold});
+}
+
+.inventory-panel__list
+{
+	@include scrollable-list(260px);
+}
+
+.inventory-panel__empty,
+.inventory-panel__error
+{
+	@include panel-message;
+}
+
+.inventory-panel__empty
+{
+	color: var(--color-text-dim, #{$color-text-dim});
+}
+
+.inventory-panel__error
+{
+	color: var(--color-dmg, #{$color-dmg});
+}

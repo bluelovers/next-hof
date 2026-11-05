@@ -10,18 +10,18 @@ import { ShopProvider } from '#/src/features/shop/state/ShopProvider';
 import { InventoryProvider } from '#/src/features/inventory/state/InventoryProvider';
 import { ShopContent } from '#/src/features/shop/components/ShopContent/ShopContent';
 import type { IShopConfig } from '#/src/features/shop/domain/types';
-import './ShopPageView.css';
+import './ShopPageView.scss';
 
-/** 頁面 props / Page props */
+/** 頁面 props */
 export interface IShopPageViewProps
 {
-	/** 由 Server Component 載入的商品定義 / Item definitions loaded by the server component */
+	/** 由 Server Component 載入的商品定義 */
 	items: readonly IItemDef[];
-	/** 可替換的商店設定 / Replaceable shop configuration */
+	/** 可替換的商店設定 */
 	config?: IShopConfig;
 }
 
-/** 商店頁面 / Shop page view */
+/** 商店頁面 */
 export const ShopPageView: React.FC<IShopPageViewProps> = ({ items, config = DEFAULT_SHOP_CONFIG }) =>
 {
 	/** 目錄只建立一次，圖示基底路徑來自設定而非寫死在元件 */

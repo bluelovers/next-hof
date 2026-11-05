@@ -4,31 +4,31 @@
  */
 import type { IItemDef } from '#/src/lib/types/item-types';
 
-/** 圖示基底路徑預設值，可由組裝端覆寫 / Default image base, overridable at composition time */
+/** 圖示基底路徑預設值，可由組裝端覆寫 */
 export const DEFAULT_ITEM_IMAGE_BASE_URL = '/image/icon/item/';
 
-/** 道具目錄對外合約 / Public contract of an item catalog */
+/** 道具目錄對外合約 */
 export interface IItemCatalog
 {
-	/** 全部道具定義 / All item definitions */
+	/** 全部道具定義 */
 	readonly items: readonly IItemDef[];
-	/** 依編號取得定義 / Resolve a definition by item number */
+	/** 依編號取得定義 */
 	getItem(no: number): IItemDef | undefined;
-	/** 依編號取得可顯示的圖示 URL，缺圖回 undefined / Resolve a displayable icon URL (undefined when absent) */
+	/** 依編號取得可顯示的圖示 URL，缺圖回 undefined */
 	getImageUrl(no: number): string | undefined;
 }
 
-/** 建立目錄時的環境設定 / Environment options when creating a catalog */
+/** 建立目錄時的環境設定 */
 export interface IItemCatalogOptions
 {
-	/** 圖示基底路徑，接在 IItemDef.img 之前 / Base URL prepended to IItemDef.img */
+	/** 圖示基底路徑，接在 IItemDef.img 之前 */
 	imageBaseUrl?: string;
 }
 
 /** 圖示副檔名：YAML 的 img 欄位不含副檔名，實體檔案皆為 /png */
 const IMAGE_EXTENSION = '.png';
 
-/** 檔名是否已帶副檔名（含 . 的最後一段視為副檔名）/ Whether the file name already carries an extension */
+/** 檔名是否已帶副檔名（含 . 的最後一段視為副檔名） */
 function hasExtension(file: string): boolean
 {
 	const lastSegment = file.split('/').pop() ?? file;
@@ -68,5 +68,5 @@ export function createItemCatalog(items: readonly IItemDef[], options: IItemCata
 	};
 }
 
-/** 空目錄，供資料尚未載入時安全渲染 / Empty catalog for safe rendering before data is loaded */
+/** 空目錄，供資料尚未載入時安全渲染 */
 export const EMPTY_ITEM_CATALOG: IItemCatalog = createItemCatalog([]);

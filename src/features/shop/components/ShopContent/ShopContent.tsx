@@ -9,9 +9,9 @@ import { ShopHeader } from '#/src/features/shop/components/ShopHeader/ShopHeader
 import { CatalogToolbar } from '#/src/features/shop/components/CatalogToolbar/CatalogToolbar';
 import { CatalogGrid } from '#/src/features/shop/components/CatalogGrid/CatalogGrid';
 import { CartPanel } from '#/src/features/shop/components/CartPanel/CartPanel';
-import './ShopContent.css';
+import './ShopContent.scss';
 
-/** 商店內容 / Shop content */
+/** 商店內容 */
 export const ShopContent: React.FC = () =>
 {
 	const config = useShopConfig();

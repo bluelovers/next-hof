@@ -1,0 +1,111 @@
+/**
+ * 暫存購物車面板版面；色彩取自共用 Design Token 並提供備援值 (Fallback)。
+ */
+@use '../../../shared/styles/mixins' as *;
+
+.cart-panel
+{
+	display: flex;
+	flex-direction: column;
+	@include panel-chrome;
+}
+
+.cart-panel__header
+{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 8px 10px;
+	border-bottom: 1px solid var(--color-border-heading, #{$color-border-heading});
+}
+
+.cart-panel__header h3
+{
+	@include panel-heading;
+}
+
+.cart-panel__clear,
+.cart-panel__checkout,
+.cart-line__controls button,
+.cart-line__remove
+{
+	@include control(3px 8px);
+}
+
+.cart-panel__checkout
+{
+	border-color: var(--color-accent-gold, #{$color-accent-gold});
+	color: var(--color-accent-gold-bright, #{$color-accent-gold-bright});
+}
+
+.cart-panel__clear:disabled,
+.cart-panel__checkout:disabled
+{
+	opacity: 0.45;
+	cursor: default;
+}
+
+.cart-panel__list
+{
+	@include scrollable-list(240px);
+}
+
+.cart-line
+{
+	@include list-row(6px);
+}
+
+.cart-line__name
+{
+	flex: 1 1 auto;
+	min-width: 0;
+	@include text-ellipsis;
+}
+
+.cart-line__total
+{
+	flex: none;
+	font-size: 0.85em;
+	color: var(--color-accent-gold, #{$color-accent-gold});
+}
+
+.cart-line__controls
+{
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	flex: none;
+}
+
+.cart-line__qty
+{
+	min-width: 1.5em;
+	text-align: center;
+}
+
+.cart-panel__empty,
+.cart-panel__error
+{
+	@include panel-message;
+}
+
+.cart-panel__empty
+{
+	color: var(--color-text-dim, #{$color-text-dim});
+}
+
+.cart-panel__error
+{
+	color: var(--color-dmg, #{$color-dmg});
+}
+
+.cart-panel__footer
+{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 8px 10px;
+	border-top: 1px solid var(--color-border-heading, #{$color-border-heading});
+	color: var(--color-accent-gold-bright, #{$color-accent-gold-bright});
+}

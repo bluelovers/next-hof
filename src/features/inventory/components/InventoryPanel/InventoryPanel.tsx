@@ -6,38 +6,38 @@ import type { EnumTradeError, ICommandResult } from '#/src/features/inventory/do
 import { useInventory } from '#/src/features/inventory/state/useInventory';
 import { buildDiscard, buildSell } from '#/src/features/inventory/domain/commands';
 import { listOwned } from '#/src/features/inventory/domain/inventory';
-import { InventoryRow } from '#/src/features/inventory/components/InventoryRow/InventoryRow';
-import './InventoryPanel.css';
+import { InventoryRow, type IInventoryRowLabels } from '#/src/features/inventory/components/InventoryRow/InventoryRow';
+import './InventoryPanel.scss';
 
-/** 面板文案 / Panel copy */
-export interface IInventoryPanelLabels
+/** 面板文案：在單列文案之外，另有面板層級的標題、空態、持有金與交易失敗訊息 */
+export interface IInventoryPanelLabels extends IInventoryRowLabels
 {
+	/** 面板標題 */
 	title: string;
+	/** 空態文案 */
 	empty: string;
-	owned: string;
-	sellPrice: string;
-	sell: string;
-	discard: string;
+	/** 持有金標籤 */
 	gold: string;
+	/** 交易失敗訊息 */
 	tradeFailed: string;
 }
 
-/** 面板 props：資料與文案全由外部注入，讓道具箱可脫離商店單獨使用 / Panel props: data and copy are injected so the panel works without a shop */
+/** 面板 props：資料與文案全由外部注入，讓道具箱可脫離商店單獨使用 */
 export interface IInventoryPanelProps
 {
-	/** 售出單價解析器 / Unit sell-price resolver */
+	/** 售出單價解析器 */
 	sellPriceOf: (no: number) => number;
-	/** 幣值標籤 / Currency label */
+	/** 幣值標籤 */
 	currencyLabel: string;
-	/** 圖示 URL 解析器 / Icon URL resolver */
+	/** 圖示 URL 解析器 */
 	iconUrlOf: (no: number) => string | undefined;
-	/** 文案 / Copy */
+	/** 文案 */
 	labels: IInventoryPanelLabels;
-	/** 錯誤訊息解析，省略時顯示通用失敗文案 / Error label resolver */
+	/** 錯誤訊息解析，省略時顯示通用失敗文案 */
 	errorLabelOf?: (error?: EnumTradeError) => string | undefined;
 }
 
-/** 道具箱面板 / Inventory panel */
+/** 道具箱面板 */
 export const InventoryPanel: React.FC<IInventoryPanelProps> = ({
 	sellPriceOf,
 	currencyLabel,

@@ -1,0 +1,25 @@
+/**
+ * 商店頁面容器：頁面級字體、寬度與標題，僅含佈局規則。
+ */
+@use '../../../shared/styles/tokens' as *;
+
+.shop-page
+{
+	box-sizing: border-box;
+	width: 100%;
+	max-width: var(--page-max-width, #{$page-max-width});
+	min-width: var(--page-min-width, #{$page-min-width});
+	margin: 0 auto;
+	padding: 16px;
+	font-family: var(--font-primary, #{$font-primary});
+	color: var(--color-text-primary, #{$color-text-primary});
+}
+
+.shop-page__title
+{
+	margin: 0 0 12px;
+	font-size: 1.4em;
+	color: var(--color-accent-gold-bright, #{$color-accent-gold-bright});
+	border-bottom: 1px solid var(--color-border-heading, #{$color-border-heading});
+	padding-bottom: 6px;
+}

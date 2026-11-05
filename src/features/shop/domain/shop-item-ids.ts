@@ -4,7 +4,7 @@
  */
 import type { IResourceId } from '#/src/lib/types/seg-types';
 
-/** 商店上架道具編號 / Item numbers offered by the shop */
+/** 商店上架道具編號 */
 export const SHOP_ITEM_IDS: readonly IResourceId[] = Object.freeze([
 	1002, 1003, 1004, 1100, 1101, 1200,
 	1700, 1701, 1702, 1703, 1800, 1801,

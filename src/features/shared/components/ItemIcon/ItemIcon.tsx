@@ -1,20 +1,20 @@
 /** 通用道具圖示：接受 URL，缺圖時以名稱首字佔位，不依賴任何資料來源。 */
 import React from 'react';
 import type { IStyleProps } from '#/src/components/shared/types';
-import './ItemIcon.css';
+import './ItemIcon.scss';
 
-/** 圖示元件 props / Icon props */
+/** 圖示元件 props */
 export interface IItemIconProps extends IStyleProps
 {
-	/** 圖示 URL，缺省時顯示佔位 / Icon URL; a placeholder is shown when absent */
+	/** 圖示 URL，缺省時顯示佔位 */
 	url?: string;
-	/** 道具名稱，用於 alt 與佔位文字 / Item name for alt text and placeholder */
+	/** 道具名稱，用於 alt 與佔位文字 */
 	name: string;
-	/** 邊長（px）/ Edge length in px */
+	/** 邊長（px） */
 	size?: number;
 }
 
-/** 道具圖示 / Item icon */
+/** 道具圖示 */
 export const ItemIcon: React.FC<IItemIconProps> = ({ url, name, size = 32, className = '', style }) =>
 {
 	const dimension = { width: size, height: size };

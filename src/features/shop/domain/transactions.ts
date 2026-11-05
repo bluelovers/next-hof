@@ -4,6 +4,7 @@ import type { ICommandResult, IInventorySnapshot, IPriceResolver } from '#/src/f
 import { EnumTradeError } from '#/src/features/inventory/domain/types';
 import { canAfford } from '#/src/features/inventory/domain/wallet';
 import { commandFail, commandOk } from '#/src/features/inventory/domain/mutation';
+import { cartLineTotal } from './cart';
 import type { ICartState } from './types';
 
 /**
@@ -39,7 +40,7 @@ export function buildPurchase(
 			return commandFail(line.quantity <= 0 ? EnumTradeError.InvalidQuantity : EnumTradeError.UnknownItem);
 		}
 
-		total += priceOf(item) * line.quantity;
+		total += cartLineTotal(line, item, priceOf);
 		itemDeltas.push({ no: line.no, delta: line.quantity });
 	}
 
