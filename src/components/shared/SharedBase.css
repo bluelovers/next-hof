@@ -1,43 +1,35 @@
 /**
- * 共享工具樣式（單一事實來源）
- * Shared utility styles (single source of truth)
- *
- * 跨頁面 / 跨元件共用的工具 class（bold、result、ttd*、divider*、charge…），
- * 統一集中於此基底檔，供 Battle 子元件與各頁面以 `#/` 別名直接匯入，
- * 避免元件反向依賴父頁面 CSS（AGENTS.md：禁止導入 ../pages/XXX.css）。
- * Cross-cutting utility classes (bold, result, ttd*, divider*, charge, …) live
- * here as one base file, imported directly via the `#/` alias by both Battle
- * sub-components and pages, so components no longer depend on parent-page CSS.
+ * Shared utility styles
  */
 
-/* ==================== CSS Custom Properties / 色票變數 ==================== */
+/* ==================== CSS Custom Properties ==================== */
 
 :root
 {
-	/* ---- 字型 / Typography ---- */
+	/* ---- 字型 ---- */
 	--font-primary: 'メイリオ', Meiryo, 'MS PGothic', Verdana, sans-serif;
 
-	/* ---- 背景 / Backgrounds ---- */
+	/* ---- 背景 ---- */
 	--color-bg-page: #10151b;
 	--color-bg-surface: #1b222c;
 	--color-bg-mid: #304052;
 
-	/* ---- 文字 / Text ---- */
+	/* ---- 文字 ---- */
 	--color-text-primary: #bdc8d7;
 	--color-text-secondary: #8a9cb7;
 	--color-text-hover: #cbd3df;
 	--color-text-dim: #5a708f;
 
-	/* ---- 邊框 / Borders ---- */
+	/* ---- 邊框 ---- */
 	--color-border-dark: #070b0e;
 	--color-border-mid: #334357;
 	--color-border-heading: #cad3df;
 
-	/* ---- 強調 / Accent ---- */
+	/* ---- 強調 ---- */
 	--color-accent-gold: #c69500;
 	--color-accent-gold-bright: #ffcc33;
 
-	/* ---- 特效 / Visual effects ---- */
+	/* ---- Visual effects ---- */
 
 	/* 精靈通用投影（BattleFieldSpriteLayers / MagicCircle / CharacterSprite 共用）
 	   兩層：深色下落陰影 + 亮色光暈（提高在深色背景上的辨識度）
@@ -45,7 +37,7 @@
 	   Two layers: dark offset shadow + a bright glow (improves contrast on the dark background). */
 	--sprite-drop-shadow: drop-shadow(2px 5px 1px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 1px rgba(189, 200, 215, 0.15));
 
-	/* ---- 屬性色 / Attribute colors ---- */
+	/* ---- Attribute colors ---- */
 	--color-dmg: #cc3300;
 	--color-dmg-glow: #e63d3d;
 	--color-recover: #3366ff;
@@ -59,26 +51,26 @@
 	--color-result: #66cc66;
 	--color-result-glow: #3c6237;
 
-	/* ---- 頁面容器 / Page container ---- */
+	/* ---- Page container ---- */
 	--page-max-width: 780px;
 	--page-min-width: 505px;
 }
 
-/* ==================== Clearfix / 清除浮動 ==================== */
+/* ==================== Clearfix ==================== */
 
 .clearfix
 {
 	clear: both;
 }
 
-/* ==================== Bold / 粗體 ==================== */
+/* ==================== Bold ==================== */
 
 .bold
 {
 	font-weight: bold;
 }
 
-/* ==================== Underline / 底線 ==================== */
+/* ==================== Underline ==================== */
 
 .u
 {
@@ -86,7 +78,7 @@
 	text-decoration-color: rgba(189, 200, 215, 0.38);
 }
 
-/* ==================== Battle 共享樣式 / Battle Shared Styles ==================== */
+/* ==================== Battle 共享樣式 ==================== */
 
 /* 這些樣式被多個 Battle 子元件使用，因此放在共享基底檔 */
 .ttd1
@@ -101,9 +93,7 @@
 }
 
 /* 區塊的水平分隔線（底／頂）。名稱刻意避開 CSS 的 break 屬性，
-   以免被誤讀為斷行／分頁語意。
-   Horizontal block divider (bottom / top). Deliberately avoids the CSS break
-   property so the name cannot be misread as a line/column break. */
+   以免被誤讀為斷行／分頁語意。 */
 .divider-bottom
 {
 	border-bottom: 1px solid var(--color-border-dark);
@@ -123,7 +113,7 @@
 
 /* ==================== BattleUnit 共享樣式 / BattleUnit Shared Styles ==================== */
 
-/* 單位容器 / Unit container */
+/* Unit container */
 .hpsp
 {
 	padding-left: 20px;
@@ -136,7 +126,7 @@
 	text-shadow: 0 0 0.2em #8F7;
 }
 
-/* ==================== 屬性色共用類別 / Shared Attribute Color Classes ==================== */
+/* ==================== 屬性色共用類別 ==================== */
 
 /* 這些類別被 BattleAction 與 SkillCard 共用，統一維護於此 */
 .dmg
@@ -157,14 +147,14 @@
 	text-shadow: 0 0 0.2em var(--color-support-glow);
 }
 
-/* SP 傷害與中毒（原始 basis.css 的 .spdmg）/ SP damage and poison (the .spdmg of the original basis.css) */
+/* SP 傷害與中毒（原始 basis.css 的 .spdmg） */
 .spdmg
 {
 	color: var(--color-spdmg);
 	text-shadow: 0 0 0.2em var(--color-spdmg-glow);
 }
 
-/* 升級（原始 basis.css 的 .levelup）/ Level up (the .levelup of the original basis.css) */
+/* 升級（原始 basis.css 的 .levelup） */
 .levelup
 {
 	font-weight: bold;
@@ -172,7 +162,7 @@
 	text-shadow: 0 0 0.2em var(--color-levelup-glow);
 }
 
-/* ==================== 導航連結共用類別 / Shared Nav Link Classes ==================== */
+/* ==================== 導航連結共用類別 ==================== */
 
 .game-link
 {
@@ -187,7 +177,7 @@
 	color: var(--color-text-hover);
 }
 
-/* ==================== 區塊標題共用類別 / Shared Section Heading ==================== */
+/* ==================== 區塊標題共用類別 ==================== */
 
 .section-heading
 {
@@ -198,7 +188,7 @@
 	display: block;
 }
 
-/* ==================== 頁面基底共用類別 / Shared Page Base ==================== */
+/* ==================== 頁面基底共用類別 ==================== */
 
 .page-base
 {
@@ -218,7 +208,7 @@
 	border-bottom: 1px solid var(--color-border-dark);
 }
 
-/* ==================== Footer 共用類別 / Shared Footer ==================== */
+/* ==================== Footer 共用類別 ==================== */
 
 .footer-base
 {
