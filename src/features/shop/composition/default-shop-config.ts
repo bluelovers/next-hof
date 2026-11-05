@@ -10,7 +10,7 @@ import { DEFAULT_ITEM_IMAGE_BASE_URL } from '#/src/features/shared/domain/item-c
 import { EnumShopSortKey, type IShopConfig } from '#/src/features/shop/domain/types';
 
 /** 商店場景背景圖，取用專案既有資源 / Shop scene background from an existing project asset */
-export const SHOP_SCENE_BACKGROUND_URL = '/image/carpet011.png';
+export const SHOP_SCENE_BACKGROUND_URL = '/image/land/768x320/00050-img-768x320-001808-krea2turboPrismoria_v10-a1b351fc.png';
 
 /** 預設商店主人的角色編號，精靈圖由既有對應表解析 / Default owner char number resolved via the existing sprite map */
 export const SHOP_OWNER_CHAR_NO = 101;
